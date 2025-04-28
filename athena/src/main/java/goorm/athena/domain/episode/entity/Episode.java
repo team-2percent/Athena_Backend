@@ -5,9 +5,7 @@ import lombok.*;
 
 @Entity
 @Getter
-@AllArgsConstructor
-@NoArgsConstructor
-@Builder
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Episode {
 
     @Id
@@ -34,4 +32,11 @@ public class Episode {
     @JoinColumn(name = "novel_id")
     private Novel novel;
     */
+
+    @Builder
+    public Episode(Long episodeId, String title, String content, int price) {
+        this.title = title;
+        this.content = content;
+        this.price = price;
+    }
 }
