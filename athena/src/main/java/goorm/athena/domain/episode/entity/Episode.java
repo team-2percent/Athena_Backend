@@ -27,6 +27,9 @@ public class Episode {
     @Column(name = "view_count", nullable = false)
     private Long viewCount = 0L;
 
+    @Column(nullable = false)
+    private int episodeNumber;
+
     /*
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "novel_id")
@@ -34,9 +37,10 @@ public class Episode {
     */
 
     @Builder
-    public Episode(Long episodeId, String title, String content, int price) {
+    public Episode(Long episodeId, String title, String content, int price, int episodeNumber) {
         this.title = title;
         this.content = content;
         this.price = price;
+        this.episodeNumber = episodeNumber;
     }
 }

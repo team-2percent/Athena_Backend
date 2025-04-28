@@ -5,6 +5,7 @@ import goorm.athena.domain.episode.dto.response.EpisodeGetResponse;
 import goorm.athena.domain.episode.entity.Episode;
 import goorm.athena.domain.episode.service.EpisodeService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,10 +15,6 @@ import org.springframework.web.bind.annotation.*;
 public class EpisodeController {
 
     private final EpisodeService episodeService;
-
-    public EpisodeController(EpisodeService episodeService) {
-        this.episodeService = episodeService;
-    }
 
     // 회차 조회
     @GetMapping("/{id}")
@@ -47,14 +44,16 @@ public class EpisodeController {
         episodeService.deleteEpisode(id);
         return ResponseEntity.noContent().build();
     }
-/*
-    // 회차 추가 (나중에 구현 예정)
+
+    // 회차 추가
     @PostMapping
     public ResponseEntity<Episode> addEpisode(@RequestBody EpisodeAddRequest request) {
+        episodeService.addEpisode(request.novelId(), request.title(), request.content(), request.price());
         // 생성 로직을 추가
-        return ResponseEntity.status(201).build();
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
+    /*
     // 회차 수정 (나중에 구현 예정)
     @PutMapping("/{id}")
     public ResponseEntity<Episode> updateEpisode(@PathVariable Long id, @RequestBody EpisodeAddRequest request) {

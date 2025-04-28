@@ -4,7 +4,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 public record EpisodeAddRequest(
-        @NotNull Long novel_id,
+        @NotNull Long novelId,
         @NotBlank String title,
         @NotBlank String content,
         @NotNull int price

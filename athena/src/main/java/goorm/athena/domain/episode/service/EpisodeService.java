@@ -14,6 +14,22 @@ public class EpisodeService {
 
     private EpisodeRepository episodeRepository;
 
+    @Transactional
+    public Episode addEpisode(Long novelId, String title, String content, int price) {
+        // 해당 novelId에 속한 모든 회차를 조회하여 마지막 회차 번호를 구함
+        int lastEpisodeNumber = episodeRepository.findMaxEpisodeNumberByNovelId(novelId).orElse(0);
+
+        // 새로운 회차를 추가할 때 episodeNumber를 계산
+        Episode newEpisode = Episode.builder()
+                .title(title)
+                .content(content)
+                .price(price)
+                .episodeNumber(lastEpisodeNumber + 1)  // 회차 번호 부여
+                .build();
+
+        return episodeRepository.save(newEpisode);
+    }
+
     // 해당 회차 전체 내용 조회
     @Transactional(readOnly = true)
     public Episode getEpisodeById(Long id){
