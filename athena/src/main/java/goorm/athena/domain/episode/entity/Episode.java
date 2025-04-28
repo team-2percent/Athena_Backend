@@ -14,13 +14,24 @@ public class Episode {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private Long episodeId;
+
+    @Column(length = 100, nullable = false)
     private String title;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(columnDefinition = "TEXT", nullable = false)
     private String content;
 
+    @Column(nullable = false)
     private int price;
-    private Long viewCount;
 
+    @Column(name = "view_count", nullable = false)
+    private Long viewCount = 0L;
+
+    /*
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "novel_id")
+    private Novel novel;
+    */
 }
