@@ -46,4 +46,10 @@ public class Episode {
     public static Episode create(String title, String content, int price, int episodeNumber){
         return new Episode(title, content, price, episodeNumber);
     }
+
+    public void update(String title, String content, int price){
+        this.title = title;
+        this.content = content;
+        this.price = price;
+    }
 }

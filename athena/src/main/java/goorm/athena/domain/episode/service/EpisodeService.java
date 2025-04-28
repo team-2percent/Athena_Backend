@@ -18,9 +18,9 @@ public class EpisodeService {
     private EpisodeRepository episodeRepository;
 
     @Transactional
-    public Episode addEpisode(Long novelId, EpisodeAddRequest request) {
+    public Episode addEpisode(EpisodeAddRequest request) {
         // 해당 novelId에 속한 모든 회차를 조회하여 마지막 회차 번호를 구함
-        int lastEpisodeNumber = episodeRepository.findMaxEpisodeNumberByNovelId(novelId).orElse(0);
+        int lastEpisodeNumber = episodeRepository.findMaxEpisodeNumberByNovelId(request.novelId()).orElse(0);
 
         Episode newEpisode = Episode.create(
                 request.title(),
@@ -30,6 +30,18 @@ public class EpisodeService {
         );
 
         return episodeRepository.save(newEpisode);
+    }
+
+    @Transactional
+    public Episode updateEpisode(Long id, EpisodeAddRequest request){
+        Episode updateEpisode = episodeRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("회차를 찾을 수 없습니다."));
+
+        updateEpisode.update(request.title(),
+                request.content(),
+                request.price());
+
+        return episodeRepository.save(updateEpisode);
     }
 
     // 해당 회차 전체 내용 조회

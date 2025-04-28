@@ -48,19 +48,19 @@ public class EpisodeController {
     // 회차 추가
     @PostMapping
     public ResponseEntity<Episode> addEpisode(@RequestBody EpisodeAddRequest request) {
-        episodeService.addEpisode(request.novelId(), request);
+        Episode newEpisode = episodeService.addEpisode(request);
         // 생성 로직을 추가
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+        return ResponseEntity.status(HttpStatus.CREATED).body(newEpisode);
     }
 
-    /*
-    // 회차 수정 (나중에 구현 예정)
+
+    // 회차 수정
     @PutMapping("/{id}")
     public ResponseEntity<Episode> updateEpisode(@PathVariable Long id, @RequestBody EpisodeAddRequest request) {
-        // 수정 로직을 추가
-        return ResponseEntity.ok().build();
+        Episode updateEpisode = episodeService.updateEpisode(id, request);
+        return ResponseEntity.ok(updateEpisode);
     }
 
- */
+
 
 }
