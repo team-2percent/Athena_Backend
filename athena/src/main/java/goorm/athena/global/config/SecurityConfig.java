@@ -14,9 +14,10 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+                .csrf().disable() // 임시로 csrf 비활성화
                 .authorizeHttpRequests((authorize) -> {
                     authorize
-                            .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html") // Swagger UI 및 API 문서 경로 허용
+                            .requestMatchers("/api/**","/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html") // Swagger UI 및 API 문서 경로 허용
                             .permitAll()
                             .anyRequest()
                             .authenticated();
