@@ -1,66 +1,24 @@
 package goorm.athena.domain.episode.controller;
 
 import goorm.athena.domain.episode.dto.request.EpisodeAddRequest;
-import goorm.athena.domain.episode.dto.response.EpisodeGetResponse;
 import goorm.athena.domain.episode.entity.Episode;
-import goorm.athena.domain.episode.service.EpisodeService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 
-@RequiredArgsConstructor
-@RestController
+@Tag(name = "Episode", description = "회차 관련 API")
 @RequestMapping("/api/episode")
-public class EpisodeController {
+public interface EpisodeController {
 
-    private final EpisodeService episodeService;
-
-    // 회차 조회
-    @GetMapping("/{id}")
-    public ResponseEntity<EpisodeGetResponse> getEpisodeById(@PathVariable Long id) {
-        Episode episode = episodeService.getEpisodeById(id);
-        EpisodeGetResponse response = new EpisodeGetResponse(
-                episode.getId(),
-                episode.getEpisodeId(),
-                episode.getTitle(),
-                episode.getContent()
-        );
-        return ResponseEntity.ok(response);
-    }
-
-    // 회차 내용 페이지 단위로 가져오기
-    @GetMapping("/{id}/content")
-    public String getEpisodeContentById(
-            @PathVariable Long id,
-            @RequestParam int page,
-            @RequestParam int pageSize) {
-        return episodeService.getEpisodeContentById(id, page, pageSize);
-    }
-
-    // 회차 삭제
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteEpisode(@PathVariable Long id) {
-        episodeService.deleteEpisode(id);
-        return ResponseEntity.noContent().build();
-    }
-
-    // 회차 추가
+    @Operation(summary = "회차 생성 API", description = "현재 웹소설의 새 회차를 생성합니다.")
+    @ApiResponse(responseCode = "200", description = "현재 웹소설의 새 회차 생성 성공",
+        content = @Content(schema = @Schema(implementation = Episode.class)))
     @PostMapping
-    public ResponseEntity<Episode> addEpisode(@RequestBody EpisodeAddRequest request) {
-        Episode newEpisode = episodeService.addEpisode(request);
-        // 생성 로직을 추가
-        return ResponseEntity.status(HttpStatus.CREATED).body(newEpisode);
-    }
-
-
-    // 회차 수정
-    @PutMapping("/{id}")
-    public ResponseEntity<Episode> updateEpisode(@PathVariable Long id, @RequestBody EpisodeAddRequest request) {
-        Episode updateEpisode = episodeService.updateEpisode(id, request);
-        return ResponseEntity.ok(updateEpisode);
-    }
-
-
-
+    ResponseEntity<Episode> createEpisode(@RequestBody EpisodeAddRequest request);
 }
