@@ -22,10 +22,11 @@ public class SecurityConfig {
                             .anyRequest()
                             .authenticated();
                 })
+                /*
                 .formLogin(form -> form
                         .loginPage("/login")
                         .permitAll());
-
+                 */.formLogin().disable();
         return http.build();
     }
 }
