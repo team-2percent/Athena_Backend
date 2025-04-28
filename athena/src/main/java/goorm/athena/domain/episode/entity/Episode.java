@@ -36,15 +36,15 @@ public class Episode {
     private Novel novel;
 
     @Builder
-    private Episode(String title, String content, int price, int episodeNumber) {
+    private Episode(Novel novel, String title, String content, int price, int episodeNumber) {
         this.title = title;
         this.content = content;
         this.price = price;
         this.episodeNumber = episodeNumber;
     }
 
-    public static Episode create(String title, String content, int price, int episodeNumber){
-        return new Episode(title, content, price, episodeNumber);
+    public static Episode create(Novel novel, String title, String content, int price, int episodeNumber){
+        return new Episode(novel, title, content, price, episodeNumber);
     }
 
     public void update(String title, String content, int price){
