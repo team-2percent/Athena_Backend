@@ -1,7 +1,9 @@
 package goorm.athena.domain.novel.entity;
 
+import goorm.athena.domain.novel.dto.req.NovelCreateRequest;
 import goorm.athena.domain.user.entity.User;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -37,4 +39,23 @@ public class Novel {
 
     @Column(name = "image_id")
     private Long imageId;
+
+    @Builder
+    public Novel(User author, String title, String summary, Status status, Long imageId) {
+        this.author = author;
+        this.title = title;
+        this.summary = summary;
+        this.status = status;
+        this.imageId = imageId;
+    }
+
+    public static Novel create(User author, NovelCreateRequest request) {
+        return Novel.builder()
+                .author(author)
+                .title(request.title())
+                .summary(request.summary())
+                .status(request.status())
+                .imageId(request.imageId())
+                .build();
+    }
 }
