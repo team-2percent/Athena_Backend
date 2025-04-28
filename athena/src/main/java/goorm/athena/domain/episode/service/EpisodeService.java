@@ -19,13 +19,15 @@ public class EpisodeService {
 
     @Transactional
     public Episode addEpisode(Long novelId, EpisodeAddRequest request) {
-        Episode newEpisode = EpisodeMapper.toEntity(request);
-
         // 해당 novelId에 속한 모든 회차를 조회하여 마지막 회차 번호를 구함
         int lastEpisodeNumber = episodeRepository.findMaxEpisodeNumberByNovelId(novelId).orElse(0);
 
-        // 새로운 회차를 추가할 때 episodeNumber를 계산
-        // newEpisode.setEpisodeNumber(lastEpisodeNumber + 1);
+        Episode newEpisode = Episode.create(
+                request.title(),
+                request.content(),
+                request.price(),
+                lastEpisodeNumber+1
+        );
 
         return episodeRepository.save(newEpisode);
     }
@@ -56,14 +58,13 @@ public class EpisodeService {
             throw new RuntimeException("페이지 번호가 잘못되었습니다.");
         }
     }
-/*
-    작품의 회차들 조회
+
+    // 작품 회차 리스트 조회
     @Transactional
     public Page<Episode> getEpisodeByNovelId(Long novelId, Pageable pageable){
         return episodeRepository.findByNovelId(novelId, pageable);
     }
 
- */
     @Transactional
     public void deleteEpisode(Long id){
         episodeRepository.deleteById(id);

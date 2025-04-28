@@ -36,10 +36,14 @@ public class Episode {
     private Novel novel;
 
     @Builder
-    public Episode(Long episodeId, String title, String content, int price, int episodeNumber) {
+    private Episode(String title, String content, int price, int episodeNumber) {
         this.title = title;
         this.content = content;
         this.price = price;
         this.episodeNumber = episodeNumber;
+    }
+
+    public static Episode create(String title, String content, int price, int episodeNumber){
+        return new Episode(title, content, price, episodeNumber);
     }
 }
