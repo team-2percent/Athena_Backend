@@ -48,7 +48,7 @@ public class EpisodeController {
     // 회차 추가
     @PostMapping
     public ResponseEntity<Episode> addEpisode(@RequestBody EpisodeAddRequest request) {
-        episodeService.addEpisode(request.novelId(), request.title(), request.content(), request.price());
+        episodeService.addEpisode(request.novelId(), request);
         // 생성 로직을 추가
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }

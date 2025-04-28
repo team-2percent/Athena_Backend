@@ -1,6 +1,9 @@
 package goorm.athena.domain.episode.service;
 
+import goorm.athena.domain.episode.dto.request.EpisodeAddRequest;
+import goorm.athena.domain.episode.dto.response.EpisodeGetResponse;
 import goorm.athena.domain.episode.entity.Episode;
+import goorm.athena.domain.episode.mapper.EpisodeMapper;
 import goorm.athena.domain.episode.repository.EpisodeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -15,17 +18,14 @@ public class EpisodeService {
     private EpisodeRepository episodeRepository;
 
     @Transactional
-    public Episode addEpisode(Long novelId, String title, String content, int price) {
+    public Episode addEpisode(Long novelId, EpisodeAddRequest request) {
+        Episode newEpisode = EpisodeMapper.toEntity(request);
+
         // 해당 novelId에 속한 모든 회차를 조회하여 마지막 회차 번호를 구함
         int lastEpisodeNumber = episodeRepository.findMaxEpisodeNumberByNovelId(novelId).orElse(0);
 
         // 새로운 회차를 추가할 때 episodeNumber를 계산
-        Episode newEpisode = Episode.builder()
-                .title(title)
-                .content(content)
-                .price(price)
-                .episodeNumber(lastEpisodeNumber + 1)  // 회차 번호 부여
-                .build();
+        newEpisode.setEpisodeNumber(lastEpisodeNumber + 1);
 
         return episodeRepository.save(newEpisode);
     }
