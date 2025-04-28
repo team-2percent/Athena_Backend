@@ -32,6 +32,15 @@ public class EpisodeController {
         return ResponseEntity.ok(response);
     }
 
+    // 회차 내용 페이지 단위로 가져오기
+    @GetMapping("/{id}/content")
+    public String getEpisodeContentById(
+            @PathVariable Long id,
+            @RequestParam int page,
+            @RequestParam int pageSize) {
+        return episodeService.getEpisodeContentById(id, page, pageSize);
+    }
+
     // 회차 삭제
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteEpisode(@PathVariable Long id) {
