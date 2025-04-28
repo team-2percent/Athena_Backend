@@ -37,6 +37,8 @@ dependencies {
 
 	// swagger
 	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.3'
+	implementation("me.paulschwarz:spring-dotenv:3.0.0")
+
 }
 
 	tasks.named('test') {
