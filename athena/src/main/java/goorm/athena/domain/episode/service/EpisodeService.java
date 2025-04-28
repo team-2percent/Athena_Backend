@@ -25,7 +25,7 @@ public class EpisodeService {
         int lastEpisodeNumber = episodeRepository.findMaxEpisodeNumberByNovelId(novelId).orElse(0);
 
         // 새로운 회차를 추가할 때 episodeNumber를 계산
-        newEpisode.setEpisodeNumber(lastEpisodeNumber + 1);
+        // newEpisode.setEpisodeNumber(lastEpisodeNumber + 1);
 
         return episodeRepository.save(newEpisode);
     }

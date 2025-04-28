@@ -1,12 +1,12 @@
 package goorm.athena.domain.episode.entity;
 
+import goorm.athena.domain.novel.entity.Novel;
 import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
 @Getter
-@Setter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 public class Episode {
 
     @Id
@@ -31,11 +31,9 @@ public class Episode {
     @Column(nullable = false)
     private int episodeNumber;
 
-    /*
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "novel_id")
     private Novel novel;
-    */
 
     @Builder
     public Episode(Long episodeId, String title, String content, int price, int episodeNumber) {
