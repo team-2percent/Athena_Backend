@@ -20,7 +20,7 @@ public interface EpisodeController {
     @ApiResponse(responseCode = "200", description = "현재 웹소설의 새 회차 생성 성공",
         content = @Content(schema = @Schema(implementation = Episode.class)))
     @PostMapping
-    ResponseEntity<Episode> createEpisode(@RequestBody EpisodeAddRequest request);
+    ResponseEntity<EpisodeGetResponse> createEpisode(@RequestBody EpisodeAddRequest request);
 
     @Operation(summary = "회차 조회 API", description = "회차의 ID를 통해 특정 회차를 조회합니다.<br>" +
             "ex) 특정 회차의 내용을 페이지 단위로 조회하기 전, 해당 회차의 제목과 현재 회차 등을 표시하기 위함입니다.")
@@ -50,5 +50,5 @@ public interface EpisodeController {
     @ApiResponse(responseCode = "200", description = "회차 수정 성공",
             content = @Content(schema = @Schema(implementation = Episode.class)))
     @PutMapping("/{id}")
-    ResponseEntity<Episode> updateEpisode(@PathVariable Long id, @RequestBody EpisodeAddRequest request);
+    ResponseEntity<EpisodeGetResponse> updateEpisode(@PathVariable Long id, @RequestBody EpisodeAddRequest request);
 }

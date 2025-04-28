@@ -13,9 +13,6 @@ public class Episode {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    private Long episodeId;
-
     @Column(length = 100, nullable = false)
     private String title;
 
@@ -29,21 +26,22 @@ public class Episode {
     private Long viewCount = 0L;
 
     @Column(nullable = false)
-    private int episodeNumber;
+    private Long episodeNumber;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "novel_id")
     private Novel novel;
 
     @Builder
-    private Episode(Novel novel, String title, String content, int price, int episodeNumber) {
+    private Episode(Novel novel, String title, String content, int price, Long episodeNumber) {
+        this.novel = novel;
         this.title = title;
         this.content = content;
         this.price = price;
         this.episodeNumber = episodeNumber;
     }
 
-    public static Episode create(Novel novel, String title, String content, int price, int episodeNumber){
+    public static Episode create(Novel novel, String title, String content, int price, Long episodeNumber){
         return new Episode(novel, title, content, price, episodeNumber);
     }
 

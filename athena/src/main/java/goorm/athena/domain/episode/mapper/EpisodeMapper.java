@@ -19,7 +19,7 @@ public class EpisodeMapper {
     public static EpisodeGetResponse toResponse(Episode episode) {
         return new EpisodeGetResponse(
                 episode.getId(),
-                episode.getEpisodeId(),
+                episode.getEpisodeNumber(),
                 episode.getTitle(),
                 episode.getContent()
         );

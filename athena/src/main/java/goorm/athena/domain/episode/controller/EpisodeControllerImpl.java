@@ -3,6 +3,7 @@ package goorm.athena.domain.episode.controller;
 import goorm.athena.domain.episode.dto.request.EpisodeAddRequest;
 import goorm.athena.domain.episode.dto.response.EpisodeGetResponse;
 import goorm.athena.domain.episode.entity.Episode;
+import goorm.athena.domain.episode.mapper.EpisodeMapper;
 import goorm.athena.domain.episode.service.EpisodeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -19,10 +20,11 @@ public class EpisodeControllerImpl implements EpisodeController {
     // 회차 추가
     @Override
     @PostMapping
-    public ResponseEntity<Episode> createEpisode(@RequestBody EpisodeAddRequest request) {
+    public ResponseEntity<EpisodeGetResponse> createEpisode(@RequestBody EpisodeAddRequest request) {
         Episode newEpisode = episodeService.addEpisode(request);
+        EpisodeGetResponse response = EpisodeMapper.toResponse(newEpisode);
         // 생성 로직을 추가
-        return ResponseEntity.status(HttpStatus.CREATED).body(newEpisode);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     // 회차 조회
@@ -31,7 +33,7 @@ public class EpisodeControllerImpl implements EpisodeController {
         Episode episode = episodeService.getEpisodeById(id);
         EpisodeGetResponse response = new EpisodeGetResponse(
                 episode.getId(),
-                episode.getEpisodeId(),
+                episode.getEpisodeNumber(),
                 episode.getTitle(),
                 episode.getContent()
         );
@@ -56,8 +58,9 @@ public class EpisodeControllerImpl implements EpisodeController {
 
     // 회차 수정
     @PutMapping("/{id}")
-    public ResponseEntity<Episode> updateEpisode(@PathVariable Long id, @RequestBody EpisodeAddRequest request) {
+    public ResponseEntity<EpisodeGetResponse> updateEpisode(@PathVariable Long id, @RequestBody EpisodeAddRequest request) {
         Episode updateEpisode = episodeService.updateEpisode(id, request);
-        return ResponseEntity.ok(updateEpisode);
+        EpisodeGetResponse response = EpisodeMapper.toResponse(updateEpisode);
+        return ResponseEntity.ok(response);
     }
 }

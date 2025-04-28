@@ -10,7 +10,7 @@ import java.util.Optional;
 
 public interface EpisodeRepository extends JpaRepository<Episode, Long> {
 
-    @Query("SELECT MAX(e.episodeId) FROM Episode e WHERE e.novel.id = :novelId")
+    @Query("SELECT MAX(e.episodeNumber) FROM Episode e WHERE e.novel.id = :novelId")
     Optional<Integer> findMaxEpisodeNumberByNovelId(Long novelId);
 
     Page<Episode> findByNovelId(Long novelId, Pageable pageable);

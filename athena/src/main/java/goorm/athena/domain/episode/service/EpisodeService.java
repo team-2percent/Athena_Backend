@@ -17,8 +17,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class EpisodeService {
 
-    private EpisodeRepository episodeRepository;
-    private NovelRepository novelRepository;
+    private final EpisodeRepository episodeRepository;
+    private final NovelRepository novelRepository;
 
     @Transactional
     public Episode addEpisode(EpisodeAddRequest request) {
@@ -26,7 +26,7 @@ public class EpisodeService {
                 .orElseThrow(() -> new RuntimeException("작품 정보를 찾을 수 없습니다."));
 
         // 해당 novelId에 속한 모든 회차를 조회하여 마지막 회차 번호를 구함
-        int lastEpisodeNumber = episodeRepository.findMaxEpisodeNumberByNovelId(request.novelId()).orElse(0);
+        long lastEpisodeNumber = episodeRepository.findMaxEpisodeNumberByNovelId(request.novelId()).orElse(0);
 
         Episode newEpisode = Episode.create(
                 novel,
