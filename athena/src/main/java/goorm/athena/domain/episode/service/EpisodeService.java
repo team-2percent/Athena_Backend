@@ -1,12 +1,12 @@
 package goorm.athena.domain.episode.service;
 
 import goorm.athena.domain.episode.dto.request.EpisodeAddRequest;
-import goorm.athena.domain.episode.dto.response.EpisodeGetResponse;
 import goorm.athena.domain.episode.entity.Episode;
-import goorm.athena.domain.episode.mapper.EpisodeMapper;
 import goorm.athena.domain.episode.repository.EpisodeRepository;
 import goorm.athena.domain.novel.entity.Novel;
 import goorm.athena.domain.novel.repository.NovelRepository;
+import goorm.athena.global.exception.CustomException;
+import goorm.athena.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -23,7 +23,7 @@ public class EpisodeService {
     @Transactional
     public Episode addEpisode(EpisodeAddRequest request) {
         Novel novel = novelRepository.findById(request.novelId())
-                .orElseThrow(() -> new RuntimeException("작품 정보를 찾을 수 없습니다."));
+                .orElseThrow(() -> new CustomException(ErrorCode.NOVEL_NOT_FOUND));
 
         // 해당 novelId에 속한 모든 회차를 조회하여 마지막 회차 번호를 구함
         long lastEpisodeNumber = episodeRepository.findMaxEpisodeNumberByNovelId(request.novelId()).orElse(0);
@@ -42,7 +42,7 @@ public class EpisodeService {
     @Transactional
     public Episode updateEpisode(Long id, EpisodeAddRequest request){
         Episode updateEpisode = episodeRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("회차를 찾을 수 없습니다."));
+                .orElseThrow(() -> new CustomException(ErrorCode.EPISODE_NOT_FOUND));
 
         updateEpisode.update(request.title(),
                 request.content(),
@@ -55,7 +55,7 @@ public class EpisodeService {
     @Transactional(readOnly = true)
     public Episode getEpisodeById(Long id){
         Episode episode = episodeRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("회차를 찾을 수 없습니다."));
+                .orElseThrow(() -> new CustomException(ErrorCode.EPISODE_NOT_FOUND));
         return episode;
     }
 
@@ -63,7 +63,7 @@ public class EpisodeService {
     @Transactional(readOnly = true)
     public String getEpisodeContentById(Long id, int page, int pageSize) {
         Episode episode = episodeRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("회차를 찾을 수 없습니다."));
+                .orElseThrow(() -> new CustomException(ErrorCode.EPISODE_NOT_FOUND));
 
         String content = episode.getContent();
 
@@ -74,7 +74,7 @@ public class EpisodeService {
         if (startIdx < content.length()) {
             return content.substring(startIdx, endIdx);
         } else {
-            throw new RuntimeException("페이지 번호가 잘못되었습니다.");
+            throw new CustomException(ErrorCode.PAGE_NOT_FOUND);
         }
     }
 
