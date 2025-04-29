@@ -1,6 +1,7 @@
 package goorm.athena.domain.episode.service;
 
 import goorm.athena.domain.episode.dto.request.EpisodeAddRequest;
+import goorm.athena.domain.episode.dto.response.EpisodeCreateResponse;
 import goorm.athena.domain.episode.dto.response.EpisodeGetResponse;
 import goorm.athena.domain.episode.entity.Episode;
 import goorm.athena.domain.episode.mapper.EpisodeMapper;
@@ -23,7 +24,7 @@ public class EpisodeService {
     private final NovelRepository novelRepository;
 
     @Transactional
-    public Episode addEpisode(EpisodeAddRequest request) {
+    public EpisodeCreateResponse addEpisode(EpisodeAddRequest request) {
         Novel novel = novelRepository.findById(request.novelId())
                 .orElseThrow(() -> new CustomException(ErrorCode.NOVEL_NOT_FOUND));
 
@@ -38,7 +39,9 @@ public class EpisodeService {
                 lastEpisodeNumber+1
         );
 
-        return episodeRepository.save(newEpisode);
+        Episode savedEpisode = episodeRepository.save(newEpisode);
+
+        return EpisodeMapper.toCreateResponse(savedEpisode);
     }
 
     @Transactional
@@ -52,7 +55,7 @@ public class EpisodeService {
 
         Episode savedEpisode = episodeRepository.save(updateEpisode);
 
-        return EpisodeMapper.toResponse(savedEpisode);
+        return EpisodeMapper.toGetResponse(savedEpisode);
     }
 
     // 해당 회차 전체 내용 조회

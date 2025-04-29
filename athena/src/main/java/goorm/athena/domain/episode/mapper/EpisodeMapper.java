@@ -1,6 +1,7 @@
 package goorm.athena.domain.episode.mapper;
 
 import goorm.athena.domain.episode.dto.request.EpisodeAddRequest;
+import goorm.athena.domain.episode.dto.response.EpisodeCreateResponse;
 import goorm.athena.domain.episode.dto.response.EpisodeGetResponse;
 import goorm.athena.domain.episode.entity.Episode;
 
@@ -16,8 +17,17 @@ public class EpisodeMapper {
     }
 
     // Episode -> EpisodeGetResponse DTO 변환
-    public static EpisodeGetResponse toResponse(Episode episode) {
+    public static EpisodeGetResponse toGetResponse(Episode episode) {
         return new EpisodeGetResponse(
+                episode.getId(),
+                episode.getEpisodeNumber(),
+                episode.getTitle(),
+                episode.getContent()
+        );
+    }
+
+    public static EpisodeCreateResponse toCreateResponse(Episode episode){
+        return new EpisodeCreateResponse(
                 episode.getId(),
                 episode.getEpisodeNumber(),
                 episode.getTitle(),

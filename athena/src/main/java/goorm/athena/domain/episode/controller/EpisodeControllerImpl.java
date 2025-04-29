@@ -1,12 +1,12 @@
 package goorm.athena.domain.episode.controller;
 
 import goorm.athena.domain.episode.dto.request.EpisodeAddRequest;
+import goorm.athena.domain.episode.dto.response.EpisodeCreateResponse;
 import goorm.athena.domain.episode.dto.response.EpisodeGetResponse;
 import goorm.athena.domain.episode.entity.Episode;
 import goorm.athena.domain.episode.mapper.EpisodeMapper;
 import goorm.athena.domain.episode.service.EpisodeService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,10 +20,8 @@ public class EpisodeControllerImpl implements EpisodeController {
     // 회차 추가
     @Override
     @PostMapping
-    public ResponseEntity<EpisodeGetResponse> createEpisode(@RequestBody EpisodeAddRequest request) {
-        Episode newEpisode = episodeService.addEpisode(request);
-        EpisodeGetResponse response = EpisodeMapper.toResponse(newEpisode);
-        // 생성 로직을 추가
+    public ResponseEntity<EpisodeCreateResponse> createEpisode(@RequestBody EpisodeAddRequest request) {
+        EpisodeCreateResponse response = episodeService.addEpisode(request);
         return ResponseEntity.ok(response);
     }
 

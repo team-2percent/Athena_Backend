@@ -1,6 +1,7 @@
 package goorm.athena.domain.episode.controller;
 
 import goorm.athena.domain.episode.dto.request.EpisodeAddRequest;
+import goorm.athena.domain.episode.dto.response.EpisodeCreateResponse;
 import goorm.athena.domain.episode.dto.response.EpisodeGetResponse;
 import goorm.athena.domain.episode.entity.Episode;
 import io.swagger.v3.oas.annotations.Operation;
@@ -20,7 +21,7 @@ public interface EpisodeController {
     @ApiResponse(responseCode = "200", description = "현재 웹소설의 새 회차 생성 성공",
         content = @Content(schema = @Schema(implementation = Episode.class)))
     @PostMapping
-    ResponseEntity<EpisodeGetResponse> createEpisode(@RequestBody EpisodeAddRequest request);
+    ResponseEntity<EpisodeCreateResponse> createEpisode(@RequestBody EpisodeAddRequest request);
 
     @Operation(summary = "회차 조회 API", description = "회차의 ID를 통해 특정 회차를 조회합니다.<br>" +
             "ex) 특정 회차의 내용을 페이지 단위로 조회하기 전, 해당 회차의 제목과 현재 회차 등을 표시하기 위함입니다.")
