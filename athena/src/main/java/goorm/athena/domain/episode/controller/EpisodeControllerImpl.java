@@ -24,7 +24,7 @@ public class EpisodeControllerImpl implements EpisodeController {
         Episode newEpisode = episodeService.addEpisode(request);
         EpisodeGetResponse response = EpisodeMapper.toResponse(newEpisode);
         // 생성 로직을 추가
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        return ResponseEntity.ok(response);
     }
 
     // 회차 조회
