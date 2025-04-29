@@ -59,8 +59,7 @@ public class EpisodeControllerImpl implements EpisodeController {
     // 회차 수정
     @PutMapping("/{id}")
     public ResponseEntity<EpisodeGetResponse> updateEpisode(@PathVariable Long id, @RequestBody EpisodeAddRequest request) {
-        Episode updateEpisode = episodeService.updateEpisode(id, request);
-        EpisodeGetResponse response = EpisodeMapper.toResponse(updateEpisode);
+        EpisodeGetResponse response = episodeService.updateEpisode(id, request);
         return ResponseEntity.ok(response);
     }
 }
