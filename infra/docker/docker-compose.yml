@@ -1,9 +1,9 @@
 name: athena
 
 services:
-  mariadb:
-    image: mariadb:latest
-    container_name: mariadb
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: 1234 # root 계정 비밀번호
@@ -13,12 +13,17 @@ services:
     ports:
       - "3306:3306" # 호스트:컨테이너 포트 매핑
     volumes:
-      - mariadb_data:/var/lib/mysql # 데이터 영속성을 위한 볼륨
+      - mysql_data:/var/lib/mysql # 데이터 영속성을 위한 볼륨
     networks:
       - backend_network
+    command:
+      # MySQL 8.0의 기본 인증 방식 변경
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+      - --default-authentication-plugin=mysql_native_password
 
 volumes:
-  mariadb_data:
+  mysql_data:
     driver: local
 
 networks:
