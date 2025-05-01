@@ -1,8 +1,10 @@
 package goorm.athena.domain.user.entity;
 
 import jakarta.persistence.*;
+import lombok.Getter;
 
 @Entity
+@Getter
 @Table(name = "\"user\"")
 public class User {
     @Id
