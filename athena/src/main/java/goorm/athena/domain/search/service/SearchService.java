@@ -48,7 +48,7 @@ public class SearchService {
     };
   }
 
-  //
+  // Page<Search> 타입은 추후 Product의 Response Dto 타입으로 변경 필요
   public Page<Search> getList(Integer page, String searchWord) {
     List<Sort.Order> sorts = new ArrayList<>();
     sorts.add(Sort.Order.desc("createdDate"));
