@@ -1,6 +1,7 @@
 package goorm.athena.domain.user.entity;
 
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -26,9 +27,8 @@ public class User {
     @Column(length = 50, nullable = false)
     private String nickname;
 
-    @ElementCollection(fetch = FetchType.EAGER)
     @Enumerated(EnumType.STRING)
-    private Set<Role> roles = new HashSet<>();
+    private Role role;
 
     @Column(length = 50, nullable = true)
     private String sellerName;
@@ -38,4 +38,22 @@ public class User {
 
     @Column(length = 2000, nullable = true)
     private String linkUrl;
+
+    @Builder
+    private User(String email, String password, String nickname){
+        this.email = email;
+        this.password = password;
+        this.nickname = nickname;
+        this.role = Role.USER;
+    }
+
+    public static User create(String email, String password, String nickname){
+        return new User(email, password, nickname);
+    }
+
+    public void update(String title, String password, String nickname){
+        this.email = title;
+        this.password = password;
+        this.nickname = nickname;
+    }
 }
