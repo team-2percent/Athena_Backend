@@ -3,10 +3,12 @@ package goorm.athena.domain.order.entity;
 import goorm.athena.domain.product.entity.Product;
 import goorm.athena.domain.user.entity.User;
 import jakarta.persistence.*;
+import lombok.Getter;
 
 import java.time.LocalDateTime;
 
 @Entity
+@Getter
 @Table(name = "orders")
 public class Order {
 
@@ -16,7 +18,7 @@ public class Order {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "buyer_id")
-    private User buyer;
+    private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id")

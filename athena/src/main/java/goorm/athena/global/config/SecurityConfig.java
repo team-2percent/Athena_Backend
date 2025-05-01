@@ -12,20 +12,20 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-//                .csrf().disable() // 임시로 csrf 비활성화
-                .authorizeHttpRequests((authorize) -> {
-                    authorize
-                            .requestMatchers("/api/**","/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html") // Swagger UI 및 API 문서 경로 허용
-                            .permitAll()
-                            .anyRequest()
-                            .authenticated();
-                })
-                /*
-                .formLogin(form -> form
-                        .loginPage("/login")
-                        .permitAll());
-                 */ .formLogin(form -> form.disable());
+
+        http.authorizeHttpRequests(auth -> auth
+                .requestMatchers(
+                        "/api/payment/**",
+                        "/api/**",
+                        "/swagger-ui/**",
+                        "/v3/api-docs/**",
+                        "/swagger-ui.html"
+                ).permitAll()
+                .anyRequest().authenticated()
+        );
+
+        http.csrf(csrf -> csrf.disable());
+        http.formLogin(form -> form.disable());
         return http.build();
     }
 }
