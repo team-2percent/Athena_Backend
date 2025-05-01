@@ -3,8 +3,10 @@ package goorm.athena.domain.user.controller;
 import goorm.athena.domain.user.dto.request.UserCreateRequest;
 import goorm.athena.domain.user.dto.request.UserUpdateRequest;
 import goorm.athena.domain.user.dto.response.UserCreateResponse;
+import goorm.athena.domain.user.dto.response.UserGetResponse;
 import goorm.athena.domain.user.dto.response.UserUpdateResponse;
 import goorm.athena.domain.user.service.UserService;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -29,4 +31,19 @@ public class UserControllerImpl implements UserController{
         UserUpdateResponse response = userService.updateUser(request);
         return ResponseEntity.ok(response);
     }
+
+    @Override
+    @GetMapping("/{id}")
+    public ResponseEntity<UserGetResponse> getUserById(@PathVariable Long id){
+        UserGetResponse response = userService.getUserById(id);
+        return ResponseEntity.ok(response);
+    }
+
+    @Override
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteUser(@PathVariable Long id){
+        userService.deleteUser(id);
+        return ResponseEntity.noContent().build();
+    }
+
 }
