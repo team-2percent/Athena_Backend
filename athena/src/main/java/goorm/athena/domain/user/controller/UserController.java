@@ -3,6 +3,7 @@ package goorm.athena.domain.user.controller;
 import goorm.athena.domain.user.dto.request.UserCreateRequest;
 import goorm.athena.domain.user.dto.request.UserUpdateRequest;
 import goorm.athena.domain.user.dto.response.UserCreateResponse;
+import goorm.athena.domain.user.dto.response.UserGetResponse;
 import goorm.athena.domain.user.dto.response.UserUpdateResponse;
 import goorm.athena.domain.user.entity.User;
 import io.swagger.v3.oas.annotations.Operation;
@@ -31,4 +32,14 @@ public interface UserController {
     @ApiResponse(responseCode = "200", description = "유저 정보 수정 성공")
     @PutMapping
     ResponseEntity<UserUpdateResponse> updateUser(@RequestBody UserUpdateRequest request);
+
+    @Operation(summary = "유저 조회 APi", description = "유저의 ID를 통해 특정 유저의 정보를 조회합니다.<br>")
+    @ApiResponse(responseCode = "200", description = "특정 유저 정보 조회 성공")
+    @GetMapping("/{id}")
+    ResponseEntity<UserGetResponse> getUserById(@PathVariable Long id);
+
+    @Operation(summary = "유저 삭제 APi", description = "유저의 ID를 통해 특정 유저의 정보를 삭제합니다.")
+    @ApiResponse(responseCode = "204", description = "특정 유저 정보 삭제 성공")
+    @DeleteMapping("/{id}")
+    ResponseEntity<Void> deleteUser(@PathVariable Long id);
 }
