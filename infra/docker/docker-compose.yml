@@ -6,10 +6,10 @@ services:
     container_name: mysql
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: 1234 # root 계정 비밀번호
-      MYSQL_DATABASE: athena # 초기 생성할 데이터베이스
-      MYSQL_USER: athena # 새로 생성할 사용자
-      MYSQL_PASSWORD: 1234 # 사용자 비밀번호
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     ports:
       - "3306:3306" # 호스트:컨테이너 포트 매핑
     volumes:
