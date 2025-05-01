@@ -2,10 +2,12 @@ package goorm.athena.domain.product.entity;
 
 import goorm.athena.domain.user.entity.User;
 import jakarta.persistence.*;
+import lombok.Getter;
 
 import java.time.LocalDateTime;
 
 @Entity
+@Getter
 @Table(name = "product")
 public class Product {
     @Id
