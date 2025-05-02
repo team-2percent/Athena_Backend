@@ -1,7 +1,7 @@
 package goorm.athena.domain.settlement.entity;
 
 import goorm.athena.domain.bankaccount.entity.BankAccount;
-import goorm.athena.domain.product.entity.Product;
+import goorm.athena.domain.project.entity.Project;
 import goorm.athena.domain.user.entity.User;
 import jakarta.persistence.*;
 
@@ -19,8 +19,8 @@ public class Settlement {
     private User seller;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_id")
-    private Product product;
+    @JoinColumn(name = "project_id")
+    private Project project;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "bankaccount_id")

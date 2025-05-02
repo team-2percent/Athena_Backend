@@ -6,7 +6,7 @@ public record PaymentReadyRequest(
         String itemName,
         Integer quantity,
         Integer totalAmount,
-        Long productId,
+        Long projectId,
         String userInfo
 ) {
     public static PaymentReadyRequest from(Order order) {
@@ -14,7 +14,7 @@ public record PaymentReadyRequest(
                 order.getItemName(),
                 order.getQuantity(),
                 order.getTotalPrice(),
-                order.getProduct().getId(),
+                order.getProject().getId(),
                 order.getUser().getNickname()
         );
     }

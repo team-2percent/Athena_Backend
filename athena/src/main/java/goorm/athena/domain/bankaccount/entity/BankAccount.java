@@ -1,6 +1,6 @@
 package goorm.athena.domain.bankaccount.entity;
 
-import goorm.athena.domain.product.entity.Product;
+import goorm.athena.domain.project.entity.Project;
 import jakarta.persistence.*;
 
 @Entity
@@ -14,7 +14,7 @@ public class BankAccount {
     private String accountNumber;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_id", nullable = false)
-    private Product product;
+    @JoinColumn(name = "project_id", nullable = false)
+    private Project project;
 
 }

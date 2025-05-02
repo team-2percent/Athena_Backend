@@ -1,4 +1,4 @@
-package goorm.athena.domain.product.entity;
+package goorm.athena.domain.project.entity;
 
 public enum Status {
     ACTIVE,    // 활성 상태 (진행 중)
