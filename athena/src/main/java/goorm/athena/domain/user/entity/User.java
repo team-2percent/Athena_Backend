@@ -28,6 +28,7 @@ public class User {
     private String nickname;
 
     @Enumerated(EnumType.STRING)
+    @Column(length = 20, nullable = false)
     private Role role;
 
     @Column(length = 50, nullable = true)
@@ -44,7 +45,7 @@ public class User {
         this.email = email;
         this.password = password;
         this.nickname = nickname;
-        this.role = Role.USER;
+        this.role = Role.ROLE_USER;
     }
 
     public static User create(String email, String password, String nickname){
