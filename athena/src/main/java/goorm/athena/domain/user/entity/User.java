@@ -1,13 +1,11 @@
 package goorm.athena.domain.user.entity;
 
+import goorm.athena.domain.imageGroup.entity.ImageGroup;
 import jakarta.persistence.*;
 
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.util.HashSet;
-import java.util.Set;
 
 @Entity
 @Getter
@@ -18,6 +16,10 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "image_group_id", nullable = false)
+    private ImageGroup imageGroup;  // 이미지 그룹 ID
 
     @Column(length = 255, nullable = false)
     private String email;
