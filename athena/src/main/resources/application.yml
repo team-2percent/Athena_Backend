@@ -16,3 +16,11 @@ spring:
     properties:
       hibernate:
         format_sql: true
+
+  kakao:
+    api:
+      cid: ${KAKAO_API_CID}
+      admin-key: ${KAKAO_API_ADMIN_KEY}
+      approval-url: ${KAKAO_API_APPROVAL_URL}
+      cancel-url: ${KAKAO_API_CANCEL_URL}
+      fail-url: ${KAKAO_API_FAIL_URL}
