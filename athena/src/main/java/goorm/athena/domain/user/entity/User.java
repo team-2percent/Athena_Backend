@@ -1,6 +1,7 @@
 package goorm.athena.domain.user.entity;
 
 import jakarta.persistence.*;
+
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -10,7 +11,7 @@ import java.util.Set;
 
 @Entity
 @Getter
-@Table(name = "user")
+@Table(name = "\"user\"")
 @NoArgsConstructor
 public class User {
 
