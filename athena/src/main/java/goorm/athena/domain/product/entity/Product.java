@@ -1,11 +1,13 @@
 package goorm.athena.domain.product.entity;
 
-import goorm.athena.domain.user.entity.User;
+import goorm.athena.domain.project.entity.Project;
 import jakarta.persistence.*;
-
-import java.time.LocalDateTime;
+import lombok.Getter;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
+@Getter
 @Table(name = "product")
 public class Product {
     @Id
@@ -13,22 +15,12 @@ public class Product {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "seller_id", nullable = false)
-    private User sellerId;
+    @JoinColumn(name = "project_id", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private Project project;
 
-    private Long categoryId;
-    private String title;
-    private String description;
-    private Long goalAmount;
-    private Long totalAmount;
-
-    private LocalDateTime startAt;
-    private LocalDateTime endAt;
-    private LocalDateTime shippedAt;
-
-    @Enumerated(EnumType.STRING)
-    private Status status;
-
-
-
+    private String productName;         // 상품명
+    private String productDescription;  // 상품 설명
+    private Long productPrice;          // 상품 가격
+    private Long stock;                 // 상품 재고
 }
