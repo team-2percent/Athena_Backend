@@ -28,7 +28,6 @@ public class Project {
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;      // 카테고리 ID
 
-    private Long categoryId;
     private String title;
     private String description;
     private Long goalAmount;

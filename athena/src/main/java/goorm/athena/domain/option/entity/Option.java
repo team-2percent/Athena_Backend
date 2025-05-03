@@ -8,7 +8,7 @@ import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
 @Getter
-@Table(name = "option")
+@Table(name = "`option`")
 public class Option {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -20,5 +20,4 @@ public class Option {
     private Product product;
 
     private String optionName;  // 옵션명
-    private String optionValue; // 옵션 값
 }

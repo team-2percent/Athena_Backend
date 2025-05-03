@@ -18,7 +18,7 @@ public class User {
     private Long id;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "image_group_id", nullable = false)
+    @JoinColumn(name = "image_group_id", nullable = true)
     private ImageGroup imageGroup;  // 이미지 그룹 ID
 
     @Column(length = 255, nullable = false)
