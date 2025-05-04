@@ -1,14 +1,19 @@
 package goorm.athena.domain.user.controller;
 
 import goorm.athena.domain.user.dto.request.UserCreateRequest;
+import goorm.athena.domain.user.dto.request.UserLoginRequest;
 import goorm.athena.domain.user.dto.request.UserUpdateRequest;
+import goorm.athena.domain.user.dto.response.UserLoginResponse;
 import goorm.athena.domain.user.dto.response.UserCreateResponse;
 import goorm.athena.domain.user.dto.response.UserGetResponse;
 import goorm.athena.domain.user.dto.response.UserUpdateResponse;
 import goorm.athena.domain.user.service.UserService;
-import lombok.Getter;
+import goorm.athena.global.exception.CustomException;
+import goorm.athena.global.exception.ErrorCode;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
@@ -46,4 +51,15 @@ public class UserControllerImpl implements UserController{
         return ResponseEntity.noContent().build();
     }
 
+    @Override
+    @PostMapping("/login")
+    public ResponseEntity<UserLoginResponse> login(@RequestBody @Valid UserLoginRequest request, BindingResult bindingResult){
+        if(bindingResult.hasErrors()){
+            throw new CustomException(ErrorCode.VALIDATION_ERROR);
+        }
+
+        UserLoginResponse loginResponse = userService.validateUserCredentials(request);
+
+        return ResponseEntity.ok(loginResponse);
+    }
 }
