@@ -23,15 +23,21 @@ public class UserService {
 
     @Transactional
     public UserCreateResponse createUser(UserCreateRequest request){
-        User newUser = User.create(
-                request.email(),
-                passwordEncoder.encode(request.password()),
-                request.nickname()
-        );
+        Boolean isExist = userRepository.existsByEmail(request.email());
 
-        User savedUser = userRepository.save(newUser);
+        if(!isExist) {
+            User newUser = User.create(
+                    request.email(),
+                    passwordEncoder.encode(request.password()),
+                    request.nickname()
+            );
 
-        return UserMapper.toCreateResponse(savedUser);
+            User savedUser = userRepository.save(newUser);
+
+            return UserMapper.toCreateResponse(savedUser);
+        } else{
+            throw new CustomException(ErrorCode.ALREADY_EXIST_USER);
+        }
     }
 
     @Transactional
