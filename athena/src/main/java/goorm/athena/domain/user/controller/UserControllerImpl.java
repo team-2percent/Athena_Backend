@@ -10,6 +10,8 @@ import goorm.athena.domain.user.dto.response.UserUpdateResponse;
 import goorm.athena.domain.user.service.UserService;
 import goorm.athena.global.exception.CustomException;
 import goorm.athena.global.exception.ErrorCode;
+import goorm.athena.global.jwt.util.CheckLogin;
+import goorm.athena.global.jwt.util.LoginUserRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -32,7 +34,8 @@ public class UserControllerImpl implements UserController{
 
     @Override
     @PutMapping
-    public ResponseEntity<UserUpdateResponse> updateUser(@RequestBody UserUpdateRequest request){
+    public ResponseEntity<UserUpdateResponse> updateUser(@CheckLogin LoginUserRequest loginUserRequest,
+                                                         @RequestBody UserUpdateRequest request){
         UserUpdateResponse response = userService.updateUser(request);
         return ResponseEntity.ok(response);
     }
