@@ -1,15 +1,19 @@
 package goorm.athena.domain.user.service;
 
 import goorm.athena.domain.user.dto.request.UserCreateRequest;
+import goorm.athena.domain.user.dto.request.UserLoginRequest;
 import goorm.athena.domain.user.dto.request.UserUpdateRequest;
 import goorm.athena.domain.user.dto.response.UserCreateResponse;
 import goorm.athena.domain.user.dto.response.UserGetResponse;
+import goorm.athena.domain.user.dto.response.UserLoginResponse;
 import goorm.athena.domain.user.dto.response.UserUpdateResponse;
+import goorm.athena.domain.user.entity.Role;
 import goorm.athena.domain.user.entity.User;
 import goorm.athena.domain.user.mapper.UserMapper;
 import goorm.athena.domain.user.repository.UserRepository;
 import goorm.athena.global.exception.CustomException;
 import goorm.athena.global.exception.ErrorCode;
+import goorm.athena.global.jwt.util.JwtTokenizer;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +24,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtTokenizer jwtTokenizer;
 
     @Transactional
     public UserCreateResponse createUser(UserCreateRequest request){
@@ -65,4 +70,19 @@ public class UserService {
     public void deleteUser(Long userId){
         userRepository.deleteById(userId);
     }
+
+    public UserLoginResponse validateUserCredentials(UserLoginRequest request){
+        User user = userRepository.findByEmail(request.email());
+        if(user == null || !passwordEncoder.matches(request.password(), user.getPassword())){
+            throw new CustomException(ErrorCode.AUTH_INVALID_LOGIN);
+        }
+
+        Role role = user.getRole();
+
+        String accessToken = jwtTokenizer.createAccessToken(user.getId(), user.getEmail(), role.name());
+        String refreshToken = jwtTokenizer.createRefreshToken(user.getId(), user.getEmail(), role.name());
+
+        return UserMapper.toLoginResponse(user.getId(), accessToken, refreshToken);
+    }
+
 }
