@@ -1,0 +1,25 @@
+package goorm.athena.domain.order.controller;
+
+import goorm.athena.domain.order.dto.req.OrderCreateRequest;
+import goorm.athena.domain.order.dto.res.OrderCreateResponse;
+import goorm.athena.domain.order.service.OrderService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequiredArgsConstructor
+@RequestMapping("/api/orders")
+public class OrderControllerImpl {
+
+    private final OrderService orderService;
+
+    @PostMapping("/{userId}")
+    public ResponseEntity<OrderCreateResponse> createOrder(
+            @PathVariable Long userId,
+            @RequestBody OrderCreateRequest request
+    ) {
+        OrderCreateResponse response = orderService.createOrder(userId, request);
+        return ResponseEntity.ok(response);
+    }
+}
