@@ -27,5 +27,9 @@ public class OrderItem {
     private int quantity;
     private int price;
 
+    public static OrderItem of(Order order, Product product, int quantity) {
+        int price = product.getProductPrice() * quantity;
+        return new OrderItem(order, product, quantity, price);
+    }
 
 }

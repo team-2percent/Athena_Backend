@@ -1,6 +1,6 @@
 package goorm.athena.domain.order.entity;
 
-import goorm.athena.domain.project.entity.Project;
+import goorm.athena.domain.deliveryinfo.entity.DeliveryInfo;
 import goorm.athena.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -29,8 +29,22 @@ public class Order {
     private int totalPrice;
 
     @Enumerated(EnumType.STRING)
-    private Status paymentStatus;
+    private Status status;
 
     private LocalDateTime orderedAt;
 
+
+    public static Order create(User user, DeliveryInfo delivery, LocalDateTime orderedAt) {
+        Order order = new Order();
+        order.user = user;
+        order.delivery = delivery;
+        order.orderedAt = orderedAt;
+        order.status = Status.ORDERED;
+        return order;
+    }
+
+    public void completeOrder(int totalPrice) {
+        this.totalPrice = totalPrice;
+        this.status = Status.ORDERED;
+    }
 }
