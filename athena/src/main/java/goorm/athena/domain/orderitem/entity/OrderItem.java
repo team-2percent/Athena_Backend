@@ -3,6 +3,7 @@ package goorm.athena.domain.orderitem.entity;
 import goorm.athena.domain.order.entity.Order;
 import goorm.athena.domain.product.entity.Product;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -23,12 +24,19 @@ public class OrderItem {
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;
 
-
     private int quantity;
-    private int price;
+    private Long price;
+
+    @Builder
+    public OrderItem(Order order, Product product, int quantity, Long price) {
+        this.order = order;
+        this.product = product;
+        this.quantity = quantity;
+        this.price = price;
+    }
 
     public static OrderItem of(Order order, Product product, int quantity) {
-        int price = product.getProductPrice() * quantity;
+        Long price = product.getProductPrice() * quantity;
         return new OrderItem(order, product, quantity, price);
     }
 
