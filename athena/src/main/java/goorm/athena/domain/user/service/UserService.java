@@ -97,8 +97,10 @@ public class UserService {
 
         String accessToken = jwtTokenizer.createAccessToken(user.getId(), user.getEmail(), user.getRole().name());
 
+
+
         // 토큰 발급 공통 로직
-        String refreshTokenValue = tokenService.issueToken(user, response, true);
+        String refreshTokenValue = tokenService.issueToken(user, response);
 
         return UserMapper.toLoginResponse(user.getId(), accessToken, refreshTokenValue);
     }
