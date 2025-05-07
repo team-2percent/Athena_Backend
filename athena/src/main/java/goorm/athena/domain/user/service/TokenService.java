@@ -20,7 +20,7 @@ public class TokenService {
     public String issueToken(User user, HttpServletResponse response){
         String refreshTokenValue = jwtTokenizer.createRefreshToken(
                 user.getId(),
-                user.getEmail(),
+                user.getNickname(),
                 user.getRole().name());
 
         ResponseCookie cookie = ResponseCookie.from("refreshToken", refreshTokenValue)

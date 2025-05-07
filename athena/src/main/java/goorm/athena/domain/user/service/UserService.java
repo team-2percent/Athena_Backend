@@ -88,9 +88,7 @@ public class UserService {
             throw new CustomException(ErrorCode.AUTH_INVALID_LOGIN);
         }
 
-        String accessToken = jwtTokenizer.createAccessToken(user.getId(), user.getEmail(), user.getRole().name());
-
-
+        String accessToken = jwtTokenizer.createAccessToken(user.getId(), user.getNickname(), user.getRole().name());
 
         // 토큰 발급 공통 로직
         String refreshTokenValue = tokenService.issueToken(user, response);

@@ -62,7 +62,7 @@ public class RefreshTokenService {
             throw new CustomException(ErrorCode.USER_NOT_FOUND);
         }
 
-        String accessToken = jwtTokenizer.createAccessToken(user.getId(), user.getEmail(), user.getRole().name());
+        String accessToken = jwtTokenizer.createAccessToken(user.getId(), user.getNickname(), user.getRole().name());
         String newRefreshToken = tokenService.issueToken(user, response);
 
         return RefreshTokenMapper.toRefreshTokenResponse(user.getId(), accessToken, newRefreshToken);
