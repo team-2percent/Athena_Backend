@@ -83,7 +83,7 @@ public class JwtTokenizer {
     }
 
     public boolean isValidAccessToken(String accessToken) {
-        return validate(extractBearerToken(accessToken), accessSecret);
+        return validateSilently(extractBearerToken(accessToken), accessSecret);
     }
 
     public boolean isValidRefreshToken(String refreshToken) {
@@ -95,9 +95,27 @@ public class JwtTokenizer {
             Jwts.parser()
                     .verifyWith(Keys.hmacShaKeyFor(secretKey))
                     .build()
+                    .parseSignedClaims(token);
+            return true;
+        } catch (ExpiredJwtException e) {
+            throw new CustomException(ErrorCode.AUTH_TOKEN_EXPIRED);
+        } catch (JwtException e) {
+            throw new CustomException(ErrorCode.AUTH_INVALID_TOKEN);
+        } catch (Exception e) {
+            throw new CustomException(ErrorCode.AUTH_FAILED);
+        }
+    }
+
+    private boolean validateSilently(String token, byte[] secretKey) {
+        try {
+            Jwts.parser()
+                    .verifyWith(Keys.hmacShaKeyFor(secretKey))
+                    .build()
                     .parse(token);
             return true;
         } catch (JwtException e) {
+            return false;  // 유효하지 않음
+        } catch (Exception e) {
             return false;
         }
     }
