@@ -46,8 +46,8 @@ public class UserService {
     }
 
     @Transactional
-    public UserUpdateResponse updateUser(UserUpdateRequest request){
-        User updateUser = userRepository.findById(request.id())
+    public UserUpdateResponse updateUser(Long userId, UserUpdateRequest request){
+        User updateUser = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         updateUser.update(request.email(),

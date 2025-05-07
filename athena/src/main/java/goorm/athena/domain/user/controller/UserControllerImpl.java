@@ -32,11 +32,13 @@ public class UserControllerImpl implements UserController{
         return ResponseEntity.ok(response);
     }
 
+    // userId와 업데이트 dto를 따로 관리하는 이유는, '@CheckLogin'에서 LoginUserRequest를 매개변수로 받으면
+    // jwt 토큰 검증을 실시합니다.
     @Override
     @PutMapping
     public ResponseEntity<UserUpdateResponse> updateUser(@CheckLogin LoginUserRequest loginUserRequest,
                                                          @RequestBody UserUpdateRequest request){
-        UserUpdateResponse response = userService.updateUser(request);
+        UserUpdateResponse response = userService.updateUser(loginUserRequest.userId(), request);
         return ResponseEntity.ok(response);
     }
 
