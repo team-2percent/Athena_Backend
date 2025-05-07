@@ -24,3 +24,7 @@ spring:
       approval-url: ${KAKAO_API_APPROVAL_URL}
       cancel-url: ${KAKAO_API_CANCEL_URL}
       fail-url: ${KAKAO_API_FAIL_URL}
+
+jwt:
+  secretKey: ${JWT_SECRET_KEY}
+  refreshKey: ${JWT_REFRESH_KEY}
