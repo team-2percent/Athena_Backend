@@ -20,13 +20,15 @@ public class TokenService {
 
     // 토큰 발급, 재발급 공통 로직
     @Transactional
-    public String issueToken(User user, HttpServletResponse response, boolean saveEntity){
+    public String issueToken(User user, HttpServletResponse response){
         String refreshTokenValue = jwtTokenizer.createRefreshToken(user.getId(), user.getEmail(), user.getRole().name());
 
-        if (saveEntity) {
-            RefreshToken refreshToken = RefreshToken.create(user, refreshTokenValue);
-            refreshTokenRepository.save(refreshToken);
-        }
+        // 기존 토큰 삭제 ( 중복 로그인 방지 )
+        refreshTokenRepository.findByUser(user)
+                .ifPresent(refreshTokenRepository::delete);
+
+        RefreshToken refreshToken = RefreshToken.create(user, refreshTokenValue);
+        refreshTokenRepository.save(refreshToken);
 
         ResponseCookie cookie = ResponseCookie.from("refreshToken", refreshTokenValue)
                 .httpOnly(true)
