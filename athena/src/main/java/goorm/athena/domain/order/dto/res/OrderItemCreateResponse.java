@@ -6,7 +6,7 @@ public record OrderItemCreateResponse(
         Long productId,
         String productName,
         int quantity,
-        int price
+        Long price
 )  {
     public static OrderItemCreateResponse from(OrderItem item) {
         return new OrderItemCreateResponse(

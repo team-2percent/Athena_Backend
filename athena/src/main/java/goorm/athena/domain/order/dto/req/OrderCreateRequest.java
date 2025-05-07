@@ -4,5 +4,6 @@ import java.util.List;
 
 public record OrderCreateRequest(
         Long deliveryInfoId,
+        Long projectId,
         List<OrderItemRequest> orderItems
 ) {}
