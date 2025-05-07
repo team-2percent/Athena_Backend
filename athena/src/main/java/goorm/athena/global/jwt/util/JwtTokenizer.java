@@ -1,6 +1,10 @@
 package goorm.athena.global.jwt.util;
 
+import goorm.athena.global.exception.CustomException;
+import goorm.athena.global.exception.ErrorCode;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
@@ -77,4 +81,23 @@ public class JwtTokenizer {
         Claims claims = parseToken(token, accessSecret);
         return Long.valueOf((Integer)claims.get("userId"));
     }
+
+    public boolean validateToken(String token){
+        try{
+            Jwts.parser()
+                    .verifyWith(Keys.hmacShaKeyFor(accessSecret))
+                    .build()
+                    .parse(token);
+
+            return true;
+        } catch (ExpiredJwtException e){
+            throw new CustomException(ErrorCode.AUTH_TOKEN_EXPIRED);
+        } catch (JwtException e){
+            throw new CustomException(ErrorCode.AUTH_INVALID_TOKEN);
+        } catch (Exception e){
+            throw new CustomException(ErrorCode.AUTH_FAILED);
+        }
+    }
+
+
 }
