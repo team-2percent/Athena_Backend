@@ -19,6 +19,7 @@ public enum ErrorCode {
     AUTH_TOKEN_EXPIRED(HttpStatus.UNAUTHORIZED, "토큰이 만료되었습니다."),
     AUTH_FAILED(HttpStatus.UNAUTHORIZED, "인증에 실패했습니다"),
     VALIDATION_ERROR(HttpStatus.BAD_REQUEST, "필드 유효성 검증에 실패했습니다"),
+    REFRESHTOKEN_NOT_FOUND(HttpStatus.NOT_FOUND, "RefreshToken을 찾지 못했습니다."),
 
     //유저
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 ID의 USER가 존재하지 않습니다."),
