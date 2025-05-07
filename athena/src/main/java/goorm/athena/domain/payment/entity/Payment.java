@@ -27,7 +27,7 @@ public class Payment {
 
     private String tid;
     private String pgToken;
-    private int amountTotal;
+    private Long amountTotal;
 
     @Enumerated(EnumType.STRING)
     private Status status;
@@ -35,7 +35,7 @@ public class Payment {
     private LocalDateTime approvedAt;
     private LocalDateTime createdAt;
 
-    public static Payment create(Order order, User user, String tid, int amountTotal) {
+    public static Payment create(Order order, User user, String tid, Long amountTotal) {
         Payment payment = new Payment();
         payment.order = order;
         payment.user = user;
