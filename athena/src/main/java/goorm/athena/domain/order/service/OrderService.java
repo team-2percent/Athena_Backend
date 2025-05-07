@@ -60,6 +60,9 @@ public class OrderService {
 
         for (OrderItemRequest item : request.orderItems()) {
             Product product = productService.getById(item.productId());
+            if (product.getStock() < item.quantity()) {
+                throw new CustomException(ErrorCode.INSUFFICIENT_INVENTORY);
+            }
             OrderItem orderItem = OrderItem.of(order, product, item.quantity());
             totalPrice += orderItem.getPrice();
             totalQuantity += item.quantity();
