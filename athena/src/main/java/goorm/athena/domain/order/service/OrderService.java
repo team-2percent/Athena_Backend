@@ -46,7 +46,7 @@ public class OrderService {
     @Transactional
     public OrderCreateResponse createOrder(Long userId, OrderCreateRequest request) {
 
-        User user = userService.getUserById2(userId);
+        User user = userService.getUser(userId);
         DeliveryInfo delivery = deliveryInfoService.getById(request.deliveryInfoId());
         Project project = projectService.getById(request.projectId());
 
