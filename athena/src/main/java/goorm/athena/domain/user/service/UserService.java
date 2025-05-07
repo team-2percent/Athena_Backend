@@ -75,10 +75,12 @@ public class UserService {
         return UserMapper.toGetResponse(user);
     }
 
+    @Transactional
     public void deleteUser(Long userId){
         userRepository.deleteById(userId);
     }
 
+    @Transactional
     public UserLoginResponse validateUserCredentials(UserLoginRequest request){
         User user = userRepository.findByEmail(request.email());
         if(user == null || !passwordEncoder.matches(request.password(), user.getPassword())){
