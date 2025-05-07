@@ -28,11 +28,11 @@ public class JwtTokenizer {
     }
 
     // 토큰 생성 템플릿
-    public String createToken(Long id, String email, String roles,
+    public String createToken(Long id, String email, String role,
                               Long expire, byte[] secretKey){
         Claims claims = Jwts.claims()
                 .subject(email)
-                .add("roles", roles)
+                .add("role", role)
                 .add("userId", id)
                 .build();
 
