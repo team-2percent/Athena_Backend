@@ -46,7 +46,7 @@ public class RefreshTokenService {
 
         User user = userService.getUser(userId);
 
-        String newAccessToken = jwtTokenizer.createAccessToken(user.getId(), claims.getSubject(), claims.get("roles", String.class));
+        String newAccessToken = jwtTokenizer.createAccessToken(user.getId(), claims.getSubject(), claims.get("role", String.class));
 
         return new RefreshTokenResponse(userId, newAccessToken, refreshTokenValue);
     }
