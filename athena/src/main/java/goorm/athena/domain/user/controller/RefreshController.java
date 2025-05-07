@@ -24,11 +24,11 @@ public interface RefreshController {
                     @ApiResponse(responseCode = "404", description = "사용자 정보 없음")
             })
 
-    @PostMapping
+    @PostMapping("/ReissueRefresh")
     public ResponseEntity<RefreshTokenResponse> requestRefresh(@CookieValue("refreshToken") String refreshToken, HttpServletResponse response);
 
     @Operation(summary = "액세스 토큰을 재발급합니다.")
     @ApiResponse(responseCode = "200", description = "액세스 토큰 재발급 성공")
-    @PostMapping("/refresh")
+    @PostMapping("/ReissueAccess")
     public ResponseEntity<RefreshTokenResponse> refreshToken(@CookieValue("refreshToken") String refreshToken, HttpServletResponse response);
 }
