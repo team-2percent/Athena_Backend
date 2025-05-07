@@ -1,4 +1,4 @@
-package goorm.athena.domain.search.dto.Response;
+package goorm.athena.domain.search.dto.response;
 
 import java.util.List;
 

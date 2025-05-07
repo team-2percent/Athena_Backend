@@ -1,4 +1,4 @@
-package goorm.athena.domain.search.dto.Request;
+package goorm.athena.domain.search.dto.request;
 
 import jakarta.validation.constraints.NotNull;
 

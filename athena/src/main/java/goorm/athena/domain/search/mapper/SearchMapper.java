@@ -1,12 +1,10 @@
 package goorm.athena.domain.search.mapper;
 
 import goorm.athena.domain.project.entity.Project;
-import goorm.athena.domain.search.dto.Response.SearchResultResponse;
+import goorm.athena.domain.search.dto.response.SearchResultResponse;
+import goorm.athena.domain.search.service.SearchService;
 import java.util.List;
 import org.springframework.data.domain.Page;
-import java.time.LocalDateTime;
-import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
 
 public class SearchMapper {
   public static SearchResultResponse toSearchResultResponse(Page<Project> page) {
@@ -23,6 +21,9 @@ public class SearchMapper {
   }
 
   public static SearchResultResponse.Project toProjectDto(Project project) {
+    if (project == null) {
+      throw new IllegalArgumentException("Project 객체는 null이 될 수 없습니다.");
+    }
     // sellerName, thumbnailUrl, daysLeft 등은 조인/계산 필요
     return new SearchResultResponse.Project(
         project.getId(),
@@ -33,11 +34,7 @@ public class SearchMapper {
         project.getDescription(),
         project.getGoalAmount(),
         project.getTotalAmount(),
-        calculateDaysLeft(project.getStartAt(), project.getEndAt()),
+        SearchService.calculateDaysLeft(project.getStartAt(), project.getEndAt()),
         project.getStatus().name());
-  }
-
-  private static int calculateDaysLeft(LocalDateTime startAt, LocalDateTime endAt) {
-    return (int) ChronoUnit.DAYS.between(LocalDate.now(), endAt.toLocalDate());
   }
 }

@@ -10,8 +10,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import goorm.athena.domain.project.repository.ProjectRepository;
 import goorm.athena.domain.project.spec.ProjectSpecification;
+import goorm.athena.domain.search.dto.response.SearchResultResponse;
 import goorm.athena.domain.search.mapper.SearchMapper;
-import goorm.athena.domain.search.dto.Response.SearchResultResponse;
+import java.time.LocalDateTime;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 
 @RequiredArgsConstructor
 @Service
@@ -23,5 +26,12 @@ public class SearchService {
     Specification<Project> spec = ProjectSpecification.searchByTitleOrSeller(searchWord);
     Page<Project> projectPage = projectRepository.findAll(spec, pageable);
     return SearchMapper.toSearchResultResponse(projectPage);
+  }
+
+  public static int calculateDaysLeft(LocalDateTime startAt, LocalDateTime endAt) {
+    if (startAt == null || endAt == null) {
+      throw new IllegalArgumentException("startAt 또는 endAt은 null이 될 수 없습니다.");
+    }
+    return (int) ChronoUnit.DAYS.between(LocalDate.now(), endAt.toLocalDate());
   }
 }
