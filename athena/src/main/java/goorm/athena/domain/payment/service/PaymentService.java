@@ -38,8 +38,7 @@ public class PaymentService {
         KakaoPayReadyResponse response;
         try {
             response = kakaoPayService
-                    .requestKakaoPayment(requestDto, user, orderId)
-                    .getBody();
+                    .requestKakaoPayment(requestDto, user, orderId);
         } catch (Exception e) {
             throw new CustomException(ErrorCode.KAKAO_PAY_UNAVAILABLE);
         }
