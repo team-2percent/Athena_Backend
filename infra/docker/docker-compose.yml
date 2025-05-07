@@ -1,0 +1,31 @@
+version: "3.8"
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    ports:
+      - "3306:3306" # 호스트:컨테이너 포트 매핑
+    volumes:
+      - mysql_data:/var/lib/mysql # 데이터 영속성을 위한 볼륨
+    networks:
+      - backend_network
+    command:
+      # MySQL 8.0의 기본 인증 방식 변경
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+      - --default-authentication-plugin=mysql_native_password
+
+volumes:
+  mysql_data:
+    driver: local
+
+networks:
+  backend_network:
+    driver: bridge
