@@ -72,6 +72,7 @@ public class UserControllerImpl implements UserController{
         return ResponseEntity.ok(loginResponse);
     }
 
+    @Override
     @PostMapping("/logout")
     public ResponseEntity<String> logout(@CookieValue("refreshToken") String refreshToken, HttpServletResponse response) {
         if (refreshToken == null || refreshToken.isEmpty()) {
