@@ -74,23 +74,13 @@ public class UserControllerImpl implements UserController{
 
     @Override
     @PostMapping("/logout")
-    public ResponseEntity<String> logout(@CookieValue("refreshToken") String refreshToken, HttpServletResponse response) {
+    public ResponseEntity<Void> logout(@CookieValue("refreshToken") String refreshToken, HttpServletResponse response) {
         if (refreshToken == null || refreshToken.isEmpty()) {
             throw new CustomException(ErrorCode.REFRESHTOKEN_NOT_FOUND);
         }
 
-        refreshTokenService.deleteRefreshToken(refreshToken);
+        refreshTokenService.deleteRefreshToken(response);
 
-        ResponseCookie cookie = ResponseCookie.from("refreshToken", "")
-                .httpOnly(true)
-                .secure(true)
-                .path("/")
-                .maxAge(0)
-                .sameSite("Strict")
-                .build();
-
-        response.addHeader("Set-Cooke", cookie.toString());
-
-        return ResponseEntity.ok("Logged out");
+        return ResponseEntity.ok().build();
     }
 }

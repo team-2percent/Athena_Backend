@@ -1,16 +1,15 @@
 package goorm.athena.domain.user.service;
 
 import goorm.athena.domain.user.dto.response.RefreshTokenResponse;
-import goorm.athena.domain.user.entity.RefreshToken;
 import goorm.athena.domain.user.entity.User;
 import goorm.athena.domain.user.mapper.RefreshTokenMapper;
-import goorm.athena.domain.user.repository.RefreshTokenRepository;
 import goorm.athena.global.exception.CustomException;
 import goorm.athena.global.exception.ErrorCode;
 import goorm.athena.global.jwt.util.JwtTokenizer;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,27 +19,25 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class RefreshTokenService {
     private final UserService userService;
-    private final RefreshTokenRepository refreshTokenRepository;
     private final JwtTokenizer jwtTokenizer;
     private final TokenService tokenService;
 
     @Transactional
-    public void deleteRefreshToken(String refreshToken){
-        Optional<RefreshToken> existingToken = refreshTokenRepository.findByValue(refreshToken);
+    public void deleteRefreshToken(HttpServletResponse response){
+        ResponseCookie cookie = ResponseCookie.from("refreshToken", "")
+                .httpOnly(true)
+                .secure(true)
+                .path("/")
+                .maxAge(0)
+                .sameSite("Strict")
+                .build();
 
-        if(existingToken.isPresent()){
-            refreshTokenRepository.delete(existingToken.get());
-        } else {
-            throw new CustomException(ErrorCode.REFRESHTOKEN_NOT_FOUND);
-        }
+        response.addHeader("Set-Cookie", cookie.toString());
+
     }
 
     @Transactional
     public RefreshTokenResponse refreshAccessToken(String refreshTokenValue){
-        // 리프레시 토큰 확인
-        RefreshToken refreshToken = refreshTokenRepository.findByValue(refreshTokenValue)
-                .orElseThrow(() -> new CustomException(ErrorCode.REFRESHTOKEN_NOT_FOUND));
-
         Claims claims = jwtTokenizer.parseRefreshToken(refreshTokenValue);
         Long userId = Long.valueOf((Integer) claims.get("userId"));
 
@@ -64,8 +61,6 @@ public class RefreshTokenService {
         if (user == null) {
             throw new CustomException(ErrorCode.USER_NOT_FOUND);
         }
-
-        refreshTokenRepository.deleteAllByUser(user);
 
         String accessToken = jwtTokenizer.createAccessToken(user.getId(), user.getEmail(), user.getRole().name());
         String newRefreshToken = tokenService.issueToken(user, response);

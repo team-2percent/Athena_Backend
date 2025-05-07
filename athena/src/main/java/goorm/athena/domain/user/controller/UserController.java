@@ -64,5 +64,5 @@ public interface UserController {
     @Operation(summary = "유저 로그아웃 API", description = "로그인 된 유저의 refreshToken을 서버에 저장된 쿠키에서 삭제합니다.")
     @ApiResponse(responseCode = "200", description = "유저 로그아웃 성공")
     @PostMapping("/logout")
-    public ResponseEntity<String> logout(@CookieValue("refreshToken") String refreshToken, HttpServletResponse response);
+    public ResponseEntity<Void> logout(@CookieValue("refreshToken") String refreshToken, HttpServletResponse response);
 }
