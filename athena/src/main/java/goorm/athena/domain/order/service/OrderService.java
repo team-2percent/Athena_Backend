@@ -51,7 +51,6 @@ public class OrderService {
         Project project = projectService.getById(request.projectId());
 
         Order order = Order.create(user, delivery, project, LocalDateTime.now());
-        orderRepository.save(order);
 
         List<OrderItem> orderItems = new ArrayList<>();
 
@@ -70,6 +69,7 @@ public class OrderService {
         }
 
         order.completeOrder(totalPrice, totalQuantity);
+        orderRepository.save(order);
         orderItemRepository.saveAll(orderItems);
 
         return OrderCreateResponse.from(order, orderItems);
