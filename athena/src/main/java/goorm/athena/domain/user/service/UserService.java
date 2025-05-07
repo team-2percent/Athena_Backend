@@ -7,22 +7,30 @@ import goorm.athena.domain.user.dto.response.UserCreateResponse;
 import goorm.athena.domain.user.dto.response.UserGetResponse;
 import goorm.athena.domain.user.dto.response.UserLoginResponse;
 import goorm.athena.domain.user.dto.response.UserUpdateResponse;
+import goorm.athena.domain.user.entity.RefreshToken;
 import goorm.athena.domain.user.entity.Role;
 import goorm.athena.domain.user.entity.User;
 import goorm.athena.domain.user.mapper.UserMapper;
+import goorm.athena.domain.user.repository.RefreshTokenRepository;
 import goorm.athena.domain.user.repository.UserRepository;
 import goorm.athena.global.exception.CustomException;
 import goorm.athena.global.exception.ErrorCode;
 import goorm.athena.global.jwt.util.JwtTokenizer;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseCookie;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
+import java.time.Duration;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
+    private final TokenService tokenService;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenizer jwtTokenizer;
 
@@ -81,18 +89,17 @@ public class UserService {
     }
 
     @Transactional
-    public UserLoginResponse validateUserCredentials(UserLoginRequest request){
+    public UserLoginResponse validateUserCredentials(UserLoginRequest request, HttpServletResponse response){
         User user = userRepository.findByEmail(request.email());
         if(user == null || !passwordEncoder.matches(request.password(), user.getPassword())){
             throw new CustomException(ErrorCode.AUTH_INVALID_LOGIN);
         }
 
-        Role role = user.getRole();
+        String accessToken = jwtTokenizer.createAccessToken(user.getId(), user.getEmail(), user.getRole().name());
 
-        String accessToken = jwtTokenizer.createAccessToken(user.getId(), user.getEmail(), role.name());
-        String refreshToken = jwtTokenizer.createRefreshToken(user.getId(), user.getEmail(), role.name());
+        // 토큰 발급 공통 로직
+        String refreshTokenValue = tokenService.issueToken(user, response, true);
 
-        return UserMapper.toLoginResponse(user.getId(), accessToken, refreshToken);
+        return UserMapper.toLoginResponse(user.getId(), accessToken, refreshTokenValue);
     }
-
 }
