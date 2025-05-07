@@ -3,8 +3,10 @@ package goorm.athena.domain.user.mapper;
 import goorm.athena.domain.user.dto.request.UserCreateRequest;
 import goorm.athena.domain.user.dto.response.UserCreateResponse;
 import goorm.athena.domain.user.dto.response.UserGetResponse;
+import goorm.athena.domain.user.dto.response.UserLoginResponse;
 import goorm.athena.domain.user.dto.response.UserUpdateResponse;
 import goorm.athena.domain.user.entity.User;
+import org.springframework.http.ResponseEntity;
 
 public class UserMapper {
 
@@ -22,7 +24,6 @@ public class UserMapper {
         return new UserCreateResponse(
                 user.getId(),
                 user.getEmail(),
-                user.getPassword(),
                 user.getNickname(),
                 user.getRole()
         );
@@ -45,6 +46,14 @@ public class UserMapper {
                 user.getPassword(),
                 user.getNickname(),
                 user.getRole()
+        );
+    }
+
+    public static UserLoginResponse toLoginResponse(Long userId, String accessToken, String refreshToken){
+        return new UserLoginResponse(
+                accessToken,
+                refreshToken,
+                userId
         );
     }
 }
