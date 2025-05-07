@@ -16,7 +16,7 @@ public class OrderControllerImpl implements OrderController {
 
     private final OrderService orderService;
 
-    @PostMapping("/{userId}")
+    @PostMapping
     public ResponseEntity<OrderCreateResponse> createOrder(
             @CheckLogin LoginUserRequest loginUserRequest,
             @RequestBody OrderCreateRequest request
