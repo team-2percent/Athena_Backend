@@ -1,8 +1,6 @@
 package goorm.athena.domain.user.service;
 
-import goorm.athena.domain.user.entity.RefreshToken;
 import goorm.athena.domain.user.entity.User;
-import goorm.athena.domain.user.repository.RefreshTokenRepository;
 import goorm.athena.global.jwt.util.JwtTokenizer;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -16,19 +14,14 @@ import java.time.Duration;
 @RequiredArgsConstructor
 public class TokenService {
     private final JwtTokenizer jwtTokenizer;
-    private final RefreshTokenRepository refreshTokenRepository;
 
     // 토큰 발급, 재발급 공통 로직
     @Transactional
     public String issueToken(User user, HttpServletResponse response){
-        String refreshTokenValue = jwtTokenizer.createRefreshToken(user.getId(), user.getEmail(), user.getRole().name());
-
-        // 기존 토큰 삭제 ( 중복 로그인 방지 )
-        refreshTokenRepository.findByUser(user)
-                .ifPresent(refreshTokenRepository::delete);
-
-        RefreshToken refreshToken = RefreshToken.create(user, refreshTokenValue);
-        refreshTokenRepository.save(refreshToken);
+        String refreshTokenValue = jwtTokenizer.createRefreshToken(
+                user.getId(),
+                user.getEmail(),
+                user.getRole().name());
 
         ResponseCookie cookie = ResponseCookie.from("refreshToken", refreshTokenValue)
                 .httpOnly(true)

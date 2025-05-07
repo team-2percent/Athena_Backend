@@ -7,24 +7,17 @@ import goorm.athena.domain.user.dto.response.UserCreateResponse;
 import goorm.athena.domain.user.dto.response.UserGetResponse;
 import goorm.athena.domain.user.dto.response.UserLoginResponse;
 import goorm.athena.domain.user.dto.response.UserUpdateResponse;
-import goorm.athena.domain.user.entity.RefreshToken;
-import goorm.athena.domain.user.entity.Role;
 import goorm.athena.domain.user.entity.User;
 import goorm.athena.domain.user.mapper.UserMapper;
-import goorm.athena.domain.user.repository.RefreshTokenRepository;
 import goorm.athena.domain.user.repository.UserRepository;
 import goorm.athena.global.exception.CustomException;
 import goorm.athena.global.exception.ErrorCode;
 import goorm.athena.global.jwt.util.JwtTokenizer;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseCookie;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.security.crypto.password.PasswordEncoder;
-
-import java.time.Duration;
 
 @Service
 @RequiredArgsConstructor
