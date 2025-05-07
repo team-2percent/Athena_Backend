@@ -43,5 +43,6 @@ public class JwtAuthenticationToken extends AbstractAuthenticationToken {
     }
 
     public void setToken(String accessToken) {
+        this.token = accessToken;
     }
 }
