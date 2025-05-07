@@ -1,13 +1,21 @@
 package goorm.athena.domain.user.controller;
 
 import goorm.athena.domain.user.dto.request.UserCreateRequest;
+import goorm.athena.domain.user.dto.request.UserLoginRequest;
 import goorm.athena.domain.user.dto.request.UserUpdateRequest;
+import goorm.athena.domain.user.dto.response.UserLoginResponse;
 import goorm.athena.domain.user.dto.response.UserCreateResponse;
 import goorm.athena.domain.user.dto.response.UserGetResponse;
 import goorm.athena.domain.user.dto.response.UserUpdateResponse;
 import goorm.athena.domain.user.service.UserService;
+import goorm.athena.global.exception.CustomException;
+import goorm.athena.global.exception.ErrorCode;
+import goorm.athena.global.jwt.util.CheckLogin;
+import goorm.athena.global.jwt.util.LoginUserRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
@@ -24,10 +32,13 @@ public class UserControllerImpl implements UserController {
         return ResponseEntity.ok(response);
     }
 
+    // userId와 업데이트 dto를 따로 관리하는 이유는, '@CheckLogin'에서 LoginUserRequest를 매개변수로 받으면
+    // jwt 토큰 검증을 실시합니다.
     @Override
     @PutMapping
-    public ResponseEntity<UserUpdateResponse> updateUser(@RequestBody UserUpdateRequest request) {
-        UserUpdateResponse response = userService.updateUser(request);
+    public ResponseEntity<UserUpdateResponse> updateUser(@CheckLogin LoginUserRequest loginUserRequest,
+                                                         @RequestBody UserUpdateRequest request){
+        UserUpdateResponse response = userService.updateUser(loginUserRequest.userId(), request);
         return ResponseEntity.ok(response);
     }
 
@@ -45,4 +56,15 @@ public class UserControllerImpl implements UserController {
         return ResponseEntity.noContent().build();
     }
 
+    @Override
+    @PostMapping("/login")
+    public ResponseEntity<UserLoginResponse> login(@RequestBody @Valid UserLoginRequest request, BindingResult bindingResult){
+        if(bindingResult.hasErrors()){
+            throw new CustomException(ErrorCode.VALIDATION_ERROR);
+        }
+
+        UserLoginResponse loginResponse = userService.validateUserCredentials(request);
+
+        return ResponseEntity.ok(loginResponse);
+    }
 }
