@@ -16,6 +16,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -58,5 +59,5 @@ public interface UserController {
     @ApiResponse(responseCode = "401", description = "로그인 실패 - 잘못된 인증 정보",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     @PostMapping("/login")
-    ResponseEntity<UserLoginResponse> login(@RequestBody @Valid UserLoginRequest loginDto, BindingResult bindingResult);
+    ResponseEntity<UserLoginResponse> login(@RequestBody @Valid UserLoginRequest loginDto, BindingResult bindingResult, HttpServletResponse response);
 }
