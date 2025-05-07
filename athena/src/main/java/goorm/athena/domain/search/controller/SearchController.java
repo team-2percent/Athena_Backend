@@ -6,10 +6,9 @@ import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.http.ResponseEntity;
-import org.springframework.data.domain.Page;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import goorm.athena.domain.search.entity.Search;
 import jakarta.validation.constraints.Size;
+import goorm.athena.domain.search.dto.Response.SearchResultResponse;
 
 @Tag(name = "Search", description = "검색 관련 API")
 @RequestMapping("/api/search")
@@ -20,7 +19,7 @@ public interface SearchController {
     @ApiResponse(responseCode = "200", description = "검색 목록 조회 성공")
     @GetMapping
     // ToDo Page<Search> 타입은 추후 Product의 Response Dto 타입으로 변경 필요
-    ResponseEntity<Page<Search>> searchList(
+    ResponseEntity<SearchResultResponse> searchList(
             @RequestParam(defaultValue = "0") Integer page,
             @RequestParam(defaultValue = "") @Size(min = 1, message = "검색어는 최소 1글자 이상이어야 합니다.") String searchWord);
 }
