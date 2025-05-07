@@ -19,6 +19,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "User", description = "유저 관련 API")
@@ -54,6 +55,8 @@ public interface UserController {
 
     @Operation(summary = "유저 로그인 API", description = "입력된 유저의 아이디, 비밀번호를 통해 로그인을 진행합니다.")
     @ApiResponse(responseCode = "200", description = "유저 로그인 성공")
+    @ApiResponse(responseCode = "401", description = "로그인 실패 - 잘못된 인증 정보",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     @PostMapping("/login")
     ResponseEntity<UserLoginResponse> login(@RequestBody @Valid UserLoginRequest loginDto, BindingResult bindingResult);
 }
