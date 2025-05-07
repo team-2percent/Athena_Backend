@@ -60,6 +60,14 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
+    public User getUser(Long userId){
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+    }
+
+
+    // 내 정보 조회 임시 로직
+    @Transactional(readOnly = true)
     public UserGetResponse getUserById(Long userId){
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
