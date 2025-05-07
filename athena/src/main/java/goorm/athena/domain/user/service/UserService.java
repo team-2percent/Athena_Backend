@@ -79,12 +79,6 @@ public class UserService {
         userRepository.deleteById(userId);
     }
 
-
-    public User getUserById2(Long userId) {
-        return userRepository.findById(userId)
-                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
-    }
-
     public UserLoginResponse validateUserCredentials(UserLoginRequest request){
         User user = userRepository.findByEmail(request.email());
         if(user == null || !passwordEncoder.matches(request.password(), user.getPassword())){
