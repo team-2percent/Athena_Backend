@@ -24,7 +24,6 @@ public class SearchService {
 
   private Specification<Search> searchWord(String searchWord) {
     return new Specification<Search>() {
-      // ToDo 아래 구문의 역할 이해하기
       private static final long serialVersionUID = 1L;
 
       @Override
@@ -39,11 +38,15 @@ public class SearchService {
         // 그렇게 조회된 상품과 판매자 테이블을 조인해서 판매자 이름을 조회
         Join<Product, User> seller = product.join("seller", JoinType.LEFT);
 
+        // SQL injection 공격 방지를 위해 검색 키워드 sanitize 처리
+        String sanitizedSearchWord = searchWord.replaceAll("[%_]", "\\$0");
+        String searchPattern = "%" + sanitizedSearchWord + "%";
+
         return criteriaBuilder.or(
             // 조인된 상품 product에서 title 컬럼을 비교
-            criteriaBuilder.like(product.get("title"), "%" + searchWord + "%"),
+            criteriaBuilder.like(product.get("title"), searchPattern),
             // 조인된 판매자 seller에서 name 컬럼을 비교
-            criteriaBuilder.like(seller.get("name"), "%" + searchWord + "%"));
+            criteriaBuilder.like(seller.get("name"), searchPattern));
       }
     };
   }
