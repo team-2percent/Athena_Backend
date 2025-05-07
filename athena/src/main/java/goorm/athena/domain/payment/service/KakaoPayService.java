@@ -43,9 +43,9 @@ public class KakaoPayService {
     @Value("${spring.kakao.api.fail-url}")
     private String failUrl;
 
-    public ResponseEntity<KakaoPayReadyResponse> requestKakaoPayment(PaymentReadyRequest requestDto, User user, Long orderId) {
+    public KakaoPayReadyResponse requestKakaoPayment(PaymentReadyRequest requestDto, User user, Long orderId) {
         HttpEntity<String> entity = createPaymentRequestEntity(requestDto, user, orderId);
-        log.info("🔐 adminKey 확인: {}", adminKey);
+        log.info("adminKey 확인: {}", adminKey);
 
 
         try {
@@ -56,10 +56,10 @@ public class KakaoPayService {
                     KakaoPayReadyResponse.class
             );
 
-            String tid = response.getBody().tid();
+//            String tid = response.getBody().tid();
             log.info("카카오페이 결제 요청 성공");
 
-            return response;
+            return response.getBody();
         } catch (Exception e) {
             log.error("카카오페이 결제 요청 실패", e);
             throw new CustomException(ErrorCode.KAKAO_PAY_REQUEST_FAILED);
@@ -92,7 +92,7 @@ public class KakaoPayService {
         params.put("cid", cid);
         params.put("partner_order_id", orderId);
         params.put("partner_user_id", user.getId());
-        params.put("item_name", dto.itemName());
+        params.put("item_name", dto.projectName());
         params.put("quantity", dto.quantity());
         params.put("total_amount", dto.totalAmount());
         params.put("tax_free_amount", 0);
