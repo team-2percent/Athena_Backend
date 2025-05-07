@@ -16,7 +16,7 @@ public class RefreshControllerImpl implements RefreshController{
     private final RefreshTokenService refreshTokenService;
 
     @Override
-    @PostMapping
+    @PostMapping("/ReissueRefresh")
     public ResponseEntity<RefreshTokenResponse> requestRefresh(@CookieValue("refreshToken") String refreshToken, HttpServletResponse response){
         if(refreshToken == null || refreshToken.isEmpty()){
             throw new CustomException(ErrorCode.REFRESHTOKEN_NOT_FOUND);
@@ -27,7 +27,7 @@ public class RefreshControllerImpl implements RefreshController{
     }
 
     @Override
-    @PostMapping("/refresh")
+    @PostMapping("/ReissueAccess")
     public ResponseEntity<RefreshTokenResponse> refreshToken(@CookieValue("refreshToken") String refreshToken, HttpServletResponse response){
         if(refreshToken == null || refreshToken.isEmpty()){
             throw new CustomException(ErrorCode.REFRESHTOKEN_NOT_FOUND);
