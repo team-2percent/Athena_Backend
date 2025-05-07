@@ -8,7 +8,7 @@ import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
 @Getter
-@Table(name = "`option`")
+@Table(name = "options")
 public class Option {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

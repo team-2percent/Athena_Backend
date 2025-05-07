@@ -22,9 +22,19 @@ public enum ErrorCode {
 
     //유저
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 ID의 USER가 존재하지 않습니다."),
-    ALREADY_EXIST_USER(HttpStatus.BAD_REQUEST, "이미 존재하는 사용자입니다.")
+    ALREADY_EXIST_USER(HttpStatus.BAD_REQUEST, "이미 존재하는 사용자입니다."),
 
-    ;
+    // 주문
+    DELIVERY_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 ID의 배송지가 존재하지 않습니다."),
+    PRODUCT_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 상품의 ID가 존재하지 않습니다."),
+    INSUFFICIENT_INVENTORY(HttpStatus.BAD_REQUEST, "재고가 부족합니다."),
+
+    // 프로젝트
+    PROJECT_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 프로젝트의 ID가 존재하지 않습니다."),
+
+    // 카카오 api
+    KAKAO_PAY_UNAVAILABLE(HttpStatus.SERVICE_UNAVAILABLE, "카카오페이 서버와의 통신에 실패했습니다. 잠시 후 다시 시도해주세요.");
+
 
     private final HttpStatus errorCode;
     private final String errorMessage;
