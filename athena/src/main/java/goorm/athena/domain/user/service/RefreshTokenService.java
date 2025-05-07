@@ -37,6 +37,7 @@ public class RefreshTokenService {
 
     @Transactional
     public RefreshTokenResponse refreshAccessToken(String refreshTokenValue){
+        // 리프레시 토큰 확인
         RefreshToken refreshToken = refreshTokenRepository.findByValue(refreshTokenValue)
                 .orElseThrow(() -> new CustomException(ErrorCode.REFRESHTOKEN_NOT_FOUND));
 
@@ -50,7 +51,7 @@ public class RefreshTokenService {
         return new RefreshTokenResponse(userId, newAccessToken, refreshTokenValue);
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public RefreshTokenResponse reissueToken(String refreshToken, HttpServletResponse response){
         if(refreshToken == null || refreshToken.isEmpty()){
             throw new CustomException(ErrorCode.REFRESHTOKEN_NOT_FOUND);
@@ -64,10 +65,10 @@ public class RefreshTokenService {
             throw new CustomException(ErrorCode.USER_NOT_FOUND);
         }
 
-        String accessToken = jwtTokenizer.createAccessToken(user.getId(), user.getEmail(), user.getRole().name());
+        refreshTokenRepository.deleteAllByUser(user);
 
-        // 토큰 발급 공통 로직 (재발급이라 DB 저장은 안 함)
-        String newRefreshToken = tokenService.issueToken(user, response, false);
+        String accessToken = jwtTokenizer.createAccessToken(user.getId(), user.getEmail(), user.getRole().name());
+        String newRefreshToken = tokenService.issueToken(user, response);
 
         return RefreshTokenMapper.toRefreshTokenResponse(user.getId(), accessToken, newRefreshToken);
     }
