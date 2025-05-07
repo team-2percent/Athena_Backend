@@ -3,6 +3,8 @@ package goorm.athena.domain.order.controller;
 
 import goorm.athena.domain.order.dto.req.OrderCreateRequest;
 import goorm.athena.domain.order.dto.res.OrderCreateResponse;
+import goorm.athena.global.jwt.util.CheckLogin;
+import goorm.athena.global.jwt.util.LoginUserRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -26,7 +28,7 @@ public interface OrderController {
     })
     @PostMapping("/{userId}")
     ResponseEntity<OrderCreateResponse> createOrder(
-            @Parameter(description = "주문자 ID", required = true) @PathVariable Long userId,
+            @Parameter(hidden = true) @CheckLogin LoginUserRequest loginUserRequest,
             @RequestBody OrderCreateRequest request
     );
 }

@@ -3,6 +3,8 @@ package goorm.athena.domain.order.controller;
 import goorm.athena.domain.order.dto.req.OrderCreateRequest;
 import goorm.athena.domain.order.dto.res.OrderCreateResponse;
 import goorm.athena.domain.order.service.OrderService;
+import goorm.athena.global.jwt.util.CheckLogin;
+import goorm.athena.global.jwt.util.LoginUserRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,10 +18,10 @@ public class OrderControllerImpl implements OrderController {
 
     @PostMapping("/{userId}")
     public ResponseEntity<OrderCreateResponse> createOrder(
-            @PathVariable Long userId,
+            @CheckLogin LoginUserRequest loginUserRequest,
             @RequestBody OrderCreateRequest request
     ) {
-        OrderCreateResponse response = orderService.createOrder(userId, request);
+        OrderCreateResponse response = orderService.createOrder(loginUserRequest.userId(), request);
         return ResponseEntity.ok(response);
     }
 }
