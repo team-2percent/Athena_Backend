@@ -21,10 +21,6 @@ public class SearchMapper {
   }
 
   public static SearchResultResponse.Project toProjectDto(Project project) {
-    if (project == null) {
-      throw new IllegalArgumentException("Project 객체는 null이 될 수 없습니다.");
-    }
-    // sellerName, thumbnailUrl, daysLeft 등은 조인/계산 필요
     return new SearchResultResponse.Project(
         project.getId(),
         project.getSeller().getNickname(),
