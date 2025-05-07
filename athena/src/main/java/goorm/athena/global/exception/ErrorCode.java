@@ -27,6 +27,7 @@ public enum ErrorCode {
     // 주문
     DELIVERY_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 ID의 배송지가 존재하지 않습니다."),
     PRODUCT_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 상품의 ID가 존재하지 않습니다."),
+    INSUFFICIENT_INVENTORY(HttpStatus.BAD_REQUEST, "재고가 부족합니다."),
 
     // 프로젝트
     PROJECT_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 프로젝트의 ID가 존재하지 않습니다."),
