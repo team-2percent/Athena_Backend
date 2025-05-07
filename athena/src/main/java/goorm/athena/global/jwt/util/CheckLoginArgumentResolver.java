@@ -37,6 +37,9 @@ public class CheckLoginArgumentResolver implements HandlerMethodArgumentResolver
             return null;
         }
 
+        if (!(principal instanceof LoginInfoDto)) {
+            return null;
+        }
         LoginInfoDto loginInfoDto = (LoginInfoDto) principal;
         LoginUserRequest loginUserRequest = LoginMapper.toRequest(loginInfoDto.email(), loginInfoDto.userId(), loginInfoDto.role());
 
