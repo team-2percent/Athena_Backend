@@ -66,54 +66,24 @@ reviews:
       enabled: true
     hadolint:
       enabled: true
-    swiftlint:
-      enabled: true
-    phpstan:
-      enabled: true
-      level: default
-    golangci-lint:
-      enabled: true
     yamllint:
       enabled: true
     gitleaks:
       enabled: true
     checkov:
       enabled: true
-    detekt:
-      enabled: true
-    eslint:
-      enabled: true
-    rubocop:
-      enabled: true
-    buf:
-      enabled: true
-    regal:
-      enabled: true
     actionlint:
       enabled: true
     pmd:
       enabled: true
-    cppcheck:
-      enabled: true
     semgrep:
       enabled: true
-    circleci:
-      enabled: true
     sqlfluff:
-      enabled: true
-    prismaLint:
-      enabled: true
-    oxc:
       enabled: true
     shopifyThemeCheck:
       enabled: true
 chat:
   auto_reply: true
-  integrations:
-    jira:
-      usage: auto
-    linear:
-      usage: auto
 knowledge_base:
   opt_out: false
   web_search:
@@ -122,12 +92,6 @@ knowledge_base:
     scope: auto
   issues:
     scope: auto
-  jira:
-    usage: auto
-    project_keys: []
-  linear:
-    usage: auto
-    team_keys: []
   pull_requests:
     scope: auto
 code_generation:
