@@ -82,20 +82,23 @@ public class JwtTokenizer {
         return Long.parseLong(claims.getSubject());
     }
 
-    public boolean validateToken(String token){
-        try{
+    public boolean isValidAccessToken(String accessToken) {
+        return validate(extractBearerToken(accessToken), accessSecret);
+    }
+
+    public boolean isValidRefreshToken(String refreshToken) {
+        return validate(extractBearerToken(refreshToken), refreshSecret);
+    }
+
+    private boolean validate(String token, byte[] secretKey) {
+        try {
             Jwts.parser()
-                    .verifyWith(Keys.hmacShaKeyFor(accessSecret))
+                    .verifyWith(Keys.hmacShaKeyFor(secretKey))
                     .build()
                     .parse(token);
-
             return true;
-        } catch (ExpiredJwtException e){
-            throw new CustomException(ErrorCode.AUTH_TOKEN_EXPIRED);
-        } catch (JwtException e){
-            throw new CustomException(ErrorCode.AUTH_INVALID_TOKEN);
-        } catch (Exception e){
-            throw new CustomException(ErrorCode.AUTH_FAILED);
+        } catch (JwtException e) {
+            return false;
         }
     }
 }
