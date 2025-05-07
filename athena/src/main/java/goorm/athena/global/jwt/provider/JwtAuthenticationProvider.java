@@ -30,7 +30,7 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
         JwtAuthenticationToken authenticationToken = (JwtAuthenticationToken) authentication;
 
         // 토큰 유효성 검증
-        jwtTokenizer.validateToken(authenticationToken.getToken());
+        jwtTokenizer.isValidAccessToken(authenticationToken.getToken());
 
         Claims claims = jwtTokenizer.parseAccessToken(authenticationToken.getToken());
         Long userId = Long.parseLong(claims.getSubject());
