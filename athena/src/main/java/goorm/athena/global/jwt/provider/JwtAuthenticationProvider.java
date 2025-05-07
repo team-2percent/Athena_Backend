@@ -24,13 +24,17 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
+        if (!(authentication instanceof JwtAuthenticationToken)) {
+            return null;
+        }
         JwtAuthenticationToken authenticationToken = (JwtAuthenticationToken) authentication;
         Claims claims = jwtTokenizer.parseAccessToken(authenticationToken.getToken());
         String email = claims.getSubject();
         Long userId = claims.get("userId", Long.class);
         List<GrantedAuthority> authorities = getGrantedAuthorities(claims);
 
-        LoginInfoDto loginInfo = LoginMapper.toLoginInfo(userId, email, String.valueOf(authorities.getFirst()));
+        String role = authorities.isEmpty() ? "ROLE_USER" : String.valueOf(authorities.getFirst());
+        LoginInfoDto loginInfo = LoginMapper.toLoginInfo(userId, email, role);
 
         return new JwtAuthenticationToken(authorities, loginInfo, null);
     }
