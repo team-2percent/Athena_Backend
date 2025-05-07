@@ -33,12 +33,12 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
         jwtTokenizer.validateToken(authenticationToken.getToken());
 
         Claims claims = jwtTokenizer.parseAccessToken(authenticationToken.getToken());
-        String email = claims.getSubject();
-        Long userId = claims.get("userId", Long.class);
+        Long userId = Long.parseLong(claims.getSubject());
+        String nickname = claims.get("nickname", String.class);
         List<GrantedAuthority> authorities = getGrantedAuthorities(claims);
 
         String role = authorities.isEmpty() ? "ROLE_USER" : String.valueOf(authorities.getFirst());
-        LoginInfoDto loginInfo = LoginMapper.toLoginInfo(userId, email, role);
+        LoginInfoDto loginInfo = LoginMapper.toLoginInfo(userId, nickname, role);
 
         return new JwtAuthenticationToken(authorities, loginInfo, null);
     }

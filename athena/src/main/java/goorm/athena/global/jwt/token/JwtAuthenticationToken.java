@@ -12,9 +12,9 @@ public class JwtAuthenticationToken extends AbstractAuthenticationToken {
     private Object principal; // 로그인한 사용자의 id, email
     private Object credentials;
 
-    public JwtAuthenticationToken(String email, String password){
+    public JwtAuthenticationToken(Long userId, String password){
         super(null);
-        this.principal = email;
+        this.principal = userId;
         this.credentials = password;
     }
 

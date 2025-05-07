@@ -28,12 +28,12 @@ public class JwtTokenizer {
     }
 
     // 토큰 생성 템플릿
-    public String createToken(Long id, String email, String role,
+    public String createToken(Long id, String nickname, String role,
                               Long expire, byte[] secretKey){
         Claims claims = Jwts.claims()
-                .subject(email)
+                .subject(String.valueOf(id))
                 .add("role", role)
-                .add("userId", id)
+                .add("nickname", nickname)
                 .build();
 
         return Jwts.builder()
@@ -44,12 +44,12 @@ public class JwtTokenizer {
                 .compact();
     }
 
-    public String createAccessToken(Long id, String email, String roles){
-        return createToken(id, email, roles, ACCESS_TOKEN_EXPIRE_COUNT, accessSecret);
+    public String createAccessToken(Long id, String nickname, String roles){
+        return createToken(id, nickname, roles, ACCESS_TOKEN_EXPIRE_COUNT, accessSecret);
     }
 
-    public String createRefreshToken(Long id, String email, String roles){
-        return createToken(id, email, roles, REFRESH_TOKEN_EXPIRE_COUNT, refreshSecret);
+    public String createRefreshToken(Long id, String nickname, String roles){
+        return createToken(id, nickname, roles, REFRESH_TOKEN_EXPIRE_COUNT, refreshSecret);
     }
 
     public Claims parseToken(String token, byte[] secretKey){
@@ -75,11 +75,11 @@ public class JwtTokenizer {
         return headerValue;
     }
 
-    public Long getMemberIdFromToken(String token){
+    public Long getUserIdFromToken(String token){
         String[] tokenArr = token.split(" ");
         token = tokenArr[1];
         Claims claims = parseToken(token, accessSecret);
-        return Long.valueOf((Integer)claims.get("userId"));
+        return Long.parseLong(claims.getSubject());
     }
 
     public boolean validateToken(String token){
@@ -98,6 +98,4 @@ public class JwtTokenizer {
             throw new CustomException(ErrorCode.AUTH_FAILED);
         }
     }
-
-
 }
