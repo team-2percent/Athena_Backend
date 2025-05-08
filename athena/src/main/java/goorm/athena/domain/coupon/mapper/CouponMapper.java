@@ -9,7 +9,7 @@ public class CouponMapper {
         return new CouponCreateResponse(
                 coupon.getId(),
                 coupon.getCode(),
-                coupon.getName(),
+                coupon.getTitle(),
                 coupon.getContent(),
                 coupon.getPrice(),
                 coupon.getStartAt(),
