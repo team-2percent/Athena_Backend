@@ -1,6 +1,6 @@
 package goorm.athena.domain.userCoupon.dto.req;
 
-public record UserCouponCreateRequest(
+public record UserCouponIssueRequest(
         Long couponId
 ) {
 }
