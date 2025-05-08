@@ -2,15 +2,19 @@ package goorm.athena.domain.userCoupon.entity;
 
 import goorm.athena.domain.coupon.entity.Coupon;
 import goorm.athena.domain.user.entity.User;
+import goorm.athena.global.exception.CustomException;
+import goorm.athena.global.exception.ErrorCode;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Getter
 @Table(name = "userCoupon")
+@RequiredArgsConstructor
 public class UserCoupon {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -41,4 +45,11 @@ public class UserCoupon {
         return new UserCoupon(user, coupon);
     }
 
+    public void useCoupon(){
+        if(this.status == Status.UNUSED){
+            this.status = Status.USED;
+        }else{
+            throw new CustomException(ErrorCode.INVALID_COUPON_STATUS);
+        }
+    }
 }
