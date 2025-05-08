@@ -17,8 +17,16 @@ public enum ErrorCode {
     AUTH_INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "유효하지 않은 토큰입니다."),
     AUTH_INVALID_LOGIN(HttpStatus.UNAUTHORIZED, "로그인 정보가 유효하지 않습니다."),
     AUTH_TOKEN_EXPIRED(HttpStatus.UNAUTHORIZED, "토큰이 만료되었습니다."),
+    AUTH_MALFORMED_TOKEN(HttpStatus.BAD_REQUEST, "토큰의 형식이 잘못되었습니다"),
+    AUTH_INVALID_SIGNATURE(HttpStatus.UNAUTHORIZED, "서명이 잘못된 토큰입니다."),
+    AUTH_EMPTY_TOKEN(HttpStatus.BAD_REQUEST, "입력받은 토큰이 비어있습니다."),
+    AUTH_UNSUPPORTED_TOKEN(HttpStatus.UNAUTHORIZED, "지원되지 않는 토큰 형식입니다."),
     AUTH_FAILED(HttpStatus.UNAUTHORIZED, "인증에 실패했습니다"),
     VALIDATION_ERROR(HttpStatus.BAD_REQUEST, "필드 유효성 검증에 실패했습니다"),
+
+    REFRESHTOKEN_NOT_FOUND(HttpStatus.NOT_FOUND, "RefreshToken을 찾지 못했습니다."),
+    REFRESHTOKEN_EXPIRED(HttpStatus.UNAUTHORIZED, "리프레시 토큰이 만료되었습니다"),
+
 
     //유저
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 ID의 USER가 존재하지 않습니다."),

@@ -2,11 +2,9 @@ package goorm.athena.global.jwt.util;
 
 import goorm.athena.global.exception.CustomException;
 import goorm.athena.global.exception.ErrorCode;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.JwtException;
-import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.security.SignatureException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -28,12 +26,12 @@ public class JwtTokenizer {
     }
 
     // 토큰 생성 템플릿
-    public String createToken(Long id, String email, String roles,
+    public String createToken(Long id, String nickname, String role,
                               Long expire, byte[] secretKey){
         Claims claims = Jwts.claims()
-                .subject(email)
-                .add("roles", roles)
-                .add("userId", id)
+                .subject(String.valueOf(id))
+                .add("role", role)
+                .add("nickname", nickname)
                 .build();
 
         return Jwts.builder()
@@ -44,12 +42,12 @@ public class JwtTokenizer {
                 .compact();
     }
 
-    public String createAccessToken(Long id, String email, String roles){
-        return createToken(id, email, roles, ACCESS_TOKEN_EXPIRE_COUNT, accessSecret);
+    public String createAccessToken(Long id, String nickname, String roles){
+        return createToken(id, nickname, roles, ACCESS_TOKEN_EXPIRE_COUNT, accessSecret);
     }
 
-    public String createRefreshToken(Long id, String email, String roles){
-        return createToken(id, email, roles, REFRESH_TOKEN_EXPIRE_COUNT, refreshSecret);
+    public String createRefreshToken(Long id, String nickname, String roles){
+        return createToken(id, nickname, roles, REFRESH_TOKEN_EXPIRE_COUNT, refreshSecret);
     }
 
     public Claims parseToken(String token, byte[] secretKey){
@@ -68,36 +66,60 @@ public class JwtTokenizer {
         return parseToken(extractBearerToken(refreshToken), refreshSecret);
     }
 
-    private String extractBearerToken(String headerValue){
+    public String extractBearerToken(String headerValue){
         if(headerValue != null && headerValue.startsWith("Bearer ")){
             return headerValue.substring(7);
         }
         return headerValue;
     }
 
-    public Long getMemberIdFromToken(String token){
-        String[] tokenArr = token.split(" ");
-        token = tokenArr[1];
+    public Long getUserIdFromToken(String token){
+        token = extractBearerToken(token);
         Claims claims = parseToken(token, accessSecret);
-        return Long.valueOf((Integer)claims.get("userId"));
+        return Long.parseLong(claims.getSubject());
     }
 
-    public boolean validateToken(String token){
-        try{
-            Jwts.parser()
-                    .verifyWith(Keys.hmacShaKeyFor(accessSecret))
-                    .build()
-                    .parse(token);
+    public boolean isValidAccessToken(String accessToken) {
+        return validateSilently(extractBearerToken(accessToken), accessSecret);
+    }
 
+    public boolean isValidRefreshToken(String refreshToken) {
+        return validate(extractBearerToken(refreshToken), refreshSecret);
+    }
+
+    private boolean validate(String token, byte[] secretKey) {
+        try {
+            Jwts.parser()
+                    .verifyWith(Keys.hmacShaKeyFor(secretKey))
+                    .build()
+                    .parseSignedClaims(token);
             return true;
-        } catch (ExpiredJwtException e){
+        } catch (ExpiredJwtException e) {
             throw new CustomException(ErrorCode.AUTH_TOKEN_EXPIRED);
-        } catch (JwtException e){
+        } catch (UnsupportedJwtException e) {
+            throw new CustomException(ErrorCode.AUTH_UNSUPPORTED_TOKEN);
+        } catch (MalformedJwtException e){
+            throw new CustomException(ErrorCode.AUTH_MALFORMED_TOKEN);
+        } catch (SignatureException e) {
+            throw new CustomException(ErrorCode.AUTH_INVALID_SIGNATURE);
+        } catch (IllegalArgumentException e) {
+            throw new CustomException(ErrorCode.AUTH_EMPTY_TOKEN);
+        } catch (JwtException e) {
             throw new CustomException(ErrorCode.AUTH_INVALID_TOKEN);
-        } catch (Exception e){
+        } catch (Exception e) {
             throw new CustomException(ErrorCode.AUTH_FAILED);
         }
     }
 
-
+    private boolean validateSilently(String token, byte[] secretKey) {
+        try {
+            Jwts.parser()
+                    .verifyWith(Keys.hmacShaKeyFor(secretKey))
+                    .build()
+                    .parseSignedClaims(token);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
 }

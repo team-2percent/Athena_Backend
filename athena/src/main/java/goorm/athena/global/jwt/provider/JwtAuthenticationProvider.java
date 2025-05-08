@@ -30,21 +30,21 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
         JwtAuthenticationToken authenticationToken = (JwtAuthenticationToken) authentication;
 
         // 토큰 유효성 검증
-        jwtTokenizer.validateToken(authenticationToken.getToken());
+        jwtTokenizer.isValidAccessToken(authenticationToken.getToken());
 
         Claims claims = jwtTokenizer.parseAccessToken(authenticationToken.getToken());
-        String email = claims.getSubject();
-        Long userId = claims.get("userId", Long.class);
+        Long userId = Long.parseLong(claims.getSubject());
+        String nickname = claims.get("nickname", String.class);
         List<GrantedAuthority> authorities = getGrantedAuthorities(claims);
 
         String role = authorities.isEmpty() ? "ROLE_USER" : String.valueOf(authorities.getFirst());
-        LoginInfoDto loginInfo = LoginMapper.toLoginInfo(userId, email, role);
+        LoginInfoDto loginInfo = LoginMapper.toLoginInfo(userId, nickname, role);
 
         return new JwtAuthenticationToken(authorities, loginInfo, null);
     }
 
     private List<GrantedAuthority> getGrantedAuthorities(Claims claims){
-        String roles = (String) claims.get("roles");
+        String roles = (String) claims.get("role");
         List<GrantedAuthority> authorities = new ArrayList<>();
         authorities.add(() -> roles);
         return authorities;
