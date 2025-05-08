@@ -6,6 +6,7 @@ import goorm.athena.domain.user.entity.User;
 import goorm.athena.domain.user.service.UserService;
 import goorm.athena.domain.userCoupon.dto.req.UserCouponIssueRequest;
 import goorm.athena.domain.userCoupon.dto.res.UserCouponIssueResponse;
+import goorm.athena.domain.userCoupon.entity.Status;
 import goorm.athena.domain.userCoupon.entity.UserCoupon;
 import goorm.athena.domain.userCoupon.mapper.UserCouponMapper;
 import goorm.athena.domain.userCoupon.repository.UserCouponRepository;
@@ -52,6 +53,10 @@ public class UserCouponService {
         UserCoupon userCoupon = userCouponRepository.findByIdAndUser(userCouponId, user)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_COUPON_NOT_FOUND));
 
-        userCoupon.useCoupon();
+        if(userCoupon.getStatus().equals(Status.UNUSED)) {
+            userCoupon.useCoupon();
+        } else {
+            throw new CustomException(ErrorCode.INVALID_COUPON_STATUS);
+        }
     }
 }
