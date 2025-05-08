@@ -13,14 +13,11 @@ import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
-
 @Service
 @RequiredArgsConstructor
 public class RefreshTokenService {
     private final UserService userService;
     private final JwtTokenizer jwtTokenizer;
-    private final TokenService tokenService;
 
     @Transactional
     public void deleteRefreshToken(HttpServletResponse response){
@@ -37,34 +34,46 @@ public class RefreshTokenService {
     }
 
     @Transactional
-    public RefreshTokenResponse refreshAccessToken(String refreshTokenValue){
-        Claims claims = jwtTokenizer.parseRefreshToken(refreshTokenValue);
-        Long userId = Long.valueOf((Integer) claims.get("userId"));
-
-        User user = userService.getUser(userId);
-
-        String newAccessToken = jwtTokenizer.createAccessToken(user.getId(), claims.getSubject(), claims.get("role", String.class));
-
-        return new RefreshTokenResponse(userId, newAccessToken, refreshTokenValue);
-    }
-
-    @Transactional
-    public RefreshTokenResponse reissueToken(String refreshToken, HttpServletResponse response){
+    public RefreshTokenResponse reissueToken(String accessToken, String refreshToken, HttpServletResponse response){
+        // 1. RefreshToken이 아예 없다면
         if(refreshToken == null || refreshToken.isEmpty()){
             throw new CustomException(ErrorCode.REFRESHTOKEN_NOT_FOUND);
         }
 
-        Claims claims = jwtTokenizer.parseRefreshToken(refreshToken);
-        Long userId = Long.valueOf((Integer) claims.get("userId"));
+        boolean isAccessTokenValid = jwtTokenizer.isValidAccessToken(accessToken);
+        boolean isRefreshTokenValid = jwtTokenizer.isValidRefreshToken(refreshToken);
 
-        User user = userService.getUser(userId);
-        if (user == null) {
-            throw new CustomException(ErrorCode.USER_NOT_FOUND);
+        // 2. Access, Refresh 둘 다 유효한 경우 → Access 토큰 그대로 사용, Refresh도 그대로
+        if (isAccessTokenValid && isRefreshTokenValid) {
+            Claims claims = jwtTokenizer.parseAccessToken(accessToken);
+            Long userId = Long.parseLong(claims.getSubject());
+
+            return RefreshTokenMapper.toRefreshTokenResponse(userId, accessToken, refreshToken);
         }
 
-        String accessToken = jwtTokenizer.createAccessToken(user.getId(), user.getNickname(), user.getRole().name());
-        String newRefreshToken = tokenService.issueToken(user, response);
 
-        return RefreshTokenMapper.toRefreshTokenResponse(user.getId(), accessToken, newRefreshToken);
+        // 3. Access는 만료, Refresh는 유효 → Access만 재발급
+        if (!isAccessTokenValid && isRefreshTokenValid) {
+            Claims claims = jwtTokenizer.parseRefreshToken(refreshToken);
+            Long userId = Long.valueOf(claims.getSubject());
+
+            User user = userService.getUser(userId);
+            if (user == null) throw new CustomException(ErrorCode.USER_NOT_FOUND);
+
+            String newAccessToken = jwtTokenizer.createAccessToken(user.getId(), user.getNickname(), user.getRole().name());
+
+            return RefreshTokenMapper.toRefreshTokenResponse(user.getId(), newAccessToken, refreshToken);
+        }
+
+
+        // 4. Access는 유효, Refresh는 만료 → Refresh만 재발급
+        if (isAccessTokenValid && !isRefreshTokenValid) {
+            deleteRefreshToken(response);
+            throw new CustomException(ErrorCode.REFRESHTOKEN_EXPIRED);
+        }
+
+        // 5. 둘 다 만료 → 로그인 필요
+        deleteRefreshToken(response);
+        throw new CustomException(ErrorCode.AUTH_TOKEN_EXPIRED);
     }
 }

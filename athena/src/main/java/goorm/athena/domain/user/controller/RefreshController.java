@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Tag(name = "Refresh", description = "리프레시 토큰 관련 API")
@@ -25,10 +26,7 @@ public interface RefreshController {
             })
 
     @PostMapping("/ReissueRefresh")
-    public ResponseEntity<RefreshTokenResponse> requestRefresh(@CookieValue("refreshToken") String refreshToken, HttpServletResponse response);
-
-    @Operation(summary = "액세스 토큰을 재발급합니다.")
-    @ApiResponse(responseCode = "200", description = "액세스 토큰 재발급 성공")
-    @PostMapping("/ReissueAccess")
-    public ResponseEntity<RefreshTokenResponse> refreshToken(@CookieValue("refreshToken") String refreshToken, HttpServletResponse response);
+    public ResponseEntity<RefreshTokenResponse> requestRefresh(@CookieValue("refreshToken") String refreshToken,
+                                                               @RequestBody String accessToken,
+                                                               HttpServletResponse response);
 }
