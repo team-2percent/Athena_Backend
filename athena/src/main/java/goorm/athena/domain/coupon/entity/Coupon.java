@@ -49,9 +49,14 @@ public class Coupon {
     }
 
     public void decreaseStock(){
+        // 사용하기 전 쿠폰의 재고를 검증
         if(this.stock <= 0){
             throw new CustomException(ErrorCode.COUPON_OUT_STOCK);
         }
         this.stock--;
+
+        if(this.stock <= 0){
+            this.couponStatus = CouponStatus.COMPLETED;
+        }
     }
 }
