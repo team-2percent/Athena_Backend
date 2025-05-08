@@ -66,7 +66,7 @@ public class JwtTokenizer {
         return parseToken(extractBearerToken(refreshToken), refreshSecret);
     }
 
-    private String extractBearerToken(String headerValue){
+    public String extractBearerToken(String headerValue){
         if(headerValue != null && headerValue.startsWith("Bearer ")){
             return headerValue.substring(7);
         }
