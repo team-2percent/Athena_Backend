@@ -31,7 +31,7 @@ public class Coupon {
     private int stock;
 
     @Enumerated(EnumType.STRING)
-    private Status status;
+    private CouponStatus couponStatus;
 
     @Builder
     public static Coupon create(CouponCreateRequest request){
@@ -44,7 +44,7 @@ public class Coupon {
         coupon.endAt = request.endAt();
         coupon.expiresAt = request.expiresAt();
         coupon.stock = request.stock();
-        coupon.status = Status.PREVIOUS;
+        coupon.couponStatus = CouponStatus.PREVIOUS;
         return coupon;
     }
 

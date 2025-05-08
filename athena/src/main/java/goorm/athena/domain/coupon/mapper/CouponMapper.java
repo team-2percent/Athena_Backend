@@ -1,6 +1,5 @@
 package goorm.athena.domain.coupon.mapper;
 
-import goorm.athena.domain.coupon.dto.req.CouponCreateRequest;
 import goorm.athena.domain.coupon.dto.res.CouponCreateResponse;
 import goorm.athena.domain.coupon.entity.Coupon;
 
@@ -16,7 +15,7 @@ public class CouponMapper {
                 coupon.getEndAt(),
                 coupon.getExpiresAt(),
                 coupon.getStock(),
-                coupon.getStatus().name()
+                coupon.getCouponStatus().name()
         );
     }
 }

@@ -3,6 +3,7 @@ package goorm.athena.domain.coupon.service;
 import goorm.athena.domain.coupon.dto.req.CouponCreateRequest;
 import goorm.athena.domain.coupon.dto.res.CouponCreateResponse;
 import goorm.athena.domain.coupon.entity.Coupon;
+import goorm.athena.domain.coupon.entity.CouponStatus;
 import goorm.athena.domain.coupon.mapper.CouponMapper;
 import goorm.athena.domain.coupon.repository.CouponRepository;
 import goorm.athena.global.exception.CustomException;
