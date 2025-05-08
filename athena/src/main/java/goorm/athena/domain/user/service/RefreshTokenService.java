@@ -58,7 +58,6 @@ public class RefreshTokenService {
             Long userId = Long.valueOf(claims.getSubject());
 
             User user = userService.getUser(userId);
-            if (user == null) throw new CustomException(ErrorCode.USER_NOT_FOUND);
 
             String newAccessToken = jwtTokenizer.createAccessToken(user.getId(), user.getNickname(), user.getRole().name());
 
@@ -66,7 +65,7 @@ public class RefreshTokenService {
         }
 
 
-        // 4. Access는 유효, Refresh는 만료 → Refresh만 재발급
+        // 4. access는 유효, refresh는 만료 -> 로그아웃 상태로 변경
         if (isAccessTokenValid && !isRefreshTokenValid) {
             deleteRefreshToken(response);
             throw new CustomException(ErrorCode.REFRESHTOKEN_EXPIRED);
