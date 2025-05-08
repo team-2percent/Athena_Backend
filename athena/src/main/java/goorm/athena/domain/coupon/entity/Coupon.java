@@ -18,7 +18,7 @@ public class Coupon {
     private Long id;
 
     private Long code;
-    private String name;
+    private String title;
     private String content;
     private int price;
 
@@ -35,7 +35,7 @@ public class Coupon {
     public static Coupon create(CouponCreateRequest request){
         Coupon coupon = new Coupon();
         coupon.code = request.code();
-        coupon.name = request.name();
+        coupon.title = request.title();
         coupon.content = request.content();
         coupon.price = request.price();
         coupon.startAt = request.startAt();

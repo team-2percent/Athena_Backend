@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 public record CouponCreateResponse(
         Long id,
         Long code,
-        String name,
+        String title,
         String content,
         int price,
         LocalDateTime startAt,
