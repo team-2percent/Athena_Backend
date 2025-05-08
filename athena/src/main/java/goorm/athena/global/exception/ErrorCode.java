@@ -32,6 +32,9 @@ public enum ErrorCode {
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 ID의 USER가 존재하지 않습니다."),
     ALREADY_EXIST_USER(HttpStatus.BAD_REQUEST, "이미 존재하는 사용자입니다."),
 
+    // 쿠폰
+    COUPON_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 ID의 쿠폰을 찾을 수 없습니다"),
+
     // 주문
     DELIVERY_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 ID의 배송지가 존재하지 않습니다."),
     PRODUCT_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 상품의 ID가 존재하지 않습니다."),
