@@ -21,7 +21,7 @@ public class CouponEvent {
 
     private String title;
     private String content;
-    boolean isActive;
+    private boolean isActive;
 
     @Builder
     public static CouponEvent create(CouponEventCreateRequest request, Coupon coupon){
