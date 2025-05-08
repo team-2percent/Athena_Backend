@@ -2,11 +2,9 @@ package goorm.athena.global.jwt.util;
 
 import goorm.athena.global.exception.CustomException;
 import goorm.athena.global.exception.ErrorCode;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.JwtException;
-import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.security.SignatureException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -99,6 +97,14 @@ public class JwtTokenizer {
             return true;
         } catch (ExpiredJwtException e) {
             throw new CustomException(ErrorCode.AUTH_TOKEN_EXPIRED);
+        } catch (UnsupportedJwtException e) {
+            throw new CustomException(ErrorCode.AUTH_UNSUPPORTED_TOKEN);
+        } catch (MalformedJwtException e){
+            throw new CustomException(ErrorCode.AUTH_MALFORMED_TOKEN);
+        } catch (SignatureException e) {
+            throw new CustomException(ErrorCode.AUTH_INVALID_SIGNATURE);
+        } catch (IllegalArgumentException e) {
+            throw new CustomException(ErrorCode.AUTH_EMPTY_TOKEN);
         } catch (JwtException e) {
             throw new CustomException(ErrorCode.AUTH_INVALID_TOKEN);
         } catch (Exception e) {
@@ -111,10 +117,8 @@ public class JwtTokenizer {
             Jwts.parser()
                     .verifyWith(Keys.hmacShaKeyFor(secretKey))
                     .build()
-                    .parse(token);
+                    .parseSignedClaims(token);
             return true;
-        } catch (JwtException e) {
-            return false;  // 유효하지 않음
         } catch (Exception e) {
             return false;
         }
