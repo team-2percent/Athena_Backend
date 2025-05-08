@@ -7,11 +7,13 @@ import goorm.athena.domain.user.dto.response.UserLoginResponse;
 import goorm.athena.domain.user.dto.response.UserCreateResponse;
 import goorm.athena.domain.user.dto.response.UserGetResponse;
 import goorm.athena.domain.user.dto.response.UserUpdateResponse;
+import goorm.athena.domain.user.service.RefreshTokenService;
 import goorm.athena.domain.user.service.UserService;
 import goorm.athena.global.exception.CustomException;
 import goorm.athena.global.exception.ErrorCode;
 import goorm.athena.global.jwt.util.CheckLogin;
 import goorm.athena.global.jwt.util.LoginUserRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +26,7 @@ import org.springframework.web.bind.annotation.*;
 public class UserControllerImpl implements UserController {
 
     private final UserService userService;
+    private final RefreshTokenService refreshTokenService;
 
     @Override
     @PostMapping
@@ -58,13 +61,25 @@ public class UserControllerImpl implements UserController {
 
     @Override
     @PostMapping("/login")
-    public ResponseEntity<UserLoginResponse> login(@RequestBody @Valid UserLoginRequest request, BindingResult bindingResult){
+    public ResponseEntity<UserLoginResponse> login(@RequestBody @Valid UserLoginRequest request, BindingResult bindingResult, HttpServletResponse response){
         if(bindingResult.hasErrors()){
             throw new CustomException(ErrorCode.VALIDATION_ERROR);
         }
 
-        UserLoginResponse loginResponse = userService.validateUserCredentials(request);
+        UserLoginResponse loginResponse = userService.validateUserCredentials(request, response);
 
         return ResponseEntity.ok(loginResponse);
+    }
+
+    @Override
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout(@CookieValue("refreshToken") String refreshToken, HttpServletResponse response) {
+        if (refreshToken == null || refreshToken.isEmpty()) {
+            throw new CustomException(ErrorCode.REFRESHTOKEN_NOT_FOUND);
+        }
+
+        refreshTokenService.deleteRefreshToken(response);
+
+        return ResponseEntity.ok().build();
     }
 }

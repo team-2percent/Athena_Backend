@@ -11,11 +11,13 @@ import goorm.athena.domain.user.entity.User;
 import goorm.athena.global.jwt.util.CheckLogin;
 import goorm.athena.global.jwt.util.LoginUserRequest;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -40,7 +42,7 @@ public interface UserController {
             security = @SecurityRequirement(name = "bearerAuth"))
     @ApiResponse(responseCode = "200", description = "유저 정보 수정 성공")
     @PutMapping
-    ResponseEntity<UserUpdateResponse> updateUser(@CheckLogin LoginUserRequest loginUserRequest,
+    ResponseEntity<UserUpdateResponse> updateUser(@Parameter(hidden = true) @CheckLogin LoginUserRequest loginUserRequest,
                                                   @RequestBody UserUpdateRequest request);
 
     @Operation(summary = "유저 조회 APi", description = "유저의 ID를 통해 특정 유저의 정보를 조회합니다.<br>")
@@ -53,10 +55,18 @@ public interface UserController {
     @DeleteMapping("/{id}")
     ResponseEntity<Void> deleteUser(@PathVariable Long id);
 
-    @Operation(summary = "유저 로그인 API", description = "입력된 유저의 아이디, 비밀번호를 통해 로그인을 진행합니다.")
+    @Operation(summary = "유저 로그인 API", description = "입력된 유저의 아이디, 비밀번호를 통해 로그인을 진행합니다.<br>" +
+            "로그인 진행 시 refreshKey는 쿠키에 저장되어 관련 api 진행 시 자동으로 검증합니다.<br>" +
+            "accessKey는 상단 위의 'authorize' 버튼을 눌러 등록하면 accessKey가 필요한 api 진행 시 이를 검증합니다.<br>" +
+            "이는, next.js에서 'Authorization' 헤더로 key를 전달해 api를 진행했을 때와 같은 역할입니다.")
     @ApiResponse(responseCode = "200", description = "유저 로그인 성공")
     @ApiResponse(responseCode = "401", description = "로그인 실패 - 잘못된 인증 정보",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     @PostMapping("/login")
-    ResponseEntity<UserLoginResponse> login(@RequestBody @Valid UserLoginRequest loginDto, BindingResult bindingResult);
+    ResponseEntity<UserLoginResponse> login(@RequestBody @Valid UserLoginRequest loginDto, BindingResult bindingResult, HttpServletResponse response);
+
+    @Operation(summary = "유저 로그아웃 API", description = "로그인 된 유저의 refreshToken을 서버에 저장된 쿠키에서 삭제합니다.")
+    @ApiResponse(responseCode = "200", description = "유저 로그아웃 성공")
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout(@Parameter(hidden = true) @CookieValue("refreshToken") String refreshToken, HttpServletResponse response);
 }
