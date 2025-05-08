@@ -7,10 +7,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CookieValue;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "Refresh", description = "리프레시 토큰 관련 API")
 @RequestMapping("/api/refreshToken")
@@ -27,6 +24,6 @@ public interface RefreshController {
 
     @PostMapping("/ReissueRefresh")
     public ResponseEntity<RefreshTokenResponse> requestRefresh(@CookieValue("refreshToken") String refreshToken,
-                                                               @RequestBody String accessToken,
+                                                               @RequestHeader("Authorization") String header,
                                                                HttpServletResponse response);
 }
