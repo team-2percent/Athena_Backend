@@ -39,12 +39,6 @@ public class UserCouponService {
             throw new CustomException(ErrorCode.ALREADY_ISSUED_COUPON);
         }
 
-        // 3. 쿠폰 재고 확인
-        if(coupon.getStock() <= 0){
-            throw new CustomException(ErrorCode.COUPON_OUT_STOCK);
-        }
-
-
         coupon.decreaseStock();
 
         UserCoupon userCoupon = UserCoupon.create(user, coupon);
