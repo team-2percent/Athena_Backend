@@ -1,6 +1,8 @@
 package goorm.athena.domain.coupon.entity;
 
 import goorm.athena.domain.coupon.dto.req.CouponCreateRequest;
+import goorm.athena.global.exception.CustomException;
+import goorm.athena.global.exception.ErrorCode;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -44,5 +46,12 @@ public class Coupon {
         coupon.stock = request.stock();
         coupon.status = Status.PREVIOUS;
         return coupon;
+    }
+
+    public void decreaseStock(){
+        if(this.stock <= 0){
+            throw new CustomException(ErrorCode.COUPON_OUT_STOCK);
+        }
+        this.stock--;
     }
 }
