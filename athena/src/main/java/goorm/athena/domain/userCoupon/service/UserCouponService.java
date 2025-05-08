@@ -1,6 +1,7 @@
 package goorm.athena.domain.userCoupon.service;
 
 import goorm.athena.domain.coupon.entity.Coupon;
+import goorm.athena.domain.coupon.entity.CouponStatus;
 import goorm.athena.domain.coupon.service.CouponService;
 import goorm.athena.domain.user.entity.User;
 import goorm.athena.domain.user.service.UserService;
@@ -27,15 +28,22 @@ public class UserCouponService {
     public UserCouponIssueResponse issueCoupon(Long userId, UserCouponIssueRequest request){
         User user = userService.getUser(userId);
         Coupon coupon = couponService.getCoupon(request.couponId());
-        // 1. 이미 발급받은 쿠폰인지 확인
+
+        // 1. 발급받을 수 있는 쿠폰인지 확인
+        if(!coupon.getCouponStatus().equals(CouponStatus.IN_PROGRESS)){
+            throw new CustomException(ErrorCode.INVALID_COUPON_STATUS);
+        }
+
+        // 2. 이미 발급받은 쿠폰인지 확인
         if(userCouponRepository.existsByUserAndCoupon(user, coupon)){
             throw new CustomException(ErrorCode.ALREADY_ISSUED_COUPON);
         }
 
-        // 2. 쿠폰 재고 확인
+        // 3. 쿠폰 재고 확인
         if(coupon.getStock() <= 0){
             throw new CustomException(ErrorCode.COUPON_OUT_STOCK);
         }
+
 
         coupon.decreaseStock();
 
@@ -56,7 +64,7 @@ public class UserCouponService {
         if(userCoupon.getStatus().equals(Status.UNUSED)) {
             userCoupon.useCoupon();
         } else {
-            throw new CustomException(ErrorCode.INVALID_COUPON_STATUS);
+            throw new CustomException(ErrorCode.INVALID_USE_COUPON);
         }
     }
 }
