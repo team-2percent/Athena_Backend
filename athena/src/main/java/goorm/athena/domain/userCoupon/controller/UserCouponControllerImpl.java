@@ -1,17 +1,18 @@
 package goorm.athena.domain.userCoupon.controller;
 
 import goorm.athena.domain.userCoupon.dto.req.UserCouponIssueRequest;
+import goorm.athena.domain.userCoupon.dto.res.UserCouponGetResponse;
 import goorm.athena.domain.userCoupon.dto.res.UserCouponIssueResponse;
 import goorm.athena.domain.userCoupon.scheduler.UserCouponScheduler;
 import goorm.athena.domain.userCoupon.service.UserCouponService;
 import goorm.athena.global.jwt.util.CheckLogin;
 import goorm.athena.global.jwt.util.LoginUserRequest;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
@@ -40,5 +41,12 @@ public class UserCouponControllerImpl implements UserCouponController {
     @PostMapping("/scheduler")
     public void schedulerExpiredUserCoupon(){
         userCouponScheduler.expiredUserCoupon();
+    }
+
+    @Override
+    @GetMapping
+    public ResponseEntity<List<UserCouponGetResponse>> getUserCoupon(@CheckLogin LoginUserRequest loginUserRequest){
+        List<UserCouponGetResponse> response = userCouponService.getUserCoupon(loginUserRequest.userId());
+        return ResponseEntity.ok(response);
     }
 }

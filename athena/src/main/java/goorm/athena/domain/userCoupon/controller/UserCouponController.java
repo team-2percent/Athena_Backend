@@ -1,6 +1,7 @@
 package goorm.athena.domain.userCoupon.controller;
 
 import goorm.athena.domain.userCoupon.dto.req.UserCouponIssueRequest;
+import goorm.athena.domain.userCoupon.dto.res.UserCouponGetResponse;
 import goorm.athena.domain.userCoupon.dto.res.UserCouponIssueResponse;
 import goorm.athena.domain.userCoupon.entity.UserCoupon;
 import goorm.athena.global.jwt.util.CheckLogin;
@@ -12,9 +13,12 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+
+import java.util.List;
 
 @Tag(name = "UserCoupon", description = "유저 쿠폰 관련 API")
 @RequestMapping("/api/userCoupon")
@@ -27,14 +31,23 @@ public interface UserCouponController {
     public ResponseEntity<UserCouponIssueResponse> issueCoupon(@Parameter(hidden = true) @CheckLogin LoginUserRequest loginUserRequest,
                                                                @RequestBody UserCouponIssueRequest request);
 
-    @Operation(summary = "유저의 쿠폰 사용 API", description = "유저가 해당 쿠폰의 ID를 받아 사용합니다." +
+    @Operation(summary = "유저의 쿠폰 사용 API", description = "유저가 해당 쿠폰의 ID를 받아 사용합니다.<br>" +
             "쿠폰 사용 예시 로직이며, 쿠폰만을 사용하는 컨트롤러 없이 다른 서비스에 사용될 수 있습니다.")
     @ApiResponse(responseCode = "203", description = "해당 유저가 보유한 쿠폰을 사용했습니다.")
     @PostMapping
     public ResponseEntity<Void> useCoupon(@Parameter(hidden = true) @CheckLogin LoginUserRequest loginUserRequest,
                                           @RequestBody Long userCouponId);
 
+    @Operation(summary = "유저 쿠폰 만료 스케줄러 수동 API", description = "쿠폰의 만료일을 기준으로 모든 유저의 쿠폰들의 상태를 수동 만료 처리합니다.<br>" +
+            "어떤 상태이든 상관없이, 만료일이 됐을 경우 모두 상태를 만료처리 합니다.")
+
     @PostMapping("/scheduler")
     public void schedulerExpiredUserCoupon();
+
+    @Operation(summary = "유저 쿠폰 조회 API", description = "유저가 현재 보유중인 모든 쿠폰을 조회합니다.<br>" +
+            "모든 쿠폰을 조회하기 때문에 추후 만료 처리를 뺀 쿠폰들을 모두 조회할 수 있습니다.")
+    @GetMapping
+    public ResponseEntity<List<UserCouponGetResponse>> getUserCoupon(@Parameter(hidden = true) @CheckLogin LoginUserRequest loginUserRequest);
+
 
 }

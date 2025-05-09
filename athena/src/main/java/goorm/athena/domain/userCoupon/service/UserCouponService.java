@@ -6,6 +6,7 @@ import goorm.athena.domain.coupon.service.CouponService;
 import goorm.athena.domain.user.entity.User;
 import goorm.athena.domain.user.service.UserService;
 import goorm.athena.domain.userCoupon.dto.req.UserCouponIssueRequest;
+import goorm.athena.domain.userCoupon.dto.res.UserCouponGetResponse;
 import goorm.athena.domain.userCoupon.dto.res.UserCouponIssueResponse;
 import goorm.athena.domain.userCoupon.entity.Status;
 import goorm.athena.domain.userCoupon.entity.UserCoupon;
@@ -16,6 +17,9 @@ import goorm.athena.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -60,5 +64,14 @@ public class UserCouponService {
         } else {
             throw new CustomException(ErrorCode.INVALID_USE_COUPON);
         }
+    }
+
+    @Transactional(readOnly = true)
+    public List<UserCouponGetResponse> getUserCoupon(Long userId){
+        User user = userService.getUser(userId);
+        List<UserCoupon> userCoupon = userCouponRepository.findByUser(user);
+        return userCouponRepository.findByUser(user).stream()
+                .map(UserCouponMapper::toGetResponse)
+                .collect(Collectors.toList());
     }
 }
