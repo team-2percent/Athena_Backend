@@ -52,4 +52,7 @@ public class UserCoupon {
             throw new CustomException(ErrorCode.INVALID_COUPON_STATUS);
         }
     }
+    public void setExpired(){
+        this.status = Status.EXPIRED;
+    }
 }
