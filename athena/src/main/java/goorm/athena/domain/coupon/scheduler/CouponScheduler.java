@@ -28,10 +28,7 @@ public class CouponScheduler {
          List<Coupon> toEnd = couponRepository.findByCouponStatusNotAndEndAtLessThan(CouponStatus.ENDED, now);
          toEnd.forEach(Coupon::expired);
 
-         // 저장
          couponRepository.saveAll(toActivate);
          couponRepository.saveAll(toEnd);
-
-         System.out.println("쿠폰 상태 업데이트 완료 (대기→발급중, 발급중→종료)");
      }
 }

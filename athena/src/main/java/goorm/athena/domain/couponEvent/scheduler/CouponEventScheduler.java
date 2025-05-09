@@ -41,6 +41,5 @@ public class CouponEventScheduler {
         }
 
         couponEventRepository.saveAll(allEvents);
-        System.out.println("쿠폰 이벤트 상태 변경 스케줄러");
     }
 }

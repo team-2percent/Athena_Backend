@@ -32,7 +32,6 @@ public class UserCouponScheduler {
         }
 
         userCouponRepository.saveAll(allUserCoupons);
-        System.out.println("유저의 쿠폰을 만료시키는 스케줄러");
     }
 
 
