@@ -32,4 +32,12 @@ public class CouponEvent {
         couponEvent.isActive = false;
         return couponEvent;
     }
+
+    public void setActive(){
+        this.isActive = true;
+    }
+
+    public void setInactive(){
+        this.isActive = false;
+    }
 }
