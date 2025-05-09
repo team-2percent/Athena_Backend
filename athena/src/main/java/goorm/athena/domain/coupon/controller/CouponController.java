@@ -17,7 +17,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("/api/coupon")
 public interface CouponController {
     
-    @Operation(summary = "쿠폰 생성 API", description = "입력된 정보로 쿠폰을 생성합니다.")
+    @Operation(summary = "쿠폰 생성 API", description = "입력된 정보로 쿠폰을 생성합니다.<br>" +
+            "관리자 권한을 가진 유저(role = 'USER_ADMIN')만 새 쿠폰을 생성할 수 있습니다.")
     @ApiResponse(responseCode = "200", description = "새 쿠폰 정보 생성이 성공되었습니다.",
         content = @Content(schema = @Schema(implementation = Coupon.class)))
     @PostMapping
