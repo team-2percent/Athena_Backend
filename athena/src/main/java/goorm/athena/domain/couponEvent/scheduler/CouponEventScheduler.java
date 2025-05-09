@@ -29,7 +29,6 @@ public class CouponEventScheduler {
             Coupon coupon = event.getCoupon();
 
             if(coupon.getEndAt().isBefore(now)){
-                System.out.println(coupon.getId());
                 // 만료된 경우
                 if(event.isActive()){
                     event.setInactive();
