@@ -27,7 +27,7 @@ public class UserCouponScheduler {
         for(UserCoupon userCoupon : allUserCoupons){
             Coupon coupon = userCoupon.getCoupon();
 
-            if(coupon.getExpiresAt().isAfter(now)){
+            if(coupon.getExpiresAt().isBefore(now)){
                 userCoupon.setExpired();
             }
         }
