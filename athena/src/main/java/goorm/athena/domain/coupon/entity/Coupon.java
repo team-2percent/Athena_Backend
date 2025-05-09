@@ -1,6 +1,7 @@
 package goorm.athena.domain.coupon.entity;
 
 import goorm.athena.domain.coupon.dto.req.CouponCreateRequest;
+import goorm.athena.domain.userCoupon.entity.Status;
 import goorm.athena.global.exception.CustomException;
 import goorm.athena.global.exception.ErrorCode;
 import jakarta.persistence.*;
@@ -58,5 +59,13 @@ public class Coupon {
         if(this.stock <= 0){
             this.couponStatus = CouponStatus.COMPLETED;
         }
+    }
+
+    public void active(){
+        this.couponStatus = CouponStatus.IN_PROGRESS;
+    }
+
+    public void expired(){
+        this.couponStatus = CouponStatus.ENDED;
     }
 }
