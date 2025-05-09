@@ -5,5 +5,5 @@ import goorm.athena.domain.coupon.entity.CouponStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface CouponRepository extends JpaRepository<Coupon, Long> {
-    boolean existsByIdAndStatus(Long id, CouponStatus couponStatus);
+    boolean existsByIdAndCouponStatus(Long id, CouponStatus couponStatus);
 }
