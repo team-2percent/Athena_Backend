@@ -32,6 +32,8 @@ public interface CouponEventController {
 
     @Operation(summary = "쿠폰 이벤트 조회 API", description = "현재 활성화된 쿠폰 이벤트들을 조회합니다.<br>" +
             "만약 이전에 해당 유저가 쿠폰 이벤트를 발급한 적이 있을 경우 'userIssued' 상태 값으로 True/False 값을 반환합니다.")
+    @ApiResponse(responseCode = "200", description = "활성화된 쿠폰 이벤트들을 조회했습니다.",
+        content = @Content(schema = @Schema(implementation = CouponEventGetResponse.class)))
     @GetMapping("/getActives")
     public ResponseEntity<List<CouponEventGetResponse>> getCouponEvents(@Parameter(hidden = true) @CheckLogin LoginUserRequest request);
 

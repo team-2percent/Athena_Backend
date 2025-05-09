@@ -1,6 +1,7 @@
 package goorm.athena.domain.userCoupon.controller;
 
 import goorm.athena.domain.userCoupon.dto.req.UserCouponIssueRequest;
+import goorm.athena.domain.userCoupon.dto.req.UserCouponUseRequest;
 import goorm.athena.domain.userCoupon.dto.res.UserCouponGetResponse;
 import goorm.athena.domain.userCoupon.dto.res.UserCouponIssueResponse;
 import goorm.athena.domain.userCoupon.scheduler.UserCouponScheduler;
@@ -32,8 +33,8 @@ public class UserCouponControllerImpl implements UserCouponController {
     @Override
     @PostMapping("/use")
     public ResponseEntity<Void> useCoupon(@CheckLogin LoginUserRequest loginUserRequest,
-                                          @RequestBody Long userCouponId){
-        userCouponService.useCoupon(loginUserRequest.userId(), userCouponId);
+                                          @RequestBody UserCouponUseRequest request){
+        userCouponService.useCoupon(loginUserRequest.userId(), request.userCouponId());
         return ResponseEntity.ok().build();
     }
 
