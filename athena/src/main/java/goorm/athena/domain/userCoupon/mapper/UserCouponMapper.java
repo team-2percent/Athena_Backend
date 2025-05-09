@@ -17,6 +17,8 @@ public class UserCouponMapper {
 
     public static UserCouponGetResponse toGetResponse(UserCoupon userCoupon){
         return new UserCouponGetResponse(
+                userCoupon.getId(),
+                userCoupon.getCoupon().getId(),
                 userCoupon.getCoupon().getTitle(),
                 userCoupon.getCoupon().getContent(),
                 userCoupon.getCoupon().getPrice(),
