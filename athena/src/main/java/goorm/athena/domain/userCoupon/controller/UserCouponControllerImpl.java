@@ -2,6 +2,7 @@ package goorm.athena.domain.userCoupon.controller;
 
 import goorm.athena.domain.userCoupon.dto.req.UserCouponIssueRequest;
 import goorm.athena.domain.userCoupon.dto.res.UserCouponIssueResponse;
+import goorm.athena.domain.userCoupon.scheduler.UserCouponScheduler;
 import goorm.athena.domain.userCoupon.service.UserCouponService;
 import goorm.athena.global.jwt.util.CheckLogin;
 import goorm.athena.global.jwt.util.LoginUserRequest;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/userCoupon")
 public class UserCouponControllerImpl implements UserCouponController {
     private final UserCouponService userCouponService;
+    private final UserCouponScheduler userCouponScheduler;
 
     @Override
     @PostMapping
@@ -32,5 +34,11 @@ public class UserCouponControllerImpl implements UserCouponController {
                                           @RequestBody Long userCouponId){
         userCouponService.useCoupon(loginUserRequest.userId(), userCouponId);
         return ResponseEntity.ok().build();
+    }
+
+    @Override
+    @PostMapping("/scheduler")
+    public void schedulerExpiredUserCoupon(){
+        userCouponScheduler.expiredUserCoupon();
     }
 }
