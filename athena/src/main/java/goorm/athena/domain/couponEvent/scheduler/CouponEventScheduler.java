@@ -4,7 +4,6 @@ import goorm.athena.domain.coupon.entity.Coupon;
 import goorm.athena.domain.couponEvent.entity.CouponEvent;
 import goorm.athena.domain.couponEvent.repository.CouponEventRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,7 +18,7 @@ public class CouponEventScheduler {
     private final CouponEventRepository couponEventRepository;
 
     @Transactional
-    @Scheduled(cron = "*/8 * * * * *")
+    @Scheduled(cron = "1 0 0 * * *")
     public void updateCouponEventStatus(){
         LocalDateTime now = LocalDateTime.now();
 

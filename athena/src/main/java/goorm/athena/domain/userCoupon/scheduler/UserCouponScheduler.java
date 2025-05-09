@@ -17,7 +17,7 @@ public class UserCouponScheduler {
     private final UserCouponRepository userCouponRepository;
 
     @Transactional
-    @Scheduled(cron = "*/7 * * * * *")
+    @Scheduled(cron = "0 0 0 * * *")
     public void expiredUserCoupon(){
         LocalDateTime now = LocalDateTime.now();
 
