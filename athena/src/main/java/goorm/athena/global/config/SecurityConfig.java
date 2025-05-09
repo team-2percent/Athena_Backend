@@ -33,7 +33,7 @@ public class SecurityConfig {
                                                    AuthenticationManager authenticationManager) throws Exception {
 
         http.authorizeHttpRequests(auth -> auth
-                .requestMatchers(HttpMethod.POST, "/api/coupon/**", "/api/couponEvent/**")
+                .requestMatchers(HttpMethod.POST, "/api/coupon/create", "/api/couponEvent/create")
                 .hasRole("ADMIN")
 
                 .requestMatchers(

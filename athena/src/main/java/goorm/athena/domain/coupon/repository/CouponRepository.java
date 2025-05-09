@@ -2,6 +2,7 @@ package goorm.athena.domain.coupon.repository;
 
 import goorm.athena.domain.coupon.entity.Coupon;
 import goorm.athena.domain.coupon.entity.CouponStatus;
+import goorm.athena.domain.user.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.LocalDateTime;

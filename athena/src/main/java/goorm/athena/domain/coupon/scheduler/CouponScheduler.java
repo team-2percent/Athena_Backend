@@ -3,9 +3,7 @@ package goorm.athena.domain.coupon.scheduler;
 import goorm.athena.domain.coupon.entity.Coupon;
 import goorm.athena.domain.coupon.entity.CouponStatus;
 import goorm.athena.domain.coupon.repository.CouponRepository;
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.RequiredArgsConstructor;
-import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
