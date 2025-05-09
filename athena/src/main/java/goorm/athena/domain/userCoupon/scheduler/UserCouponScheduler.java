@@ -21,7 +21,7 @@ public class UserCouponScheduler {
     public void expiredUserCoupon(){
         LocalDateTime now = LocalDateTime.now();
 
-        List<UserCoupon> allUserCoupons = userCouponRepository.findAll();
+        List<UserCoupon> allUserCoupons = userCouponRepository.findAllWithCoupon();
 
         for(UserCoupon userCoupon : allUserCoupons){
             Coupon coupon = userCoupon.getCoupon();
