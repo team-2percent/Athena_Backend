@@ -33,4 +33,8 @@ public interface UserCouponController {
     @PostMapping
     public ResponseEntity<Void> useCoupon(@Parameter(hidden = true) @CheckLogin LoginUserRequest loginUserRequest,
                                           @RequestBody Long userCouponId);
+
+    @PostMapping("/scheduler")
+    public void schedulerExpiredUserCoupon();
+
 }

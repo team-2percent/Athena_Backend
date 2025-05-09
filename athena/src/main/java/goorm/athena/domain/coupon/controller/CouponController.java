@@ -21,6 +21,11 @@ public interface CouponController {
             "관리자 권한을 가진 유저(role = 'USER_ADMIN')만 새 쿠폰을 생성할 수 있습니다.")
     @ApiResponse(responseCode = "200", description = "새 쿠폰 정보 생성이 성공되었습니다.",
         content = @Content(schema = @Schema(implementation = Coupon.class)))
-    @PostMapping
+    @PostMapping("/create")
     ResponseEntity<CouponCreateResponse> createCoupon(@RequestBody CouponCreateRequest request);
+
+    @Operation(summary = "쿠폰의 상태 업데이트 스케줄러 수동 API", description = "쿠폰의 상태 업데이트 변경 스케줄러를 수동으로 작동합니다." +
+            "로그인 한 유저의 권한은 'admin'이어야 하며 상태가 이전 -> 진행")
+    @PostMapping("/scheduler")
+    public void scheduleUpdateCoupon();
 }

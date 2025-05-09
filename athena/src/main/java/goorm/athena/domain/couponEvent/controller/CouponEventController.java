@@ -20,6 +20,9 @@ public interface CouponEventController {
             "관리자 권한을 가진 유저(role = 'USER_ADMIN')만 새 쿠폰을 생성할 수 있습니다.")
     @ApiResponse(responseCode = "200", description = "새 쿠폰 이벤트가 생성되었습니다.",
         content = @Content(schema = @Schema(implementation = CouponEvent.class)))
-    @PostMapping
-    public ResponseEntity<CouponEventCreateResponse> crearteCouponEvent(@RequestBody CouponEventCreateRequest request);
+    @PostMapping("/create")
+    public ResponseEntity<CouponEventCreateResponse> createCouponEvent(@RequestBody CouponEventCreateRequest request);
+
+    @PostMapping("/scheduler")
+    public void schedulerCouponEvent();
 }
