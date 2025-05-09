@@ -19,16 +19,12 @@ public class CouponEvent {
     @JoinColumn(name = "coupon_id")
     private Coupon coupon;
 
-    private String title;
-    private String content;
     private boolean isActive;
 
     @Builder
     public static CouponEvent create(CouponEventCreateRequest request, Coupon coupon){
         CouponEvent couponEvent = new CouponEvent();
         couponEvent.coupon = coupon;
-        couponEvent.title = request.title();
-        couponEvent.content = request.content();
         couponEvent.isActive = false;
         return couponEvent;
     }

@@ -1,7 +1,6 @@
 package goorm.athena.domain.coupon.entity;
 
 import goorm.athena.domain.coupon.dto.req.CouponCreateRequest;
-import goorm.athena.domain.userCoupon.entity.Status;
 import goorm.athena.global.exception.CustomException;
 import goorm.athena.global.exception.ErrorCode;
 import jakarta.persistence.*;
