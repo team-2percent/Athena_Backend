@@ -22,7 +22,7 @@ public class CouponEventScheduler {
     public void updateCouponEventStatus(){
         LocalDateTime now = LocalDateTime.now();
 
-        List<CouponEvent> allEvents = couponEventRepository.findAll();
+        List<CouponEvent> allEvents = couponEventRepository.findAllWithCoupon();
 
         for(CouponEvent event : allEvents){
             Coupon coupon = event.getCoupon();
