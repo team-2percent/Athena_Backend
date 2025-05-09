@@ -16,7 +16,7 @@ public class CouponScheduler {
 
     private final CouponRepository couponRepository;
 
-     @Scheduled(cron = "*/9 * * * * *")
+     @Scheduled(cron = "2 0 0 * * *")
      public void updateCouponStatuses(){
          LocalDateTime now = LocalDateTime.now();
 
