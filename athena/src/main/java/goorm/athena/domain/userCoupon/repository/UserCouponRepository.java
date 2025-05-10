@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 public interface UserCouponRepository extends JpaRepository<UserCoupon, Long> {
     boolean existsByUserAndCoupon(User user, Coupon coupon);
@@ -18,4 +19,7 @@ public interface UserCouponRepository extends JpaRepository<UserCoupon, Long> {
 
     @Query("SELECT uc FROM UserCoupon uc JOIN FETCH uc.coupon")
     List<UserCoupon> findAllWithCoupon();
+
+    @Query("SELECT uc.coupon.id FROM UserCoupon uc WHERE uc.user.id = :userId AND uc.coupon.id IN :couponIds")
+    Set<Long> findCouponIdsByUserIdAndCouponIdIn(Long userId, List<Long> couponIds);
 }
