@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Component
@@ -17,12 +18,14 @@ public class CouponEventScheduler {
 
     private final CouponEventRepository couponEventRepository;
 
+    // 추후 배치를 사용하여 대량 데이터 처리 시에 대한 쿼리 최적화 예정
     @Transactional
     @Scheduled(cron = "1 0 0 * * *")
     public void updateCouponEventStatus(){
         LocalDateTime now = LocalDateTime.now();
 
         List<CouponEvent> allEvents = couponEventRepository.findAllWithCoupon();
+        List<CouponEvent> updatedEvents = new ArrayList<>();
 
         for(CouponEvent event : allEvents){
             Coupon coupon = event.getCoupon();
@@ -31,15 +34,19 @@ public class CouponEventScheduler {
                 // 만료된 경우
                 if(event.isActive()){
                     event.setInactive();
+                    updatedEvents.add(event);
                 }
             } else if(!coupon.getStartAt().isAfter(now)){
                 // 발급 시작일 활성화
                 if(!event.isActive()){
                     event.setActive();
+                    updatedEvents.add(event);
                 }
             }
         }
 
-        couponEventRepository.saveAll(allEvents);
+        if(!updatedEvents.isEmpty()) {
+            couponEventRepository.saveAll(allEvents);
+        }
     }
 }
