@@ -22,7 +22,7 @@ public class CouponEvent {
     private boolean isActive;
 
     @Builder
-    public static CouponEvent create(CouponEventCreateRequest request, Coupon coupon){
+    public static CouponEvent create(Coupon coupon){
         CouponEvent couponEvent = new CouponEvent();
         couponEvent.coupon = coupon;
         couponEvent.isActive = false;

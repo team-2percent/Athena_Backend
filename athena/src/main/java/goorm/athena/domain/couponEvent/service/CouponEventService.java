@@ -8,7 +8,6 @@ import goorm.athena.domain.couponEvent.dto.res.CouponEventGetResponse;
 import goorm.athena.domain.couponEvent.entity.CouponEvent;
 import goorm.athena.domain.couponEvent.mapper.CouponEventMapper;
 import goorm.athena.domain.couponEvent.repository.CouponEventRepository;
-import goorm.athena.domain.user.entity.User;
 import goorm.athena.domain.user.service.UserService;
 import goorm.athena.domain.userCoupon.repository.UserCouponRepository;
 import goorm.athena.global.exception.CustomException;
@@ -19,7 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -33,7 +31,7 @@ public class CouponEventService {
     public CouponEventCreateResponse createCouponEvent(CouponEventCreateRequest request) {
         Coupon coupon = couponRepository.findById(request.couponId())
                 .orElseThrow(() -> new CustomException(ErrorCode.COUPON_NOT_FOUND));
-        CouponEvent couponEvent = CouponEvent.create(request, coupon);
+        CouponEvent couponEvent = CouponEvent.create(coupon);
 
         couponEventRepository.save(couponEvent);
 
