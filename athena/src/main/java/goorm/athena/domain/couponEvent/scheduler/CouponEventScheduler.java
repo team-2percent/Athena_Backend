@@ -46,7 +46,7 @@ public class CouponEventScheduler {
         }
 
         if(!updatedEvents.isEmpty()) {
-            couponEventRepository.saveAll(allEvents);
+            couponEventRepository.saveAll(updatedEvents);
         }
     }
 }
