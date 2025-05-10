@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Component
@@ -23,15 +24,25 @@ public class CouponScheduler {
      public void updateCouponStatuses(){
          LocalDateTime now = LocalDateTime.now();
 
-         // 1. PREVIOUS → IN_PROGRESS
-         List<Coupon> toActivate = couponRepository.findByCouponStatusAndStartAtLessThanEqual(CouponStatus.PREVIOUS, now);
-         toActivate.forEach(Coupon::active);
+         // 발급일 or 만료일이 지난 상태를 업데이트 해야할 쿠폰들만 조회
+         List<Coupon> coupons = couponRepository.findCouponsToUpdate(now);
 
-         // 2. NOT ENDED → ENDED
-         List<Coupon> toEnd = couponRepository.findByCouponStatusNotAndEndAtLessThan(CouponStatus.ENDED, now);
-         toEnd.forEach(Coupon::expired);
+         List<Coupon> updatedCoupons = new ArrayList<>();
 
-         couponRepository.saveAll(toActivate);
-         couponRepository.saveAll(toEnd);
+         for (Coupon coupon : coupons) {
+             // 1. PREVIOUS -> IN_PROGRESS
+             if (coupon.getCouponStatus() == CouponStatus.PREVIOUS && !coupon.getStartAt().isAfter(now)) {
+                 coupon.active();
+                 updatedCoupons.add(coupon);
+             } // 2. NOT ENDED -> ENDED
+             else if (coupon.getCouponStatus() != CouponStatus.ENDED && coupon.getEndAt().isBefore(now)) {
+                 coupon.expired();
+                 updatedCoupons.add(coupon);
+             }
+         }
+
+         if (!updatedCoupons.isEmpty()) {
+             couponRepository.saveAll(updatedCoupons);
+         }
      }
 }
