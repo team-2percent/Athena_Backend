@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -42,14 +43,21 @@ public class CouponEventService {
     @Transactional(readOnly = true)
     public List<CouponEventGetResponse> getCouponEvent(Long userId){
         User user = userService.getUser(userId);
-        List<CouponEvent> couponEventList = couponEventRepository.findByIsActiveTrue();
+        List<CouponEvent> couponEventList = couponEventRepository.findByIsActiveTrueWithCoupon();
+
+        List<Long> couponIds = couponEventList.stream()
+                .map(event -> event.getCoupon().getId())
+                .toList();
+
+        Set<Long> alreadyIssuedCouponIds = userCouponRepository
+                .findCouponIdsByUserIdAndCouponIdIn(userId, couponIds);
 
         return couponEventList.stream()
                 .map(event -> {
-                    boolean alreadyIssued = userCouponRepository.existsByUserAndCoupon(user, event.getCoupon());
+                    boolean alreadyIssued = alreadyIssuedCouponIds.contains(event.getCoupon().getId());
                     return CouponEventMapper.toGetResponse(event, alreadyIssued);
                 })
-                .collect(Collectors.toList());
+                .toList();
 
     }
 }
