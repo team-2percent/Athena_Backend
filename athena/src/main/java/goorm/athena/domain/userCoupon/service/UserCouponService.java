@@ -69,7 +69,6 @@ public class UserCouponService {
     @Transactional(readOnly = true)
     public List<UserCouponGetResponse> getUserCoupon(Long userId){
         User user = userService.getUser(userId);
-        List<UserCoupon> userCoupon = userCouponRepository.findByUser(user);
         return userCouponRepository.findByUser(user).stream()
                 .map(UserCouponMapper::toGetResponse)
                 .collect(Collectors.toList());
