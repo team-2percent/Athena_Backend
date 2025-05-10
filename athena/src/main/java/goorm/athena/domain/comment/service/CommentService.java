@@ -44,7 +44,7 @@ public class CommentService {
     @Transactional(readOnly = true)
     public List<CommentGetResponse> getCommentByProject(Long projectId){
         Project project = projectService.getById(projectId);
-        List<Comment> comments = commentRepository.findByProject(project);
+        List<Comment> comments = commentRepository.findByProjectWithUser(project);
 
         return comments.stream()
                 .map(CommentMapper::toGetResponse)
