@@ -6,6 +6,7 @@ import goorm.athena.domain.coupon.repository.CouponRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -16,6 +17,8 @@ public class CouponScheduler {
 
     private final CouponRepository couponRepository;
 
+     // 추후 bulk update ( 한 번에 업데이트 ) 보다는 대용량 처리에 적합한 batch로 쿼리 조회 수 리팩토링 예정
+     @Transactional
      @Scheduled(cron = "2 0 0 * * *")
      public void updateCouponStatuses(){
          LocalDateTime now = LocalDateTime.now();
