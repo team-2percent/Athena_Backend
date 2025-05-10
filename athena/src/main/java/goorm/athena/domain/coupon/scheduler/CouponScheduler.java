@@ -35,7 +35,7 @@ public class CouponScheduler {
                  coupon.active();
                  updatedCoupons.add(coupon);
              } // 2. NOT ENDED -> ENDED
-             else if (coupon.getCouponStatus() != CouponStatus.ENDED && coupon.getEndAt().isBefore(now)) {
+             if (coupon.getCouponStatus() != CouponStatus.ENDED && coupon.getEndAt().isBefore(now)) {
                  coupon.expired();
                  updatedCoupons.add(coupon);
              }

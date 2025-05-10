@@ -42,7 +42,6 @@ public class CouponEventService {
 
     @Transactional(readOnly = true)
     public List<CouponEventGetResponse> getCouponEvent(Long userId){
-        User user = userService.getUser(userId);
         List<CouponEvent> couponEventList = couponEventRepository.findByIsActiveTrueWithCoupon();
 
         List<Long> couponIds = couponEventList.stream()
