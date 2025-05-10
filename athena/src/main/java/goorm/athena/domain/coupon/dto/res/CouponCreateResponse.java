@@ -1,5 +1,7 @@
 package goorm.athena.domain.coupon.dto.res;
 
+import goorm.athena.domain.coupon.entity.CouponStatus;
+
 import java.time.LocalDateTime;
 
 public record CouponCreateResponse(
@@ -12,6 +14,6 @@ public record CouponCreateResponse(
         LocalDateTime endAt,
         LocalDateTime expiresAt,
         int stock,
-        String status
+        CouponStatus status
 ) {
 }
