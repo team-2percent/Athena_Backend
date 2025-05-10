@@ -15,7 +15,7 @@ public class CouponMapper {
                 coupon.getEndAt(),
                 coupon.getExpiresAt(),
                 coupon.getStock(),
-                coupon.getCouponStatus().name()
+                coupon.getCouponStatus()
         );
     }
 }
