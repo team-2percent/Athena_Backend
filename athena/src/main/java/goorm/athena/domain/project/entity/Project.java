@@ -44,6 +44,8 @@ public class Project {
     @Enumerated(EnumType.STRING)
     private Status status;
 
+    private Long views = 0L;
+
     @Builder
     private Project(User seller, ImageGroup imageGroup, Category category, String title, String description, Long goalAmount, Long totalAmount, String contentMarkdown, LocalDateTime startAt, LocalDateTime endAt, LocalDateTime shippedAt) {
         this.seller = seller;
@@ -59,5 +61,7 @@ public class Project {
         this.shippedAt = shippedAt;
     }
 
-
+    public void increaseViews(){
+        this.views++;
+    }
 }
