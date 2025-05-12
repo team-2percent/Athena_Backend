@@ -6,6 +6,18 @@ import org.springframework.http.HttpStatus;
 @Getter
 public enum ErrorCode {
 
+    // 프로젝트, 상품
+    PROJECT_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 프로젝트 ID가 존재하지 않습니다."),
+    PRODUCT_UPLOAD_FAILED(HttpStatus.NOT_FOUND, "등록된 상품이 없습니다."),
+
+    // 카테고리
+    CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, "카테고리를 찾을 수 없습니다."),
+
+    // 이미지
+    IMAGE_GROUP_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 이미지 그룹 ID가 존재하지 않습니다."),
+    IMAGE_UPLOAD_FAILED(HttpStatus.NOT_FOUND, "이미지 업로드에 실패했습니다."),
+    INVALID_IMAGE_EXTENSION(HttpStatus.NOT_FOUND, "이미지 확장자가 올바르지 않습니다."),
+
     // 결제
     ORDER_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 ID의 주문이 존재하지 않습니다."),
     PAYMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 ID의 결제가 존재하지 않습니다."),
@@ -48,9 +60,6 @@ public enum ErrorCode {
     DELIVERY_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 ID의 배송지가 존재하지 않습니다."),
     PRODUCT_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 상품의 ID가 존재하지 않습니다."),
     INSUFFICIENT_INVENTORY(HttpStatus.BAD_REQUEST, "재고가 부족합니다."),
-
-    // 프로젝트
-    PROJECT_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 프로젝트의 ID가 존재하지 않습니다."),
 
     // 카카오 api
     KAKAO_PAY_UNAVAILABLE(HttpStatus.SERVICE_UNAVAILABLE, "카카오페이 서버와의 통신에 실패했습니다. 잠시 후 다시 시도해주세요.");

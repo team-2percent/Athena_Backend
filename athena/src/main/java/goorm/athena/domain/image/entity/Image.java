@@ -1,15 +1,14 @@
 package goorm.athena.domain.image.entity;
 
 import goorm.athena.domain.imageGroup.entity.ImageGroup;
-import goorm.athena.domain.project.entity.Project;
-import goorm.athena.domain.user.entity.User;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
+@NoArgsConstructor
 @Table(name = "image")
 public class Image {
     @Id
@@ -21,6 +20,14 @@ public class Image {
     private ImageGroup imageGroup;
 
     private String fileName;
-    private String fileUrl;
+    private String originalUrl;
     private String fileType;    // 파일형
+
+    @Builder
+    private Image(ImageGroup imageGroup, String fileName, String originalUrl, String fileType) {
+        this.imageGroup = imageGroup;
+        this.fileName = fileName;
+        this.originalUrl = originalUrl;
+        this.fileType = fileType;
+    }
 }
