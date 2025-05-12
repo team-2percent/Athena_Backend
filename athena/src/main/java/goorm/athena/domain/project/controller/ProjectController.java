@@ -1,17 +1,23 @@
 package goorm.athena.domain.project.controller;
 
 import goorm.athena.domain.project.dto.req.ProjectCreateRequest;
+import goorm.athena.domain.project.dto.req.ProjectGetCategoryRequest;
+import goorm.athena.domain.project.dto.req.ProjectGetDeadLineRequest;
+import goorm.athena.domain.project.dto.res.ProjectAllResponse;
+import goorm.athena.domain.project.dto.res.ProjectCategoryResponse;
+import goorm.athena.domain.project.dto.res.ProjectDeadLineResponse;
 import goorm.athena.domain.project.dto.res.ProjectIdResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "Project", description = "Project API")
 @RequestMapping("/api/project")
@@ -28,4 +34,31 @@ public interface ProjectController {
     @PostMapping
     ResponseEntity<ProjectIdResponse> createProject(@RequestBody ProjectCreateRequest request);
 
+    @Operation(summary = "프로젝트 전체 조회", description = "프로젝트를 전체로 조회하면서 인기 순으로 정렬합니다. (조회수 순 정렬)<br>" +
+            "테스트 시 기본적으로 Pageable은 sort를 가지기 때문에 요청 파라미터에서 sort 키를 없애주시면 됩니다,, !! ")
+    @ApiResponse(responseCode = "200", description = "프로젝트 전체 조회 성공",
+            content = @Content(schema = @Schema(implementation = ProjectAllResponse.class)))
+    @GetMapping("/all")
+    public ResponseEntity<Page<ProjectAllResponse>> getProjectsAll(@PageableDefault(size = 10, sort = "id", direction = Sort.Direction.DESC) Pageable pageable);
+
+    @Operation(summary = "프로젝트 신규순 조회", description = "프로젝트를 신규 순으로 조회합니다. (신규순 정렬)<br>" +
+            "테스트 시 기본적으로 Pageable은 sort를 가지기 때문에 요청 파라미터에서 sort 키를 없애주시면 됩니다,, !! ")
+    @ApiResponse(responseCode = "200", description = "프로젝트 신규순 조회 성공",
+            content = @Content(schema = @Schema(implementation = ProjectAllResponse.class)))
+    @GetMapping("/new")
+    public ResponseEntity<Page<ProjectAllResponse>> getProjectsByNew(@PageableDefault(size = 10, sort = "id", direction = Sort.Direction.DESC) Pageable pageable);
+
+    @Operation(summary = "프로젝트 카테고리별 조회", description = "프로젝트를 카테고리별로 조회합니다.")
+    @ApiResponse(responseCode = "200", description = "프로젝트 카테고리별 조회 성공",
+            content = @Content(schema = @Schema(implementation = ProjectCategoryResponse.class)))
+    @GetMapping("/category")
+    public ResponseEntity<Page<ProjectCategoryResponse>> getProjectByCategory(@ModelAttribute ProjectGetCategoryRequest request,
+                                                                              @PageableDefault(size = 10, sort = "id", direction = Sort.Direction.DESC) Pageable pageable);
+
+    @Operation(summary = "프로젝트 마감별 조회", description = "프로젝트의 마감일자를 오름차순으로 조회합니다 ( 빨리 끝나는 순)")
+    @ApiResponse(responseCode = "200", description = "프로젝트 마감별 조회 성공",
+        content = @Content(schema = @Schema(implementation = ProjectDeadLineResponse.class)))
+    @GetMapping("/deadLine")
+    public ResponseEntity<Page<ProjectDeadLineResponse>> getProjectByDeadLine(@ModelAttribute ProjectGetDeadLineRequest request,
+                                                                              @PageableDefault(size = 10, sort = "id", direction = Sort.Direction.DESC) Pageable pageable);
 }

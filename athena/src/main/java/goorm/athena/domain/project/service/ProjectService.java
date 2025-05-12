@@ -74,7 +74,8 @@ public class ProjectService {
     public Page<ProjectAllResponse> getProjectsByNew(Pageable pageable){
         return projectRepository.findByOrderByStartAtDesc(pageable);
     }
-    
+
+
     @Transactional(readOnly = true)
     public Page<ProjectCategoryResponse> getProjectByCategory(Long categoryId, SortType sortType, Pageable pageable){
         return projectQueryService.getProjectsByCategoryId(categoryId, sortType, pageable);
