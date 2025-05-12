@@ -4,12 +4,15 @@ import goorm.athena.domain.category.entity.Category;
 import goorm.athena.domain.imageGroup.entity.ImageGroup;
 import goorm.athena.domain.user.entity.User;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Getter
+@NoArgsConstructor
 @Table(name = "project")
 public class Project {
     @Id
@@ -29,15 +32,32 @@ public class Project {
     private Category category;      // 카테고리 ID
 
     private String title;
-    private String description;
+    private String description;         // 설명 (요약)
     private Long goalAmount;
     private Long totalAmount;
-    private String contentMarkdown;
+    private String contentMarkdown;     // 소개글 (마크 다운)
 
     private LocalDateTime startAt;
     private LocalDateTime endAt;
-    private LocalDateTime shippedAt;
+    private LocalDateTime shippedAt;    // 발송 일자
 
     @Enumerated(EnumType.STRING)
     private Status status;
+
+    @Builder
+    private Project(User seller, ImageGroup imageGroup, Category category, String title, String description, Long goalAmount, Long totalAmount, String contentMarkdown, LocalDateTime startAt, LocalDateTime endAt, LocalDateTime shippedAt) {
+        this.seller = seller;
+        this.imageGroup = imageGroup;
+        this.category = category;
+        this.title = title;
+        this.description = description;
+        this.goalAmount = goalAmount;
+        this.totalAmount = totalAmount;
+        this.contentMarkdown = contentMarkdown;
+        this.startAt = startAt;
+        this.endAt = endAt;
+        this.shippedAt = shippedAt;
+    }
+
+
 }

@@ -25,6 +25,18 @@ spring:
       cancel-url: ${KAKAO_API_CANCEL_URL}
       fail-url: ${KAKAO_API_FAIL_URL}
 
+cloud:
+  aws:
+    credentials:
+      access-key: ${ACCESS_KEY}
+      secret-key: ${SECRET_KEY}
+    s3:
+      bucket: ${BUCKET_NAME}
+    region:
+      static: ap-northeast-2
+    stack:
+      auto: false
+
 jwt:
   secretKey: ${JWT_SECRET_KEY}
   refreshKey: ${JWT_REFRESH_KEY}
