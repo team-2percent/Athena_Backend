@@ -1,5 +1,9 @@
 spring:
 
+  servlet:
+    multipart:
+      enabled: true
+
   config:
     import: optional:file:.env[.properties]
 

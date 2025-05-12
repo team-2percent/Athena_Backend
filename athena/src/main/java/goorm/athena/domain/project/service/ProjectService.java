@@ -39,6 +39,8 @@ public class ProjectService {
         Category category = categoryService.getCategoryById(request.categoryId());
 
         Project project = ProjectMapper.toEntity(request, seller, imageGroup, category);    // 새 프로젝트 생성
+        Project savedProject = projectRepository.save(project);         // 프로젝트 저장
+        // 프로젝트 생성 시 예외 처리 필요
 
         List<ProductRequest> productRequests = request.products();      // 상품 등록 요청 처리
         if (productRequests != null && !productRequests.isEmpty()) {
@@ -48,7 +50,7 @@ public class ProjectService {
             throw new CustomException(ErrorCode.PRODUCT_UPLOAD_FAILED);
         }
 
-        return ProjectMapper.toCreateDto(projectRepository.save(project));
+        return ProjectMapper.toCreateDto(savedProject);
     }
 
     // Get Project

@@ -41,8 +41,7 @@ public class S3Service {
 
             // InputStream 으로 추출 후 S3 업로드
             try(InputStream inputStream = file.getInputStream()) {
-                amazonS3.putObject(new PutObjectRequest(imageBucket, fileName, inputStream, metadata)
-                        .withCannedAcl(CannedAccessControlList.PublicRead));    // public URL 변환
+                amazonS3.putObject(new PutObjectRequest(imageBucket, fileName, inputStream, metadata));
             } catch(IOException e){
                 throw new CustomException(ErrorCode.IMAGE_UPLOAD_FAILED);
             }
