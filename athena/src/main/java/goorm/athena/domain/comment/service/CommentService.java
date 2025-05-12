@@ -9,6 +9,8 @@ import goorm.athena.domain.project.entity.Project;
 import goorm.athena.domain.project.service.ProjectService;
 import goorm.athena.domain.user.entity.User;
 import goorm.athena.domain.user.service.UserService;
+import goorm.athena.global.exception.CustomException;
+import goorm.athena.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,6 +29,11 @@ public class CommentService {
         User user = userService.getUser(userId);
         Project project = projectService.getById(projectId);
 
+        boolean alreadyCommented = commentRepository.existsByUserAndProject(user, project);
+        if(alreadyCommented){
+            throw new CustomException(ErrorCode.ALREADY_COMMENTED);
+        }
+        
         Comment comment = Comment.create(user, project, content);
 
         commentRepository.save(comment);
