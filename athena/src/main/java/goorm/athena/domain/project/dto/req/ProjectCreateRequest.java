@@ -13,7 +13,6 @@ public record ProjectCreateRequest(
         String title,
         String description,
         Long goalAmount,
-        Long totalAmount,
         String contentMarkdown,
 
         LocalDateTime startAt,
