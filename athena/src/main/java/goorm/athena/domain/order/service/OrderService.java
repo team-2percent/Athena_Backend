@@ -15,7 +15,6 @@ import goorm.athena.domain.user.entity.User;
 import goorm.athena.domain.order.entity.Order;
 import goorm.athena.domain.deliveryinfo.entity.DeliveryInfo;
 
-
 import goorm.athena.domain.user.service.UserService;
 import goorm.athena.global.exception.CustomException;
 import goorm.athena.global.exception.ErrorCode;
@@ -41,6 +40,10 @@ public class OrderService {
     public Order getById(Long id) {
         return orderRepository.findById(id)
                 .orElseThrow(() -> new CustomException(ErrorCode.ORDER_NOT_FOUND));
+    }
+
+    public void saveAll(List<Order> orders) {
+        orderRepository.saveAll(orders);
     }
 
     @Transactional

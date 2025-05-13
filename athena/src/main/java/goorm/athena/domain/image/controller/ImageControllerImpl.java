@@ -8,6 +8,7 @@ import goorm.athena.domain.s3.service.S3Service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -29,7 +30,7 @@ public class ImageControllerImpl implements ImageController {
         // 파일을 S3 업로드
         List<ImageCreateRequest> imageCreateRequests = s3Service.uploadFile(files);
 
-        // DTO: imageGroupId 추가
+        // 새 DTO 생성: imageGroupId 추가 ver
         List<ImageCreateRequest> updatedRequests = imageCreateRequests.stream()
                 .map(req -> req.withImageGroupId(imageGroupId))
                 .toList();
