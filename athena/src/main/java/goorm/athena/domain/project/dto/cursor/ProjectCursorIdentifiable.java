@@ -1,4 +1,4 @@
-package goorm.athena.domain.project.dto.res;
+package goorm.athena.domain.project.dto.cursor;
 
 import java.time.LocalDateTime;
 

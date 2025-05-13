@@ -40,6 +40,7 @@ public class Project {
     private LocalDateTime startAt;
     private LocalDateTime endAt;
     private LocalDateTime shippedAt;    // 발송 일자
+    private LocalDateTime createdAt = LocalDateTime.now();
 
     @Enumerated(EnumType.STRING)
     private Status status;

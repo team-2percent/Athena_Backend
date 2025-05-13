@@ -2,10 +2,12 @@ package goorm.athena.domain.project.service;
 
 import goorm.athena.domain.category.entity.Category;
 import goorm.athena.domain.category.service.CategoryService;
+import goorm.athena.domain.image.service.ImageService;
 import goorm.athena.domain.imageGroup.entity.ImageGroup;
 import goorm.athena.domain.imageGroup.service.ImageGroupService;
 import goorm.athena.domain.product.dto.req.ProductRequest;
 import goorm.athena.domain.product.service.ProductService;
+import goorm.athena.domain.project.dto.cursor.*;
 import goorm.athena.domain.project.dto.req.ProjectCreateRequest;
 import goorm.athena.domain.project.dto.req.ProjectCursorRequest;
 import goorm.athena.domain.project.dto.res.*;
@@ -19,19 +21,19 @@ import goorm.athena.domain.user.service.UserService;
 import goorm.athena.global.exception.CustomException;
 import goorm.athena.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
 public class ProjectService {
     private final ProjectRepository projectRepository;
     private final ImageGroupService imageGroupService;
+    private final ImageService imageService;
     private final UserService userService;
     private final CategoryService categoryService;
     private final ProductService productService;
@@ -63,45 +65,42 @@ public class ProjectService {
                 .orElseThrow(() -> new CustomException(ErrorCode.PROJECT_NOT_FOUND));
     }
 
-    public Page<ProjectAllResponse> getProjects(Pageable pageable) {
-        return projectRepository.findByOrderByViewsDesc(pageable);
+    @Transactional(readOnly = true)
+    public List<ProjectAllResponse> getProjects() {
+        List<Project> projects = projectRepository.findTop20WithImageGroupByOrderByViewsDesc();
+        return projects.stream()
+                .map(project -> {
+                    String imageUrl = imageService.getImage(project.getImageGroup().getId());
+                    return ProjectAllResponse.from(project, imageUrl);
+                })
+                .collect(Collectors.toList());
     }
-
-    /*
-        @Transactional(readOnly = true)
-        public Page<ProjectAllResponse> getProjectsByNew(Pageable pageable){
-            return projectRepository.findByOrderByStartAtDesc(pageable);
-        }
-
-
-
-        @Transactional(readOnly = true)
-        public Page<ProjectCategoryResponse> getProjectByCategory(Long categoryId, SortType sortType, Pageable pageable){
-            return projectQueryService.getProjectsByCategoryId(categoryId, sortType, pageable);
-        }
-
-        @Transactional(readOnly = true)
-        public Page<ProjectDeadLineResponse> getProjectsByDeadLine(SortType sortType, Pageable pageable){
-            return projectQueryService.getProjectsByDeadline(sortType, pageable);
-        }
-     */
 
     // 최신 프로젝트 조회 (커서 기반 페이징)
     @Transactional(readOnly = true)
-    public ProjectCursorResponse<ProjectAllResponse> getProjectsByNew(LocalDateTime lastStartAt, Long lastProjectId, int pageSize) {
+    public ProjectCursorResponse<ProjectRecentResponse> getProjectsByNew(LocalDateTime lastStartAt, Long lastProjectId, int pageSize) {
         ProjectCursorRequest<LocalDateTime> request = new ProjectCursorRequest<>(lastStartAt, lastProjectId, pageSize);
         return projectQueryService.getProjectsByNew(request);
     }
 
     // 카테고리별 프로젝트 조회 (커서 기반 페이징)
     @Transactional(readOnly = true)
-    public ProjectCursorResponse<ProjectCategoryResponse> getProjectsByCategory(Long categoryId, SortType sortType, Long lastProjectId, int pageSize) {
-        return projectQueryService.getProjectsByCategory(categoryId, sortType, lastProjectId, pageSize);
+    public ProjectCursorResponse<ProjectCategoryResponse> getProjectsByCategory(LocalDateTime lastStartAt, Long categoryId, SortType sortType, Long lastProjectId, int pageSize) {
+        ProjectCursorRequest<LocalDateTime> request = new ProjectCursorRequest<>(lastStartAt, lastProjectId, pageSize);
+        return projectQueryService.getProjectsByCategory(request, categoryId, sortType);
     }
 
     // 마감 기한별 프로젝트 조회 (커서 기반 페이징)
     @Transactional(readOnly = true)
-    public ProjectCursorResponse<ProjectDeadLineResponse> getProjectsByDeadLine(SortType sortType, Long lastProjectId, int pageSize) {
-        return projectQueryService.getProjectsByDeadline(sortType, lastProjectId, pageSize);
+    public ProjectCursorResponse<ProjectDeadLineResponse> getProjectsByDeadLine(LocalDateTime lastStartAt, SortType sortType, Long lastProjectId, int pageSize) {
+        ProjectCursorRequest<LocalDateTime> request = new ProjectCursorRequest<>(lastStartAt, lastProjectId, pageSize);
+        return projectQueryService.getProjectsByDeadline(request, sortType);
+    }
+
+    // 검색 프로젝트 조회 (커서 기반 페이징)
+    @Transactional(readOnly = true)
+    public ProjectSearchResponse<ProjectCategoryResponse> searchProjects( String searchTerms, SortType sortType, Long lastProjectId, int pageSize) {
+        ProjectCursorRequest<String> request = new ProjectCursorRequest<>(searchTerms, lastProjectId, pageSize);
+        return projectQueryService.searchProjects(request, searchTerms, sortType);
     }
 }

@@ -1,4 +1,4 @@
-package goorm.athena.domain.project.dto.res;
+package goorm.athena.domain.project.dto.cursor;
 
 import goorm.athena.domain.project.entity.Project;
 
@@ -8,19 +8,17 @@ public record ProjectAllResponse(
         Long id,
         String title,
         Long views,
-        Long goalAmount,
-        Long totalAmount,
+        Long achievementRate,
         LocalDateTime startAt,
         LocalDateTime endAt,
         String imageUrl
-) implements ProjectCursorIdentifiable{
+) implements ProjectCursorIdentifiable {
     public static ProjectAllResponse from(Project project, String imageUrl) {
         return new ProjectAllResponse(
                 project.getId(),
                 project.getTitle(),
                 project.getViews(),
-                project.getGoalAmount(),
-                project.getTotalAmount(),
+                project.getGoalAmount() / project.getTotalAmount(),
                 project.getStartAt(),
                 project.getEndAt(),
                 imageUrl

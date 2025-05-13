@@ -1,23 +1,21 @@
 package goorm.athena.domain.project.controller;
 
+import goorm.athena.domain.project.dto.cursor.*;
 import goorm.athena.domain.project.dto.req.ProjectCreateRequest;
-import goorm.athena.domain.project.dto.req.ProjectGetCategoryRequest;
-import goorm.athena.domain.project.dto.req.ProjectGetDeadLineRequest;
 import goorm.athena.domain.project.dto.res.*;
+import goorm.athena.domain.project.entity.SortType;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Tag(name = "Project", description = "Project API")
 @RequestMapping("/api/project")
@@ -39,32 +37,92 @@ public interface ProjectController {
     @ApiResponse(responseCode = "200", description = "프로젝트 전체 조회 성공",
             content = @Content(schema = @Schema(implementation = ProjectAllResponse.class)))
     @GetMapping("/all")
-    public ResponseEntity<Page<ProjectAllResponse>> getProjectsAll(@PageableDefault(size = 10, sort = "id", direction = Sort.Direction.DESC) Pageable pageable);
+    public ResponseEntity<List<ProjectAllResponse>> getProjectsAll();
 
-    @Operation(summary = "프로젝트 신규순 조회", description = "프로젝트를 신규 순으로 조회합니다. (신규순 정렬)<br>" +
-            "테스트 시 기본적으로 Pageable은 sort를 가지기 때문에 요청 파라미터에서 sort 키를 없애주시면 됩니다,, !! ")
+    @Operation(summary = "프로젝트 신규순 조회(무한 페이징)", description = "프로젝트를 신규 순으로 조회합니다. (신규순 정렬)<br>" +
+            "페이지는 20개 단위로 구성되며, **맨 처음에는 아무 값도 입력되지 않아도 됩니다.**<br>" +
+            "배열 형식으로 20개가 출력되고 맨 마지막에는 'nextCursorValue', 'nextProjectId'가 주어집니다.<br>" +
+            "다음 페이지 로딩 시 해당 값을 입력값에 입력 하면 해당 Value의 '다음'값들이 페이지 조회됩니다.<br>")
     @ApiResponse(responseCode = "200", description = "프로젝트 신규순 조회 성공",
             content = @Content(schema = @Schema(implementation = ProjectAllResponse.class)))
     @GetMapping("/new")
-    public ResponseEntity<ProjectCursorResponse<ProjectAllResponse>> getProjectsByNew(@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime cursorValue,
-                                                                                      @RequestParam(required = false) Long lastProjectId,
-                                                                                      @RequestParam(defaultValue = "10") int pageSize);
+    public ResponseEntity<ProjectCursorResponse<ProjectRecentResponse>> getProjectsByNew(@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime cursorValue,
+                                                                                         @RequestParam(required = false) Long lastProjectId,
+                                                                                         @Parameter(hidden = true) @RequestParam(defaultValue = "20") int pageSize);
 
 
-    @Operation(summary = "프로젝트 카테고리별 조회", description = "프로젝트를 카테고리별로 조회합니다.")
+    @Operation(summary = "프로젝트 카테고리별 조회", description = "프로젝트를 카테고리별로 조회합니다.<br>" +
+            "페이지는 20개 단위로 구성되며, **맨 처음에는 아무 값도 입력되지 않아도 됩니다.**<br>" +
+            "배열 형식으로 20개가 출력되고 맨 마지막에는 'nextCursorValue', 'nextProjectId'가 주어집니다.<br>" +
+            "다음 페이지 로딩 시 해당 값을 입력값에 입력 하면 **해당 Value의 '다음'값들이 페이지 조회됩니다.**<br>" +
+            """
+            <br>⚠️ <b>DEADLINE</b>으로 시작하는 정렬은 사용할 수 없으며, 사용할 시 에러가 리턴됩니다.<br><br>"
+                ✅ 사용 가능한 정렬 방식:
+                <ul>
+                  <li><b style='color:#0074D9;'>최신순 (LATEST)</b></li>
+                  <li><b style='color:#0074D9;'>추천순 (RECOMMENDED)</b></li>
+                  <li><b style='color:#0074D9;'>인기순 (POPULAR)</b></li>
+                  <li><b style='color:#0074D9;'>달성률 순 (SUCCESS_RATE)</b></li>
+                </ul>
+            """)
     @ApiResponse(responseCode = "200", description = "프로젝트 카테고리별 조회 성공",
             content = @Content(schema = @Schema(implementation = ProjectCategoryResponse.class)))
     @GetMapping("/category")
-    public ResponseEntity<ProjectCursorResponse<ProjectCategoryResponse>> getProjectByCategory(@RequestParam(required = false) Long lastProjectId,
-                                                                                               @ModelAttribute ProjectGetCategoryRequest request,
-                                                                                               @RequestParam(defaultValue = "10") int pageSize);
+    public ResponseEntity<ProjectCursorResponse<ProjectCategoryResponse>> getProjectByCategory(@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime cursorValue,
+                                                                                               @RequestParam(required = false) Long lastProjectId,
+                                                                                               @RequestParam Long categoryId,
+                                                                                               @ModelAttribute SortType sortType,
+                                                                                               @Parameter(hidden = true) @RequestParam(defaultValue = "20") int pageSize);
 
-    @Operation(summary = "프로젝트 마감별 조회", description = "프로젝트의 마감일자를 오름차순으로 조회합니다 ( 빨리 끝나는 순)")
+    @Operation(summary = "프로젝트 마감별 조회", description =
+            "프로젝트의 마감일자를 오름차순으로 조회합니다 ( 빨리 끝나는 순)<br>" +
+            "페이지는 20개 단위로 구성되며, **맨 처음에는 아무 값도 입력되지 않아도 됩니다.**<br>" +
+            "배열 형식으로 20개가 출력되고 맨 마지막에는 'nextCursorValue', 'nextProjectId'가 주어집니다.<br>" +
+            "다음 페이지 로딩 시 해당 값을 입력값에 입력 하면 **해당 Value의 '다음'값들이 페이지 조회됩니다.**<br>" +
+                    """
+        <br>⚠️ <b>DEADLINE</b>으로 시작하지 않는 정렬은 사용할 수 없으며, 그 외에는 에러가 리턴됩니다.<br><br>"
+            ✅ 사용 가능한 정렬 방식:
+            <ul>
+              <li><b style='color:#0074D9;'>마감순 (DEADLINE)</b></li>
+              <li><b style='color:#0074D9;'>추천순 (DEADLINE_RECOMMENDED)</b></li>
+              <li><b style='color:#0074D9;'>인기순 (DEADLINE_POPULAR)</b></li>
+              <li><b style='color:#0074D9;'>달성률 순 (DEADLINE_SUCCESS_RATE)</b></li>
+            </ul>
+                    """)
     @ApiResponse(responseCode = "200", description = "프로젝트 마감별 조회 성공",
         content = @Content(schema = @Schema(implementation = ProjectDeadLineResponse.class)))
     @GetMapping("/deadLine")
-    public ResponseEntity<ProjectCursorResponse<ProjectDeadLineResponse>> getProjectByDeadLine(@RequestParam(required = false) Long lastProjectId,
-                                                                                               @ModelAttribute ProjectGetDeadLineRequest request,
-                                                                                               @RequestParam(defaultValue = "10") int pageSize);
+    public ResponseEntity<ProjectCursorResponse<ProjectDeadLineResponse>> getProjectByDeadLine(@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime cursorValue,
+                                                                                               @RequestParam(required = false) Long lastProjectId,
+                                                                                               @Parameter(
+                                                                                                       description = "마감 정렬 방식",
+                                                                                                       example = "DEADLINE",
+                                                                                                       schema = @Schema(implementation = SortType.class)
+                                                                                               )
+                                                                                               @ModelAttribute SortType sortType,
+                                                                                               @Parameter(hidden = true) @RequestParam(defaultValue = "20") int pageSize);
+
+
+    @Operation(summary = "프로젝트 검색 조회", description = "프로젝트 검색 결과로 제목을 조회합니다.<br>" +
+            "페이지는 20개 단위로 구성되며, **맨 처음에는 아무 값도 입력되지 않아도 됩니다.**<br>" +
+            "배열 형식으로 20개가 출력되고 맨 마지막에는 'nextCursorValue', 'nextProjectId'가 주어집니다.<br>" +
+            "다음 페이지 로딩 시 해당 값을 입력값에 입력 하면 **해당 Value의 '다음'값들이 페이지 조회됩니다.**<br>" +
+            """
+            <br>⚠️ <b>DEADLINE</b>으로 시작하는 정렬은 사용할 수 없으며, 사용할 시 에러가 리턴됩니다.<br><br>"
+                ✅ 사용 가능한 정렬 방식:
+                <ul>
+                  <li><b style='color:#0074D9;'>최신순 (LATEST)</b></li>
+                  <li><b style='color:#0074D9;'>추천순 (RECOMMENDED)</b></li>
+                  <li><b style='color:#0074D9;'>인기순 (POPULAR)</b></li>
+                  <li><b style='color:#0074D9;'>달성률 순 (SUCCESS_RATE)</b></li>
+                </ul>
+            """)
+    @ApiResponse(responseCode = "200", description = "프로젝트 마감별 조회 성공",
+            content = @Content(schema = @Schema(implementation = ProjectCategoryResponse.class)))
+    @GetMapping("/search")
+    public ResponseEntity<ProjectSearchResponse<ProjectCategoryResponse>> searchProject(@RequestParam String searchTerm,
+                                                                                        @RequestParam(required = false) Long lastProjectId,
+                                                                                        @ModelAttribute SortType sortType,
+                                                                                        @Parameter(hidden = true) @RequestParam(defaultValue = "20") int pageSize);
 }
 

@@ -3,21 +3,18 @@ package goorm.athena.domain.project.controller;
 import goorm.athena.domain.imageGroup.entity.ImageGroup;
 import goorm.athena.domain.imageGroup.entity.Type;
 import goorm.athena.domain.imageGroup.service.ImageGroupService;
+import goorm.athena.domain.project.dto.cursor.*;
 import goorm.athena.domain.project.dto.req.ProjectCreateRequest;
-import goorm.athena.domain.project.dto.req.ProjectGetCategoryRequest;
-import goorm.athena.domain.project.dto.req.ProjectGetDeadLineRequest;
 import goorm.athena.domain.project.dto.res.*;
+import goorm.athena.domain.project.entity.SortType;
 import goorm.athena.domain.project.service.ProjectService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
@@ -41,36 +38,49 @@ public class ProjectControllerImpl implements ProjectController {
 
     @Override
     @GetMapping("/all")
-    public ResponseEntity<Page<ProjectAllResponse>> getProjectsAll(@PageableDefault(size = 10, sort = "id", direction = Sort.Direction.DESC) Pageable pageable){
-        Page<ProjectAllResponse> responses = projectService.getProjects(pageable);
+    public ResponseEntity<List<ProjectAllResponse>> getProjectsAll(){
+        List<ProjectAllResponse> responses = projectService.getProjects();
         return ResponseEntity.ok(responses);
     }
 
     @Override
     @GetMapping("/new")
-    public ResponseEntity<ProjectCursorResponse<ProjectAllResponse>> getProjectsByNew(@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime cursorValue,
-                                                                                      @RequestParam(required = false) Long lastProjectId,
-                                                                                      @RequestParam(defaultValue = "10") int pageSize){
-        ProjectCursorResponse<ProjectAllResponse> responses = projectService.getProjectsByNew(cursorValue, lastProjectId, pageSize);
+    public ResponseEntity<ProjectCursorResponse<ProjectRecentResponse>> getProjectsByNew(@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime cursorValue,
+                                                                                         @RequestParam(required = false) Long lastProjectId,
+                                                                                         @RequestParam(defaultValue = "20") int pageSize){
+        ProjectCursorResponse<ProjectRecentResponse> responses = projectService.getProjectsByNew(cursorValue, lastProjectId, pageSize);
         return ResponseEntity.ok(responses);
     }
 
     @Override
     @GetMapping("/category")
-    public ResponseEntity<ProjectCursorResponse<ProjectCategoryResponse>> getProjectByCategory(@RequestParam(required = false) Long lastProjectId,
-                                                                                               @ModelAttribute ProjectGetCategoryRequest request,
-                                                                                               @RequestParam(defaultValue = "10") int pageSize){
-        ProjectCursorResponse<ProjectCategoryResponse> response = projectService.getProjectsByCategory(request.categoryId(), request.sortType(), lastProjectId, pageSize);
+    public ResponseEntity<ProjectCursorResponse<ProjectCategoryResponse>> getProjectByCategory(@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime cursorValue,
+                                                                                               @RequestParam(required = false) Long lastProjectId,
+                                                                                               @RequestParam Long categoryId,
+                                                                                               @ModelAttribute SortType sortType,
+                                                                                               @RequestParam(defaultValue = "20") int pageSize){
+        ProjectCursorResponse<ProjectCategoryResponse> response = projectService.getProjectsByCategory(cursorValue, categoryId, sortType, lastProjectId, pageSize);
         return ResponseEntity.ok(response);
     }
 
     @Override
     @GetMapping("/deadLine")
-    public ResponseEntity<ProjectCursorResponse<ProjectDeadLineResponse>> getProjectByDeadLine(@RequestParam(required = false) Long lastProjectId,
-                                                                                               @ModelAttribute ProjectGetDeadLineRequest request,
-                                                                                               @RequestParam(defaultValue = "10") int pageSize){
-        ProjectCursorResponse<ProjectDeadLineResponse> responses = projectService.getProjectsByDeadLine(request.sortType(), lastProjectId, pageSize);
+    public ResponseEntity<ProjectCursorResponse<ProjectDeadLineResponse>> getProjectByDeadLine(@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime cursorValue,
+                                                                                               @RequestParam(required = false) Long lastProjectId,
+                                                                                               @ModelAttribute SortType sortType,
+                                                                                               @RequestParam(defaultValue = "20") int pageSize){
+        ProjectCursorResponse<ProjectDeadLineResponse> responses = projectService.getProjectsByDeadLine(cursorValue, sortType, lastProjectId, pageSize);
         return ResponseEntity.ok(responses);
 
+    }
+
+    @Override
+    @GetMapping("/search")
+    public ResponseEntity<ProjectSearchResponse<ProjectCategoryResponse>> searchProject(@RequestParam String searchTerm,
+                                                                                        @RequestParam(required = false) Long lastProjectId,
+                                                                                        @ModelAttribute SortType sortType,
+                                                                                        @RequestParam(defaultValue = "20") int pageSize){
+        ProjectSearchResponse<ProjectCategoryResponse> response = projectService.searchProjects(searchTerm, sortType, lastProjectId, pageSize);
+        return ResponseEntity.ok(response);
     }
 }
