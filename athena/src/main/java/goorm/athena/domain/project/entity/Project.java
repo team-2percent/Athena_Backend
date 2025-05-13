@@ -1,5 +1,6 @@
 package goorm.athena.domain.project.entity;
 
+import goorm.athena.domain.bankaccount.entity.BankAccount;
 import goorm.athena.domain.category.entity.Category;
 import goorm.athena.domain.imageGroup.entity.ImageGroup;
 import goorm.athena.domain.user.entity.User;
@@ -30,6 +31,10 @@ public class Project {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;      // 카테고리 ID
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "bank_account_id", nullable = false)
+    private BankAccount bankAccount;
 
     private String title;
     private String description;         // 설명 (요약)
