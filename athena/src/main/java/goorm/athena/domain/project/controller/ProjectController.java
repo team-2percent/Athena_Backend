@@ -104,8 +104,8 @@ public interface ProjectController {
 
 
     @Operation(summary = "프로젝트 검색 조회", description = "프로젝트 검색 결과로 제목을 조회합니다.<br>" +
-            "페이지는 20개 단위로 구성되며, **맨 처음에는 아무 값도 입력되지 않아도 됩니다.**<br>" +
-            "배열 형식으로 20개가 출력되고 맨 마지막에는 'nextCursorValue', 'nextProjectId'가 주어집니다.<br>" +
+            "페이지는 20개 단위로 구성되며, **기본적으로 검색값 = searchTerm과 lastProjectId에는 첫 번째 값 '0'을 입력하셔야 합니다.**<br>" +
+            "배열 형식으로 20개가 출력되고 맨 마지막에는 'searchTerm', 'nextProjectId'가 주어집니다.<br>" +
             "다음 페이지 로딩 시 해당 값을 입력값에 입력 하면 **해당 Value의 '다음'값들이 페이지 조회됩니다.**<br>" +
             """
             <br>⚠️ <b>DEADLINE</b>으로 시작하는 정렬은 사용할 수 없으며, 사용할 시 에러가 리턴됩니다.<br><br>"
@@ -118,11 +118,11 @@ public interface ProjectController {
                 </ul>
             """)
     @ApiResponse(responseCode = "200", description = "프로젝트 마감별 조회 성공",
-            content = @Content(schema = @Schema(implementation = ProjectCategoryResponse.class)))
+            content = @Content(schema = @Schema(implementation = ProjectSearchResponse.class)))
     @GetMapping("/search")
-    public ResponseEntity<ProjectSearchResponse<ProjectCategoryResponse>> searchProject(@RequestParam String searchTerm,
-                                                                                        @RequestParam(required = false) Long lastProjectId,
-                                                                                        @ModelAttribute SortType sortType,
-                                                                                        @Parameter(hidden = true) @RequestParam(defaultValue = "20") int pageSize);
+    public ResponseEntity<ProjectSearchCursorResponse<ProjectSearchResponse>> searchProject(@RequestParam String searchTerm,
+                                                                                            @RequestParam(required = false) Long lastProjectId,
+                                                                                            @ModelAttribute SortType sortType,
+                                                                                            @Parameter(hidden = true) @RequestParam(defaultValue = "20") int pageSize);
 }
 

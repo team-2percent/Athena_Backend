@@ -76,11 +76,11 @@ public class ProjectControllerImpl implements ProjectController {
 
     @Override
     @GetMapping("/search")
-    public ResponseEntity<ProjectSearchResponse<ProjectCategoryResponse>> searchProject(@RequestParam String searchTerm,
-                                                                                        @RequestParam(required = false) Long lastProjectId,
-                                                                                        @ModelAttribute SortType sortType,
-                                                                                        @RequestParam(defaultValue = "20") int pageSize){
-        ProjectSearchResponse<ProjectCategoryResponse> response = projectService.searchProjects(searchTerm, sortType, lastProjectId, pageSize);
+    public ResponseEntity<ProjectSearchCursorResponse<ProjectSearchResponse>> searchProject(@RequestParam String searchTerm,
+                                                                                            @RequestParam(required = false) Long lastProjectId,
+                                                                                            @ModelAttribute SortType sortType,
+                                                                                            @RequestParam(defaultValue = "20") int pageSize){
+        ProjectSearchCursorResponse<ProjectSearchResponse> response = projectService.searchProjects(searchTerm, sortType, lastProjectId, pageSize);
         return ResponseEntity.ok(response);
     }
 }

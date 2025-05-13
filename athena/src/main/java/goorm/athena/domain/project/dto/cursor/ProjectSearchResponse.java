@@ -1,19 +1,29 @@
 package goorm.athena.domain.project.dto.cursor;
 
+import goorm.athena.domain.project.entity.Project;
+
 import java.time.LocalDateTime;
-import java.util.List;
 
-public record ProjectSearchResponse<T>(
-        List<T> content,
-        String searchTerm,
-        Long nextProjectId
-) {
-    public static <T extends ProjectCursorIdentifiable> ProjectSearchResponse<T> ofBySearch(List<T> content, String searchTerm) {
-        if (content.isEmpty()) {
-            return new ProjectSearchResponse<>(content, searchTerm, null);
-        }
-
-        T last = content.get(content.size() - 1);
-        return new ProjectSearchResponse<>(content, searchTerm, last.id());
+public record ProjectSearchResponse(
+        Long id,
+        String title,
+        Long views,
+        Long achievementRate,
+        LocalDateTime startAt,
+        LocalDateTime endAt,
+        LocalDateTime createdAt,
+        String imageUrl
+) implements SearchCursorIdentifiable {
+    public static ProjectSearchResponse from(Project project, String imageUrl) {
+        return new ProjectSearchResponse(
+                project.getId(),
+                project.getTitle(),
+                project.getViews(),
+                project.getGoalAmount() / project.getTotalAmount(),
+                project.getStartAt(),
+                project.getEndAt(),
+                project.getCreatedAt(),
+                imageUrl
+        );
     }
 }
