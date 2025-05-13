@@ -26,10 +26,18 @@ public class Image {
     private boolean isDefault;
 
     @Builder
-    private Image(ImageGroup imageGroup, String fileName, String originalUrl, String fileType) {
+    private Image(ImageGroup imageGroup, String fileName, String originalUrl, String fileType, boolean isDefault) {
         this.imageGroup = imageGroup;
         this.fileName = fileName;
         this.originalUrl = originalUrl;
         this.fileType = fileType;
+    }
+
+    public void setAsDefault(){
+        this.isDefault = true;
+    }
+
+    public void unsetAsDefault(){
+        this.isDefault = false;
     }
 }
