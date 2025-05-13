@@ -7,7 +7,6 @@ import goorm.athena.domain.order.dto.res.OrderCreateResponse;
 import goorm.athena.domain.order.repository.OrderRepository;
 import goorm.athena.domain.orderitem.entity.OrderItem;
 import goorm.athena.domain.orderitem.repository.OrderItemRepository;
-import goorm.athena.domain.payment.service.PaymentService;
 import goorm.athena.domain.product.entity.Product;
 import goorm.athena.domain.product.service.ProductService;
 import goorm.athena.domain.project.entity.Project;
@@ -16,7 +15,6 @@ import goorm.athena.domain.user.entity.User;
 import goorm.athena.domain.order.entity.Order;
 import goorm.athena.domain.deliveryinfo.entity.DeliveryInfo;
 
-
 import goorm.athena.domain.user.service.UserService;
 import goorm.athena.global.exception.CustomException;
 import goorm.athena.global.exception.ErrorCode;
@@ -24,10 +22,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 @Service

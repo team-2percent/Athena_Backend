@@ -29,12 +29,12 @@ public class SettlementHistory {
     @Column(name ="total_price")
     private long totalPrice;
     private int fee;
-    private Long amount;
+    private long amount;
 
     private LocalDateTime createdAt = LocalDateTime.now();
 
     @Builder
-    public SettlementHistory(Settlement settlement, Order order, long totalPrice, int fee, Long amount) {
+    public SettlementHistory(Settlement settlement, Order order, long totalPrice, int fee, long amount) {
         this.settlement = settlement;
         this.order = order;
         this.totalPrice = totalPrice;

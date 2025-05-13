@@ -76,7 +76,7 @@ public class SettlementService {
     private Settlement createSettlement(Project project, List<Order> orders) {
         long totalSales = orders.stream().mapToLong(Order::getTotalPrice).sum();
         int totalCount = orders.size();
-        long fee = (long) (totalSales * PLATFORM_FEE_RATE);
+        long fee = Math.round(totalSales * PLATFORM_FEE_RATE);
         long payout = totalSales - fee;
 
         BankAccount bankAccount = bankAccountService.getPrimaryAccount(project.getSeller().getId());

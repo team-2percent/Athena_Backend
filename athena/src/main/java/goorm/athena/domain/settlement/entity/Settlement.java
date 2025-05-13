@@ -33,19 +33,20 @@ public class Settlement {
     private Project project;
 
     private int totalCount;
-    private Long totalSales;
-    private Long payOutAmount;
-    private Long platformFee;
+    private long totalSales;
+    private long payOutAmount;
+    private long platformFee;
 
-    private LocalDateTime settledAt;     // 정산 처리 시간
+    private LocalDateTime requestedAt;
+    private LocalDateTime settledAt;
 
     @Enumerated(EnumType.STRING)
     private Status status;               // PENDING, COMPLETED, FAILED
 
     @Builder
     public Settlement(User user, BankAccount bankAccount, Project project,
-                      int totalCount, Long totalSales, Long platformFee,
-                      Long payOutAmount, Status status) {
+                      int totalCount, long totalSales, long platformFee,
+                      long payOutAmount, Status status) {
         this.user = user;
         this.bankAccount = bankAccount;
         this.project = project;
@@ -54,7 +55,7 @@ public class Settlement {
         this.platformFee = platformFee;
         this.payOutAmount = payOutAmount;
         this.status = status;
-        this.settledAt = LocalDateTime.now();
+        this.requestedAt = LocalDateTime.now();
     }
 
     public void markAsCompleted() {

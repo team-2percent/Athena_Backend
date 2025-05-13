@@ -12,12 +12,4 @@ import java.util.List;
 
 public interface OrderRepository extends JpaRepository<Order, Long> {
 
-    @Query("""
-    SELECT p.order FROM Payment p
-    WHERE p.order.project IN :projects
-      AND p.order.isSettled = false
-      AND p.status = 'APPROVED'
-      AND p.order.orderedAt BETWEEN p.order.project.startAt AND p.order.project.endAt
-    """)
-    List<Order> findUnsettledOrdersForProjects(@Param("projects") List<Project> projects);
 }
