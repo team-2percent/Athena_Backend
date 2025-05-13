@@ -19,7 +19,7 @@ public record ProjectRecentResponse(
                 project.getId(),
                 project.getTitle(),
                 project.getViews(),
-                project.getGoalAmount() / project.getTotalAmount(),
+                project.getTotalAmount() > 0 ? (project.getTotalAmount() * 100) / project.getGoalAmount() : 0L,
                 project.getStartAt(),
                 project.getEndAt(),
                 project.getCreatedAt(),
