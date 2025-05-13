@@ -79,6 +79,7 @@ public interface ProjectController {
             "페이지는 20개 단위로 구성되며, **맨 처음에는 아무 값도 입력되지 않아도 됩니다.**<br>" +
             "배열 형식으로 20개가 출력되고 맨 마지막에는 'nextCursorValue', 'nextProjectId'가 주어집니다.<br>" +
             "다음 페이지 로딩 시 해당 값을 입력값에 입력 하면 **해당 Value의 '다음'값들이 페이지 조회됩니다.**<br>" +
+                    "마감일자를 우선으로 정렬됩니다! 1. 마감일자, 2. 세부필터(ex : 성공률, 조회수) 로 정렬됩니다.<br>" +
                     """
         <br>⚠️ <b>DEADLINE</b>으로 시작하지 않는 정렬은 사용할 수 없으며, 그 외에는 에러가 리턴됩니다.<br><br>"
             ✅ 사용 가능한 정렬 방식:
@@ -117,7 +118,7 @@ public interface ProjectController {
                   <li><b style='color:#0074D9;'>달성률 순 (SUCCESS_RATE)</b></li>
                 </ul>
             """)
-    @ApiResponse(responseCode = "200", description = "프로젝트 마감별 조회 성공",
+    @ApiResponse(responseCode = "200", description = "프로젝트 검색별 조회 성공",
             content = @Content(schema = @Schema(implementation = ProjectSearchResponse.class)))
     @GetMapping("/search")
     public ResponseEntity<ProjectSearchCursorResponse<ProjectSearchResponse>> searchProject(@RequestParam String searchTerm,
