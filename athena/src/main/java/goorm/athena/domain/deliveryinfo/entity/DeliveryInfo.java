@@ -20,15 +20,27 @@ public class DeliveryInfo {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @Column(name = "zipcode", nullable = false)
+    @Column(name = "zipcode")
     private String zipcode;
 
-    @Column(name = "address", nullable = false)
+    @Column(name = "address")
     private String address;
 
     @Column(name = "detail_address")
     private String detailAddress;
 
-    @Column(name = "is_default", nullable = false)
+    @Column(name = "is_default")
     private boolean isDefault = false;
+
+    public DeliveryInfo(User user, String zipcode, String address, String detailAddress, boolean isDefault) {
+        this.user = user;
+        this.zipcode = zipcode;
+        this.address = address;
+        this.detailAddress = detailAddress;
+        this.isDefault = isDefault;
+    }
+
+    public void updateDefault(boolean isDefault) {
+        this.isDefault = isDefault;
+    }
 }

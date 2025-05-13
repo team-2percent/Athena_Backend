@@ -4,10 +4,16 @@ import goorm.athena.domain.bankaccount.entity.BankAccount;
 import goorm.athena.domain.project.entity.Project;
 import goorm.athena.domain.user.entity.User;
 import jakarta.persistence.*;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
+@Getter
+@NoArgsConstructor
 public class Settlement {
 
     @Id
@@ -15,25 +21,45 @@ public class Settlement {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "seller_id")
-    private User seller;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "project_id")
-    private Project project;
+    @JoinColumn(name = "user_id")
+    private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "bankaccount_id")
     private BankAccount bankAccount;
 
-    private int totalCount;
-    private int totalSales;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "project_id")
+    private Project project;
 
+    private int totalCount;
+    private long totalSales;
+    private long payOutAmount;
+    private long platformFee;
+
+    private LocalDateTime requestedAt;
     private LocalDateTime settledAt;
-    private LocalDateTime scheduledAt;
 
     @Enumerated(EnumType.STRING)
-    private Status status;
+    private Status status;               // PENDING, COMPLETED, FAILED
 
-    private LocalDateTime createdAt;
+    @Builder
+    public Settlement(User user, BankAccount bankAccount, Project project,
+                      int totalCount, long totalSales, long platformFee,
+                      long payOutAmount, Status status) {
+        this.user = user;
+        this.bankAccount = bankAccount;
+        this.project = project;
+        this.totalCount = totalCount;
+        this.totalSales = totalSales;
+        this.platformFee = platformFee;
+        this.payOutAmount = payOutAmount;
+        this.status = status;
+        this.requestedAt = LocalDateTime.now();
+    }
+
+    public void markAsCompleted() {
+        this.status = Status.COMPLETED;
+        this.settledAt = LocalDateTime.now();
+    }
 }

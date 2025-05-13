@@ -43,6 +43,9 @@ public class Project {
     private LocalDateTime createdAt = LocalDateTime.now();
 
     @Enumerated(EnumType.STRING)
+    private ApprovalStatus isApproved;
+
+    @Enumerated(EnumType.STRING)
     private Status status;
 
     private Long views = 0L;

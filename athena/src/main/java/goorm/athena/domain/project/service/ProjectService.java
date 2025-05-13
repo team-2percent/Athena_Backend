@@ -24,6 +24,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -48,6 +49,8 @@ public class ProjectService {
         Category category = categoryService.getCategoryById(request.categoryId());
 
         Project project = ProjectMapper.toEntity(request, seller, imageGroup, category);    // 새 프로젝트 생성
+        Project savedProject = projectRepository.save(project);         // 프로젝트 저장
+        // 프로젝트 생성 시 예외 처리 필요
 
         List<ProductRequest> productRequests = request.products();      // 상품 등록 요청 처리
         if (productRequests != null && !productRequests.isEmpty()) {
@@ -56,15 +59,14 @@ public class ProjectService {
             throw new CustomException(ErrorCode.PRODUCT_UPLOAD_FAILED);
         }
 
-        return ProjectMapper.toCreateDto(projectRepository.save(project));
+        return ProjectMapper.toCreateDto(savedProject);
     }
 
-    // Get Project
     public Project getById(Long id) {
         return projectRepository.findById(id)
                 .orElseThrow(() -> new CustomException(ErrorCode.PROJECT_NOT_FOUND));
     }
-
+  
     @Transactional(readOnly = true)
     public List<ProjectAllResponse> getProjects() {
         List<Project> projects = projectRepository.findTop20WithImageGroupByOrderByViewsDesc();
@@ -102,5 +104,11 @@ public class ProjectService {
     public ProjectSearchResponse<ProjectCategoryResponse> searchProjects( String searchTerms, SortType sortType, Long lastProjectId, int pageSize) {
         ProjectCursorRequest<String> request = new ProjectCursorRequest<>(searchTerms, lastProjectId, pageSize);
         return projectQueryService.searchProjects(request, searchTerms, sortType);
+    }
+  
+    // 후원 기간 종료, 목표금액 달성 , 중복 정산 제외  조건이 충족해야함
+    public List<Project> getEligibleProjects(LocalDate baseDate) {
+        LocalDateTime endAt = baseDate.plusDays(1).atStartOfDay();
+        return projectRepository.findProjectsWithUnsettledOrders(endAt);
     }
 }
