@@ -33,4 +33,10 @@ public class ImageService {
         return responses;
     }
 
+    public String getImage(Long imageGroupId){
+        return imageRepository.findFirstImageByImageGroupId(imageGroupId)
+                .map(Image::getOriginalUrl)
+                .orElse("");
+
+    }
 }

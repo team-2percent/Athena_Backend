@@ -23,6 +23,8 @@ public class Image {
     private String originalUrl;
     private String fileType;    // 파일형
 
+    private boolean isDefault;
+
     @Builder
     private Image(ImageGroup imageGroup, String fileName, String originalUrl, String fileType) {
         this.imageGroup = imageGroup;
