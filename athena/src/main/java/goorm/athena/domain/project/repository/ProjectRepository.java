@@ -4,6 +4,7 @@ import goorm.athena.domain.project.entity.Project;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
+
 import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDateTime;
@@ -11,6 +12,14 @@ import java.util.List;
 
 public interface ProjectRepository extends JpaRepository<Project, Long>, JpaSpecificationExecutor<Project> {
     List<Project> findAllByEndAtBefore(LocalDateTime date);
+  
+    @Query("""
+    SELECT p
+    FROM Project p
+    JOIN FETCH p.imageGroup ig
+    ORDER BY p.views DESC
+    """)
+    List<Project> findTop20WithImageGroupByOrderByViewsDesc();
 
     @Query("""
     SELECT DISTINCT p.order.project FROM Payment p

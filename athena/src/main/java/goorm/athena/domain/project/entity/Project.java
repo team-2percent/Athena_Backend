@@ -40,12 +40,15 @@ public class Project {
     private LocalDateTime startAt;
     private LocalDateTime endAt;
     private LocalDateTime shippedAt;    // 발송 일자
+    private LocalDateTime createdAt = LocalDateTime.now();
 
     @Enumerated(EnumType.STRING)
     private ApprovalStatus isApproved;
 
     @Enumerated(EnumType.STRING)
     private Status status;
+
+    private Long views = 0L;
 
     @Builder
     private Project(User seller, ImageGroup imageGroup, Category category, String title, String description, Long goalAmount, Long totalAmount, String contentMarkdown, LocalDateTime startAt, LocalDateTime endAt, LocalDateTime shippedAt) {
@@ -62,5 +65,7 @@ public class Project {
         this.shippedAt = shippedAt;
     }
 
-
+    public void increaseViews(){
+        this.views++;
+    }
 }
