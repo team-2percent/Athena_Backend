@@ -23,7 +23,7 @@ public record ProjectCursorResponse<T>(
         }
 
         T last = content.get(content.size() - 1);
-        return new ProjectCursorResponse<>(content, last.startAt(), last.id());
+        return new ProjectCursorResponse<>(content, last.createdAt(), last.id());
     }
 
     public static <T extends DeadLineCursorIdentifiable> ProjectCursorResponse<T> ofByEndAt(List<T> content){

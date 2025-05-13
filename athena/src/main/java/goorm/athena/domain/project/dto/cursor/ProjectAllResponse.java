@@ -11,6 +11,7 @@ public record ProjectAllResponse(
         Long achievementRate,
         LocalDateTime startAt,
         LocalDateTime endAt,
+        LocalDateTime createdAt,
         String imageUrl
 ) implements ProjectCursorIdentifiable {
     public static ProjectAllResponse from(Project project, String imageUrl) {
@@ -18,9 +19,12 @@ public record ProjectAllResponse(
                 project.getId(),
                 project.getTitle(),
                 project.getViews(),
-                project.getGoalAmount() / project.getTotalAmount(),
+                project.getTotalAmount() == 0 || project.getGoalAmount() == 0
+                        ? 0L
+                        : (project.getTotalAmount() * 100) / project.getGoalAmount(),
                 project.getStartAt(),
                 project.getEndAt(),
+                project.getCreatedAt(),
                 imageUrl
         );
     }
