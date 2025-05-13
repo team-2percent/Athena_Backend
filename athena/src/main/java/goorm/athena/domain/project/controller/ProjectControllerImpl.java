@@ -6,18 +6,18 @@ import goorm.athena.domain.imageGroup.service.ImageGroupService;
 import goorm.athena.domain.project.dto.req.ProjectCreateRequest;
 import goorm.athena.domain.project.dto.req.ProjectGetCategoryRequest;
 import goorm.athena.domain.project.dto.req.ProjectGetDeadLineRequest;
-import goorm.athena.domain.project.dto.res.ProjectAllResponse;
-import goorm.athena.domain.project.dto.res.ProjectCategoryResponse;
-import goorm.athena.domain.project.dto.res.ProjectDeadLineResponse;
-import goorm.athena.domain.project.dto.res.ProjectIdResponse;
+import goorm.athena.domain.project.dto.res.*;
 import goorm.athena.domain.project.service.ProjectService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDateTime;
 
 @RequiredArgsConstructor
 @RestController
@@ -48,24 +48,28 @@ public class ProjectControllerImpl implements ProjectController {
 
     @Override
     @GetMapping("/new")
-    public ResponseEntity<Page<ProjectAllResponse>> getProjectsByNew(@PageableDefault(size = 10, sort = "id", direction = Sort.Direction.DESC) Pageable pageable){
-        Page<ProjectAllResponse> responses = projectService.getProjectsByNew(pageable);
+    public ResponseEntity<ProjectCursorResponse<ProjectAllResponse>> getProjectsByNew(@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime cursorValue,
+                                                                                      @RequestParam(required = false) Long lastProjectId,
+                                                                                      @RequestParam(defaultValue = "10") int pageSize){
+        ProjectCursorResponse<ProjectAllResponse> responses = projectService.getProjectsByNew(cursorValue, lastProjectId, pageSize);
         return ResponseEntity.ok(responses);
     }
 
     @Override
     @GetMapping("/category")
-    public ResponseEntity<Page<ProjectCategoryResponse>> getProjectByCategory(@ModelAttribute ProjectGetCategoryRequest request,
-                                                              @PageableDefault(size = 10, sort = "id", direction = Sort.Direction.DESC) Pageable pageable){
-        Page<ProjectCategoryResponse> response = projectService.getProjectByCategory(request.categoryId(), request.sortType(), pageable);
+    public ResponseEntity<ProjectCursorResponse<ProjectCategoryResponse>> getProjectByCategory(@RequestParam(required = false) Long lastProjectId,
+                                                                                               @ModelAttribute ProjectGetCategoryRequest request,
+                                                                                               @RequestParam(defaultValue = "10") int pageSize){
+        ProjectCursorResponse<ProjectCategoryResponse> response = projectService.getProjectsByCategory(request.categoryId(), request.sortType(), lastProjectId, pageSize);
         return ResponseEntity.ok(response);
     }
 
     @Override
     @GetMapping("/deadLine")
-    public ResponseEntity<Page<ProjectDeadLineResponse>> getProjectByDeadLine(@ModelAttribute ProjectGetDeadLineRequest request,
-                                                                              @PageableDefault(size = 10, sort = "id", direction = Sort.Direction.DESC) Pageable pageable){
-        Page<ProjectDeadLineResponse> responses = projectService.getProjectsByDeadLine(request.sortType(), pageable);
+    public ResponseEntity<ProjectCursorResponse<ProjectDeadLineResponse>> getProjectByDeadLine(@RequestParam(required = false) Long lastProjectId,
+                                                                                               @ModelAttribute ProjectGetDeadLineRequest request,
+                                                                                               @RequestParam(defaultValue = "10") int pageSize){
+        ProjectCursorResponse<ProjectDeadLineResponse> responses = projectService.getProjectsByDeadLine(request.sortType(), lastProjectId, pageSize);
         return ResponseEntity.ok(responses);
 
     }

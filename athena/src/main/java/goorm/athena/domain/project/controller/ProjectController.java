@@ -3,10 +3,7 @@ package goorm.athena.domain.project.controller;
 import goorm.athena.domain.project.dto.req.ProjectCreateRequest;
 import goorm.athena.domain.project.dto.req.ProjectGetCategoryRequest;
 import goorm.athena.domain.project.dto.req.ProjectGetDeadLineRequest;
-import goorm.athena.domain.project.dto.res.ProjectAllResponse;
-import goorm.athena.domain.project.dto.res.ProjectCategoryResponse;
-import goorm.athena.domain.project.dto.res.ProjectDeadLineResponse;
-import goorm.athena.domain.project.dto.res.ProjectIdResponse;
+import goorm.athena.domain.project.dto.res.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -16,8 +13,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDateTime;
 
 @Tag(name = "Project", description = "Project API")
 @RequestMapping("/api/project")
@@ -46,19 +46,25 @@ public interface ProjectController {
     @ApiResponse(responseCode = "200", description = "프로젝트 신규순 조회 성공",
             content = @Content(schema = @Schema(implementation = ProjectAllResponse.class)))
     @GetMapping("/new")
-    public ResponseEntity<Page<ProjectAllResponse>> getProjectsByNew(@PageableDefault(size = 10, sort = "id", direction = Sort.Direction.DESC) Pageable pageable);
+    public ResponseEntity<ProjectCursorResponse<ProjectAllResponse>> getProjectsByNew(@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime cursorValue,
+                                                                                      @RequestParam(required = false) Long lastProjectId,
+                                                                                      @RequestParam(defaultValue = "10") int pageSize);
+
 
     @Operation(summary = "프로젝트 카테고리별 조회", description = "프로젝트를 카테고리별로 조회합니다.")
     @ApiResponse(responseCode = "200", description = "프로젝트 카테고리별 조회 성공",
             content = @Content(schema = @Schema(implementation = ProjectCategoryResponse.class)))
     @GetMapping("/category")
-    public ResponseEntity<Page<ProjectCategoryResponse>> getProjectByCategory(@ModelAttribute ProjectGetCategoryRequest request,
-                                                                              @PageableDefault(size = 10, sort = "id", direction = Sort.Direction.DESC) Pageable pageable);
+    public ResponseEntity<ProjectCursorResponse<ProjectCategoryResponse>> getProjectByCategory(@RequestParam(required = false) Long lastProjectId,
+                                                                                               @ModelAttribute ProjectGetCategoryRequest request,
+                                                                                               @RequestParam(defaultValue = "10") int pageSize);
 
     @Operation(summary = "프로젝트 마감별 조회", description = "프로젝트의 마감일자를 오름차순으로 조회합니다 ( 빨리 끝나는 순)")
     @ApiResponse(responseCode = "200", description = "프로젝트 마감별 조회 성공",
         content = @Content(schema = @Schema(implementation = ProjectDeadLineResponse.class)))
     @GetMapping("/deadLine")
-    public ResponseEntity<Page<ProjectDeadLineResponse>> getProjectByDeadLine(@ModelAttribute ProjectGetDeadLineRequest request,
-                                                                              @PageableDefault(size = 10, sort = "id", direction = Sort.Direction.DESC) Pageable pageable);
+    public ResponseEntity<ProjectCursorResponse<ProjectDeadLineResponse>> getProjectByDeadLine(@RequestParam(required = false) Long lastProjectId,
+                                                                                               @ModelAttribute ProjectGetDeadLineRequest request,
+                                                                                               @RequestParam(defaultValue = "10") int pageSize);
 }
+

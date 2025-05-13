@@ -7,10 +7,8 @@ import goorm.athena.domain.imageGroup.service.ImageGroupService;
 import goorm.athena.domain.product.dto.req.ProductRequest;
 import goorm.athena.domain.product.service.ProductService;
 import goorm.athena.domain.project.dto.req.ProjectCreateRequest;
-import goorm.athena.domain.project.dto.res.ProjectAllResponse;
-import goorm.athena.domain.project.dto.res.ProjectCategoryResponse;
-import goorm.athena.domain.project.dto.res.ProjectDeadLineResponse;
-import goorm.athena.domain.project.dto.res.ProjectIdResponse;
+import goorm.athena.domain.project.dto.req.ProjectCursorRequest;
+import goorm.athena.domain.project.dto.res.*;
 import goorm.athena.domain.project.entity.Project;
 import goorm.athena.domain.project.entity.SortType;
 import goorm.athena.domain.project.mapper.ProjectMapper;
@@ -26,6 +24,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -51,8 +50,7 @@ public class ProjectService {
         List<ProductRequest> productRequests = request.products();      // 상품 등록 요청 처리
         if (productRequests != null && !productRequests.isEmpty()) {
             productService.createProducts(productRequests, project);
-        }
-        else{
+        } else {
             throw new CustomException(ErrorCode.PRODUCT_UPLOAD_FAILED);
         }
 
@@ -65,24 +63,45 @@ public class ProjectService {
                 .orElseThrow(() -> new CustomException(ErrorCode.PROJECT_NOT_FOUND));
     }
 
-    @Transactional(readOnly = true)
-    public Page<ProjectAllResponse> getProjects(Pageable pageable){
+    public Page<ProjectAllResponse> getProjects(Pageable pageable) {
         return projectRepository.findByOrderByViewsDesc(pageable);
     }
 
+    /*
+        @Transactional(readOnly = true)
+        public Page<ProjectAllResponse> getProjectsByNew(Pageable pageable){
+            return projectRepository.findByOrderByStartAtDesc(pageable);
+        }
+
+
+
+        @Transactional(readOnly = true)
+        public Page<ProjectCategoryResponse> getProjectByCategory(Long categoryId, SortType sortType, Pageable pageable){
+            return projectQueryService.getProjectsByCategoryId(categoryId, sortType, pageable);
+        }
+
+        @Transactional(readOnly = true)
+        public Page<ProjectDeadLineResponse> getProjectsByDeadLine(SortType sortType, Pageable pageable){
+            return projectQueryService.getProjectsByDeadline(sortType, pageable);
+        }
+     */
+
+    // 최신 프로젝트 조회 (커서 기반 페이징)
     @Transactional(readOnly = true)
-    public Page<ProjectAllResponse> getProjectsByNew(Pageable pageable){
-        return projectRepository.findByOrderByStartAtDesc(pageable);
+    public ProjectCursorResponse<ProjectAllResponse> getProjectsByNew(LocalDateTime lastStartAt, Long lastProjectId, int pageSize) {
+        ProjectCursorRequest<LocalDateTime> request = new ProjectCursorRequest<>(lastStartAt, lastProjectId, pageSize);
+        return projectQueryService.getProjectsByNew(request);
     }
 
-
+    // 카테고리별 프로젝트 조회 (커서 기반 페이징)
     @Transactional(readOnly = true)
-    public Page<ProjectCategoryResponse> getProjectByCategory(Long categoryId, SortType sortType, Pageable pageable){
-        return projectQueryService.getProjectsByCategoryId(categoryId, sortType, pageable);
+    public ProjectCursorResponse<ProjectCategoryResponse> getProjectsByCategory(Long categoryId, SortType sortType, Long lastProjectId, int pageSize) {
+        return projectQueryService.getProjectsByCategory(categoryId, sortType, lastProjectId, pageSize);
     }
 
+    // 마감 기한별 프로젝트 조회 (커서 기반 페이징)
     @Transactional(readOnly = true)
-    public Page<ProjectDeadLineResponse> getProjectsByDeadLine(SortType sortType, Pageable pageable){
-        return projectQueryService.getProjectsByDeadline(sortType, pageable);
+    public ProjectCursorResponse<ProjectDeadLineResponse> getProjectsByDeadLine(SortType sortType, Long lastProjectId, int pageSize) {
+        return projectQueryService.getProjectsByDeadline(sortType, lastProjectId, pageSize);
     }
 }

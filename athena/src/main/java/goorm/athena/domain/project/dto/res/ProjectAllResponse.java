@@ -4,24 +4,26 @@ import goorm.athena.domain.project.entity.Project;
 
 import java.time.LocalDateTime;
 
-public record ProjectAllResponse<T>(
+public record ProjectAllResponse(
         Long id,
         String title,
         Long views,
         Long goalAmount,
         Long totalAmount,
         LocalDateTime startAt,
-        LocalDateTime endAt
-) {
-    public static <T> ProjectAllResponse<T> from(Project project) {
-        return new ProjectAllResponse<>(
+        LocalDateTime endAt,
+        String imageUrl
+) implements ProjectCursorIdentifiable{
+    public static ProjectAllResponse from(Project project, String imageUrl) {
+        return new ProjectAllResponse(
                 project.getId(),
                 project.getTitle(),
                 project.getViews(),
                 project.getGoalAmount(),
                 project.getTotalAmount(),
                 project.getStartAt(),
-                project.getEndAt()
+                project.getEndAt(),
+                imageUrl
         );
     }
 }
