@@ -1,18 +1,32 @@
 package goorm.athena.domain.bankaccount.entity;
 
 import goorm.athena.domain.project.entity.Project;
+import goorm.athena.domain.user.entity.User;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
+@Getter
+@NoArgsConstructor
 public class BankAccount {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String bankName;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
+    @Column(name = "account_number")
     private String accountNumber;
 
+    @Column(name = "account_holder")
+    private String accountHolder;
 
+    @Column(name = "bank_name")
+    private String bankName;
 
+    private boolean isDefault;
 }

@@ -62,8 +62,10 @@ public enum ErrorCode {
     INSUFFICIENT_INVENTORY(HttpStatus.BAD_REQUEST, "재고가 부족합니다."),
 
     // 카카오 api
-    KAKAO_PAY_UNAVAILABLE(HttpStatus.SERVICE_UNAVAILABLE, "카카오페이 서버와의 통신에 실패했습니다. 잠시 후 다시 시도해주세요.");
+    KAKAO_PAY_UNAVAILABLE(HttpStatus.SERVICE_UNAVAILABLE, "카카오페이 서버와의 통신에 실패했습니다. 잠시 후 다시 시도해주세요."),
 
+    // 계좌
+    BANK_ACCOUNT_NOT_FOUND(HttpStatus.NOT_FOUND, "사용자 은행 계좌를 찾을 수 없습니다.");
 
     private final HttpStatus errorCode;
     private final String errorMessage;

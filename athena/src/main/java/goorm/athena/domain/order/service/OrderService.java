@@ -7,6 +7,7 @@ import goorm.athena.domain.order.dto.res.OrderCreateResponse;
 import goorm.athena.domain.order.repository.OrderRepository;
 import goorm.athena.domain.orderitem.entity.OrderItem;
 import goorm.athena.domain.orderitem.repository.OrderItemRepository;
+import goorm.athena.domain.payment.service.PaymentService;
 import goorm.athena.domain.product.entity.Product;
 import goorm.athena.domain.product.service.ProductService;
 import goorm.athena.domain.project.entity.Project;
@@ -23,8 +24,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -41,6 +44,10 @@ public class OrderService {
     public Order getById(Long id) {
         return orderRepository.findById(id)
                 .orElseThrow(() -> new CustomException(ErrorCode.ORDER_NOT_FOUND));
+    }
+
+    public void saveAll(List<Order> orders) {
+        orderRepository.saveAll(orders);
     }
 
     @Transactional

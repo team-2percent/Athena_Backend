@@ -1,4 +1,8 @@
 package goorm.athena.domain.settlementhistory.repository;
 
-public class SettlementHistoryRepository {
+import goorm.athena.domain.settlementhistory.entity.SettlementHistory;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface SettlementHistoryRepository extends JpaRepository<SettlementHistory, Long> {
+
 }

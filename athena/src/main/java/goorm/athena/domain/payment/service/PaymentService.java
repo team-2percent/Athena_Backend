@@ -9,6 +9,7 @@ import goorm.athena.domain.payment.dto.res.KakaoPayApproveResponse;
 import goorm.athena.domain.payment.dto.res.KakaoPayReadyResponse;
 import goorm.athena.domain.payment.entity.Payment;
 import goorm.athena.domain.payment.repository.PaymentRepository;
+import goorm.athena.domain.project.entity.Project;
 import goorm.athena.domain.user.entity.User;
 import goorm.athena.domain.user.repository.UserRepository;
 import goorm.athena.domain.user.service.UserService;
@@ -19,6 +20,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -27,6 +30,10 @@ public class PaymentService {
     private final KakaoPayService kakaoPayService;
     private final OrderService orderService;
     private final PaymentRepository paymentRepository;
+
+    public List<Order> getUnsettledOrdersByProjects(List<Project> projects) {
+        return paymentRepository.findUnsettledOrdersByProjects(projects);
+    }
 
     public KakaoPayReadyResponse readyPayment(Long orderId) {
 

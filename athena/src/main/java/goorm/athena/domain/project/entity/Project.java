@@ -42,6 +42,9 @@ public class Project {
     private LocalDateTime shippedAt;    // 발송 일자
 
     @Enumerated(EnumType.STRING)
+    private ApprovalStatus isApproved;
+
+    @Enumerated(EnumType.STRING)
     private Status status;
 
     @Builder
