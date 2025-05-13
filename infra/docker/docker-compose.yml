@@ -22,6 +22,33 @@ services:
       - --collation-server=utf8mb4_unicode_ci
       - --default-authentication-plugin=mysql_native_password
 
+  athena:
+    build:
+      context: ../../athena
+      dockerfile: Dockerfile
+    container_name: athena
+    depends_on:
+      - mysql
+    environment:
+      DATABASE_URL: jdbc:mysql://mysql:3306/${MYSQL_DATABASE}
+      DATABASE_USERNAME: ${MYSQL_USER}
+      DATABASE_PASSWORD: ${MYSQL_PASSWORD}
+      DATABASE_DRIVER: ${DATABASE_DRIVER}
+      KAKAO_API_CID: ${KAKAO_API_CID}
+      KAKAO_API_ADMIN_KEY: ${KAKAO_API_ADMIN_KEY}
+      KAKAO_API_APPROVAL_URL: ${KAKAO_API_APPROVAL_URL}
+      KAKAO_API_CANCEL_URL: ${KAKAO_API_CANCEL_URL}
+      KAKAO_API_FAIL_URL: ${KAKAO_API_FAIL_URL}
+      ACCESS_KEY: ${ACCESS_KEY}
+      SECRET_KEY: ${SECRET_KEY}
+      BUCKET_NAME: ${BUCKET_NAME}
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+      JWT_REFRESH_KEY: ${JWT_REFRESH_KEY}
+    ports:
+      - "8080:8080"
+    networks:
+      - backend_network
+
 volumes:
   mysql_data:
     driver: local
