@@ -19,6 +19,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -53,9 +55,14 @@ public class ProjectService {
         return ProjectMapper.toCreateDto(savedProject);
     }
 
-    // Get Project
     public Project getById(Long id) {
         return projectRepository.findById(id)
                 .orElseThrow(() -> new CustomException(ErrorCode.PROJECT_NOT_FOUND));
+    }
+
+    // 후원 기간 종료, 목표금액 달성 , 중복 정산 제외  조건이 충족해야함
+    public List<Project> getEligibleProjects(LocalDate baseDate) {
+        LocalDateTime endAt = baseDate.plusDays(1).atStartOfDay();
+        return projectRepository.findProjectsWithUnsettledOrders(endAt);
     }
 }

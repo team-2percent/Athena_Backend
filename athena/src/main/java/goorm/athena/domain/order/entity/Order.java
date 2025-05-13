@@ -26,6 +26,7 @@ public class Order {
     private Project project;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "delivery_info_id")
     private DeliveryInfo delivery;
 
     private int quantity;
@@ -34,6 +35,9 @@ public class Order {
 
     @Enumerated(EnumType.STRING)
     private Status status;
+
+    @Column(name = "is_settled")
+    private boolean isSettled = false;
 
     private LocalDateTime orderedAt;
 
@@ -51,5 +55,9 @@ public class Order {
         this.totalPrice = totalPrice;
         this.quantity = quantity;
         this.status = Status.ORDERED;
+    }
+
+    public void markAsSettled() {
+        this.isSettled = true;
     }
 }
