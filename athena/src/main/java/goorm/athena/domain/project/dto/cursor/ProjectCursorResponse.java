@@ -8,30 +8,30 @@ public record ProjectCursorResponse<T>(
         LocalDateTime nextCursorValue,
         Long nextProjectId
 ) {
-    public static <T extends CreatedAtCursorIdentifiable> ProjectCursorResponse<T> ofByCreatedAt(List<T> content) {
+    public static ProjectCursorResponse<ProjectRecentResponse> ofByCreatedAt(List<ProjectRecentResponse> content) {
         if (content.isEmpty()) {
             return new ProjectCursorResponse<>(content, null, null);
         }
 
-        T last = content.get(content.size() - 1);
+        ProjectRecentResponse last = content.get(content.size() - 1);
         return new ProjectCursorResponse<>(content, last.createdAt(), last.id());
     }
 
-    public static <T extends ProjectCursorIdentifiable> ProjectCursorResponse<T> ofByStartAt(List<T> content) {
+    public static ProjectCursorResponse<ProjectCategoryResponse> ofByStartAt(List<ProjectCategoryResponse> content) {
         if (content.isEmpty()) {
             return new ProjectCursorResponse<>(content, null, null);
         }
 
-        T last = content.get(content.size() - 1);
+        ProjectCategoryResponse last = content.get(content.size() - 1);
         return new ProjectCursorResponse<>(content, last.createdAt(), last.id());
     }
 
-    public static <T extends DeadLineCursorIdentifiable> ProjectCursorResponse<T> ofByEndAt(List<T> content){
+    public static ProjectCursorResponse<ProjectDeadLineResponse> ofByEndAt(List<ProjectDeadLineResponse> content){
         if(content.isEmpty()){
             return new ProjectCursorResponse<>(content, null, null);
         }
 
-        T last = content.get(content.size() - 1);
+        ProjectDeadLineResponse last = content.get(content.size() - 1);
         return new ProjectCursorResponse<>(content, last.endAt(), last.id());
     }
 }

@@ -12,7 +12,7 @@ public record ProjectDeadLineResponse(
         LocalDateTime startAt,
         LocalDateTime endAt,
         String imageUrl
-) implements DeadLineCursorIdentifiable {
+) {
     public static ProjectDeadLineResponse from(Project project, String imageUrl) {
         return new ProjectDeadLineResponse(
                 project.getId(),

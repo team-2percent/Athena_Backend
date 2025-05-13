@@ -13,7 +13,7 @@ public record ProjectAllResponse(
         LocalDateTime endAt,
         LocalDateTime createdAt,
         String imageUrl
-) implements ProjectCursorIdentifiable {
+){
     public static ProjectAllResponse from(Project project, String imageUrl) {
         return new ProjectAllResponse(
                 project.getId(),

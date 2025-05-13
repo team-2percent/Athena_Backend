@@ -3,16 +3,16 @@ package goorm.athena.domain.project.dto.cursor;
 import java.util.List;
 
 public record ProjectSearchCursorResponse<T>(
-        List<T> content,
+        List<ProjectSearchResponse> content,
         String searchTerm,
         Long nextProjectId
 ) {
-    public static <T extends SearchCursorIdentifiable> ProjectSearchCursorResponse<T> ofBySearch(List<T> content, String searchTerm) {
+    public static ProjectSearchCursorResponse<ProjectSearchResponse> ofBySearch(List<ProjectSearchResponse> content, String searchTerm) {
         if (content.isEmpty()) {
             return new ProjectSearchCursorResponse<>(content, searchTerm, null);
         }
 
-        T last = content.get(content.size() - 1);
+        ProjectSearchResponse last = content.get(content.size() - 1);
         return new ProjectSearchCursorResponse<>(content, searchTerm, last.id());
     }
 }

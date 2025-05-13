@@ -13,7 +13,7 @@ public record ProjectSearchResponse(
         LocalDateTime endAt,
         LocalDateTime createdAt,
         String imageUrl
-) implements SearchCursorIdentifiable {
+){
     public static ProjectSearchResponse from(Project project, String imageUrl) {
         return new ProjectSearchResponse(
                 project.getId(),

@@ -14,7 +14,7 @@ public record ProjectCategoryResponse(
         LocalDateTime endAt,
         LocalDateTime createdAt,
         String imageUrl
-) implements ProjectCursorIdentifiable {
+){
     public static ProjectCategoryResponse from(Project project, String imageUrl) {
         return new ProjectCategoryResponse(
                 project.getId(),

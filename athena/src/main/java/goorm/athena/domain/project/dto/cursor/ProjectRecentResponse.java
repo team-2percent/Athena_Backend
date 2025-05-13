@@ -13,7 +13,7 @@ public record ProjectRecentResponse(
         LocalDateTime endAt,
         LocalDateTime createdAt,
         String imageUrl
-) implements CreatedAtCursorIdentifiable {
+){
     public static ProjectRecentResponse from(Project project, String imageUrl) {
         return new ProjectRecentResponse(
                 project.getId(),
