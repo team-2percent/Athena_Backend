@@ -65,4 +65,12 @@ public class ProjectService {
         LocalDateTime endAt = baseDate.plusDays(1).atStartOfDay();
         return projectRepository.findProjectsWithUnsettledOrders(endAt);
     }
+
+    @Transactional
+    public void updateApprovalStatus(Long projectId, boolean isApproved) {
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new CustomException(ErrorCode.PROJECT_NOT_FOUND));
+
+        project.setApprovalStatus(isApproved);
+    }
 }

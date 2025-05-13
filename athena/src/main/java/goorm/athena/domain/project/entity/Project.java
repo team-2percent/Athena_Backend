@@ -67,5 +67,9 @@ public class Project {
         this.shippedAt = shippedAt;
     }
 
+    public void setApprovalStatus(boolean isApproved) {
+        this.isApproved = isApproved ? ApprovalStatus.APPROVED : ApprovalStatus.REJECTED;
+    }
+
 
 }

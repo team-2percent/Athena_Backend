@@ -5,6 +5,7 @@ import goorm.athena.domain.imageGroup.entity.Type;
 import goorm.athena.domain.imageGroup.service.ImageGroupService;
 import goorm.athena.domain.product.dto.res.ProductResponse;
 import goorm.athena.domain.product.service.ProductService;
+import goorm.athena.domain.project.dto.req.ProjectApprovalRequest;
 import goorm.athena.domain.project.dto.req.ProjectCreateRequest;
 import goorm.athena.domain.project.dto.res.ProjectIdResponse;
 import goorm.athena.domain.project.service.ProjectService;
@@ -40,7 +41,17 @@ public class ProjectControllerImpl implements ProjectController {
     public ResponseEntity<List<ProductResponse>> getProductsByProject(
             @PathVariable Long projectId
     ) {
-        List<ProductResponse> productList = productService.getProductsByProjectId(projectId); // ✅ ProductService 호출
+        List<ProductResponse> productList = productService.getProductsByProjectId(projectId);
         return ResponseEntity.ok(productList);
+    }
+
+    @PatchMapping("/{projectId}/approval")
+    public ResponseEntity<String> updateApprovalStatus(
+            @PathVariable Long projectId,
+            @RequestBody ProjectApprovalRequest request
+    ) {
+        projectService.updateApprovalStatus(projectId, request.approve());
+        String resultMessage = request.approve() ? "승인되었습니다." : "거절되었습니다.";
+        return ResponseEntity.ok(resultMessage);
     }
 }
