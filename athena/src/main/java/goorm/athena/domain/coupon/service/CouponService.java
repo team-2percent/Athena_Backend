@@ -4,6 +4,7 @@ import goorm.athena.domain.coupon.dto.req.CouponCreateRequest;
 import goorm.athena.domain.coupon.dto.res.CouponCreateResponse;
 import goorm.athena.domain.coupon.dto.res.CouponGetDetailResponse;
 import goorm.athena.domain.coupon.entity.Coupon;
+import goorm.athena.domain.coupon.entity.CouponStatus;
 import goorm.athena.domain.coupon.mapper.CouponMapper;
 import goorm.athena.domain.coupon.repository.CouponRepository;
 import goorm.athena.global.exception.CustomException;
@@ -34,6 +35,12 @@ public class CouponService {
     public Page<Coupon> getCoupons(int page, int size){
         Pageable pageable = PageRequest.of(page, size, Sort.by("id"));
         return couponRepository.findAll(pageable);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<Coupon> getCouponByStatus(int page, int size, CouponStatus status){
+        Pageable pageable = PageRequest.of(page, size, Sort.by("id"));
+        return couponRepository.findByCouponStatus(pageable, status);
     }
 
     @Transactional(readOnly = true)

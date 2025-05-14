@@ -5,6 +5,7 @@ import goorm.athena.domain.coupon.dto.res.CouponCreateResponse;
 import goorm.athena.domain.coupon.dto.res.CouponGetDetailResponse;
 import goorm.athena.domain.coupon.dto.res.CouponGetResponse;
 import goorm.athena.domain.coupon.entity.Coupon;
+import goorm.athena.domain.coupon.entity.CouponStatus;
 import goorm.athena.domain.coupon.mapper.CouponMapper;
 import goorm.athena.domain.coupon.scheduler.CouponScheduler;
 import goorm.athena.domain.coupon.service.CouponService;
@@ -29,6 +30,19 @@ public class CouponControllerImpl implements CouponController{
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size){
         Page<Coupon> coupons = couponService.getCoupons(page, size);
+        Page<CouponGetResponse> response = coupons.map(CouponMapper::toGetResponse);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @Override
+    @GetMapping("/status")
+    public ResponseEntity<Page<CouponGetResponse>> getCouponByStatus(
+            @CheckLogin LoginUserRequest request,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam CouponStatus status){
+        Page<Coupon> coupons = couponService.getCouponByStatus(page, size, status);
         Page<CouponGetResponse> response = coupons.map(CouponMapper::toGetResponse);
 
         return ResponseEntity.ok(response);

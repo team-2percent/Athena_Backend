@@ -5,6 +5,7 @@ import goorm.athena.domain.coupon.dto.res.CouponCreateResponse;
 import goorm.athena.domain.coupon.dto.res.CouponGetDetailResponse;
 import goorm.athena.domain.coupon.dto.res.CouponGetResponse;
 import goorm.athena.domain.coupon.entity.Coupon;
+import goorm.athena.domain.coupon.entity.CouponStatus;
 import goorm.athena.global.jwt.util.CheckLogin;
 import goorm.athena.global.jwt.util.LoginUserRequest;
 import io.swagger.v3.oas.annotations.Operation;
@@ -28,6 +29,13 @@ public interface CouponController {
             @Parameter(hidden = true) @CheckLogin LoginUserRequest request,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size);
+
+    @GetMapping("/status")
+    public ResponseEntity<Page<CouponGetResponse>> getCouponByStatus(
+            @Parameter(hidden = true) @CheckLogin LoginUserRequest request,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam CouponStatus status);
 
 
     @Operation(summary = "쿠폰 상세 정보 조회 API", description = "쿠폰의 상세 정보를 조회합니다.")
