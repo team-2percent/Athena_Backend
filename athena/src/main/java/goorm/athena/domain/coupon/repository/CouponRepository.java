@@ -9,8 +9,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public interface CouponRepository extends JpaRepository<Coupon, Long> {
-    boolean existsByCode(Long code);
-
     @Query("SELECT c FROM Coupon c WHERE c.startAt <= :now OR c.endAt <= :now")
     List<Coupon> findCouponsToUpdate(LocalDateTime now);
 }

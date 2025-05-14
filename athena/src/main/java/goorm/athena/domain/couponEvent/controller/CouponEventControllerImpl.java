@@ -1,5 +1,6 @@
 package goorm.athena.domain.couponEvent.controller;
 
+import goorm.athena.domain.coupon.dto.req.CouponCreateRequest;
 import goorm.athena.domain.couponEvent.dto.req.CouponEventCreateRequest;
 import goorm.athena.domain.couponEvent.dto.res.CouponEventCreateResponse;
 import goorm.athena.domain.couponEvent.dto.res.CouponEventGetResponse;
@@ -22,7 +23,7 @@ public class CouponEventControllerImpl implements CouponEventController{
 
     @Override
     @PostMapping("/create")
-    public ResponseEntity<CouponEventCreateResponse> createCouponEvent(@RequestBody CouponEventCreateRequest request){
+    public ResponseEntity<CouponEventCreateResponse> createCouponEvent(@RequestBody CouponCreateRequest request){
         CouponEventCreateResponse response = couponEventService.createCouponEvent(request);
         return ResponseEntity.ok(response);
     }

@@ -18,10 +18,6 @@ public class CouponService {
 
     @Transactional
     public CouponCreateResponse createCoupon(CouponCreateRequest request){
-        if(couponRepository.existsByCode(request.code())){
-            throw new CustomException(ErrorCode.COUPON_CODE_ALREADY_EXISTS);
-        }
-
         Coupon coupon = Coupon.create(request);
 
         couponRepository.save(coupon);

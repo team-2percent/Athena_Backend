@@ -7,7 +7,6 @@ public class CouponMapper {
     public static CouponCreateResponse toCreateResponse(Coupon coupon){
         return new CouponCreateResponse(
                 coupon.getId(),
-                coupon.getCode(),
                 coupon.getTitle(),
                 coupon.getContent(),
                 coupon.getPrice(),

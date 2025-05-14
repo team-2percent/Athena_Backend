@@ -1,5 +1,6 @@
 package goorm.athena.domain.couponEvent.service;
 
+import goorm.athena.domain.coupon.dto.req.CouponCreateRequest;
 import goorm.athena.domain.coupon.entity.Coupon;
 import goorm.athena.domain.coupon.repository.CouponRepository;
 import goorm.athena.domain.couponEvent.dto.req.CouponEventCreateRequest;
@@ -28,11 +29,14 @@ public class CouponEventService {
     private final UserService userService;
 
     @Transactional
-    public CouponEventCreateResponse createCouponEvent(CouponEventCreateRequest request) {
-        Coupon coupon = couponRepository.findById(request.couponId())
-                .orElseThrow(() -> new CustomException(ErrorCode.COUPON_NOT_FOUND));
-        CouponEvent couponEvent = CouponEvent.create(coupon);
+    public CouponEventCreateResponse createCouponEvent(CouponCreateRequest request) {
 
+        // 쿠폰 생성
+        Coupon coupon = Coupon.create(request);
+        couponRepository.save(coupon);
+
+        // 쿠폰 이벤트 생성
+        CouponEvent couponEvent = CouponEvent.create(coupon);
         couponEventRepository.save(couponEvent);
 
         return CouponEventMapper.toCreateResponse(couponEvent);

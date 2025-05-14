@@ -19,13 +19,6 @@ public class CouponControllerImpl implements CouponController{
     private final CouponScheduler couponScheduler;
 
     @Override
-    @PostMapping("/create")
-    public ResponseEntity<CouponCreateResponse> createCoupon(@RequestBody CouponCreateRequest request){
-        CouponCreateResponse response = couponService.createCoupon(request);
-        return ResponseEntity.ok(response);
-    }
-
-    @Override
     @PostMapping("/scheduler")
     public void scheduleUpdateCoupon(){
         couponScheduler.updateCouponStatuses();
