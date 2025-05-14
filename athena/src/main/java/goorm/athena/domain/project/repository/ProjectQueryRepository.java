@@ -95,9 +95,13 @@ public class ProjectQueryRepository {
                 .limit(request.getSize())
                 .fetch();
 
+        Long totalCount = queryFactory
+                .select(project.count())
+                .from(project)
+                .fetchOne();
 
         // 다음 커서 계산: 마지막 프로젝트 ID를 nextCursor로 반환
-        return ProjectCursorResponse.ofByCreatedAt(content);// Pageable.unpaged()를 사용하여 페이징 없이 총 수만 반환
+        return ProjectCursorResponse.ofByCreatedAt(content, totalCount);// Pageable.unpaged()를 사용하여 페이징 없이 총 수만 반환
     }
 
     // 카테고리별 프로젝트 조회 (커서 기반 페이징)
@@ -158,7 +162,13 @@ public class ProjectQueryRepository {
                 .limit(request.getSize())
                 .fetch();
 
-        return ProjectCursorResponse.ofByStartAt(content);
+        Long totalCount = queryFactory
+                .select(project.count())
+                .from(project)
+                .where(project.category.id.eq(categoryId))
+                .fetchOne();
+
+        return ProjectCursorResponse.ofByStartAt(content, totalCount);
     }
 
     // 마감 기한별 프로젝트 조회 (커서 기반 페이징)
@@ -215,7 +225,12 @@ public class ProjectQueryRepository {
                 .limit(request.getSize())
                 .fetch();
 
-        return ProjectCursorResponse.ofByEndAt(content);
+        Long totalCount = queryFactory
+                .select(project.count())
+                .from(project)
+                .fetchOne();
+
+        return ProjectCursorResponse.ofByEndAt(content, totalCount);
     }
 
     // 검색 기반 페이지 조회
@@ -267,6 +282,12 @@ public class ProjectQueryRepository {
                 .limit(request.getSize())
                 .fetch();
 
-        return ProjectSearchCursorResponse.ofBySearch(content, searchTerm);
+        Long totalCount = queryFactory
+                .select(project.count())
+                .from(project)
+                .where(project.title.containsIgnoreCase(searchTerm))
+                .fetchOne();
+
+        return ProjectSearchCursorResponse.ofBySearch(content, searchTerm, totalCount);
     }
 }
