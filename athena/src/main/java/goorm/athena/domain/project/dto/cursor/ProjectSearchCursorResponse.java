@@ -6,7 +6,7 @@ public record ProjectSearchCursorResponse<T>(
         List<ProjectSearchResponse> content,
         String searchTerm,
         Long nextProjectId,
-        Long totalElements
+        Long total
 ) {
     public static ProjectSearchCursorResponse<ProjectSearchResponse> ofBySearch(List<ProjectSearchResponse> content, String searchTerm, Long total) {
         if (content.isEmpty()) {

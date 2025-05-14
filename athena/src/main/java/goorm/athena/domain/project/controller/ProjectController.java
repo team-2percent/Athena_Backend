@@ -6,6 +6,7 @@ import goorm.athena.domain.project.dto.req.ProjectUpdateRequest;
 import goorm.athena.domain.project.dto.res.ProjectIdResponse;
 import goorm.athena.domain.project.dto.res.*;
 import goorm.athena.domain.project.entity.SortType;
+import goorm.athena.domain.project.entity.SortTypeLatest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -13,6 +14,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -88,11 +90,13 @@ public interface ProjectController {
             """)
     @ApiResponse(responseCode = "200", description = "프로젝트 카테고리별 조회 성공",
             content = @Content(schema = @Schema(implementation = ProjectCategoryResponse.class)))
-    @GetMapping("/category")
-    public ResponseEntity<ProjectCategoryCursorResponse<ProjectCategoryResponse>> getProjectByCategory(@RequestParam(required = false) Long lastProjectId,
-                                                                                               @RequestParam(required = false) Long categoryId,
-                                                                                               @ModelAttribute SortType sortType,
-                                                                                               @Parameter(hidden = true) @RequestParam(defaultValue = "2") int pageSize);
+    @GetMapping("/category/{categoryId}")
+    public ResponseEntity<ProjectFilterCursorResponse<?>> getProjectsByCategory(
+            @RequestParam(value = "cursorId", required = false) Long cursorId,
+            @RequestParam(value = "cursorValue", required = false) Object cursorValue,
+            @RequestParam(value = "size", defaultValue = "2") int size,
+            @PathVariable Long categoryId,
+            @RequestParam SortTypeLatest sortType);
 
     @Operation(summary = "프로젝트 마감별 조회", description =
             "프로젝트의 마감일자를 오름차순으로 조회합니다 ( 빨리 끝나는 순)<br>" +
@@ -141,10 +145,11 @@ public interface ProjectController {
     @ApiResponse(responseCode = "200", description = "프로젝트 검색별 조회 성공",
             content = @Content(schema = @Schema(implementation = ProjectSearchResponse.class)))
     @GetMapping("/search")
-    public ResponseEntity<ProjectSearchCursorResponse<ProjectSearchResponse>> searchProject(@RequestParam String searchTerm,
-                                                                                            @RequestParam(required = false) Long lastProjectId,
-                                                                                            @ModelAttribute SortType sortType,
-                                                                                            @Parameter(hidden = true) @RequestParam(defaultValue = "2") int pageSize);
+    public ResponseEntity<ProjectFilterCursorResponse<ProjectSearchResponse>> searchProject(@RequestParam String searchTerm,
+                                                                                            @RequestParam(required = false) Object cursorValue,
+                                                                                            @RequestParam(required = false) Long cursorId,
+                                                                                            @RequestParam SortTypeLatest sortType,
+                                                                                            @RequestParam(defaultValue = "2") int pageSize);
 
     @Operation(summary = "프로젝트 메인 카테고리 배너 조회", description = "프로젝트의 메인 배너에서 각 카테고리의 조회수가 제일 높은 것을 조회합니다.")
     @ApiResponse(responseCode = "200", description = "프로젝트의 카테고리별 조회수 높은 프로젝트 조회 성공")

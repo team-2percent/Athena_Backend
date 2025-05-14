@@ -8,10 +8,12 @@ import goorm.athena.domain.imageGroup.entity.Type;
 import goorm.athena.domain.imageGroup.service.ImageGroupService;
 import goorm.athena.domain.project.dto.cursor.*;
 import goorm.athena.domain.project.dto.req.ProjectCreateRequest;
+import goorm.athena.domain.project.dto.req.ProjectCursorRequest;
 import goorm.athena.domain.project.dto.req.ProjectUpdateRequest;
 import goorm.athena.domain.project.dto.res.ProjectIdResponse;
 import goorm.athena.domain.project.dto.res.*;
 import goorm.athena.domain.project.entity.SortType;
+import goorm.athena.domain.project.entity.SortTypeLatest;
 import goorm.athena.domain.project.service.ProjectService;
 import goorm.athena.global.exception.CustomException;
 import goorm.athena.global.exception.ErrorCode;
@@ -89,13 +91,23 @@ public class ProjectControllerImpl implements ProjectController {
         return ResponseEntity.ok(responses);
     }
 
-    @Override
-    public ResponseEntity<ProjectCategoryCursorResponse<ProjectCategoryResponse>> getProjectByCategory(@RequestParam(required = false) Long lastProjectId,
-                                                                                               @RequestParam(required = false) Long categoryId,
-                                                                                               @ModelAttribute SortType sortType,
-                                                                                               @RequestParam(defaultValue = "2") int pageSize){
-        ProjectCategoryCursorResponse<ProjectCategoryResponse> response = projectService.getProjectsByCategory(categoryId, sortType, lastProjectId, pageSize);
+    // 카테고리별 프로젝트 조회 (커서 기반 페이징)
+    @GetMapping("/category/{categoryId}")
+    public ResponseEntity<ProjectFilterCursorResponse<?>> getProjectsByCategory(
+            @RequestParam(value = "cursorId", required = false) Long cursorId,
+            @RequestParam(value = "cursorValue", required = false) Object cursorValue,
+            @RequestParam(value = "size", defaultValue = "2") int size,
+            @PathVariable Long categoryId,
+            @RequestParam SortTypeLatest sortType) {
+
+        // ProjectCursorRequest DTO 구성
+        ProjectCursorRequest<Object> request = new ProjectCursorRequest<>(cursorValue, cursorId, size);
+
+        // 서비스 호출
+        ProjectFilterCursorResponse<?> response = projectService.getProjectsByCategory(request, categoryId, sortType);
+
         return ResponseEntity.ok(response);
+
     }
 
     @Override
@@ -109,11 +121,14 @@ public class ProjectControllerImpl implements ProjectController {
     }
 
     @Override
-    public ResponseEntity<ProjectSearchCursorResponse<ProjectSearchResponse>> searchProject(@RequestParam String searchTerm,
-                                                                                            @RequestParam(required = false) Long lastProjectId,
-                                                                                            @ModelAttribute SortType sortType,
+    public ResponseEntity<ProjectFilterCursorResponse<ProjectSearchResponse>> searchProject(@RequestParam String searchTerm,
+                                                                                            @RequestParam(required = false) Object cursorValue,
+                                                                                            @RequestParam(required = false) Long cursorId,
+                                                                                            @RequestParam SortTypeLatest sortType,
                                                                                             @RequestParam(defaultValue = "2") int pageSize){
-        ProjectSearchCursorResponse<ProjectSearchResponse> response = projectService.searchProjects(searchTerm, sortType, lastProjectId, pageSize);
+        ProjectCursorRequest<Object> request = new ProjectCursorRequest<>(cursorValue, cursorId, pageSize);
+
+        ProjectFilterCursorResponse<ProjectSearchResponse> response = projectService.searchProjects(request, searchTerm, pageSize, sortType);
         return ResponseEntity.ok(response);
     }
 

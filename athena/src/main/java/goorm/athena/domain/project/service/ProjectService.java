@@ -15,6 +15,7 @@ import goorm.athena.domain.project.dto.req.ProjectCursorRequest;
 import goorm.athena.domain.project.dto.res.*;
 import goorm.athena.domain.project.entity.Project;
 import goorm.athena.domain.project.entity.SortType;
+import goorm.athena.domain.project.entity.SortTypeLatest;
 import goorm.athena.domain.project.mapper.ProjectMapper;
 import goorm.athena.domain.project.repository.ProjectQueryRepository;
 import goorm.athena.domain.project.repository.ProjectRepository;
@@ -148,8 +149,8 @@ public class ProjectService {
 
     // 카테고리별 프로젝트 조회 (커서 기반 페이징)
     @Transactional(readOnly = true)
-    public ProjectCategoryCursorResponse<ProjectCategoryResponse> getProjectsByCategory(Long categoryId, SortType sortType, Long lastProjectId, int pageSize) {
-        ProjectCursorRequest<Long> request = new ProjectCursorRequest<>(categoryId, lastProjectId, pageSize);
+    public ProjectFilterCursorResponse<?> getProjectsByCategory(ProjectCursorRequest<?> request, Long categoryId, SortTypeLatest sortType) {
+
         return projectQueryRepository.getProjectsByCategory(request, categoryId, sortType);
     }
 
@@ -162,8 +163,7 @@ public class ProjectService {
 
     // 검색 프로젝트 조회 (커서 기반 페이징)
     @Transactional(readOnly = true)
-    public ProjectSearchCursorResponse<ProjectSearchResponse> searchProjects(String searchTerms, SortType sortType, Long lastProjectId, int pageSize) {
-        ProjectCursorRequest<String> request = new ProjectCursorRequest<>(searchTerms, lastProjectId, pageSize);
+    public ProjectFilterCursorResponse<ProjectSearchResponse> searchProjects(ProjectCursorRequest<?> request, String searchTerms, int pageSize, SortTypeLatest sortType) {
         return projectQueryRepository.searchProjects(request, searchTerms, sortType);
     }
 
