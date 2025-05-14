@@ -1,22 +1,17 @@
 package goorm.athena.domain.product.service;
 
-
-import goorm.athena.domain.image.dto.req.ImageCreateRequest;
-import goorm.athena.domain.image.dto.res.ImageCreateResponse;
-import goorm.athena.domain.image.entity.Image;
-import goorm.athena.domain.image.mapper.ImageMapper;
-import goorm.athena.domain.imageGroup.entity.ImageGroup;
+import goorm.athena.domain.option.entity.Option;
+import goorm.athena.domain.option.repository.OptionRepository;
 import goorm.athena.domain.product.dto.req.ProductRequest;
 import goorm.athena.domain.product.entity.Product;
 import goorm.athena.domain.product.mapper.ProductMapper;
 import goorm.athena.domain.product.repository.ProductRepository;
 import goorm.athena.domain.project.entity.Project;
-import goorm.athena.domain.project.repository.ProjectRepository;
-import goorm.athena.domain.project.service.ProjectService;
 import goorm.athena.global.exception.CustomException;
 import goorm.athena.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,15 +20,64 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ProductService {
     private final ProductRepository productRepository;
+    private final OptionRepository optionRepository;    // OptionService를 따로 만들지 않고 여기서 관리
 
     // 상품 리스트 저장
-    public void createProducts(List<ProductRequest> requests, Project project){
+    @Transactional
+    public void saveProducts(List<ProductRequest> requests, Project project){
+        List<Product> products = new ArrayList<>();
+
         for (ProductRequest request : requests) {
             Product product = ProductMapper.toEntity(request, project);
-            productRepository.save(product);
+            products.add(product);
+        }
+
+        List<Product> savedProducts = productRepository.saveAll(products);  // 상품 일괄 저장
+
+        // ProductRequest와 Product의 순서를 맞춰서 옵션 생성
+        for (int i = 0; i < savedProducts.size(); i++) {
+            ProductRequest request = requests.get(i);
+            Product product = savedProducts.get(i);
+
+            if (request.options() != null && !request.options().isEmpty()) {
+                createOptions(product, request);
+            }
         }
     }
 
+    // 상품 리스트 삭제
+    public void deleteAllByProject(Project project){
+        List<Product> products = productRepository.findAllByProject(project);
+        for (Product product : products){
+            deleteOptions(product);
+            productRepository.delete(product);
+        }
+    }
+
+    // 옵션 리스트 생성
+    private void createOptions(Product product, ProductRequest request) {
+        List<Option> options = new ArrayList<>();
+
+        for (String optionName : request.options()) {
+            // 옵션이 빈 문자열이거나 NULL이 아니면 저장
+            if (optionName != null && !optionName.isEmpty()) {
+                Option option = new Option(product, optionName);
+                options.add(option);
+            } else {
+                throw new CustomException(ErrorCode.OPTION_IS_EMPTY);
+            }
+        }
+
+        optionRepository.saveAll(options);
+    }
+
+    // 옵션 리스트 삭제
+    private void deleteOptions(Product product){
+        List<Option> options = optionRepository.findAllByProduct(product);
+        optionRepository.deleteAll(options);
+    }
+
+    // Get Product
     public Product getById(Long id) {
         return productRepository.findById(id)
                 .orElseThrow(() -> new CustomException(ErrorCode.PRODUCT_NOT_FOUND));

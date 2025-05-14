@@ -1,17 +1,27 @@
 package goorm.athena.domain.project.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import goorm.athena.domain.imageGroup.entity.ImageGroup;
 import goorm.athena.domain.imageGroup.entity.Type;
 import goorm.athena.domain.imageGroup.service.ImageGroupService;
 import goorm.athena.domain.project.dto.cursor.*;
 import goorm.athena.domain.project.dto.req.ProjectCreateRequest;
+import goorm.athena.domain.project.dto.req.ProjectUpdateRequest;
+import goorm.athena.domain.project.dto.res.ProjectIdResponse;
 import goorm.athena.domain.project.dto.res.*;
 import goorm.athena.domain.project.entity.SortType;
 import goorm.athena.domain.project.service.ProjectService;
+import goorm.athena.global.exception.CustomException;
+import goorm.athena.global.exception.ErrorCode;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -21,6 +31,7 @@ import java.util.List;
 public class ProjectControllerImpl implements ProjectController {
     private final ProjectService projectService;
     private final ImageGroupService imageGroupService;
+    private final ObjectMapper objectMapper;
 
     // 프로젝트 초기 설정 (이미지 그룹 생성)
     @Override
@@ -36,15 +47,41 @@ public class ProjectControllerImpl implements ProjectController {
         return ResponseEntity.ok(response);
     }
 
+    // 프로젝트 수정
     @Override
-    @GetMapping("/all")
+    public ResponseEntity<Void> updateProject(
+            @PathVariable Long projectId,
+            @RequestParam("projectUpdateRequest") String projectUpdateRequestJson,
+            @RequestParam(value = "images", required = false) List<MultipartFile> newFiles){
+        ProjectUpdateRequest projectUpdateRequest = convertJsonToDto(projectUpdateRequestJson);
+        projectService.updateProject(projectId, projectUpdateRequest, newFiles);
+        return ResponseEntity.ok().build();
+    }
+
+    // 프로젝트 삭제
+    @Override
+    public ResponseEntity<Void> deleteProject(@PathVariable Long projectId){
+        projectService.deleteProject(projectId);
+        return ResponseEntity.noContent().build();
+    }
+
+    // String -> JSON 처리
+    // Swagger test에서만 문제가 있는 부분이라면 추후 삭제 예정
+    private ProjectUpdateRequest convertJsonToDto(String json) {
+        try {
+            return objectMapper.readValue(json, ProjectUpdateRequest.class);
+        } catch (JsonProcessingException e) {
+            throw new CustomException(ErrorCode.INVALID_JSON_FORMAT);
+        }
+    }
+
+    @Override
     public ResponseEntity<List<ProjectAllResponse>> getProjectsAll(){
         List<ProjectAllResponse> responses = projectService.getProjects();
         return ResponseEntity.ok(responses);
     }
 
     @Override
-    @GetMapping("/new")
     public ResponseEntity<ProjectCursorResponse<ProjectRecentResponse>> getProjectsByNew(@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime cursorValue,
                                                                                          @RequestParam(required = false) Long lastProjectId,
                                                                                          @RequestParam(defaultValue = "20") int pageSize){
@@ -53,7 +90,6 @@ public class ProjectControllerImpl implements ProjectController {
     }
 
     @Override
-    @GetMapping("/category")
     public ResponseEntity<ProjectCursorResponse<ProjectCategoryResponse>> getProjectByCategory(@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime cursorValue,
                                                                                                @RequestParam(required = false) Long lastProjectId,
                                                                                                @RequestParam Long categoryId,
@@ -64,7 +100,6 @@ public class ProjectControllerImpl implements ProjectController {
     }
 
     @Override
-    @GetMapping("/deadLine")
     public ResponseEntity<ProjectCursorResponse<ProjectDeadLineResponse>> getProjectByDeadLine(@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime cursorValue,
                                                                                                @RequestParam(required = false) Long lastProjectId,
                                                                                                @ModelAttribute SortType sortType,
@@ -75,7 +110,6 @@ public class ProjectControllerImpl implements ProjectController {
     }
 
     @Override
-    @GetMapping("/search")
     public ResponseEntity<ProjectSearchCursorResponse<ProjectSearchResponse>> searchProject(@RequestParam String searchTerm,
                                                                                             @RequestParam(required = false) Long lastProjectId,
                                                                                             @ModelAttribute SortType sortType,

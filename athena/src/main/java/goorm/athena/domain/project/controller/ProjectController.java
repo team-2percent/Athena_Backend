@@ -2,6 +2,8 @@ package goorm.athena.domain.project.controller;
 
 import goorm.athena.domain.project.dto.cursor.*;
 import goorm.athena.domain.project.dto.req.ProjectCreateRequest;
+import goorm.athena.domain.project.dto.req.ProjectUpdateRequest;
+import goorm.athena.domain.project.dto.res.ProjectIdResponse;
 import goorm.athena.domain.project.dto.res.*;
 import goorm.athena.domain.project.entity.SortType;
 import io.swagger.v3.oas.annotations.Operation;
@@ -10,6 +12,12 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -32,6 +40,22 @@ public interface ProjectController {
     @PostMapping
     ResponseEntity<ProjectIdResponse> createProject(@RequestBody ProjectCreateRequest request);
 
+    @Operation(summary = "프로젝트 수정 API", description = "프로젝트 정보를 수정합니다.<br>" +
+            "프로젝트를 수정하기 위해서 필수 항목을 모두 입력해야 합니다.")
+    @ApiResponse(responseCode = "200", description = "프로젝트 수정 성공")
+    @PutMapping(value = "/{projectId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    ResponseEntity<Void> updateProject(@PathVariable Long projectId,
+                                       @RequestParam("projectUpdateRequest") String projectUpdateRequestJson,
+
+                                       @Parameter(description = "새로 업데이트 된 파일들")
+                                       @RequestParam(value = "images", required = false) List<MultipartFile> newFiles);
+
+    @Operation(summary = "프로젝트 삭제 API", description = "프로젝트를 영구적으로 삭제합니다.<br>" +
+            "삭제한 프로젝트는 다시 되돌릴 수 없습니다.")
+    @ApiResponse(responseCode = "204", description = "프로젝트 삭제 성공")
+    @DeleteMapping("/{projectId}")
+    ResponseEntity<Void> deleteProject(@PathVariable Long projectId);
+
     @Operation(summary = "프로젝트 전체 조회", description = "프로젝트를 전체로 조회하면서 인기 순으로 정렬합니다. (조회수 순 정렬)<br>" +
             "테스트 시 기본적으로 Pageable은 sort를 가지기 때문에 요청 파라미터에서 sort 키를 없애주시면 됩니다,, !! ")
     @ApiResponse(responseCode = "200", description = "프로젝트 전체 조회 성공",
@@ -47,10 +71,7 @@ public interface ProjectController {
             content = @Content(schema = @Schema(implementation = ProjectAllResponse.class)))
     @GetMapping("/new")
     public ResponseEntity<ProjectCursorResponse<ProjectRecentResponse>> getProjectsByNew(@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime cursorValue,
-                                                                                         @RequestParam(required = false) Long lastProjectId,
-                                                                                         @Parameter(hidden = true) @RequestParam(defaultValue = "20") int pageSize);
-
-
+                                                                                         @RequestParam(required = false) Long lastProjectId, @Parameter(hidden = true) @RequestParam(defaultValue = "20") int pageSize);
     @Operation(summary = "프로젝트 카테고리별 조회", description = "프로젝트를 카테고리별로 조회합니다.<br>" +
             "페이지는 20개 단위로 구성되며, **맨 처음에는 아무 값도 입력되지 않아도 됩니다.**<br>" +
             "배열 형식으로 20개가 출력되고 맨 마지막에는 'nextCursorValue', 'nextProjectId'가 주어집니다.<br>" +

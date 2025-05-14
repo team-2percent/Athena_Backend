@@ -1,8 +1,6 @@
 package goorm.athena.domain.s3.service;
 
 import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.AmazonS3Client;
-import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import goorm.athena.domain.image.dto.req.ImageCreateRequest;
@@ -27,8 +25,8 @@ public class S3Service {
     @Value("${cloud.aws.s3.bucket}")
     private String imageBucket;
 
-    // MultipartFiles -> S3 Upload
-    public List<ImageCreateRequest> uploadFile(List<MultipartFile> multipartFiles) {
+    // MultipartFiles -> S3 이미지 등록
+    public List<ImageCreateRequest> uploadFiles(List<MultipartFile> multipartFiles) {
         List<ImageCreateRequest> imageRequests = new ArrayList<>();
 
         multipartFiles.forEach(file -> {
@@ -63,6 +61,30 @@ public class S3Service {
         return imageRequests;
     }
 
+    // S3 이미지 URL 대조
+    public List<String> compareImages(List<String> baseUrls, List<String> existingUrls) {
+        List<String> removeUrls = new ArrayList<>();    // 삭제할 URL
+        for (String baseUrl : baseUrls) {
+            if (!existingUrls.contains(baseUrl)) {
+                removeUrls.add(baseUrl);
+            }
+        }
+        return removeUrls;
+    }
+
+    // S3 이미지 삭제 (파일 이름으로 변경해서 삭제)
+    public void deleteFiles(List<String> fileUrls) {
+        for (String fileUrl : fileUrls){
+            String fileName = extractFileNameFromUrl(fileUrl);
+            amazonS3.deleteObject(imageBucket, fileName);
+        }
+    }
+
+    // URL에서 파일명 추출 (파일 삭제를 위해)
+    private String extractFileNameFromUrl(String fileUrl) {
+        return fileUrl.substring(fileUrl.lastIndexOf("/") + 1);
+    }
+
     // 파일마다 고유한 이름 부여 (중복 방지)
     private String createFileName(String fileName){
         return UUID.randomUUID().toString().concat(getFileExtension(fileName));
@@ -80,6 +102,8 @@ public class S3Service {
             throw new CustomException(ErrorCode.INVALID_IMAGE_EXTENSION);
         }
     }
+
+
 
     // 이미지 리사이징
 

@@ -6,7 +6,6 @@ import goorm.athena.domain.user.dto.response.UserGetResponse;
 import goorm.athena.domain.user.dto.response.UserLoginResponse;
 import goorm.athena.domain.user.dto.response.UserUpdateResponse;
 import goorm.athena.domain.user.entity.User;
-import org.springframework.http.ResponseEntity;
 
 public class UserMapper {
 
