@@ -23,11 +23,21 @@ public class Image {
     private String originalUrl;
     private String fileType;    // 파일형
 
+    private boolean isDefault;
+
     @Builder
-    private Image(ImageGroup imageGroup, String fileName, String originalUrl, String fileType) {
+    private Image(ImageGroup imageGroup, String fileName, String originalUrl, String fileType, boolean isDefault) {
         this.imageGroup = imageGroup;
         this.fileName = fileName;
         this.originalUrl = originalUrl;
         this.fileType = fileType;
+    }
+
+    public void setAsDefault(){
+        this.isDefault = true;
+    }
+
+    public void unsetAsDefault(){
+        this.isDefault = false;
     }
 }

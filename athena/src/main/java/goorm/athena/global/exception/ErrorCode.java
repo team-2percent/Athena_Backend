@@ -8,7 +8,10 @@ public enum ErrorCode {
 
     // 프로젝트, 상품
     PROJECT_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 프로젝트 ID가 존재하지 않습니다."),
-    PRODUCT_UPLOAD_FAILED(HttpStatus.NOT_FOUND, "등록된 상품이 없습니다."),
+    PRODUCT_IS_EMPTY(HttpStatus.NOT_FOUND, "등록된 상품이 없습니다."),
+    OPTION_IS_EMPTY(HttpStatus.NOT_FOUND, "옵션은 빈 문자열일 수 없습니다."),
+    INVALID_JSON_FORMAT(HttpStatus.NOT_FOUND, "JSON 형태가 올바르지 않습니다."),
+    INVALID_PROJECT_ORDER(HttpStatus.BAD_REQUEST, "해당 카테고리에서는 할 수 없는 정렬입니다."),
 
     // 카테고리
     CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, "카테고리를 찾을 수 없습니다."),

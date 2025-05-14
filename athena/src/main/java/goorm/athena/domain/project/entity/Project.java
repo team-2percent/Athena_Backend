@@ -46,6 +46,7 @@ public class Project {
     private LocalDateTime startAt;
     private LocalDateTime endAt;
     private LocalDateTime shippedAt;    // 발송 일자
+    private LocalDateTime createdAt = LocalDateTime.now();
 
     @Enumerated(EnumType.STRING)
     private ApprovalStatus isApproved;
@@ -53,11 +54,15 @@ public class Project {
     @Enumerated(EnumType.STRING)
     private Status status;
 
+
     @CreationTimestamp
     private LocalDateTime createdAt;
 
+    private Long views = 0L;
+
     @Builder
-    private Project(User seller, ImageGroup imageGroup, Category category, String title, String description, Long goalAmount, Long totalAmount, String contentMarkdown, LocalDateTime startAt, LocalDateTime endAt, LocalDateTime shippedAt) {
+    private Project(User seller, ImageGroup imageGroup, Category category, String title, String description,
+                    Long goalAmount, Long totalAmount, String contentMarkdown, LocalDateTime startAt, LocalDateTime endAt, LocalDateTime shippedAt) {
         this.seller = seller;
         this.imageGroup = imageGroup;
         this.category = category;
@@ -71,9 +76,27 @@ public class Project {
         this.shippedAt = shippedAt;
     }
 
+
     public void setApprovalStatus(boolean isApproved) {
         this.isApproved = isApproved ? ApprovalStatus.APPROVED : ApprovalStatus.REJECTED;
     }
 
+
+    public void update(Category category, String title, String description, Long goalAmount, String contentMarkdown,
+                       LocalDateTime startAt, LocalDateTime endAt, LocalDateTime shippedAt) {
+        this.category = category;
+        this.title = title;
+        this.description = description;
+        this.goalAmount = goalAmount;
+        this.contentMarkdown = contentMarkdown;
+        this.startAt = startAt;
+        this.endAt = endAt;
+        this.shippedAt = shippedAt;
+    }
+    
+    // 조회수 증가
+    public void increaseViews(){
+        this.views++;
+    }
 
 }

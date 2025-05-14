@@ -25,10 +25,10 @@ public class ImageControllerImpl implements ImageController {
     @Override
     public ResponseEntity<List<ImageCreateResponse>> uploadImages(
             @RequestParam("files") List<MultipartFile> files,
-            @RequestParam(value = "imageGroupId") Long imageGroupId
+            @RequestParam("imageGroupId") Long imageGroupId
     ) {
         // 파일을 S3 업로드
-        List<ImageCreateRequest> imageCreateRequests = s3Service.uploadFile(files);
+        List<ImageCreateRequest> imageCreateRequests = s3Service.uploadFiles(files);
 
         // 새 DTO 생성: imageGroupId 추가 ver
         List<ImageCreateRequest> updatedRequests = imageCreateRequests.stream()

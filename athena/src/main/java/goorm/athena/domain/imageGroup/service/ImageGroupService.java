@@ -19,6 +19,11 @@ public class ImageGroupService {
         return imageGroupRepository.save(imageGroup);
     }
 
+    // 이미지 그룹 삭제
+    public void deleteImageGroup(ImageGroup imageGroup) {
+        imageGroupRepository.delete(imageGroup);
+    }
+
     // Get Image group
     public ImageGroup getById(Long id) {
         return imageGroupRepository.findById(id)
