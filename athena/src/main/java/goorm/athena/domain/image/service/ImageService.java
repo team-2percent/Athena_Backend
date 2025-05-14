@@ -76,4 +76,10 @@ public class ImageService {
         imageGroupService.deleteImageGroup(imageGroup); // Image group 삭제
     }
 
+    public String getImage(Long imageGroupId){
+        return imageRepository.findFirstImageByImageGroupId(imageGroupId)
+                .map(Image::getOriginalUrl)
+                .orElse("");
+
+    }
 }

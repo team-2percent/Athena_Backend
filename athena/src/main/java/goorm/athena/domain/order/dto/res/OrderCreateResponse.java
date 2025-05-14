@@ -8,7 +8,7 @@ import java.util.List;
 
 public record OrderCreateResponse(
         Long orderId,
-        Long totalPrice,
+        long totalPrice,
         LocalDateTime orderedAt,
         List<OrderItemCreateResponse> items
 ) {

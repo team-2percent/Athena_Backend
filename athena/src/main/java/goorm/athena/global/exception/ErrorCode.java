@@ -11,6 +11,7 @@ public enum ErrorCode {
     PRODUCT_IS_EMPTY(HttpStatus.NOT_FOUND, "등록된 상품이 없습니다."),
     OPTION_IS_EMPTY(HttpStatus.NOT_FOUND, "옵션은 빈 문자열일 수 없습니다."),
     INVALID_JSON_FORMAT(HttpStatus.NOT_FOUND, "JSON 형태가 올바르지 않습니다."),
+    INVALID_PROJECT_ORDER(HttpStatus.BAD_REQUEST, "해당 카테고리에서는 할 수 없는 정렬입니다."),
 
     // 카테고리
     CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, "카테고리를 찾을 수 없습니다."),
@@ -46,6 +47,9 @@ public enum ErrorCode {
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 ID의 USER가 존재하지 않습니다."),
     ALREADY_EXIST_USER(HttpStatus.BAD_REQUEST, "이미 존재하는 사용자입니다."),
 
+    // 댓글(후기)
+    ALREADY_COMMENTED(HttpStatus.BAD_REQUEST, "이미 해당 프로젝트에 댓글을 작성했습니다."),
+
     // 쿠폰
     COUPON_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 ID의 쿠폰을 찾을 수 없습니다"),
     COUPON_OUT_STOCK(HttpStatus.BAD_REQUEST, "쿠폰의 재고가 부족합니다"),
@@ -61,8 +65,10 @@ public enum ErrorCode {
     INSUFFICIENT_INVENTORY(HttpStatus.BAD_REQUEST, "재고가 부족합니다."),
 
     // 카카오 api
-    KAKAO_PAY_UNAVAILABLE(HttpStatus.SERVICE_UNAVAILABLE, "카카오페이 서버와의 통신에 실패했습니다. 잠시 후 다시 시도해주세요.");
+    KAKAO_PAY_UNAVAILABLE(HttpStatus.SERVICE_UNAVAILABLE, "카카오페이 서버와의 통신에 실패했습니다. 잠시 후 다시 시도해주세요."),
 
+    // 계좌
+    BANK_ACCOUNT_NOT_FOUND(HttpStatus.NOT_FOUND, "사용자 은행 계좌를 찾을 수 없습니다.");
 
     private final HttpStatus errorCode;
     private final String errorMessage;
