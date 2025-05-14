@@ -3,10 +3,7 @@ package goorm.athena.domain.user.controller;
 import goorm.athena.domain.user.dto.request.UserCreateRequest;
 import goorm.athena.domain.user.dto.request.UserLoginRequest;
 import goorm.athena.domain.user.dto.request.UserUpdateRequest;
-import goorm.athena.domain.user.dto.response.UserCreateResponse;
-import goorm.athena.domain.user.dto.response.UserGetResponse;
-import goorm.athena.domain.user.dto.response.UserLoginResponse;
-import goorm.athena.domain.user.dto.response.UserUpdateResponse;
+import goorm.athena.domain.user.dto.response.*;
 import goorm.athena.domain.user.entity.User;
 import goorm.athena.global.jwt.util.CheckLogin;
 import goorm.athena.global.jwt.util.LoginUserRequest;
@@ -69,4 +66,9 @@ public interface UserController {
     @ApiResponse(responseCode = "200", description = "유저 로그아웃 성공")
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(@Parameter(hidden = true) @CookieValue("refreshToken") String refreshToken, HttpServletResponse response);
+
+    @Operation(summary = "유저 헤더 정보 조회 API", description = "헤더에서 유저의 이름과 이미지를 조회합니다.")
+    @ApiResponse(responseCode = "200", description = "유저 헤더 정보 조회 성공")
+    @PostMapping("/Header")
+    public ResponseEntity<UserHeaderGetResponse> getHeader(@Parameter(hidden = true) @CheckLogin LoginUserRequest request);
 }

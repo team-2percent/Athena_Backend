@@ -3,10 +3,7 @@ package goorm.athena.domain.user.controller;
 import goorm.athena.domain.user.dto.request.UserCreateRequest;
 import goorm.athena.domain.user.dto.request.UserLoginRequest;
 import goorm.athena.domain.user.dto.request.UserUpdateRequest;
-import goorm.athena.domain.user.dto.response.UserLoginResponse;
-import goorm.athena.domain.user.dto.response.UserCreateResponse;
-import goorm.athena.domain.user.dto.response.UserGetResponse;
-import goorm.athena.domain.user.dto.response.UserUpdateResponse;
+import goorm.athena.domain.user.dto.response.*;
 import goorm.athena.domain.user.service.RefreshTokenService;
 import goorm.athena.domain.user.service.UserService;
 import goorm.athena.global.exception.CustomException;
@@ -81,5 +78,12 @@ public class UserControllerImpl implements UserController {
         refreshTokenService.deleteRefreshToken(response);
 
         return ResponseEntity.ok().build();
+    }
+
+    @Override
+    @PostMapping("/Header")
+    public ResponseEntity<UserHeaderGetResponse> getHeader(@CheckLogin LoginUserRequest request){
+        UserHeaderGetResponse response = userService.getHeaderById(request.userId());
+        return ResponseEntity.ok(response);
     }
 }

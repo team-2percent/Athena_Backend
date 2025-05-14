@@ -1,10 +1,7 @@
 package goorm.athena.domain.user.mapper;
 
 import goorm.athena.domain.user.dto.request.UserCreateRequest;
-import goorm.athena.domain.user.dto.response.UserCreateResponse;
-import goorm.athena.domain.user.dto.response.UserGetResponse;
-import goorm.athena.domain.user.dto.response.UserLoginResponse;
-import goorm.athena.domain.user.dto.response.UserUpdateResponse;
+import goorm.athena.domain.user.dto.response.*;
 import goorm.athena.domain.user.entity.User;
 
 public class UserMapper {
@@ -53,6 +50,14 @@ public class UserMapper {
                 accessToken,
                 refreshToken,
                 userId
+        );
+    }
+
+    public static UserHeaderGetResponse toHeaderGetResponse(User user, String imageUrl){
+        return new UserHeaderGetResponse(
+                user.getId(),
+                user.getNickname(),
+                imageUrl
         );
     }
 }

@@ -12,7 +12,8 @@ public record ProjectAllResponse(
         LocalDateTime startAt,
         LocalDateTime endAt,
         String imageUrl,
-        int rank
+        int rank,
+        Long view
 ){
     public static ProjectAllResponse from(Project project, String imageUrl, int rank) {
         return new ProjectAllResponse(
@@ -25,7 +26,8 @@ public record ProjectAllResponse(
                 project.getStartAt(),
                 project.getEndAt(),
                 imageUrl,
-                rank
+                rank,
+                project.getViews()
         );
     }
 }

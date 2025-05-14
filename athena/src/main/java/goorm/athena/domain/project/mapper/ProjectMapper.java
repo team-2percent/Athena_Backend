@@ -42,7 +42,8 @@ public class ProjectMapper {
                 project.getId(),
                 project.getSeller().getNickname(),
                 project.getTitle(),
-                project.getCategory().getId()
+                project.getCategory().getId(),
+                project.getViews()
         );
     }
 }

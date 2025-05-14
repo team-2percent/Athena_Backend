@@ -1,12 +1,10 @@
 package goorm.athena.domain.user.service;
 
+import goorm.athena.domain.image.service.ImageService;
 import goorm.athena.domain.user.dto.request.UserCreateRequest;
 import goorm.athena.domain.user.dto.request.UserLoginRequest;
 import goorm.athena.domain.user.dto.request.UserUpdateRequest;
-import goorm.athena.domain.user.dto.response.UserCreateResponse;
-import goorm.athena.domain.user.dto.response.UserGetResponse;
-import goorm.athena.domain.user.dto.response.UserLoginResponse;
-import goorm.athena.domain.user.dto.response.UserUpdateResponse;
+import goorm.athena.domain.user.dto.response.*;
 import goorm.athena.domain.user.entity.User;
 import goorm.athena.domain.user.mapper.UserMapper;
 import goorm.athena.domain.user.repository.UserRepository;
@@ -26,6 +24,7 @@ public class UserService {
     private final TokenService tokenService;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenizer jwtTokenizer;
+    private final ImageService imageService;
 
     @Transactional
     public UserCreateResponse createUser(UserCreateRequest request){
@@ -66,6 +65,12 @@ public class UserService {
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
     }
 
+    @Transactional
+    public UserHeaderGetResponse getHeaderById(Long userId){
+        User user = getUser(userId);
+        String imageUrl = imageService.getImage(user.getImageGroup().getId());
+        return UserMapper.toHeaderGetResponse(user, imageUrl);
+    }
 
     // 내 정보 조회 임시 로직
     @Transactional(readOnly = true)
