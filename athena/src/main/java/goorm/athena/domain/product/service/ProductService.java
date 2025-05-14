@@ -25,12 +25,21 @@ public class ProductService {
     // 상품 리스트 저장
     @Transactional
     public void saveProducts(List<ProductRequest> requests, Project project){
+        List<Product> products = new ArrayList<>();
+
         for (ProductRequest request : requests) {
             Product product = ProductMapper.toEntity(request, project);
-            productRepository.save(product);
+            products.add(product);
+        }
 
-            // 옵션 리스트가 존재하는 경우 저장
-            if (request.options() != null && !request.options().isEmpty()){
+        List<Product> savedProducts = productRepository.saveAll(products);  // 상품 일괄 저장
+
+        // ProductRequest와 Product의 순서를 맞춰서 옵션 생성
+        for (int i = 0; i < savedProducts.size(); i++) {
+            ProductRequest request = requests.get(i);
+            Product product = savedProducts.get(i);
+
+            if (request.options() != null && !request.options().isEmpty()) {
                 createOptions(product, request);
             }
         }
@@ -48,6 +57,7 @@ public class ProductService {
     // 옵션 리스트 생성
     private void createOptions(Product product, ProductRequest request) {
         List<Option> options = new ArrayList<>();
+
         for (String optionName : request.options()) {
             // 옵션이 빈 문자열이거나 NULL이 아니면 저장
             if (optionName != null && !optionName.isEmpty()) {
@@ -57,6 +67,7 @@ public class ProductService {
                 throw new CustomException(ErrorCode.OPTION_IS_EMPTY);
             }
         }
+
         optionRepository.saveAll(options);
     }
 

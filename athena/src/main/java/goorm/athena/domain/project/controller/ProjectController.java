@@ -48,7 +48,7 @@ public interface ProjectController {
                                        @RequestParam("projectUpdateRequest") String projectUpdateRequestJson,
 
                                        @Parameter(description = "새로 업데이트 된 파일들")
-                                       @RequestParam("images") List<MultipartFile> newFiles);
+                                       @RequestParam(value = "images", required = false) List<MultipartFile> newFiles);
 
     @Operation(summary = "프로젝트 삭제 API", description = "프로젝트를 영구적으로 삭제합니다.<br>" +
             "삭제한 프로젝트는 다시 되돌릴 수 없습니다.")

@@ -52,7 +52,7 @@ public class ProjectControllerImpl implements ProjectController {
     public ResponseEntity<Void> updateProject(
             @PathVariable Long projectId,
             @RequestParam("projectUpdateRequest") String projectUpdateRequestJson,
-            @RequestParam("images") List<MultipartFile> newFiles){
+            @RequestParam(value = "images", required = false) List<MultipartFile> newFiles){
         ProjectUpdateRequest projectUpdateRequest = convertJsonToDto(projectUpdateRequestJson);
         projectService.updateProject(projectId, projectUpdateRequest, newFiles);
         return ResponseEntity.ok().build();
