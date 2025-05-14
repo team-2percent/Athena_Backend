@@ -6,7 +6,10 @@ import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.core.types.dsl.NumberExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import goorm.athena.domain.admin.dto.res.ProjectSummaryResponse;
+import goorm.athena.domain.admin.dto.res.SettlementDetailInfoResponse;
+import goorm.athena.domain.bankaccount.entity.QBankAccount;
 import goorm.athena.domain.project.entity.QProject;
+import goorm.athena.domain.settlement.entity.QSettlement;
 import goorm.athena.domain.user.entity.QUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -67,4 +70,5 @@ public class AdminQueryRepository {
 
         return new PageImpl<>(content, pageable, total == null ? 0 : total);
     }
+
 }

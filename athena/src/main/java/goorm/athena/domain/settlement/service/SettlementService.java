@@ -1,5 +1,6 @@
 package goorm.athena.domain.settlement.service;
 
+import goorm.athena.domain.admin.dto.res.SettlementDetailInfoResponse;
 import goorm.athena.domain.bankaccount.entity.BankAccount;
 import goorm.athena.domain.bankaccount.service.BankAccountService;
 import goorm.athena.domain.order.entity.Order;
@@ -93,5 +94,9 @@ public class SettlementService {
 
     public Page<SettlementSummaryResponse> getSettlements(Status status, Integer year, Integer month, Pageable pageable) {
         return settlementQueryRepository.findPageByFilters(status, year, month, pageable);
+    }
+
+    public SettlementDetailInfoResponse getSettlementDetailInfo(Long settlementId) {
+        return settlementQueryRepository.findSettlementDetailInfo(settlementId);
     }
 }

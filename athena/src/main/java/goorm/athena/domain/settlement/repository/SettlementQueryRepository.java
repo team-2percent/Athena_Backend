@@ -4,6 +4,8 @@ import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import goorm.athena.domain.admin.dto.res.SettlementDetailInfoResponse;
+import goorm.athena.domain.bankaccount.entity.QBankAccount;
 import goorm.athena.domain.project.entity.QProject;
 import goorm.athena.domain.settlement.dto.res.SettlementSummaryResponse;
 import goorm.athena.domain.settlement.entity.QSettlement;
@@ -65,5 +67,37 @@ public class SettlementQueryRepository {
                 .fetchOne();
 
         return new PageImpl<>(content, pageable, total == null ? 0 : total);
+    }
+
+    public SettlementDetailInfoResponse findSettlementDetailInfo(Long settlementId) {
+        QSettlement settlement = QSettlement.settlement;
+        QProject project = QProject.project;
+        QUser user = QUser.user;
+        QBankAccount bankAccount = QBankAccount.bankAccount;
+
+        return queryFactory
+                .select(Projections.constructor(SettlementDetailInfoResponse.class,
+                        project.title,
+                        user.nickname,
+                        project.goalAmount,
+                        settlement.totalSales,
+                        settlement.payOutAmount,
+                        settlement.platformFee,
+                        settlement.totalCount,
+                        settlement.settledAt,
+                        settlement.status,
+                        Projections.constructor(SettlementDetailInfoResponse.BankAccountInfo.class,
+                                bankAccount.bankName,
+                                bankAccount.accountNumber
+                        ),
+                        project.startAt,
+                        project.endAt
+                ))
+                .from(settlement)
+                .join(settlement.project, project)
+                .join(settlement.user, user)
+                .join(settlement.bankAccount, bankAccount)
+                .where(settlement.id.eq(settlementId))
+                .fetchOne();
     }
 }

@@ -1,6 +1,7 @@
 package goorm.athena.domain.admin.controller;
 
 import goorm.athena.domain.admin.dto.res.ProjectSummaryResponse;
+import goorm.athena.domain.admin.dto.res.SettlementDetailInfoResponse;
 import goorm.athena.domain.admin.dto.res.SettlementSummaryPageResponse;
 import goorm.athena.domain.admin.service.AdminRoleCheckService;
 import goorm.athena.domain.admin.service.AdminService;
@@ -63,5 +64,14 @@ public class AdminControllerImpl implements AdminController {
         adminRoleCheckService.checkAdmin(loginUserRequest);
         SettlementSummaryPageResponse response = adminService.getSettlementList(status, year, month, page);
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/settlements/{settlementId}/info")
+    public ResponseEntity<SettlementDetailInfoResponse> getSettlementInfo(
+            @PathVariable Long settlementId
+//            @CheckLogin LoginUserRequest loginUserRequest
+    ) {
+//        adminRoleCheckService.checkAdmin(loginUserRequest);
+        return ResponseEntity.ok(settlementService.getSettlementDetailInfo(settlementId));
     }
 }
