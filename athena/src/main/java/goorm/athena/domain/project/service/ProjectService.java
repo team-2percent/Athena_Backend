@@ -1,5 +1,6 @@
 package goorm.athena.domain.project.service;
 
+import goorm.athena.domain.admin.dto.res.ProjectSummaryResponse;
 import goorm.athena.domain.category.entity.Category;
 import goorm.athena.domain.category.service.CategoryService;
 import goorm.athena.domain.imageGroup.entity.ImageGroup;
@@ -8,6 +9,7 @@ import goorm.athena.domain.product.dto.req.ProductRequest;
 import goorm.athena.domain.product.service.ProductService;
 import goorm.athena.domain.project.dto.req.ProjectCreateRequest;
 import goorm.athena.domain.project.dto.res.ProjectIdResponse;
+import goorm.athena.domain.project.entity.ApprovalStatus;
 import goorm.athena.domain.project.entity.Project;
 import goorm.athena.domain.project.mapper.ProjectMapper;
 import goorm.athena.domain.project.repository.ProjectRepository;
@@ -16,6 +18,8 @@ import goorm.athena.domain.user.service.UserService;
 import goorm.athena.global.exception.CustomException;
 import goorm.athena.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -73,4 +77,5 @@ public class ProjectService {
 
         project.setApprovalStatus(isApproved);
     }
+
 }

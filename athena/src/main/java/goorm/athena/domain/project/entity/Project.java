@@ -8,6 +8,7 @@ import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 
@@ -51,6 +52,9 @@ public class Project {
 
     @Enumerated(EnumType.STRING)
     private Status status;
+
+    @CreationTimestamp
+    private LocalDateTime createdAt;
 
     @Builder
     private Project(User seller, ImageGroup imageGroup, Category category, String title, String description, Long goalAmount, Long totalAmount, String contentMarkdown, LocalDateTime startAt, LocalDateTime endAt, LocalDateTime shippedAt) {
