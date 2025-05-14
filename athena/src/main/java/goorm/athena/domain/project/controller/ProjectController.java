@@ -89,7 +89,7 @@ public interface ProjectController {
     public ResponseEntity<ProjectFilterCursorResponse<?>> getProjectsByCategory(
             @RequestParam(value = "cursorId", required = false) Long cursorId,
             @RequestParam(value = "cursorValue", required = false) Object cursorValue,
-            @RequestParam(value = "size", defaultValue = "2") int size,
+            @RequestParam(value = "size", defaultValue = "20") int size,
             @PathVariable Long categoryId,
             @RequestParam SortTypeLatest sortType);
 
