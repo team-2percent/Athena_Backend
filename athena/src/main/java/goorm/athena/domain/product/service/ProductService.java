@@ -3,6 +3,7 @@ package goorm.athena.domain.product.service;
 import goorm.athena.domain.option.entity.Option;
 import goorm.athena.domain.option.repository.OptionRepository;
 import goorm.athena.domain.product.dto.req.ProductRequest;
+import goorm.athena.domain.product.dto.res.ProductResponse;
 import goorm.athena.domain.product.entity.Product;
 import goorm.athena.domain.product.mapper.ProductMapper;
 import goorm.athena.domain.product.repository.ProductRepository;
@@ -15,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -81,5 +83,12 @@ public class ProductService {
     public Product getById(Long id) {
         return productRepository.findById(id)
                 .orElseThrow(() -> new CustomException(ErrorCode.PRODUCT_NOT_FOUND));
+    }
+
+    public List<ProductResponse> getProductsByProjectId(Long projectId) {
+        List<Product> products = productRepository.findByProjectId(projectId);
+        return products.stream()
+                .map(ProductResponse::from)
+                .toList();
     }
 }
