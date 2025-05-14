@@ -2,12 +2,11 @@ package goorm.athena.domain.settlement.repository;
 
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Projections;
-import com.querydsl.jpa.impl.JPAQuery;
+import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import goorm.athena.domain.project.entity.QProject;
 import goorm.athena.domain.settlement.dto.res.SettlementSummaryResponse;
 import goorm.athena.domain.settlement.entity.QSettlement;
-import goorm.athena.domain.settlement.entity.Settlement;
 import goorm.athena.domain.settlement.entity.Status;
 import goorm.athena.domain.user.entity.QUser;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +22,6 @@ import java.util.List;
 public class SettlementQueryRepository {
 
     private final JPAQueryFactory queryFactory;
-
 
     public Page<SettlementSummaryResponse> findPageByFilters(Status status, Integer year, Integer month, Pageable pageable) {
         QSettlement settlement = QSettlement.settlement;
@@ -52,7 +50,12 @@ public class SettlementQueryRepository {
                 .where(builder)
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
-                .orderBy(settlement.requestedAt.desc())
+                .orderBy(
+                        new CaseBuilder()
+                                .when(settlement.status.eq(Status.PENDING)).then(0)
+                                .otherwise(1).asc(),
+                        settlement.requestedAt.desc()
+                )
                 .fetch();
 
         Long total = queryFactory
