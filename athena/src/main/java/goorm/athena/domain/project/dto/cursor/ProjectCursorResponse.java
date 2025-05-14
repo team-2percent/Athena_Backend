@@ -35,15 +35,4 @@ public record ProjectCursorResponse<T>(
         ProjectDeadLineResponse last = content.get(content.size() - 1);
         return new ProjectCursorResponse<>(content, last.endAt(), last.id(), total);
     }
-/*
-    public static ProjectCursorResponse<ProjectCategoryResponse> of(
-            List<ProjectCategoryResponse> content,
-            T nextCursorValue,
-            Long nextProjectId,
-            Long total
-    ) {
-        return new ProjectCursorResponse<>(content, nextCursorValue, nextProjectId, total);
-    }
-
- */
 }

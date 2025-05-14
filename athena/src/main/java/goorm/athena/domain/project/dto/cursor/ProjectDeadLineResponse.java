@@ -12,7 +12,8 @@ public record ProjectDeadLineResponse(
         Long achievementRate,
         LocalDateTime createdAt,
         LocalDateTime endAt,
-        int daysLeft
+        int daysLeft,
+        Long views
 ) {
     public static ProjectDeadLineResponse from(Project project, String imageUrl) {
         // 현재 날짜와 종료일 사이의 차이 계산
@@ -32,7 +33,8 @@ public record ProjectDeadLineResponse(
                 project.getGoalAmount() / project.getTotalAmount(),
                 project.getCreatedAt(),
                 project.getEndAt(),
-                safeDaysLeft
+                safeDaysLeft,
+                project.getViews()
         );
     }
 }

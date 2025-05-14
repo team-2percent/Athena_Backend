@@ -1,7 +1,6 @@
 package goorm.athena.domain.project.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import goorm.athena.domain.imageGroup.entity.ImageGroup;
 import goorm.athena.domain.imageGroup.entity.Type;
@@ -12,12 +11,11 @@ import goorm.athena.domain.project.dto.req.ProjectCursorRequest;
 import goorm.athena.domain.project.dto.req.ProjectUpdateRequest;
 import goorm.athena.domain.project.dto.res.ProjectIdResponse;
 import goorm.athena.domain.project.dto.res.*;
-import goorm.athena.domain.project.entity.SortType;
+import goorm.athena.domain.project.entity.SortTypeDeadLine;
 import goorm.athena.domain.project.entity.SortTypeLatest;
 import goorm.athena.domain.project.service.ProjectService;
 import goorm.athena.global.exception.CustomException;
 import goorm.athena.global.exception.ErrorCode;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -113,9 +111,9 @@ public class ProjectControllerImpl implements ProjectController {
     @Override
     public ResponseEntity<ProjectCursorResponse<ProjectDeadLineResponse>> getProjectByDeadLine(@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime cursorValue,
                                                                                                @RequestParam(required = false) Long lastProjectId,
-                                                                                               @ModelAttribute SortType sortType,
+                                                                                               @ModelAttribute SortTypeDeadLine sortTypeDeadLine,
                                                                                                @RequestParam(defaultValue = "20") int pageSize){
-        ProjectCursorResponse<ProjectDeadLineResponse> responses = projectService.getProjectsByDeadLine(cursorValue, sortType, lastProjectId, pageSize);
+        ProjectCursorResponse<ProjectDeadLineResponse> responses = projectService.getProjectsByDeadLine(cursorValue, sortTypeDeadLine, lastProjectId, pageSize);
         return ResponseEntity.ok(responses);
 
     }

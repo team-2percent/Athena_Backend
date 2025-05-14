@@ -2,10 +2,9 @@ package goorm.athena.domain.project.controller;
 
 import goorm.athena.domain.project.dto.cursor.*;
 import goorm.athena.domain.project.dto.req.ProjectCreateRequest;
-import goorm.athena.domain.project.dto.req.ProjectUpdateRequest;
 import goorm.athena.domain.project.dto.res.ProjectIdResponse;
 import goorm.athena.domain.project.dto.res.*;
-import goorm.athena.domain.project.entity.SortType;
+import goorm.athena.domain.project.entity.SortTypeDeadLine;
 import goorm.athena.domain.project.entity.SortTypeLatest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -13,16 +12,12 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -122,9 +117,9 @@ public interface ProjectController {
                                                                                                @Parameter(
                                                                                                        description = "마감 정렬 방식",
                                                                                                        example = "DEADLINE",
-                                                                                                       schema = @Schema(implementation = SortType.class)
+                                                                                                       schema = @Schema(implementation = SortTypeDeadLine.class)
                                                                                                )
-                                                                                               @ModelAttribute SortType sortType,
+                                                                                               @ModelAttribute SortTypeDeadLine sortTypeDeadLine,
                                                                                                @RequestParam(defaultValue = "20") int pageSize);
 
 

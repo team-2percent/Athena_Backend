@@ -3,7 +3,6 @@ package goorm.athena.domain.project.repository;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Projections;
-import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.core.types.dsl.NumberExpression;
 import com.querydsl.jpa.JPAExpressions;
@@ -12,9 +11,8 @@ import goorm.athena.domain.image.entity.QImage;
 import goorm.athena.domain.imageGroup.entity.QImageGroup;
 import goorm.athena.domain.project.dto.cursor.*;
 import goorm.athena.domain.project.dto.req.ProjectCursorRequest;
-import goorm.athena.domain.project.entity.Project;
 import goorm.athena.domain.project.entity.QProject;
-import goorm.athena.domain.project.entity.SortType;
+import goorm.athena.domain.project.entity.SortTypeDeadLine;
 import goorm.athena.domain.project.entity.SortTypeLatest;
 import goorm.athena.global.exception.CustomException;
 import goorm.athena.global.exception.ErrorCode;
@@ -29,25 +27,21 @@ import java.util.List;
 public class ProjectQueryRepository {
     private final JPAQueryFactory queryFactory;
 
-    private List<OrderSpecifier<?>> getSortOrders(SortType sortType, QProject project) {
+    private List<OrderSpecifier<?>> getSortOrdersDeadLine(SortTypeDeadLine sortTypeDeadLine, QProject project) {
         NumberExpression<Long> successRate = project.totalAmount.multiply(100.0)
                 .divide(project.goalAmount.doubleValue());
 
-        return switch (sortType) {
+        return switch (sortTypeDeadLine) {
             case DEADLINE -> List.of(project.endAt.asc(), project.id.asc());
             case DEADLINE_POPULAR -> List.of(project.endAt.asc(), project.views.desc(), project.id.asc());
             case DEADLINE_SUCCESS_RATE -> List.of(project.endAt.asc(), successRate.desc(), project.id.asc());
             case DEADLINE_RECOMMENDED -> List.of(project.endAt.asc(),
                     Expressions.numberTemplate(Double.class, "function('rand')").asc(), project.id.asc());
 
-            case LATEST -> List.of(project.createdAt.desc(), project.id.asc());
-            case POPULAR -> List.of(project.views.desc(), project.id.desc());
-            case SUCCESS_RATE -> List.of(successRate.desc(), project.createdAt.desc(), project.id.asc());
-            case RECOMMENDED -> List.of(Expressions.numberTemplate(Double.class, "function('rand')").asc(), project.id.asc());
         };
     }
 
-    private List<OrderSpecifier<?>> getSortOrders1(SortTypeLatest sortType, QProject project) {
+    private List<OrderSpecifier<?>> getSortOrdersLatest(SortTypeLatest sortType, QProject project) {
         NumberExpression<Long> successRate = project.totalAmount.multiply(100.0)
                 .divide(project.goalAmount.doubleValue());
 
@@ -206,7 +200,7 @@ public class ProjectQueryRepository {
                                 ))
                 )
                 .where(builder)
-                .orderBy(getSortOrders1(sortType, project).toArray(new OrderSpecifier[0]))
+                .orderBy(getSortOrdersLatest(sortType, project).toArray(new OrderSpecifier[0]))
                 .limit(request.getSize())
                 .fetch();
 
@@ -248,8 +242,8 @@ public class ProjectQueryRepository {
 
     // 마감 기한별 프로젝트 조회 (커서 기반 페이징)
     public ProjectCursorResponse<ProjectDeadLineResponse> getProjectsByDeadline(ProjectCursorRequest<LocalDateTime> request,
-                                                                                SortType sortType) {
-        if (!(sortType.name().startsWith("DEADLINE"))) {
+                                                                                SortTypeDeadLine sortTypeDeadLine) {
+        if (!(sortTypeDeadLine.name().startsWith("DEADLINE"))) {
             throw new CustomException(ErrorCode.INVALID_PROJECT_ORDER);
         }
 
@@ -283,7 +277,8 @@ public class ProjectQueryRepository {
                                 project.totalAmount, project.goalAmount),
                         project.createdAt,
                         project.endAt,
-                        Expressions.numberTemplate(Integer.class, "DATEDIFF({0}, CURRENT_DATE)", project.endAt)
+                        Expressions.numberTemplate(Integer.class, "DATEDIFF({0}, CURRENT_DATE)", project.endAt),
+                        project.views
                 ))
                 .from(project)
                 .leftJoin(project.imageGroup, imageGroup)
@@ -297,7 +292,7 @@ public class ProjectQueryRepository {
                                 ))
                 )
                 .where(builder)
-                .orderBy(getSortOrders(sortType, project).toArray(OrderSpecifier[]::new)) // 마감일 빠른 순
+                .orderBy(getSortOrdersDeadLine(sortTypeDeadLine, project).toArray(OrderSpecifier[]::new)) // 마감일 빠른 순
                 .limit(request.getSize())
                 .fetch();
 
@@ -392,7 +387,7 @@ public class ProjectQueryRepository {
                                 .and(image.isDefault.isTrue())
                 )
                 .where(builder)
-                .orderBy(getSortOrders1(sortType, project).toArray(new OrderSpecifier[0]))
+                .orderBy(getSortOrdersLatest(sortType, project).toArray(new OrderSpecifier[0]))
                 .limit(request.getSize())
                 .fetch();
 
