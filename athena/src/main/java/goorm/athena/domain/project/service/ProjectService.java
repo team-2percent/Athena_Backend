@@ -96,10 +96,13 @@ public class ProjectService {
     @Transactional
     public void deleteProject(Long projectId){
         Project project = getById(projectId);
+        ImageGroup imageGroup = project.getImageGroup();
 
-        imageService.deleteImages(project.getImageGroup()); // 이미지 -> 이미지 그룹 삭제
+        imageService.deleteImages(imageGroup);              // 이미지 삭제
         deleteProducts(project);                            // 상품 -> 옵션 삭제
         projectRepository.delete(project);                  // 프로젝트 삭제
+        imageGroupService.deleteImageGroup(imageGroup);     // 이미지 그룹 삭제
+
     }
 
     // 상품 리스트 생성

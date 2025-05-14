@@ -84,9 +84,8 @@ public class ImageService {
             fileUrls.add(fileUrl);
         }
 
-        s3Service.deleteFiles(fileUrls);               // S3에서 이미지 삭제
+        s3Service.deleteFiles(fileUrls);                // S3에서 이미지 삭제
         imageRepository.deleteAll(images);              // DB에서 이미지 삭제
-        imageGroupService.deleteImageGroup(imageGroup); // Image group 삭제
     }
 
     public String getImage(Long imageGroupId){
