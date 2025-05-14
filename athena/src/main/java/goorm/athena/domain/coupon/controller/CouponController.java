@@ -25,7 +25,8 @@ public interface CouponController {
     @GetMapping
     public ResponseEntity<Page<CouponGetResponse>> getCouponAll(
             @Parameter(hidden = true) @CheckLogin LoginUserRequest request,
-            @RequestParam(defaultValue = "0") int page);
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size);
 
 
     @Operation(summary = "쿠폰의 상태 업데이트 스케줄러 수동 API", description = "쿠폰의 상태 업데이트 변경 스케줄러를 수동으로 작동합니다.<br>" +

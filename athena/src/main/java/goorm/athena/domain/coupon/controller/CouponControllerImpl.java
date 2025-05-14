@@ -25,8 +25,9 @@ public class CouponControllerImpl implements CouponController{
     @GetMapping
     public ResponseEntity<Page<CouponGetResponse>> getCouponAll(
             @CheckLogin LoginUserRequest request,
-            @RequestParam(defaultValue = "0") int page){
-        Page<Coupon> coupons = couponService.getCoupons(page, 10);
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size){
+        Page<Coupon> coupons = couponService.getCoupons(page, size);
         Page<CouponGetResponse> response = coupons.map(CouponMapper::toGetResponse);
 
         return ResponseEntity.ok(response);
