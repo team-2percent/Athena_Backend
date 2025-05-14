@@ -69,6 +69,14 @@ public class ProjectQueryRepository {
         // 커서 조건 (startAt < 커서 or (startAt == 커서 and id < 커서Id))
         BooleanBuilder builder = new BooleanBuilder();
 
+        if (request.cursorValue() != null && request.cursorId() != null) {
+            builder.and(
+                    project.createdAt.lt(request.cursorValue())
+                            .or(project.createdAt.eq(request.cursorValue())
+                                    .and(project.id.lt(request.cursorId())))
+            );
+        }
+
         // 서브쿼리: imageGroup 별로 가장 id가 작은 이미지
         QImage imageSub = new QImage("imageSub");
 

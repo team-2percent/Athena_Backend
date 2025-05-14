@@ -73,7 +73,7 @@ public interface ProjectController {
             content = @Content(schema = @Schema(implementation = ProjectAllResponse.class)))
     @GetMapping("/new")
     public ResponseEntity<ProjectCursorResponse<ProjectRecentResponse>> getProjectsByNew(@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime cursorValue,
-                                                                                         @RequestParam(required = false) Long lastProjectId, @Parameter(hidden = true) @RequestParam(defaultValue = "20") int pageSize);
+                                                                                         @RequestParam(required = false) Long lastProjectId,  @RequestParam(defaultValue = "20") int pageSize);
     @Operation(summary = "프로젝트 카테고리별 조회", description = "프로젝트를 카테고리별로 조회합니다.<br>" +
             "페이지는 20개 단위로 구성되며, **맨 처음에는 아무 값도 입력되지 않아도 됩니다.**<br>" +
             "배열 형식으로 20개가 출력되고 맨 마지막에는 'nextCursorValue', 'nextProjectId'가 주어집니다.<br>" +
@@ -125,7 +125,7 @@ public interface ProjectController {
                                                                                                        schema = @Schema(implementation = SortType.class)
                                                                                                )
                                                                                                @ModelAttribute SortType sortType,
-                                                                                               @Parameter(hidden = true) @RequestParam(defaultValue = "20") int pageSize);
+                                                                                               @RequestParam(defaultValue = "20") int pageSize);
 
 
     @Operation(summary = "프로젝트 검색 조회", description = "프로젝트 검색 결과로 제목을 조회합니다.<br>" +
@@ -149,7 +149,7 @@ public interface ProjectController {
                                                                                             @RequestParam(required = false) Object cursorValue,
                                                                                             @RequestParam(required = false) Long cursorId,
                                                                                             @RequestParam SortTypeLatest sortType,
-                                                                                            @RequestParam(defaultValue = "2") int pageSize);
+                                                                                            @RequestParam(defaultValue = "20") int pageSize);
 
     @Operation(summary = "프로젝트 메인 카테고리 배너 조회", description = "프로젝트의 메인 배너에서 각 카테고리의 조회수가 제일 높은 것을 조회합니다.")
     @ApiResponse(responseCode = "200", description = "프로젝트의 카테고리별 조회수 높은 프로젝트 조회 성공")
