@@ -1,8 +1,9 @@
 package goorm.athena.domain.admin.controller;
 
 import goorm.athena.domain.admin.dto.res.ProjectSummaryResponse;
-import goorm.athena.domain.product.dto.res.ProductResponse;
 import goorm.athena.domain.project.dto.req.ProjectApprovalRequest;
+import goorm.athena.global.jwt.util.CheckLogin;
+import goorm.athena.global.jwt.util.LoginUserRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -11,8 +12,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @Tag(name = "Admin", description = "관리자용 페이지 API")
 @RequestMapping("/api/admin/projects")
@@ -28,9 +27,8 @@ public interface AdminController {
     )
     @PatchMapping("/{projectId}/approval")
     ResponseEntity<String> updateApprovalStatus(
-            @Parameter(description = "승인 또는 거절할 프로젝트의 ID", example = "1")
-            @PathVariable Long projectId,
-
+            @Parameter(hidden = true) @CheckLogin LoginUserRequest loginUserRequest,
+            @Parameter(description = "승인 또는 거절할 프로젝트의 ID", example = "1") @PathVariable Long projectId,
             @RequestBody ProjectApprovalRequest request
     );
 
@@ -44,6 +42,7 @@ public interface AdminController {
     )
     @GetMapping
     ResponseEntity<ProjectSummaryResponse> getProjects(
+            @Parameter(hidden = true) @CheckLogin LoginUserRequest loginUserRequest,
             @Parameter(description = "프로젝트 제목 검색어 (선택)") @RequestParam(required = false) String keyword,
             @Parameter(description = "정렬 방향(desc 또는 asc)", example = "desc") @RequestParam(value = "direction", defaultValue = "desc") String direction,
             @Parameter(description = "페이지 번호 (0부터 시작)", example = "0") @RequestParam(value = "page", defaultValue = "0") int page
