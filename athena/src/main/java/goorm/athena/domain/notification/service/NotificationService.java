@@ -14,8 +14,11 @@ import org.springframework.transaction.annotation.Transactional;
 public class NotificationService {
   private final NotificationRepository notificationRepository;
 
-  public Notification createNotification(Long userId, String content, NotificationType type) {
-    Notification notification = new Notification(userId, content, type);
+  /**
+   * @param urlPath -> nullable
+   */
+  public Notification createNotification(Long userId, String content, NotificationType type, String urlPath) {
+    Notification notification = new Notification(userId, content, type, urlPath);
     return notificationRepository.save(notification);
   }
 

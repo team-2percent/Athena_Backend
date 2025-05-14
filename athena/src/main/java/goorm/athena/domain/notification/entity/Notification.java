@@ -30,12 +30,16 @@ public class Notification {
   @Column(name = "created_at", nullable = false)
   private LocalDateTime createdAt;
 
-  public Notification(Long userId, String content, NotificationType type) {
+  @Column(nullable = true)
+  private String urlPath;
+
+  public Notification(Long userId, String content, NotificationType type, String urlPath) {
     this.userId = userId;
     this.content = content;
     this.type = type;
     this.isRead = false;
     this.createdAt = LocalDateTime.now();
+    this.urlPath = urlPath;
   }
 
   public void markAsRead() {

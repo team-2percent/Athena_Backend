@@ -18,6 +18,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -28,26 +30,25 @@ public class UserService {
     private final JwtTokenizer jwtTokenizer;
 
     @Transactional
-    public UserCreateResponse createUser(UserCreateRequest request){
+    public UserCreateResponse createUser(UserCreateRequest request) {
         Boolean isExist = userRepository.existsByEmail(request.email());
 
-        if(!isExist) {
+        if (!isExist) {
             User newUser = User.create(
                     request.email(),
                     passwordEncoder.encode(request.password()),
-                    request.nickname()
-            );
+                    request.nickname());
 
             User savedUser = userRepository.save(newUser);
 
             return UserMapper.toCreateResponse(savedUser);
-        } else{
+        } else {
             throw new CustomException(ErrorCode.ALREADY_EXIST_USER);
         }
     }
 
     @Transactional
-    public UserUpdateResponse updateUser(Long userId, UserUpdateRequest request){
+    public UserUpdateResponse updateUser(Long userId, UserUpdateRequest request) {
         User updateUser = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
@@ -61,15 +62,14 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public User getUser(Long userId){
+    public User getUser(Long userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
     }
 
-
     // 내 정보 조회 임시 로직
     @Transactional(readOnly = true)
-    public UserGetResponse getUserById(Long userId){
+    public UserGetResponse getUserById(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
@@ -77,14 +77,14 @@ public class UserService {
     }
 
     @Transactional
-    public void deleteUser(Long userId){
+    public void deleteUser(Long userId) {
         userRepository.deleteById(userId);
     }
 
     @Transactional
-    public UserLoginResponse validateUserCredentials(UserLoginRequest request, HttpServletResponse response){
+    public UserLoginResponse validateUserCredentials(UserLoginRequest request, HttpServletResponse response) {
         User user = userRepository.findByEmail(request.email());
-        if(user == null || !passwordEncoder.matches(request.password(), user.getPassword())){
+        if (user == null || !passwordEncoder.matches(request.password(), user.getPassword())) {
             throw new CustomException(ErrorCode.AUTH_INVALID_LOGIN);
         }
 
@@ -94,5 +94,11 @@ public class UserService {
         String refreshTokenValue = tokenService.issueToken(user, response);
 
         return UserMapper.toLoginResponse(user.getId(), accessToken, refreshTokenValue);
+    }
+
+    public List<Long> getUserIdAll() {
+        return userRepository.findAll().stream()
+                .map(User::getId)
+                .collect(Collectors.toList());
     }
 }

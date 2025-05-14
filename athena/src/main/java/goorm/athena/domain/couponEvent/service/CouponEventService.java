@@ -15,6 +15,8 @@ import goorm.athena.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import goorm.athena.domain.notification.service.NotificationService;
+import goorm.athena.domain.notification.NotificationType;
 
 import java.util.List;
 import java.util.Set;
@@ -26,6 +28,7 @@ public class CouponEventService {
     private final CouponEventRepository couponEventRepository;
     private final UserCouponRepository userCouponRepository;
     private final UserService userService;
+    private final NotificationService notificationService;
 
     @Transactional
     public CouponEventCreateResponse createCouponEvent(CouponEventCreateRequest request) {
@@ -34,12 +37,18 @@ public class CouponEventService {
         CouponEvent couponEvent = CouponEvent.create(coupon);
 
         couponEventRepository.save(couponEvent);
+        Long couponId = couponEvent.getCoupon().getId();
+        List<Long> userIds = userService.getUserIdAll();
+        for (Long userId : userIds) {
+            notificationService.createNotification(userId, "등록할 수 있는 신규 쿠폰이 발행되었어요~! 지금 바로 받으러 가기!! ",
+                    NotificationType.COUPON, "/coupon/" + couponId);
+        }
 
         return CouponEventMapper.toCreateResponse(couponEvent);
     }
 
     @Transactional(readOnly = true)
-    public List<CouponEventGetResponse> getCouponEvent(Long userId){
+    public List<CouponEventGetResponse> getCouponEvent(Long userId) {
         List<CouponEvent> couponEventList = couponEventRepository.findByIsActiveTrueWithCoupon();
 
         List<Long> couponIds = couponEventList.stream()
