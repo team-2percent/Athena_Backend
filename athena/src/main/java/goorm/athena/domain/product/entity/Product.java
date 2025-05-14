@@ -1,6 +1,8 @@
 package goorm.athena.domain.product.entity;
 
 import goorm.athena.domain.project.entity.Project;
+import goorm.athena.global.exception.CustomException;
+import goorm.athena.global.exception.ErrorCode;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -34,6 +36,13 @@ public class Product {
         this.description = description;
         this.price = price;
         this.stock = stock;
+    }
+
+    public void decreaseStock(int quantity) {
+        if (this.stock < quantity) {
+            throw new CustomException(ErrorCode.INSUFFICIENT_INVENTORY);
+        }
+        this.stock -= quantity;
     }
 
     public String getProductName() {

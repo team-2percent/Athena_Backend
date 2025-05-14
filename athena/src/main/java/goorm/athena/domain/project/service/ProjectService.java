@@ -1,5 +1,6 @@
 package goorm.athena.domain.project.service;
 
+import goorm.athena.domain.admin.dto.res.ProjectSummaryResponse;
 import goorm.athena.domain.category.entity.Category;
 import goorm.athena.domain.category.service.CategoryService;
 import goorm.athena.domain.image.service.ImageService;
@@ -11,6 +12,7 @@ import goorm.athena.domain.project.dto.cursor.*;
 import goorm.athena.domain.project.dto.req.ProjectCreateRequest;
 import goorm.athena.domain.project.dto.req.ProjectUpdateRequest;
 import goorm.athena.domain.project.dto.res.ProjectIdResponse;
+import goorm.athena.domain.project.entity.ApprovalStatus;
 import goorm.athena.domain.project.dto.req.ProjectCursorRequest;
 import goorm.athena.domain.project.dto.res.*;
 import goorm.athena.domain.project.entity.Project;
@@ -24,6 +26,8 @@ import goorm.athena.domain.user.service.UserService;
 import goorm.athena.global.exception.CustomException;
 import goorm.athena.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -182,4 +186,13 @@ public class ProjectService {
         LocalDateTime endAt = baseDate.plusDays(1).atStartOfDay();
         return projectRepository.findProjectsWithUnsettledOrders(endAt);
     }
+
+    @Transactional
+    public void updateApprovalStatus(Long projectId, boolean isApproved) {
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new CustomException(ErrorCode.PROJECT_NOT_FOUND));
+
+        project.setApprovalStatus(isApproved);
+    }
+
 }
