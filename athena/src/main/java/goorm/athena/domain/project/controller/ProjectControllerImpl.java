@@ -73,15 +73,15 @@ public class ProjectControllerImpl implements ProjectController {
         } catch (JsonProcessingException e) {
             throw new CustomException(ErrorCode.INVALID_JSON_FORMAT);
         }
+    }
+
     @Override
-    @GetMapping("/all")
     public ResponseEntity<List<ProjectAllResponse>> getProjectsAll(){
         List<ProjectAllResponse> responses = projectService.getProjects();
         return ResponseEntity.ok(responses);
     }
 
     @Override
-    @GetMapping("/new")
     public ResponseEntity<ProjectCursorResponse<ProjectRecentResponse>> getProjectsByNew(@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime cursorValue,
                                                                                          @RequestParam(required = false) Long lastProjectId,
                                                                                          @RequestParam(defaultValue = "20") int pageSize){
@@ -90,7 +90,6 @@ public class ProjectControllerImpl implements ProjectController {
     }
 
     @Override
-    @GetMapping("/category")
     public ResponseEntity<ProjectCursorResponse<ProjectCategoryResponse>> getProjectByCategory(@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime cursorValue,
                                                                                                @RequestParam(required = false) Long lastProjectId,
                                                                                                @RequestParam Long categoryId,
@@ -101,7 +100,6 @@ public class ProjectControllerImpl implements ProjectController {
     }
 
     @Override
-    @GetMapping("/deadLine")
     public ResponseEntity<ProjectCursorResponse<ProjectDeadLineResponse>> getProjectByDeadLine(@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime cursorValue,
                                                                                                @RequestParam(required = false) Long lastProjectId,
                                                                                                @ModelAttribute SortType sortType,
@@ -112,7 +110,6 @@ public class ProjectControllerImpl implements ProjectController {
     }
 
     @Override
-    @GetMapping("/search")
     public ResponseEntity<ProjectSearchCursorResponse<ProjectSearchResponse>> searchProject(@RequestParam String searchTerm,
                                                                                             @RequestParam(required = false) Long lastProjectId,
                                                                                             @ModelAttribute SortType sortType,

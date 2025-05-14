@@ -76,6 +76,7 @@ public class Project {
         this.startAt = startAt;
         this.endAt = endAt;
         this.shippedAt = shippedAt;
+    }
     
     // 조회수 증가
     public void increaseViews(){

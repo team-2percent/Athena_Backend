@@ -55,6 +55,7 @@ public interface ProjectController {
     @ApiResponse(responseCode = "204", description = "프로젝트 삭제 성공")
     @DeleteMapping("/{projectId}")
     ResponseEntity<Void> deleteProject(@PathVariable Long projectId);
+
     @Operation(summary = "프로젝트 전체 조회", description = "프로젝트를 전체로 조회하면서 인기 순으로 정렬합니다. (조회수 순 정렬)<br>" +
             "테스트 시 기본적으로 Pageable은 sort를 가지기 때문에 요청 파라미터에서 sort 키를 없애주시면 됩니다,, !! ")
     @ApiResponse(responseCode = "200", description = "프로젝트 전체 조회 성공",
@@ -70,10 +71,7 @@ public interface ProjectController {
             content = @Content(schema = @Schema(implementation = ProjectAllResponse.class)))
     @GetMapping("/new")
     public ResponseEntity<ProjectCursorResponse<ProjectRecentResponse>> getProjectsByNew(@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime cursorValue,
-                                                                                         @RequestParam(required = false) Long lastProjectId,
-                                                                                         @Parameter(hidden = true) @RequestParam(defaultValue = "20") int pageSize);
-
-
+                                                                                         @RequestParam(required = false) Long lastProjectId, @Parameter(hidden = true) @RequestParam(defaultValue = "20") int pageSize);
     @Operation(summary = "프로젝트 카테고리별 조회", description = "프로젝트를 카테고리별로 조회합니다.<br>" +
             "페이지는 20개 단위로 구성되며, **맨 처음에는 아무 값도 입력되지 않아도 됩니다.**<br>" +
             "배열 형식으로 20개가 출력되고 맨 마지막에는 'nextCursorValue', 'nextProjectId'가 주어집니다.<br>" +
