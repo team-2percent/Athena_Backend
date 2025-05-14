@@ -8,6 +8,10 @@ import goorm.athena.domain.coupon.repository.CouponRepository;
 import goorm.athena.global.exception.CustomException;
 import goorm.athena.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +27,11 @@ public class CouponService {
         couponRepository.save(coupon);
 
         return CouponMapper.toCreateResponse(coupon);
+    }
+
+    public Page<Coupon> getCoupons(int page, int size){
+        Pageable pageable = PageRequest.of(page, size, Sort.by("id"));
+        return couponRepository.findAll(pageable);
     }
 
     @Transactional(readOnly = true)

@@ -2,14 +2,17 @@ package goorm.athena.domain.coupon.controller;
 
 import goorm.athena.domain.coupon.dto.req.CouponCreateRequest;
 import goorm.athena.domain.coupon.dto.res.CouponCreateResponse;
+import goorm.athena.domain.coupon.dto.res.CouponGetResponse;
+import goorm.athena.domain.coupon.entity.Coupon;
+import goorm.athena.domain.coupon.mapper.CouponMapper;
 import goorm.athena.domain.coupon.scheduler.CouponScheduler;
 import goorm.athena.domain.coupon.service.CouponService;
+import goorm.athena.global.jwt.util.CheckLogin;
+import goorm.athena.global.jwt.util.LoginUserRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
 @RestController
@@ -17,6 +20,18 @@ import org.springframework.web.bind.annotation.RestController;
 public class CouponControllerImpl implements CouponController{
     private final CouponService couponService;
     private final CouponScheduler couponScheduler;
+
+    @Override
+    @GetMapping
+    public ResponseEntity<Page<CouponGetResponse>> getCouponAll(
+            @CheckLogin LoginUserRequest request,
+            @RequestParam(defaultValue = "0") int page){
+        Page<Coupon> coupons = couponService.getCoupons(page, 10);
+        Page<CouponGetResponse> response = coupons.map(CouponMapper::toGetResponse);
+
+        return ResponseEntity.ok(response);
+    }
+
 
     @Override
     @PostMapping("/scheduler")
