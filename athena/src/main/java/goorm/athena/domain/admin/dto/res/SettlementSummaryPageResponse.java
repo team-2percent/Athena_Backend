@@ -1,28 +1,20 @@
 package goorm.athena.domain.admin.dto.res;
 
+import goorm.athena.domain.settlement.dto.res.SettlementSummaryResponse;
 import org.springframework.data.domain.Page;
 
 import java.util.List;
 
-public record ProjectSummaryResponse(
-        List<Item> content,
+public record SettlementSummaryPageResponse(
+        List<SettlementSummaryResponse> content,
         PageInfo pageInfo
 ) {
-
-    public static ProjectSummaryResponse of(Page<Item> page) {
-        return new ProjectSummaryResponse(
+    public static SettlementSummaryPageResponse of(Page<SettlementSummaryResponse> page) {
+        return new SettlementSummaryPageResponse(
                 page.getContent(),
                 new PageInfo(page.getNumber(), page.getTotalPages())
         );
     }
-
-    public record Item(
-            Long projectId,
-            String title,
-            String createdAt,
-            String sellerName,
-            String approvalStatus
-    ) {}
 
     public record PageInfo(
             int currentPage,

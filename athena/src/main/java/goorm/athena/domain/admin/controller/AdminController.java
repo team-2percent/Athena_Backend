@@ -1,7 +1,9 @@
 package goorm.athena.domain.admin.controller;
 
 import goorm.athena.domain.admin.dto.res.ProjectSummaryResponse;
+import goorm.athena.domain.admin.dto.res.SettlementSummaryPageResponse;
 import goorm.athena.domain.project.dto.req.ProjectApprovalRequest;
+import goorm.athena.domain.settlement.entity.Status;
 import goorm.athena.global.jwt.util.CheckLogin;
 import goorm.athena.global.jwt.util.LoginUserRequest;
 import io.swagger.v3.oas.annotations.Operation;
@@ -14,7 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "Admin", description = "관리자용 페이지 API")
-@RequestMapping("/api/admin/projects")
+@RequestMapping("/api/admin")
 public interface AdminController {
 
     @Operation(
@@ -25,7 +27,7 @@ public interface AdminController {
                     @ApiResponse(responseCode = "404", description = "프로젝트를 찾을 수 없음")
             }
     )
-    @PatchMapping("/{projectId}/approval")
+    @PatchMapping("/projects/{projectId}/approval")
     ResponseEntity<String> updateApprovalStatus(
             @Parameter(hidden = true) @CheckLogin LoginUserRequest loginUserRequest,
             @Parameter(description = "승인 또는 거절할 프로젝트의 ID", example = "1") @PathVariable Long projectId,
@@ -40,11 +42,35 @@ public interface AdminController {
                             content = @Content(schema = @Schema(implementation = ProjectSummaryResponse.class)))
             }
     )
-    @GetMapping
+    @GetMapping("/projects")
     ResponseEntity<ProjectSummaryResponse> getProjects(
             @Parameter(hidden = true) @CheckLogin LoginUserRequest loginUserRequest,
             @Parameter(description = "프로젝트 제목 검색어 (선택)") @RequestParam(required = false) String keyword,
             @Parameter(description = "정렬 방향(desc 또는 asc)", example = "desc") @RequestParam(value = "direction", defaultValue = "desc") String direction,
             @Parameter(description = "페이지 번호 (0부터 시작)", example = "0") @RequestParam(value = "page", defaultValue = "0") int page
+    );
+
+    @Operation(
+            summary = "정산 내역 목록 조회",
+            description = "관리자가 정산 상태, 연도, 월 기준으로 정산 내역을 조회합니다.",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "정산 내역 조회 성공",
+                            content = @Content(schema = @Schema(implementation = SettlementSummaryPageResponse.class)))
+            }
+    )
+    @GetMapping("/settlements")
+    ResponseEntity<SettlementSummaryPageResponse> getSettlements(
+            @Parameter(hidden = true) @CheckLogin LoginUserRequest loginUserRequest,
+            @Parameter(description = "정산 상태 (예: PENDING, COMPLETED)", example = "PENDING")
+            @RequestParam(required = false) Status status,
+
+            @Parameter(description = "조회할 연도 (예: 2025)", example = "2025")
+            @RequestParam(required = false) Integer year,
+
+            @Parameter(description = "조회할 월 (1~12)", example = "5")
+            @RequestParam(required = false) Integer month,
+
+            @Parameter(description = "페이지 번호 (0부터 시작)", example = "0")
+            @RequestParam(defaultValue = "0") int page
     );
 }

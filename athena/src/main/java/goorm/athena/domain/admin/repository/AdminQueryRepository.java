@@ -1,4 +1,4 @@
-package goorm.athena.domain.admin.service;
+package goorm.athena.domain.admin.repository;
 
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Projections;
@@ -12,14 +12,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 
-@Service
+@Repository
 @RequiredArgsConstructor
-public class AdminQueryService {
+public class AdminQueryRepository {
 
     private final JPAQueryFactory queryFactory;
 
@@ -43,7 +43,7 @@ public class AdminQueryService {
                         ProjectSummaryResponse.Item.class,
                         project.id,
                         project.title,
-                        project.createdAt.stringValue(),   // string으로 변환
+                        project.createdAt.stringValue(),
                         project.seller.nickname,
                         project.isApproved.stringValue()
                 ))
