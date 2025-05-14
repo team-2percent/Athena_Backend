@@ -2,6 +2,7 @@ package goorm.athena.domain.coupon.service;
 
 import goorm.athena.domain.coupon.dto.req.CouponCreateRequest;
 import goorm.athena.domain.coupon.dto.res.CouponCreateResponse;
+import goorm.athena.domain.coupon.dto.res.CouponGetDetailResponse;
 import goorm.athena.domain.coupon.entity.Coupon;
 import goorm.athena.domain.coupon.mapper.CouponMapper;
 import goorm.athena.domain.coupon.repository.CouponRepository;
@@ -29,9 +30,16 @@ public class CouponService {
         return CouponMapper.toCreateResponse(coupon);
     }
 
+    @Transactional(readOnly = true)
     public Page<Coupon> getCoupons(int page, int size){
         Pageable pageable = PageRequest.of(page, size, Sort.by("id"));
         return couponRepository.findAll(pageable);
+    }
+
+    @Transactional(readOnly = true)
+    public CouponGetDetailResponse getCouponDetail(Long couponId){
+        Coupon coupon = getCoupon(couponId);
+        return CouponMapper.toGetDetailResponse(coupon);
     }
 
     @Transactional(readOnly = true)

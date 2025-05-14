@@ -2,6 +2,7 @@ package goorm.athena.domain.coupon.controller;
 
 import goorm.athena.domain.coupon.dto.req.CouponCreateRequest;
 import goorm.athena.domain.coupon.dto.res.CouponCreateResponse;
+import goorm.athena.domain.coupon.dto.res.CouponGetDetailResponse;
 import goorm.athena.domain.coupon.dto.res.CouponGetResponse;
 import goorm.athena.domain.coupon.entity.Coupon;
 import goorm.athena.domain.coupon.mapper.CouponMapper;
@@ -33,6 +34,14 @@ public class CouponControllerImpl implements CouponController{
         return ResponseEntity.ok(response);
     }
 
+    @Override
+    @GetMapping("/{couponId}")
+    public ResponseEntity<CouponGetDetailResponse> getCouponDetail(
+            @CheckLogin LoginUserRequest request,
+            @PathVariable Long couponId) {
+        CouponGetDetailResponse response = couponService.getCouponDetail(couponId);
+        return ResponseEntity.ok(response);
+    }
 
     @Override
     @PostMapping("/scheduler")
