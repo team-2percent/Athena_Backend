@@ -13,8 +13,20 @@ import org.springframework.web.bind.annotation.*;
 public interface PaymentController {
 
     @Operation(
-            summary = "카카오페이 결제 준비 요청"
-            , description = "주문 ID를 통해 카카오페이 결제를 준비합니다."
+            summary = "카카오페이 결제 준비 요청",
+            description = """
+        **주문을 완료한 후, 카카오페이 결제를 시작하는 API입니다.**
+
+        - 이 API는 `/api/orders`를 통해 생성된 주문의 `orderId`를 기반으로 호출합니다.
+        - 카카오페이 결제 페이지 URL을 반환하며, 프론트는 해당 URL로 리다이렉트합니다.
+        - 이후 카카오페이 결제가 완료되면 `pg_token`을 반환받아 `/api/payment/approve/{orderId}`로 승인 요청을 보내야 합니다.
+
+        **결제 흐름 요약**
+        1. `/api/orders` → 주문 생성 → `orderId` 반환
+        2. `/api/payment/ready/{orderId}` → 결제 준비 및 결제 페이지 URL 응답
+        3. 사용자가 카카오페이에서 결제
+        4. `pg_token` 수신 → `/api/payment/approve/{orderId}?pg_token=...` 로 승인 요청
+        """
     )
     @ApiResponse(responseCode = "200", description = "결제 준비 성공")
     @PostMapping("/ready/{orderId}")

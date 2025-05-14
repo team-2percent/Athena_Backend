@@ -6,6 +6,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import goorm.athena.domain.imageGroup.entity.ImageGroup;
 import goorm.athena.domain.imageGroup.entity.Type;
 import goorm.athena.domain.imageGroup.service.ImageGroupService;
+import goorm.athena.domain.product.dto.res.ProductResponse;
+import goorm.athena.domain.product.service.ProductService;
+import goorm.athena.domain.project.dto.req.ProjectApprovalRequest;
 import goorm.athena.domain.project.dto.cursor.*;
 import goorm.athena.domain.project.dto.req.ProjectCreateRequest;
 import goorm.athena.domain.project.dto.req.ProjectUpdateRequest;
@@ -20,6 +23,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import org.springframework.web.multipart.MultipartFile;
 
 
@@ -28,9 +32,11 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
+@RequestMapping("/api/projects")
 public class ProjectControllerImpl implements ProjectController {
     private final ProjectService projectService;
-    private final ImageGroupService imageGroupService;
+    private final ImageGroupService imageGroupService;d
+    private final ProductService productService;
     private final ObjectMapper objectMapper;
 
     // 프로젝트 초기 설정 (이미지 그룹 생성)
@@ -46,6 +52,23 @@ public class ProjectControllerImpl implements ProjectController {
         ProjectIdResponse response = projectService.createProject(request); // 프로젝트 생성 로직
         return ResponseEntity.ok(response);
     }
+  
+    @GetMapping("/{projectId}/products")
+    public ResponseEntity<List<ProductResponse>> getProductsByProject(
+            @PathVariable Long projectId
+    ) {
+        List<ProductResponse> productList = productService.getProductsByProjectId(projectId);
+        return ResponseEntity.ok(productList);
+    }
+
+    @PatchMapping("/{projectId}/approval")
+    public ResponseEntity<String> updateApprovalStatus(
+            @PathVariable Long projectId,
+            @RequestBody ProjectApprovalRequest request
+    ) {
+        projectService.updateApprovalStatus(projectId, request.approve());
+        String resultMessage = request.approve() ? "승인되었습니다." : "거절되었습니다.";
+        return ResponseEntity.ok(resultMessage);
 
     // 프로젝트 수정
     @Override
@@ -116,5 +139,6 @@ public class ProjectControllerImpl implements ProjectController {
                                                                                             @RequestParam(defaultValue = "20") int pageSize){
         ProjectSearchCursorResponse<ProjectSearchResponse> response = projectService.searchProjects(searchTerm, sortType, lastProjectId, pageSize);
         return ResponseEntity.ok(response);
+
     }
 }

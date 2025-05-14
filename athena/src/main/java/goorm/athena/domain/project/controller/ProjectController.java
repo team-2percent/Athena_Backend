@@ -1,5 +1,7 @@
 package goorm.athena.domain.project.controller;
 
+import goorm.athena.domain.product.dto.res.ProductResponse;
+import goorm.athena.domain.project.dto.req.ProjectApprovalRequest;
 import goorm.athena.domain.project.dto.cursor.*;
 import goorm.athena.domain.project.dto.req.ProjectCreateRequest;
 import goorm.athena.domain.project.dto.req.ProjectUpdateRequest;
@@ -16,6 +18,8 @@ import jakarta.validation.Valid;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+
 import org.springframework.web.multipart.MultipartFile;
 
 import org.springframework.format.annotation.DateTimeFormat;
@@ -23,6 +27,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+
 import java.util.List;
 
 @Tag(name = "Project", description = "Project API")
@@ -39,6 +44,37 @@ public interface ProjectController {
         content = @Content(schema = @Schema(implementation = ProjectIdResponse.class)))
     @PostMapping
     ResponseEntity<ProjectIdResponse> createProject(@RequestBody ProjectCreateRequest request);
+
+    @Operation(
+            summary = "프로젝트별 상품 목록 조회 API",
+            description = """
+    특정 프로젝트에 등록된 모든 상품 목록을 조회합니다.<br>
+    - `projectId`는 조회 대상 프로젝트의 ID입니다.<br>
+    사용 예시: GET /api/project/{projectId}/products
+    """
+    )
+    @ApiResponse(
+            responseCode = "200",
+            description = "상품 목록 조회 성공",
+            content = @Content(schema = @Schema(implementation = ProductResponse.class))
+    )
+    @GetMapping("/{projectId}/products")
+    ResponseEntity<List<ProductResponse>> getProductsByProject(@PathVariable Long projectId);
+
+    @Operation(
+            summary = "프로젝트 승인/반려 API",
+            description = """
+    관리자가 프로젝트를 승인 또는 반려합니다.<br>
+    - `approve`: true면 승인, false면 반려로 처리됩니다.<br>
+    사용 예시: PATCH /api/project/{projectId}/approval
+    """
+    )
+    @ApiResponse(responseCode = "200", description = "승인/반려 처리 완료")
+    @PatchMapping("/{projectId}/approval")
+    ResponseEntity<String> updateApprovalStatus(
+            @PathVariable Long projectId,
+            @RequestBody ProjectApprovalRequest request
+    );
 
     @Operation(summary = "프로젝트 수정 API", description = "프로젝트 정보를 수정합니다.<br>" +
             "프로젝트를 수정하기 위해서 필수 항목을 모두 입력해야 합니다.")
@@ -146,5 +182,6 @@ public interface ProjectController {
                                                                                             @RequestParam(required = false) Long lastProjectId,
                                                                                             @ModelAttribute SortType sortType,
                                                                                             @Parameter(hidden = true) @RequestParam(defaultValue = "20") int pageSize);
+
 }
 

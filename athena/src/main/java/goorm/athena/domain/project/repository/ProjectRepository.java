@@ -1,6 +1,9 @@
 package goorm.athena.domain.project.repository;
 
+import goorm.athena.domain.project.entity.ApprovalStatus;
 import goorm.athena.domain.project.entity.Project;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
@@ -31,4 +34,6 @@ public interface ProjectRepository extends JpaRepository<Project, Long>, JpaSpec
       AND p.status = 'APPROVED'
     """)
     List<Project> findProjectsWithUnsettledOrders(@Param("endAt") LocalDateTime endAt);
+
+    Page<Project> findByIsApproved(ApprovalStatus isApproved, Pageable pageable);
 }
