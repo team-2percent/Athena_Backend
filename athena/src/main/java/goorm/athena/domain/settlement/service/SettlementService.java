@@ -1,6 +1,7 @@
 package goorm.athena.domain.settlement.service;
 
 import goorm.athena.domain.admin.dto.res.SettlementDetailInfoResponse;
+import goorm.athena.domain.admin.dto.res.SettlementHistoryPageResponse;
 import goorm.athena.domain.bankaccount.entity.BankAccount;
 import goorm.athena.domain.bankaccount.service.BankAccountService;
 import goorm.athena.domain.order.entity.Order;
@@ -14,10 +15,12 @@ import goorm.athena.domain.settlement.entity.Status;
 import goorm.athena.domain.settlement.mapper.SettlementMapper;
 import goorm.athena.domain.settlement.repository.SettlementQueryRepository;
 import goorm.athena.domain.settlement.repository.SettlementRepository;
+import goorm.athena.domain.settlementhistory.repository.SettlementHistoryQueryRepository;
 import goorm.athena.domain.settlementhistory.service.SettlementHistoryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,6 +43,7 @@ public class SettlementService {
     private final SettlementHistoryService historyService;
     private final PaymentService paymentService;
     private final SettlementQueryRepository settlementQueryRepository;
+    private final SettlementHistoryQueryRepository settlementHistoryQueryRepository;
 
     private static final double PLATFORM_FEE_RATE = 0.10;
 
@@ -98,5 +102,15 @@ public class SettlementService {
 
     public SettlementDetailInfoResponse getSettlementDetailInfo(Long settlementId) {
         return settlementQueryRepository.findSettlementDetailInfo(settlementId);
+    }
+
+    public SettlementHistoryPageResponse getSettlementHistories(Long settlementId, int page) {
+        Pageable pageable = PageRequest.of(page, 10);
+        Page<SettlementHistoryPageResponse.SettlementHistoryItem> pageResult = settlementHistoryQueryRepository.findHistoriesBySettlementId(settlementId, pageable);
+
+        return new SettlementHistoryPageResponse(
+                pageResult.getContent(),
+                new SettlementHistoryPageResponse.PageInfo(pageResult.getNumber(), pageResult.getTotalPages())
+        );
     }
 }
