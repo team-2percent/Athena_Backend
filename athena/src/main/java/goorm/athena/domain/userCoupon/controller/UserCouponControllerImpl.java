@@ -1,5 +1,6 @@
 package goorm.athena.domain.userCoupon.controller;
 
+import goorm.athena.domain.userCoupon.dto.cursor.UserCouponCursorResponse;
 import goorm.athena.domain.userCoupon.dto.req.UserCouponIssueRequest;
 import goorm.athena.domain.userCoupon.dto.req.UserCouponUseRequest;
 import goorm.athena.domain.userCoupon.dto.res.UserCouponGetResponse;
@@ -8,6 +9,7 @@ import goorm.athena.domain.userCoupon.scheduler.UserCouponScheduler;
 import goorm.athena.domain.userCoupon.service.UserCouponService;
 import goorm.athena.global.jwt.util.CheckLogin;
 import goorm.athena.global.jwt.util.LoginUserRequest;
+import io.swagger.v3.oas.annotations.Parameter;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -49,5 +51,17 @@ public class UserCouponControllerImpl implements UserCouponController {
     public ResponseEntity<List<UserCouponGetResponse>> getUserCoupon(@CheckLogin LoginUserRequest loginUserRequest){
         List<UserCouponGetResponse> response = userCouponService.getUserCoupon(loginUserRequest.userId());
         return ResponseEntity.ok(response);
+    }
+
+    @Override
+    @GetMapping("/{userId}/coupons")
+    public ResponseEntity<UserCouponCursorResponse> getUserCoupons(
+            @Parameter(hidden = true) @CheckLogin LoginUserRequest loginUserRequest,
+            @PathVariable Long userId,
+            @RequestParam(required = false) Long cursorId,
+            @RequestParam(defaultValue = "20") int size
+    ){
+        UserCouponCursorResponse responses = userCouponService.getUserCoupons(userId, cursorId, size);
+        return ResponseEntity.ok(responses);
     }
 }

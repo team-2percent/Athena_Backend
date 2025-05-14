@@ -1,6 +1,7 @@
 package goorm.athena.domain.userCoupon.controller;
 
 import goorm.athena.domain.couponEvent.dto.res.CouponEventGetResponse;
+import goorm.athena.domain.userCoupon.dto.cursor.UserCouponCursorResponse;
 import goorm.athena.domain.userCoupon.dto.req.UserCouponIssueRequest;
 import goorm.athena.domain.userCoupon.dto.req.UserCouponUseRequest;
 import goorm.athena.domain.userCoupon.dto.res.UserCouponGetResponse;
@@ -15,10 +16,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -54,5 +52,14 @@ public interface UserCouponController {
     @GetMapping
     public ResponseEntity<List<UserCouponGetResponse>> getUserCoupon(@Parameter(hidden = true) @CheckLogin LoginUserRequest loginUserRequest);
 
-
+    @Operation(summary = "유저 쿠폰 커서 페이지 조회 APi", description = "유저가 현재 보유중인 모든 쿠폰들을 무한 페이징 형식으로 조회합니다.<br>" +
+            "조회가 완료되면 아래의 'nextCouponId'를 위에 입력하면 해당 값을 기준으로 다음 값들이 사이즈만큼 보여집니다.")
+    @ApiResponse(responseCode = "200", description = "유저가 보유하는 모든 쿠폰들을 페이지 형식으로 조회합니다.")
+    @GetMapping("/{userId}/coupons")
+    public ResponseEntity<UserCouponCursorResponse> getUserCoupons(
+            @Parameter(hidden = true) @CheckLogin LoginUserRequest loginUserRequest,
+            @PathVariable Long userId,
+            @RequestParam(required = false) Long cursorId,
+            @RequestParam(defaultValue = "20") int size
+    );
 }
