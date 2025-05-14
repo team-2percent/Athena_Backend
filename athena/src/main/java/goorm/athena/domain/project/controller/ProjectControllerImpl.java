@@ -35,7 +35,7 @@ import java.util.List;
 @RequestMapping("/api/projects")
 public class ProjectControllerImpl implements ProjectController {
     private final ProjectService projectService;
-    private final ImageGroupService imageGroupService;d
+    private final ImageGroupService imageGroupService;
     private final ProductService productService;
     private final ObjectMapper objectMapper;
 
@@ -69,7 +69,8 @@ public class ProjectControllerImpl implements ProjectController {
         projectService.updateApprovalStatus(projectId, request.approve());
         String resultMessage = request.approve() ? "승인되었습니다." : "거절되었습니다.";
         return ResponseEntity.ok(resultMessage);
-
+    }
+    
     // 프로젝트 수정
     @Override
     public ResponseEntity<Void> updateProject(

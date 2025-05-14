@@ -46,6 +46,8 @@ public class Project {
     private LocalDateTime startAt;
     private LocalDateTime endAt;
     private LocalDateTime shippedAt;    // 발송 일자
+
+    @CreationTimestamp
     private LocalDateTime createdAt = LocalDateTime.now();
 
     @Enumerated(EnumType.STRING)
@@ -54,9 +56,6 @@ public class Project {
     @Enumerated(EnumType.STRING)
     private Status status;
 
-
-    @CreationTimestamp
-    private LocalDateTime createdAt;
 
     private Long views = 0L;
 
