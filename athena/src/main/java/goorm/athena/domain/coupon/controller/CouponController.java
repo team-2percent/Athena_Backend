@@ -30,6 +30,8 @@ public interface CouponController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size);
 
+    @Operation(summary = "쿠폰 상태값 조회 API", description = "쿠폰 목록들을 상태값을 기준으로 조회합니다.")
+    @ApiResponse(responseCode = "200", description = "쿠폰 상태 기준 목록 조회 완료")
     @GetMapping("/status")
     public ResponseEntity<Page<CouponGetResponse>> getCouponByStatus(
             @Parameter(hidden = true) @CheckLogin LoginUserRequest request,

@@ -95,7 +95,7 @@ public class ProjectControllerImpl implements ProjectController {
             @RequestParam(value = "cursorId", required = false) Long cursorId,
             @RequestParam(value = "cursorValue", required = false) Object cursorValue,
             @RequestParam(value = "size", defaultValue = "20") int size,
-            @PathVariable Long categoryId,
+            @RequestParam(value = "categoryId", required = false) Long categoryId,
             @RequestParam SortTypeLatest sortType) {
 
         // ProjectCursorRequest DTO 구성
