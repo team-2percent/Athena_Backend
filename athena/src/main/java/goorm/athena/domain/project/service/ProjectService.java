@@ -30,6 +30,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -127,10 +128,13 @@ public class ProjectService {
     @Transactional(readOnly = true)
     public List<ProjectAllResponse> getProjects() {
         List<Project> projects = projectRepository.findTop20WithImageGroupByOrderByViewsDesc();
+
+        AtomicInteger rank = new AtomicInteger(1);
         return projects.stream()
                 .map(project -> {
                     String imageUrl = imageService.getImage(project.getImageGroup().getId());
-                    return ProjectAllResponse.from(project, imageUrl);
+                    int currentRank = rank.getAndIncrement();
+                    return ProjectAllResponse.from(project, imageUrl, currentRank);
                 })
                 .collect(Collectors.toList());
     }

@@ -12,13 +12,11 @@ import java.util.List;
 
 public interface ProjectRepository extends JpaRepository<Project, Long>, JpaSpecificationExecutor<Project> {
     List<Project> findAllByEndAtBefore(LocalDateTime date);
-  
-    @Query("""
-    SELECT p
-    FROM Project p
-    JOIN FETCH p.imageGroup ig
-    ORDER BY p.views DESC
-    """)
+
+    @Query("SELECT p FROM Project p " +
+            "JOIN FETCH p.seller " +
+            "JOIN FETCH p.imageGroup " +
+            "ORDER BY p.views DESC")
     List<Project> findTop20WithImageGroupByOrderByViewsDesc();
 
     @Query("""

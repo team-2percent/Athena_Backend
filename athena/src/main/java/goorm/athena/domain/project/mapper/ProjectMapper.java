@@ -40,7 +40,7 @@ public class ProjectMapper {
     public static ProjectTopViewResponse toTopViewResponse(Project project, String imageUrl){
         return new ProjectTopViewResponse(
                 project.getId(),
-                imageUrl,
+                project.getSeller().getNickname(),
                 project.getTitle(),
                 project.getCategory().getId()
         );
