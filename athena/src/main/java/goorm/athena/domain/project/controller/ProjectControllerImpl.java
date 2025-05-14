@@ -90,12 +90,11 @@ public class ProjectControllerImpl implements ProjectController {
     }
 
     @Override
-    public ResponseEntity<ProjectCursorResponse<ProjectCategoryResponse>> getProjectByCategory(@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime cursorValue,
-                                                                                               @RequestParam(required = false) Long lastProjectId,
-                                                                                               @RequestParam Long categoryId,
+    public ResponseEntity<ProjectCategoryCursorResponse<ProjectCategoryResponse>> getProjectByCategory(@RequestParam(required = false) Long lastProjectId,
+                                                                                               @RequestParam(required = false) Long categoryId,
                                                                                                @ModelAttribute SortType sortType,
-                                                                                               @RequestParam(defaultValue = "20") int pageSize){
-        ProjectCursorResponse<ProjectCategoryResponse> response = projectService.getProjectsByCategory(cursorValue, categoryId, sortType, lastProjectId, pageSize);
+                                                                                               @RequestParam(defaultValue = "2") int pageSize){
+        ProjectCategoryCursorResponse<ProjectCategoryResponse> response = projectService.getProjectsByCategory(categoryId, sortType, lastProjectId, pageSize);
         return ResponseEntity.ok(response);
     }
 
@@ -113,8 +112,14 @@ public class ProjectControllerImpl implements ProjectController {
     public ResponseEntity<ProjectSearchCursorResponse<ProjectSearchResponse>> searchProject(@RequestParam String searchTerm,
                                                                                             @RequestParam(required = false) Long lastProjectId,
                                                                                             @ModelAttribute SortType sortType,
-                                                                                            @RequestParam(defaultValue = "20") int pageSize){
+                                                                                            @RequestParam(defaultValue = "2") int pageSize){
         ProjectSearchCursorResponse<ProjectSearchResponse> response = projectService.searchProjects(searchTerm, sortType, lastProjectId, pageSize);
         return ResponseEntity.ok(response);
+    }
+
+    @Override
+    public ResponseEntity<List<ProjectTopViewResponse>> getProjectByTopView(){
+        List<ProjectTopViewResponse> responses = projectService.getTopView();
+        return ResponseEntity.ok(responses);
     }
 }

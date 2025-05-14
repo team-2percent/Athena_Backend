@@ -122,6 +122,7 @@ public class ProjectService {
         return projectRepository.findById(id)
                 .orElseThrow(() -> new CustomException(ErrorCode.PROJECT_NOT_FOUND));
     }
+
   
     @Transactional(readOnly = true)
     public List<ProjectAllResponse> getProjects() {
@@ -143,8 +144,8 @@ public class ProjectService {
 
     // 카테고리별 프로젝트 조회 (커서 기반 페이징)
     @Transactional(readOnly = true)
-    public ProjectCursorResponse<ProjectCategoryResponse> getProjectsByCategory(LocalDateTime lastStartAt, Long categoryId, SortType sortType, Long lastProjectId, int pageSize) {
-        ProjectCursorRequest<LocalDateTime> request = new ProjectCursorRequest<>(lastStartAt, lastProjectId, pageSize);
+    public ProjectCategoryCursorResponse<ProjectCategoryResponse> getProjectsByCategory(Long categoryId, SortType sortType, Long lastProjectId, int pageSize) {
+        ProjectCursorRequest<Long> request = new ProjectCursorRequest<>(categoryId, lastProjectId, pageSize);
         return projectQueryRepository.getProjectsByCategory(request, categoryId, sortType);
     }
 
@@ -160,6 +161,16 @@ public class ProjectService {
     public ProjectSearchCursorResponse<ProjectSearchResponse> searchProjects(String searchTerms, SortType sortType, Long lastProjectId, int pageSize) {
         ProjectCursorRequest<String> request = new ProjectCursorRequest<>(searchTerms, lastProjectId, pageSize);
         return projectQueryRepository.searchProjects(request, searchTerms, sortType);
+    }
+
+    public List<ProjectTopViewResponse> getTopView(){
+        List<Project> projects = projectRepository.findTopViewedProjectsByCategory();
+        return projects.stream()
+                .map(project -> {
+                    String imageUrl = imageService.getImage(project.getImageGroup().getId());
+                    return ProjectMapper.toTopViewResponse(project, imageUrl);
+                })
+                .toList();
     }
   
     // 후원 기간 종료, 목표금액 달성 , 중복 정산 제외  조건이 충족해야함
