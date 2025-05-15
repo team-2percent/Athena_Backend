@@ -25,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import goorm.athena.domain.notification.service.NotificationService;
 
 @Service
 @RequiredArgsConstructor
@@ -36,6 +37,7 @@ public class OrderService {
     private final DeliveryInfoService deliveryInfoService;
     private final ProductService productService;
     private final ProjectService projectService;
+    private final NotificationService notificationService;
 
     public Order getById(Long id) {
         return orderRepository.findById(id)
@@ -75,8 +77,10 @@ public class OrderService {
         orderRepository.save(order);
         orderItemRepository.saveAll(orderItems);
 
+        notificationService.sendOrderedNotification(project.getSeller().getId(), user.getNickname(),
+                project.getTitle());
+
         return OrderCreateResponse.from(order, orderItems);
     }
-
 
 }

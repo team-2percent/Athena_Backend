@@ -45,9 +45,9 @@ public class NotificationService {
   }
 
   // ToDo: urlPath를 별도로 받지 않고, 메시지 자체에서 하이퍼링크를 걸어서 프론트에 반환할 수 있도록 수정
-  public void sendOrderedNotification(Long userId, String sellerName, String projectTitle) {
-    String content = NotificationMessage.getMessage(NotificationType.ORDERED, sellerName, projectTitle);
-    createNotification(userId, content, NotificationType.ORDERED, null);
+  public void sendOrderedNotification(Long sellerId, String buyerName, String projectTitle) {
+    String content = NotificationMessage.getMessage(NotificationType.ORDERED, buyerName, projectTitle);
+    createNotification(sellerId, content, NotificationType.ORDERED, null);
   }
 
   @Transactional(readOnly = true)
