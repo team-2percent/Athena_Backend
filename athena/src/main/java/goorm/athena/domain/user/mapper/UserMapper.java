@@ -49,7 +49,8 @@ public class UserMapper {
                 user.getId(),
                 user.getEmail(),
                 user.getNickname(),
-                imageUrl
+                imageUrl,
+                user.getSellerIntroduction()
         );
     }
 

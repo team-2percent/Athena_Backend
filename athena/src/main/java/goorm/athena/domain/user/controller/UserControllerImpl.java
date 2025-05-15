@@ -106,4 +106,11 @@ public class UserControllerImpl implements UserController {
         UserHeaderGetResponse response = userService.getHeaderById(request.userId());
         return ResponseEntity.ok(response);
     }
+
+    @Override
+    @GetMapping("/profile/{id}")
+    public ResponseEntity<UserGetResponse> getUserProfile(@PathVariable Long id) {
+        UserGetResponse response = userService.getUserById(id);
+        return ResponseEntity.ok(response);
+    }
 }
