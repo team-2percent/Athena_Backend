@@ -50,7 +50,7 @@ public class NotificationService {
     createNotification(sellerId, content, NotificationType.ORDERED, null);
   }
 
-  @Transactional(readOnly = true)
+  @Transactional
   public void readNotification(Long notificationId) {
     Notification notification = notificationRepository.findById(notificationId)
         .orElseThrow(() -> new EntityNotFoundException("Notification not found"));
