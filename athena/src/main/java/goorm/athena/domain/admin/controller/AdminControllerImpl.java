@@ -66,20 +66,20 @@ public class AdminControllerImpl implements AdminController {
 
     @GetMapping("/settlements/{settlementId}/info")
     public ResponseEntity<SettlementDetailInfoResponse> getSettlementInfo(
-            @PathVariable Long settlementId
-//            @CheckLogin LoginUserRequest loginUserRequest
+            @PathVariable Long settlementId,
+            @CheckLogin LoginUserRequest loginUserRequest
     ) {
-//        adminRoleCheckService.checkAdmin(loginUserRequest);
+        adminRoleCheckService.checkAdmin(loginUserRequest);
         return ResponseEntity.ok(settlementService.getSettlementDetailInfo(settlementId));
     }
 
     @GetMapping("/settlements/{settlementId}/histories")
     public ResponseEntity<SettlementHistoryPageResponse> getSettlementHistories(
             @PathVariable Long settlementId,
-            @RequestParam(defaultValue = "0") int page
-//            @CheckLogin LoginUserRequest loginUserRequest
+            @RequestParam(defaultValue = "0") int page,
+            @CheckLogin LoginUserRequest loginUserRequest
     ) {
-//        adminRoleCheckService.checkAdmin(loginUserRequest);
+        adminRoleCheckService.checkAdmin(loginUserRequest);
         return ResponseEntity.ok(settlementService.getSettlementHistories(settlementId, page));
     }
 

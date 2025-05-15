@@ -1,7 +1,6 @@
 package goorm.athena.domain.admin.controller;
 
-import goorm.athena.domain.admin.dto.res.ProjectSummaryResponse;
-import goorm.athena.domain.admin.dto.res.SettlementSummaryPageResponse;
+import goorm.athena.domain.admin.dto.res.*;
 import goorm.athena.domain.project.dto.req.ProjectApprovalRequest;
 import goorm.athena.domain.settlement.entity.Status;
 import goorm.athena.global.jwt.util.CheckLogin;
@@ -72,5 +71,47 @@ public interface AdminController {
 
             @Parameter(description = "페이지 번호 (0부터 시작)", example = "0")
             @RequestParam(defaultValue = "0") int page
+    );
+
+    @Operation(
+            summary = "정산 상세 정보 조회",
+            description = "특정 정산 ID의 상세 정보를 조회합니다.",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "정산 상세 조회 성공",
+                            content = @Content(schema = @Schema(implementation = SettlementDetailInfoResponse.class)))
+            }
+    )
+    @GetMapping("/settlements/{settlementId}/info")
+    ResponseEntity<SettlementDetailInfoResponse> getSettlementInfo(
+            @Parameter(description = "정산 ID", example = "1") @PathVariable Long settlementId,
+            @Parameter(hidden = true) @CheckLogin LoginUserRequest loginUserRequest
+    );
+
+    @Operation(
+            summary = "정산 히스토리 내역 조회",
+            description = "특정 정산 ID에 대한 히스토리 내역을 페이지 단위로 조회합니다.",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "정산 히스토리 조회 성공",
+                            content = @Content(schema = @Schema(implementation = SettlementHistoryPageResponse.class)))
+            }
+    )
+    @GetMapping("/settlements/{settlementId}/histories")
+    ResponseEntity<SettlementHistoryPageResponse> getSettlementHistories(
+            @Parameter(description = "정산 ID", example = "1") @PathVariable Long settlementId,
+            @Parameter(description = "페이지 번호 (0부터 시작)", example = "0") @RequestParam(defaultValue = "0") int page,
+            @Parameter(hidden = true) @CheckLogin LoginUserRequest loginUserRequest
+    );
+
+    @Operation(
+            summary = "상품별 정산 요약 정보 조회",
+            description = "특정 정산 ID에 포함된 상품들의 정산 요약 정보를 조회합니다.",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "상품 정산 요약 조회 성공",
+                            content = @Content(schema = @Schema(implementation = ProductSettlementSummaryResponse.class)))
+            }
+    )
+    @GetMapping("/settlements/{settlementId}/product-summary")
+    ResponseEntity<ProductSettlementSummaryResponse> getProductSettlementInfo(
+            @Parameter(description = "정산 ID", example = "1") @PathVariable Long settlementId
     );
 }

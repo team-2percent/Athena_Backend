@@ -1,5 +1,7 @@
 package goorm.athena.domain.user.service;
 
+import goorm.athena.domain.user.dto.response.MyOrderScrollRequest;
+import goorm.athena.domain.user.dto.response.MyOrderScrollResponse;
 import goorm.athena.domain.user.dto.response.MyProjectScrollRequest;
 import goorm.athena.domain.user.dto.response.MyProjectScrollResponse;
 import goorm.athena.domain.user.repository.MyInfoQueryRepository;
@@ -19,5 +21,9 @@ public class MyInfoService {
                 request.nextProjectId(),
                 request.pageSize()
         );
+    }
+
+    public MyOrderScrollResponse getMyOrders(Long userId, MyOrderScrollRequest request) {
+        return myInfoQueryRepository.findOrdersByUserIdWithScroll(userId, request);
     }
 }

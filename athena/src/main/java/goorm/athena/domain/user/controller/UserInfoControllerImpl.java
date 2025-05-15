@@ -1,5 +1,7 @@
 package goorm.athena.domain.user.controller;
 
+import goorm.athena.domain.user.dto.response.MyOrderScrollRequest;
+import goorm.athena.domain.user.dto.response.MyOrderScrollResponse;
 import goorm.athena.domain.user.dto.response.MyProjectScrollRequest;
 import goorm.athena.domain.user.dto.response.MyProjectScrollResponse;
 import goorm.athena.domain.user.service.MyInfoService;
@@ -32,4 +34,15 @@ public class UserInfoControllerImpl implements UserInfoController{
         return ResponseEntity.ok(myInfoService.getMyProjects(loginUserRequest.userId(), request));
     }
 
+
+    @GetMapping("/orders")
+    public ResponseEntity<MyOrderScrollResponse> getMyOrders(
+            @CheckLogin LoginUserRequest loginUserRequest,
+            @RequestParam(required = false) LocalDateTime nextCursorValue,
+            @RequestParam(required = false) Long nextOrderId,
+            @RequestParam(defaultValue = "10") int pageSize
+    ) {
+        MyOrderScrollRequest request = new MyOrderScrollRequest(nextCursorValue, nextOrderId, pageSize);
+        return ResponseEntity.ok(myInfoService.getMyOrders(loginUserRequest.userId(), request));
+    }
 }
