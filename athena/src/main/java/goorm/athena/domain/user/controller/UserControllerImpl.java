@@ -16,6 +16,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -89,16 +90,5 @@ public class UserControllerImpl implements UserController {
     public ResponseEntity<UserHeaderGetResponse> getHeader(@CheckLogin LoginUserRequest request){
         UserHeaderGetResponse response = userService.getHeaderById(request.userId());
         return ResponseEntity.ok(response);
-    }
-
-    @Override
-    @GetMapping("/coupons")
-    public ResponseEntity<UserCouponCursorResponse> getUserCoupons(
-            @Parameter(hidden = true) @CheckLogin LoginUserRequest request,
-            @RequestParam(required = false) Long cursorId,
-            @RequestParam(defaultValue = "5") int size
-    ){
-        UserCouponCursorResponse responses = userCouponService.getUserCoupons(request.userId(), cursorId, size);
-        return ResponseEntity.ok(responses);
     }
 }

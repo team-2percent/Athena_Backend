@@ -1,8 +1,12 @@
 package goorm.athena.domain.user.service;
 
+import goorm.athena.domain.comment.dto.res.CommentGetResponse;
+import goorm.athena.domain.comment.entity.Comment;
+import goorm.athena.domain.comment.service.CommentService;
 import goorm.athena.domain.image.service.ImageService;
 import goorm.athena.domain.user.dto.request.UserCreateRequest;
 import goorm.athena.domain.user.dto.request.UserLoginRequest;
+import goorm.athena.domain.user.dto.request.UserUpdatePasswordRequest;
 import goorm.athena.domain.user.dto.request.UserUpdateRequest;
 import goorm.athena.domain.user.dto.response.*;
 import goorm.athena.domain.user.entity.User;
@@ -76,10 +80,13 @@ public class UserService {
     // 내 정보 조회 임시 로직
     @Transactional(readOnly = true)
     public UserGetResponse getUserById(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        User user = getUser(userId);
+        String imageUrl = null;
+        if(user.getImageGroup() != null && user.getImageGroup().getId() != null) {
+            imageUrl = imageService.getImage(user.getImageGroup().getId());
+        }
 
-        return UserMapper.toGetResponse(user);
+        return UserMapper.toGetResponse(user, imageUrl);
     }
 
     @Transactional
@@ -106,5 +113,25 @@ public class UserService {
         return userRepository.findAll().stream()
                 .map(User::getId)
                 .collect(Collectors.toList());
+    }
+
+    public boolean checkPassword(Long userId, String password){
+        User user = getUser(userId);
+        return passwordEncoder.matches(password, user.getPassword());
+    }
+
+    @Transactional
+    public void updatePassword(Long userId, UserUpdatePasswordRequest updatePassword){
+        User user = getUser(userId);
+        if(checkPassword(userId, updatePassword.oldPassword())){
+            user.updatePassword(passwordEncoder.encode(updatePassword.newPassword()));
+        }else{
+            throw new CustomException(ErrorCode.INVALID_USER_PASSWORD);
+        }
+    }
+
+    public UserSummaryResponse getUserSummary(Long userId){
+        User user = getUser(userId);
+        return UserMapper.toSummaryResponse(user);
     }
 }

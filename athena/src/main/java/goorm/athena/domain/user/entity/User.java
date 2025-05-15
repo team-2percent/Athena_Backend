@@ -34,9 +34,6 @@ public class User {
     @Column(length = 20, nullable = false)
     private Role role;
 
-    @Column(length = 50, nullable = true)
-    private String sellerName;
-
     @Column(length = 3000, nullable = true)
     private String sellerIntroduction;
 
@@ -53,6 +50,10 @@ public class User {
 
     public static User create(String email, String password, String nickname){
         return new User(email, password, nickname);
+    }
+
+    public void updatePassword(String password){
+        this.password = password;
     }
 
     public void update(String email, String password, String nickname){

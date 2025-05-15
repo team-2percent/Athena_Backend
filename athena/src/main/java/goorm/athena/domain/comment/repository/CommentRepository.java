@@ -13,5 +13,7 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     @Query("SELECT c FROM Comment c JOIN FETCH c.user WHERE c.project = :project")
     List<Comment> findByProjectWithUser(Project project);
 
+    List<Comment> findByUser(User user);
+
     boolean existsByUserAndProject(User user, Project project);
 }
