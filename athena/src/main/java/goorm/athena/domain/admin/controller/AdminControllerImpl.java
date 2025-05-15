@@ -51,7 +51,7 @@ public class AdminControllerImpl implements AdminController {
         ProjectSummaryResponse response = adminService.getProjectList(keyword, direction, page);
         return ResponseEntity.ok(response);
     }
-    
+
     @GetMapping("/projects/{projectId}")
     public ResponseEntity<ProjectDetailResponse> getProjectDetail(@PathVariable Long projectId){
         ProjectDetailResponse response = projectService.getProjectDetail(projectId);
