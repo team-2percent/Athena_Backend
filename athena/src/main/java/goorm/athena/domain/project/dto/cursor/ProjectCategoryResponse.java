@@ -31,7 +31,7 @@ public record ProjectCategoryResponse(
                 imageUrl,
                 project.getSeller().getNickname(),
                 project.getTitle(),
-                project.getGoalAmount() / project.getTotalAmount(),
+                project.getTotalAmount() == 0 ? 0L : (project.getTotalAmount()) / project.getGoalAmount(),
                 project.getCreatedAt(),
                 project.getEndAt(),
                 safeDaysLeft,

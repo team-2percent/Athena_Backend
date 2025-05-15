@@ -22,7 +22,7 @@ public record ProjectAllResponse(
                 project.getTitle(),
                 project.getTotalAmount() == 0 || project.getGoalAmount() == 0
                         ? 0L
-                        : (project.getTotalAmount() * 100) / project.getGoalAmount(),
+                        : (project.getTotalAmount()) / project.getGoalAmount(),
                 project.getStartAt(),
                 project.getEndAt(),
                 imageUrl,
