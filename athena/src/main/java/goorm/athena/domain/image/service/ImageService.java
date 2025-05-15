@@ -23,26 +23,39 @@ public class ImageService {
     private final ImageGroupService imageGroupService;
     private final S3Service s3Service;
 
-    // 복수 이미지 저장
-    public List<ImageCreateResponse> uploadImages(List<ImageCreateRequest> requests) {
-        List<Image> images = new ArrayList<>();
-
-        for (ImageCreateRequest request : requests) {
-            ImageGroup imageGroup = imageGroupService.getById(request.imageGroupId());
-            Image image = ImageMapper.toEntity(request, imageGroup);
-            images.add(image);
-        }
-        List<Image> savedImages = imageRepository.saveAll(images);   // 이미지 Entity 일괄 저장
-
+    // 이미지 저장 응답 DTO 생성
+    public List<ImageCreateResponse> createResponses(ImageGroup imageGroup) {
+        List<Image> images = imageRepository.findAllByImageGroup(imageGroup);
         List<ImageCreateResponse> responses = new ArrayList<>();
-        for (Image saved : savedImages) {
-            responses.add(ImageMapper.toCreateDto(saved));
+        for (Image image : images) {
+            responses.add(ImageMapper.toCreateDto(image));
         }
 
         return responses;
     }
 
-    // 파일 이름, URL만 담아 이미지 DB 업로드
+    @Transactional
+    // 이미지 S3 + DB 저장
+    public void uploadImages(List<MultipartFile> files, ImageGroup imageGroup){
+        // S3 업로드
+        List<ImageCreateRequest> imageCreateRequests = s3Service.uploadFiles(files);
+        List<ImageCreateRequest> updatedRequests = imageCreateRequests.stream()
+                .map(req -> req.withImageGroupId(imageGroup))
+                .toList();                  // 새 DTO 생성: imageGroupId 추가 ver
+
+        List<Image> images = new ArrayList<>();
+
+        for (ImageCreateRequest request : updatedRequests) {
+            Image image = ImageMapper.toEntity(request, imageGroup);
+            images.add(image);
+        }
+        imageRepository.saveAll(images);   // 이미지 DB 저장
+    }
+
+    /*  [단일 이미지 저장]
+        파일 이름, URL만 담아 이미지 DB 업로드
+        추후 마크다운 로컬 첨부 이미지 처리 시 사용 예정
+     */
     public void uploadImage(String fileName, String url){
         ImageCreateRequest request = new ImageCreateRequest(
                 null,
@@ -68,18 +81,13 @@ public class ImageService {
         List<String> removeUrls = compareImages(imageUrls, existingUrls);   // Url 대조 (DB 기준)
         for (Image image : images) {
             if (removeUrls.contains(image.getOriginalUrl())) {
-                imageRepository.delete(image);                                      // 제거할 URL에 해당되는 파일 제거 (DB)
+                imageRepository.delete(image);                              // 제거할 URL에 해당되는 파일 제거 (DB)
             }
         }
-        s3Service.deleteFiles(removeUrls);                                          // 제거할 URL에 해당되는 파일 제거 (S3)
+        s3Service.deleteFiles(removeUrls);                                  // 제거할 URL에 해당되는 파일 제거 (S3)
 
         if (newImageFiles != null && newImageFiles.isEmpty()) {
-            List<ImageCreateRequest> newImages = s3Service.uploadFiles(newImageFiles);  // 새로 들어온 파일 업로드 (S3)
-            List<ImageCreateRequest> newImagesDto = newImages.stream()                  // 이미지 그룹 매핑한 DTO 생성
-                    .map(req -> req.withImageGroupId(imageGroup.getId()))
-                    .toList();
-
-            uploadImages(newImagesDto);                                                 // 새로 들어온 파일 저장 (DB)
+            uploadImages(newImageFiles, imageGroup);                        // 새로운 이미지 S3 + DB 저장
         }
     }
 

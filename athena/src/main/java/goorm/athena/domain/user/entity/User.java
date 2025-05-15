@@ -52,12 +52,12 @@ public class User {
         return new User(email, password, nickname);
     }
 
-    public void update(String email, String password, String nickname){
+    public void update(ImageGroup imageGroup, String email, String nickname, String sellerIntroduction){
+        this.imageGroup = imageGroup;
+        this.sellerIntroduction = sellerIntroduction;
+
         if(email != null){
             this.email = email;
-        }
-        if(password != null){
-            this.password = password;
         }
         if(nickname != null){
             this.nickname = nickname;

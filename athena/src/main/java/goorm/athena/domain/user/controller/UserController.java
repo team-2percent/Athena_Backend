@@ -23,6 +23,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @Tag(name = "User", description = "유저 관련 API")
 @RequestMapping("/api/user")
@@ -43,7 +44,8 @@ public interface UserController {
     @ApiResponse(responseCode = "200", description = "유저 정보 수정 성공")
     @PutMapping
     ResponseEntity<UserUpdateResponse> updateUser(@Parameter(hidden = true) @CheckLogin LoginUserRequest loginUserRequest,
-                                                  @RequestBody UserUpdateRequest request);
+                                                  @RequestParam UserUpdateRequest request,
+                                                  @RequestParam MultipartFile image);
 
     @Operation(summary = "유저 조회 APi", description = "유저의 ID를 통해 특정 유저의 정보를 조회합니다.<br>")
     @ApiResponse(responseCode = "200", description = "특정 유저 정보 조회 성공")
