@@ -16,7 +16,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import goorm.athena.domain.notification.service.NotificationService;
-import goorm.athena.domain.notification.NotificationType;
 
 import java.util.List;
 import java.util.Set;
@@ -37,11 +36,10 @@ public class CouponEventService {
         CouponEvent couponEvent = CouponEvent.create(coupon);
 
         couponEventRepository.save(couponEvent);
-        Long couponId = couponEvent.getCoupon().getId();
+
         List<Long> userIds = userService.getUserIdAll();
         for (Long userId : userIds) {
-            notificationService.createNotification(userId, "등록할 수 있는 신규 쿠폰이 발행되었어요~! 지금 바로 받으러 가기!! ",
-                    NotificationType.COUPON, "/coupon/" + couponId);
+            notificationService.sendCouponEventNotification(userId, couponEvent.getCoupon().getTitle());
         }
 
         return CouponEventMapper.toCreateResponse(couponEvent);
