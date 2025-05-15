@@ -11,7 +11,7 @@ import java.util.regex.Pattern;
 
 @Service
 public class MarkdownParser {
-    // 정규식으로 마크다운 이미지 태그 parshing
+    // 정규식으로 마크다운 이미지 태그 parsing
     private static final Pattern MARKDOWN_IMAGE_PATTERN = Pattern.compile("!\\[.*?]\\((.*?)\\)");
 
     /**
@@ -22,7 +22,7 @@ public class MarkdownParser {
     public List<String> extractImagePaths(String markdown) {
         List<String> imagePaths = new ArrayList<>();
 
-        Matcher matcher = MARKDOWN_IMAGE_PATTERN.matcher(markdown); // 이미지 태그 parshing
+        Matcher matcher = MARKDOWN_IMAGE_PATTERN.matcher(markdown); // 이미지 태그 parsing
         while (matcher.find()) {
             String imagePath = matcher.group(1);                    // 괄호 안의 내용
             imagePaths.add(imagePath);
