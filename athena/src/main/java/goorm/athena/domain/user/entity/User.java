@@ -52,6 +52,11 @@ public class User {
         return new User(email, password, nickname);
     }
 
+    public void update(ImageGroup imageGroup, String email, String nickname, String sellerIntroduction){
+        this.imageGroup = imageGroup;
+        this.sellerIntroduction = sellerIntroduction;
+    }
+
     public void updatePassword(String password){
         this.password = password;
     }
@@ -59,9 +64,6 @@ public class User {
     public void update(String email, String password, String nickname){
         if(email != null){
             this.email = email;
-        }
-        if(password != null){
-            this.password = password;
         }
         if(nickname != null){
             this.nickname = nickname;

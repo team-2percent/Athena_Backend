@@ -1,9 +1,7 @@
 package goorm.athena.domain.user.service;
 
-import goorm.athena.domain.comment.dto.res.CommentGetResponse;
-import goorm.athena.domain.comment.entity.Comment;
-import goorm.athena.domain.comment.service.CommentService;
 import goorm.athena.domain.image.service.ImageService;
+import goorm.athena.domain.imageGroup.entity.ImageGroup;
 import goorm.athena.domain.user.dto.request.UserCreateRequest;
 import goorm.athena.domain.user.dto.request.UserLoginRequest;
 import goorm.athena.domain.user.dto.request.UserUpdatePasswordRequest;
@@ -20,6 +18,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.multipart.MultipartFile;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -51,14 +51,18 @@ public class UserService {
     }
 
     @Transactional
-    public UserUpdateResponse updateUser(Long userId, UserUpdateRequest request) {
+    public UserUpdateResponse updateUser(ImageGroup userImageGroup, Long userId,
+                                         UserUpdateRequest request, MultipartFile image){
         User updateUser = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
-        updateUser.update(request.email(),
-                passwordEncoder.encode(request.password()),
-                request.nickname());
+        updateUser.update(
+                userImageGroup,
+                request.email(),
+                request.nickname(),
+                request.sellerIntroduction());
 
+        imageService.uploadImages(List.of(image), userImageGroup);   // 프로필 이미지 등록
         User savedUser = userRepository.save(updateUser);
 
         return UserMapper.toUpdateResponse(savedUser);
@@ -76,7 +80,7 @@ public class UserService {
         String imageUrl = imageService.getImage(user.getImageGroup().getId());
         return UserMapper.toHeaderGetResponse(user, imageUrl);
     }
-  
+
     // 내 정보 조회 임시 로직
     @Transactional(readOnly = true)
     public UserGetResponse getUserById(Long userId) {

@@ -1,5 +1,10 @@
 package goorm.athena.domain.user.controller;
 
+import goorm.athena.domain.image.service.ImageService;
+import goorm.athena.domain.imageGroup.entity.ImageGroup;
+import goorm.athena.domain.imageGroup.entity.Type;
+import goorm.athena.domain.imageGroup.service.ImageGroupService;
+import goorm.athena.domain.s3.service.S3Service;
 import goorm.athena.domain.user.dto.request.UserCreateRequest;
 import goorm.athena.domain.user.dto.request.UserLoginRequest;
 import goorm.athena.domain.user.dto.request.UserUpdateRequest;
@@ -20,6 +25,9 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
@@ -28,6 +36,9 @@ public class UserControllerImpl implements UserController {
 
     private final UserService userService;
     private final RefreshTokenService refreshTokenService;
+    private final ImageGroupService imageGroupService;
+    private final ImageService imageService;
+    private final S3Service s3Service;
     private final UserCouponService userCouponService;
 
     @Override
@@ -42,8 +53,12 @@ public class UserControllerImpl implements UserController {
     @Override
     @PutMapping
     public ResponseEntity<UserUpdateResponse> updateUser(@CheckLogin LoginUserRequest loginUserRequest,
-                                                         @RequestBody UserUpdateRequest request){
-        UserUpdateResponse response = userService.updateUser(loginUserRequest.userId(), request);
+                                                         @RequestParam UserUpdateRequest request,
+                                                         @RequestParam MultipartFile image){
+        // User <-> ImageGroup 1:1 매핑되도록 생성
+        ImageGroup userImageGroup = imageGroupService.createImageGroup(Type.USER);
+
+        UserUpdateResponse response = userService.updateUser(userImageGroup, loginUserRequest.userId(), request, image);
         return ResponseEntity.ok(response);
     }
 

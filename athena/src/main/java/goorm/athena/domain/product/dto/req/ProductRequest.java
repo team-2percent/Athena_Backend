@@ -1,6 +1,5 @@
 package goorm.athena.domain.product.dto.req;
 
-import goorm.athena.domain.option.entity.Option;
 
 import java.util.List;
 

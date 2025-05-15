@@ -1,6 +1,5 @@
 package goorm.athena.domain.bankaccount.entity;
 
-import goorm.athena.domain.project.entity.Project;
 import goorm.athena.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.Getter;

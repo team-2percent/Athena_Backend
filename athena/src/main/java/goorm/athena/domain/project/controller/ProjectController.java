@@ -1,9 +1,11 @@
 package goorm.athena.domain.project.controller;
 
+import goorm.athena.domain.image.dto.req.ImageUpdateRequest;
 import goorm.athena.domain.product.dto.res.ProductResponse;
 import goorm.athena.domain.project.dto.req.ProjectApprovalRequest;
 import goorm.athena.domain.project.dto.cursor.*;
 import goorm.athena.domain.project.dto.req.ProjectCreateRequest;
+import goorm.athena.domain.project.dto.req.ProjectUpdateRequest;
 import goorm.athena.domain.project.dto.res.ProjectIdResponse;
 import goorm.athena.domain.project.dto.res.*;
 import goorm.athena.domain.project.entity.SortTypeDeadLine;
@@ -17,9 +19,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-
-import org.springframework.web.multipart.MultipartFile;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -63,10 +62,10 @@ public interface ProjectController {
     @ApiResponse(responseCode = "200", description = "프로젝트 수정 성공")
     @PutMapping(value = "/{projectId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     ResponseEntity<Void> updateProject(@PathVariable Long projectId,
-                                       @RequestParam("projectUpdateRequest") String projectUpdateRequestJson,
+                                       @RequestParam("projectUpdateRequest") ProjectUpdateRequest projectUpdateRequest,
 
-                                       @Parameter(description = "새로 업데이트 된 파일들")
-                                       @RequestParam(value = "images", required = false) List<MultipartFile> newFiles);
+                                       @Parameter(description = "새로 업데이트 된 이미지 리스트")
+                                       @RequestParam(value = "images", required = false) List<ImageUpdateRequest> imageUpdateRequests);
 
     @Operation(summary = "프로젝트 삭제 API", description = "프로젝트를 영구적으로 삭제합니다.<br>" +
             "삭제한 프로젝트는 다시 되돌릴 수 없습니다.")
@@ -74,12 +73,18 @@ public interface ProjectController {
     @DeleteMapping("/{projectId}")
     ResponseEntity<Void> deleteProject(@PathVariable Long projectId);
 
+    @Operation(summary = "프로젝트 상세 조회", description = "프로젝트 상세 내용을 조회합니다.")
+    @ApiResponse(responseCode = "200", description = "프로젝트 상세 조회 성공",
+            content = @Content(schema = @Schema(implementation = ProjectDetailResponse.class)))
+    @GetMapping("/{projectId}")
+    ResponseEntity<ProjectDetailResponse> getProjectDetail(@PathVariable Long projectId);
+
     @Operation(summary = "프로젝트 전체 조회", description = "프로젝트를 전체로 조회하면서 인기 순으로 정렬합니다. (조회수 순 정렬)<br>" +
             "테스트 시 기본적으로 Pageable은 sort를 가지기 때문에 요청 파라미터에서 sort 키를 없애주시면 됩니다,, !! ")
     @ApiResponse(responseCode = "200", description = "프로젝트 전체 조회 성공",
             content = @Content(schema = @Schema(implementation = ProjectAllResponse.class)))
     @GetMapping("/all")
-    public ResponseEntity<List<ProjectAllResponse>> getProjectsAll();
+    ResponseEntity<List<ProjectAllResponse>> getProjectsAll();
 
     @Operation(summary = "프로젝트 신규순 조회(무한 페이징)", description = "프로젝트를 신규 순으로 조회합니다. (신규순 정렬)<br>" +
             "페이지는 20개 단위로 구성되며, **맨 처음에는 아무 값도 입력되지 않아도 됩니다.**<br>" +
@@ -140,7 +145,7 @@ public interface ProjectController {
     @ApiResponse(responseCode = "200", description = "프로젝트 마감별 조회 성공",
         content = @Content(schema = @Schema(implementation = ProjectDeadLineResponse.class)))
     @GetMapping("/deadLine")
-    public ResponseEntity<ProjectCursorResponse<ProjectDeadLineResponse>> getProjectByDeadLine(@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime cursorValue,
+    ResponseEntity<ProjectCursorResponse<ProjectDeadLineResponse>> getProjectByDeadLine(@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime cursorValue,
                                                                                                @RequestParam(required = false) Long lastProjectId,
                                                                                                @Parameter(
                                                                                                        description = "마감 정렬 방식",

@@ -2,12 +2,12 @@ package goorm.athena.domain.project.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import goorm.athena.domain.image.dto.req.ImageUpdateRequest;
 import goorm.athena.domain.imageGroup.entity.ImageGroup;
 import goorm.athena.domain.imageGroup.entity.Type;
 import goorm.athena.domain.imageGroup.service.ImageGroupService;
 import goorm.athena.domain.product.dto.res.ProductResponse;
 import goorm.athena.domain.product.service.ProductService;
-import goorm.athena.domain.project.dto.req.ProjectApprovalRequest;
 import goorm.athena.domain.project.dto.cursor.*;
 import goorm.athena.domain.project.dto.req.ProjectCreateRequest;
 import goorm.athena.domain.project.dto.req.ProjectCursorRequest;
@@ -24,7 +24,6 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import org.springframework.web.multipart.MultipartFile;
 
 
 import java.time.LocalDateTime;
@@ -65,18 +64,11 @@ public class ProjectControllerImpl implements ProjectController {
     @Override
     public ResponseEntity<Void> updateProject(
             @PathVariable Long projectId,
-            @RequestParam("projectUpdateRequest") String projectUpdateRequestJson,
-            @RequestParam(value = "images", required = false) List<MultipartFile> newFiles){
-        ProjectUpdateRequest projectUpdateRequest = convertJsonToDto(projectUpdateRequestJson);
-        projectService.updateProject(projectId, projectUpdateRequest, newFiles);
+            @RequestParam("projectUpdateRequest") ProjectUpdateRequest projectUpdateRequest,
+            @RequestParam(value = "images", required = false) List<ImageUpdateRequest> imageUpdateRequests){
+        // ProjectUpdateRequest projectUpdateRequest = convertJsonToDto(projectUpdateRequestJson);
+        projectService.updateProject(projectId, projectUpdateRequest, imageUpdateRequests);
         return ResponseEntity.ok().build();
-    }
-
-    // 프로젝트 삭제
-    @Override
-    public ResponseEntity<Void> deleteProject(@PathVariable Long projectId){
-        projectService.deleteProject(projectId);
-        return ResponseEntity.noContent().build();
     }
 
     // String -> JSON 처리
@@ -87,6 +79,24 @@ public class ProjectControllerImpl implements ProjectController {
         } catch (JsonProcessingException e) {
             throw new CustomException(ErrorCode.INVALID_JSON_FORMAT);
         }
+    }
+
+    // 프로젝트 삭제
+    @Override
+    public ResponseEntity<Void> deleteProject(@PathVariable Long projectId){
+        projectService.deleteProject(projectId);
+        return ResponseEntity.noContent().build();
+    }
+
+    /**
+     * [GET API]
+     */
+
+    // 상세 조회
+    @Override
+    public ResponseEntity<ProjectDetailResponse> getProjectDetail(@PathVariable Long projectId){
+        ProjectDetailResponse response = projectService.getProjectDetail(projectId);
+        return ResponseEntity.ok(response);
     }
 
     @Override

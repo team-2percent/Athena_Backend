@@ -25,6 +25,15 @@ public class UserMapper {
         );
     }
 
+    public static UserDetailResponse toDetailResponse(User user){
+        return new UserDetailResponse(
+                user.getId(),
+                user.getNickname(),
+                user.getSellerIntroduction(),
+                user.getLinkUrl()
+        );
+    }
+
     public static UserUpdateResponse toUpdateResponse(User user){
         return new UserUpdateResponse(
                 user.getId(),

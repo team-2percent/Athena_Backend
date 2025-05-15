@@ -56,6 +56,19 @@ public class ProductService {
         }
     }
 
+    // 상품 리스트 전체 조회
+    public List<ProductResponse> getAllProducts(Project project){
+        List<Product> products = productRepository.findAllByProject(project);
+        List<ProductResponse> productResponses = new ArrayList<>();
+
+        for (Product product : products){
+                List<String> options = getAllOptions(product);
+                productResponses.add(ProductMapper.toDetailDto(product, options));
+        }
+
+        return productResponses;
+    }
+
     // 옵션 리스트 생성
     private void createOptions(Product product, ProductRequest request) {
         List<Option> options = new ArrayList<>();
@@ -79,12 +92,25 @@ public class ProductService {
         optionRepository.deleteAll(options);
     }
 
-    // Get Product
+    /**
+     * GET
+     */
+
+    // 상품 조회
     public Product getById(Long id) {
         return productRepository.findById(id)
                 .orElseThrow(() -> new CustomException(ErrorCode.PRODUCT_NOT_FOUND));
     }
 
+    // 상품과 연관된 옵션 리스트 전체 조회
+    private List<String> getAllOptions(Product product) {
+        List<String> options = new ArrayList<>();
+        List<Option> productOptions = optionRepository.findAllByProduct(product);
+        productOptions.forEach(option -> options.add(option.getOptionName()));
+        return options;
+    }
+    
+    // 프로젝트 ID 기준으로 상품 리스트 조회
     public List<ProductResponse> getProductsByProjectId(Long projectId) {
         List<Product> products = productRepository.findByProjectId(projectId);
         return products.stream()
