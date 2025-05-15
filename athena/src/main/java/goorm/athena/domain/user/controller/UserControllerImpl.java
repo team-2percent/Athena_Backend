@@ -6,10 +6,13 @@ import goorm.athena.domain.user.dto.request.UserUpdateRequest;
 import goorm.athena.domain.user.dto.response.*;
 import goorm.athena.domain.user.service.RefreshTokenService;
 import goorm.athena.domain.user.service.UserService;
+import goorm.athena.domain.userCoupon.dto.cursor.UserCouponCursorResponse;
+import goorm.athena.domain.userCoupon.service.UserCouponService;
 import goorm.athena.global.exception.CustomException;
 import goorm.athena.global.exception.ErrorCode;
 import goorm.athena.global.jwt.util.CheckLogin;
 import goorm.athena.global.jwt.util.LoginUserRequest;
+import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +27,7 @@ public class UserControllerImpl implements UserController {
 
     private final UserService userService;
     private final RefreshTokenService refreshTokenService;
+    private final UserCouponService userCouponService;
 
     @Override
     @PostMapping
@@ -85,5 +89,17 @@ public class UserControllerImpl implements UserController {
     public ResponseEntity<UserHeaderGetResponse> getHeader(@CheckLogin LoginUserRequest request){
         UserHeaderGetResponse response = userService.getHeaderById(request.userId());
         return ResponseEntity.ok(response);
+    }
+
+    @Override
+    @GetMapping("/coupons/{userId}")
+    public ResponseEntity<UserCouponCursorResponse> getUserCoupons(
+            @Parameter(hidden = true) @CheckLogin LoginUserRequest loginUserRequest,
+            @PathVariable Long userId,
+            @RequestParam(required = false) Long cursorId,
+            @RequestParam(defaultValue = "20") int size
+    ){
+        UserCouponCursorResponse responses = userCouponService.getUserCoupons(userId, cursorId, size);
+        return ResponseEntity.ok(responses);
     }
 }

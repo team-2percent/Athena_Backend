@@ -128,7 +128,7 @@ public interface ProjectController {
             """)
     @ApiResponse(responseCode = "200", description = "프로젝트 카테고리별 조회 성공",
             content = @Content(schema = @Schema(implementation = ProjectCategoryResponse.class)))
-    @GetMapping("/category/{categoryId}")
+    @GetMapping("/category")
     public ResponseEntity<ProjectFilterCursorResponse<?>> getProjectsByCategory(
             @RequestParam(value = "cursorId", required = false) Long cursorId,
             @RequestParam(value = "cursorValue", required = false) Object cursorValue,
@@ -187,7 +187,7 @@ public interface ProjectController {
                 </ul>
             """)
     @ApiResponse(responseCode = "200", description = "프로젝트 검색별 조회 성공",
-            content = @Content(schema = @Schema(implementation = ProjectSearchResponse.class)))
+            content = @Content(schema = @Schema(implementation = ProjectFilterCursorResponse.class)))
     @GetMapping("/search")
     public ResponseEntity<ProjectFilterCursorResponse<ProjectSearchResponse>> searchProject(@RequestParam String searchTerm,
                                                                                             @RequestParam(required = false) Object cursorValue,

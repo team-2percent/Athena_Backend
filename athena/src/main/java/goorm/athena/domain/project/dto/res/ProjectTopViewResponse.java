@@ -5,6 +5,6 @@ public record ProjectTopViewResponse(
         String imageUrl,
         String title,
         Long categoryId,
-        Long views
+        String categoryName
 ) {
 }
