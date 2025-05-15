@@ -55,6 +55,10 @@ public class User {
         return new User(email, password, nickname);
     }
 
+    public void updatePassword(String password){
+        this.password = password;
+    }
+
     public void update(String email, String password, String nickname){
         if(email != null){
             this.email = email;
