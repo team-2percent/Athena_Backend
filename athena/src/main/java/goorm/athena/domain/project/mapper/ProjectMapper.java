@@ -5,6 +5,7 @@ import goorm.athena.domain.imageGroup.entity.ImageGroup;
 import goorm.athena.domain.project.dto.req.ProjectCreateRequest;
 import goorm.athena.domain.project.dto.req.ProjectUpdateRequest;
 import goorm.athena.domain.project.dto.res.ProjectIdResponse;
+import goorm.athena.domain.project.dto.res.ProjectTopViewResponse;
 import goorm.athena.domain.project.entity.Project;
 import goorm.athena.domain.user.entity.User;
 
@@ -35,5 +36,14 @@ public class ProjectMapper {
                 .build();
     }
 
-
+    // Entity -> ProjectTopViewResponse(Dto)
+    public static ProjectTopViewResponse toTopViewResponse(Project project, String imageUrl){
+        return new ProjectTopViewResponse(
+                project.getId(),
+                project.getSeller().getNickname(),
+                project.getTitle(),
+                project.getCategory().getId(),
+                project.getCategory().getCategoryName()
+        );
+    }
 }

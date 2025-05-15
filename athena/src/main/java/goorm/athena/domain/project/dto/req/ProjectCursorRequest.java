@@ -10,4 +10,5 @@ public record ProjectCursorRequest<T>(
     public int getSize() {
         return size == 0 ? DEFAULT_SIZE : size;
     }
+
 }

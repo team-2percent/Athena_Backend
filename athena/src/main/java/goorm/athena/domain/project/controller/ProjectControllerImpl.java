@@ -1,25 +1,29 @@
 package goorm.athena.domain.project.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import goorm.athena.domain.imageGroup.entity.ImageGroup;
 import goorm.athena.domain.imageGroup.entity.Type;
 import goorm.athena.domain.imageGroup.service.ImageGroupService;
+import goorm.athena.domain.product.dto.res.ProductResponse;
+import goorm.athena.domain.product.service.ProductService;
+import goorm.athena.domain.project.dto.req.ProjectApprovalRequest;
 import goorm.athena.domain.project.dto.cursor.*;
 import goorm.athena.domain.project.dto.req.ProjectCreateRequest;
+import goorm.athena.domain.project.dto.req.ProjectCursorRequest;
 import goorm.athena.domain.project.dto.req.ProjectUpdateRequest;
 import goorm.athena.domain.project.dto.res.ProjectIdResponse;
 import goorm.athena.domain.project.dto.res.*;
-import goorm.athena.domain.project.entity.SortType;
+import goorm.athena.domain.project.entity.SortTypeDeadLine;
+import goorm.athena.domain.project.entity.SortTypeLatest;
 import goorm.athena.domain.project.service.ProjectService;
 import goorm.athena.global.exception.CustomException;
 import goorm.athena.global.exception.ErrorCode;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import org.springframework.web.multipart.MultipartFile;
 
 
@@ -28,9 +32,11 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
+@RequestMapping("/api/projects")
 public class ProjectControllerImpl implements ProjectController {
     private final ProjectService projectService;
     private final ImageGroupService imageGroupService;
+    private final ProductService productService;
     private final ObjectMapper objectMapper;
 
     // 프로젝트 초기 설정 (이미지 그룹 생성)
@@ -46,7 +52,25 @@ public class ProjectControllerImpl implements ProjectController {
         ProjectIdResponse response = projectService.createProject(request); // 프로젝트 생성 로직
         return ResponseEntity.ok(response);
     }
+  
+    @GetMapping("/{projectId}/products")
+    public ResponseEntity<List<ProductResponse>> getProductsByProject(
+            @PathVariable Long projectId
+    ) {
+        List<ProductResponse> productList = productService.getProductsByProjectId(projectId);
+        return ResponseEntity.ok(productList);
+    }
 
+    @PatchMapping("/{projectId}/approval")
+    public ResponseEntity<String> updateApprovalStatus(
+            @PathVariable Long projectId,
+            @RequestBody ProjectApprovalRequest request
+    ) {
+        projectService.updateApprovalStatus(projectId, request.approve());
+        String resultMessage = request.approve() ? "승인되었습니다." : "거절되었습니다.";
+        return ResponseEntity.ok(resultMessage);
+    }
+    
     // 프로젝트 수정
     @Override
     public ResponseEntity<Void> updateProject(
@@ -89,32 +113,51 @@ public class ProjectControllerImpl implements ProjectController {
         return ResponseEntity.ok(responses);
     }
 
-    @Override
-    public ResponseEntity<ProjectCursorResponse<ProjectCategoryResponse>> getProjectByCategory(@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime cursorValue,
-                                                                                               @RequestParam(required = false) Long lastProjectId,
-                                                                                               @RequestParam Long categoryId,
-                                                                                               @ModelAttribute SortType sortType,
-                                                                                               @RequestParam(defaultValue = "20") int pageSize){
-        ProjectCursorResponse<ProjectCategoryResponse> response = projectService.getProjectsByCategory(cursorValue, categoryId, sortType, lastProjectId, pageSize);
+    // 카테고리별 프로젝트 조회 (커서 기반 페이징)
+    @GetMapping("/category")
+    public ResponseEntity<ProjectFilterCursorResponse<?>> getProjectsByCategory(
+            @RequestParam(value = "cursorId", required = false) Long cursorId,
+            @RequestParam(value = "cursorValue", required = false) Object cursorValue,
+            @RequestParam(value = "size", defaultValue = "20") int size,
+            @RequestParam(value = "categoryId", required = false) Long categoryId,
+            @RequestParam SortTypeLatest sortType) {
+
+        // ProjectCursorRequest DTO 구성
+        ProjectCursorRequest<Object> request = new ProjectCursorRequest<>(cursorValue, cursorId, size);
+
+        // 서비스 호출
+        ProjectFilterCursorResponse<?> response = projectService.getProjectsByCategory(request, categoryId, sortType);
+
         return ResponseEntity.ok(response);
+
     }
 
     @Override
     public ResponseEntity<ProjectCursorResponse<ProjectDeadLineResponse>> getProjectByDeadLine(@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime cursorValue,
                                                                                                @RequestParam(required = false) Long lastProjectId,
-                                                                                               @ModelAttribute SortType sortType,
+                                                                                               @ModelAttribute SortTypeDeadLine sortTypeDeadLine,
                                                                                                @RequestParam(defaultValue = "20") int pageSize){
-        ProjectCursorResponse<ProjectDeadLineResponse> responses = projectService.getProjectsByDeadLine(cursorValue, sortType, lastProjectId, pageSize);
+        ProjectCursorResponse<ProjectDeadLineResponse> responses = projectService.getProjectsByDeadLine(cursorValue, sortTypeDeadLine, lastProjectId, pageSize);
         return ResponseEntity.ok(responses);
 
     }
 
     @Override
-    public ResponseEntity<ProjectSearchCursorResponse<ProjectSearchResponse>> searchProject(@RequestParam String searchTerm,
-                                                                                            @RequestParam(required = false) Long lastProjectId,
-                                                                                            @ModelAttribute SortType sortType,
+    public ResponseEntity<ProjectFilterCursorResponse<ProjectSearchResponse>> searchProject(@RequestParam String searchTerm,
+                                                                                            @RequestParam(required = false) Object cursorValue,
+                                                                                            @RequestParam(required = false) Long cursorId,
+                                                                                            @RequestParam SortTypeLatest sortType,
                                                                                             @RequestParam(defaultValue = "20") int pageSize){
-        ProjectSearchCursorResponse<ProjectSearchResponse> response = projectService.searchProjects(searchTerm, sortType, lastProjectId, pageSize);
+        ProjectCursorRequest<Object> request = new ProjectCursorRequest<>(cursorValue, cursorId, pageSize);
+
+        ProjectFilterCursorResponse<ProjectSearchResponse> response = projectService.searchProjects(request, searchTerm, pageSize, sortType);
         return ResponseEntity.ok(response);
+
+    }
+
+    @Override
+    public ResponseEntity<List<ProjectTopViewResponse>> getProjectByTopView(){
+        List<ProjectTopViewResponse> responses = projectService.getTopView();
+        return ResponseEntity.ok(responses);
     }
 }

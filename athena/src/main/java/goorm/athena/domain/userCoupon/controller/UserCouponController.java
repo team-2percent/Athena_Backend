@@ -1,6 +1,7 @@
 package goorm.athena.domain.userCoupon.controller;
 
 import goorm.athena.domain.couponEvent.dto.res.CouponEventGetResponse;
+import goorm.athena.domain.userCoupon.dto.cursor.UserCouponCursorResponse;
 import goorm.athena.domain.userCoupon.dto.req.UserCouponIssueRequest;
 import goorm.athena.domain.userCoupon.dto.req.UserCouponUseRequest;
 import goorm.athena.domain.userCoupon.dto.res.UserCouponGetResponse;
@@ -15,10 +16,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -46,13 +44,5 @@ public interface UserCouponController {
 
     @PostMapping("/scheduler")
     public void schedulerExpiredUserCoupon();
-
-    @Operation(summary = "유저 쿠폰 조회 API", description = "유저가 현재 보유중인 모든 쿠폰을 조회합니다.<br>" +
-            "모든 쿠폰을 조회하기 때문에 추후 만료 처리를 뺀 쿠폰들을 모두 조회할 수 있습니다.")
-    @ApiResponse(responseCode = "200", description = "유저가 보유하는 모든 쿠폰들을 조회했습니다.",
-            content = @Content(schema = @Schema(implementation = UserCouponGetResponse.class)))
-    @GetMapping
-    public ResponseEntity<List<UserCouponGetResponse>> getUserCoupon(@Parameter(hidden = true) @CheckLogin LoginUserRequest loginUserRequest);
-
 
 }

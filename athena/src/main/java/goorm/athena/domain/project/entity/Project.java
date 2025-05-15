@@ -1,5 +1,6 @@
 package goorm.athena.domain.project.entity;
 
+import goorm.athena.domain.bankaccount.entity.BankAccount;
 import goorm.athena.domain.category.entity.Category;
 import goorm.athena.domain.imageGroup.entity.ImageGroup;
 import goorm.athena.domain.user.entity.User;
@@ -7,6 +8,7 @@ import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 
@@ -31,6 +33,10 @@ public class Project {
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;      // 카테고리 ID
 
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "bank_account_id", nullable = false)
+    private BankAccount bankAccount;
+
     private String title;
     private String description;         // 설명 (요약)
     private Long goalAmount;
@@ -40,6 +46,8 @@ public class Project {
     private LocalDateTime startAt;
     private LocalDateTime endAt;
     private LocalDateTime shippedAt;    // 발송 일자
+
+    @CreationTimestamp
     private LocalDateTime createdAt = LocalDateTime.now();
 
     @Enumerated(EnumType.STRING)
@@ -47,6 +55,7 @@ public class Project {
 
     @Enumerated(EnumType.STRING)
     private Status status;
+
 
     private Long views = 0L;
 
@@ -66,6 +75,12 @@ public class Project {
         this.shippedAt = shippedAt;
     }
 
+
+    public void setApprovalStatus(boolean isApproved) {
+        this.isApproved = isApproved ? ApprovalStatus.APPROVED : ApprovalStatus.REJECTED;
+    }
+
+
     public void update(Category category, String title, String description, Long goalAmount, String contentMarkdown,
                        LocalDateTime startAt, LocalDateTime endAt, LocalDateTime shippedAt) {
         this.category = category;
@@ -82,4 +97,5 @@ public class Project {
     public void increaseViews(){
         this.views++;
     }
+
 }
