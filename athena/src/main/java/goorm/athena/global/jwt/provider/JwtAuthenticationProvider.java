@@ -1,5 +1,6 @@
 package goorm.athena.global.jwt.provider;
 
+import goorm.athena.domain.user.entity.Role;
 import goorm.athena.global.jwt.token.JwtAuthenticationToken;
 import goorm.athena.global.jwt.util.JwtTokenizer;
 import goorm.athena.global.jwt.util.LoginInfoDto;
@@ -37,7 +38,8 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
         String nickname = claims.get("nickname", String.class);
         List<GrantedAuthority> authorities = getGrantedAuthorities(claims);
 
-        String role = authorities.isEmpty() ? "ROLE_USER" : String.valueOf(authorities.getFirst());
+        String roleStr = authorities.isEmpty() ? "ROLE_USER" : authorities.getFirst().getAuthority();
+        Role role = Role.valueOf(roleStr);
         LoginInfoDto loginInfo = LoginMapper.toLoginInfo(userId, nickname, role);
 
         return new JwtAuthenticationToken(authorities, loginInfo, null);

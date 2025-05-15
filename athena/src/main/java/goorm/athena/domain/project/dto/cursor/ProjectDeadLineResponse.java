@@ -6,22 +6,39 @@ import java.time.LocalDateTime;
 
 public record ProjectDeadLineResponse(
         Long id,
+        String imageUrl,
+        String sellerName,
         String title,
-        Long views,
+        String description,
         Long achievementRate,
-        LocalDateTime startAt,
+        LocalDateTime createdAt,
         LocalDateTime endAt,
-        String imageUrl
+        int daysLeft,
+        Long views
 ) {
     public static ProjectDeadLineResponse from(Project project, String imageUrl) {
+        // 현재 날짜와 종료일 사이의 차이 계산
+        long daysLeft = java.time.Duration.between(
+                LocalDateTime.now(),
+                project.getEndAt()
+        ).toDays();
+
+        // 음수 방지 (이미 마감된 경우)
+        int safeDaysLeft = (int) Math.max(daysLeft, 0);
+
         return new ProjectDeadLineResponse(
                 project.getId(),
+                imageUrl,
+                project.getSeller().getNickname(),
                 project.getTitle(),
-                project.getViews(),
-                project.getGoalAmount() / project.getTotalAmount(),
-                project.getStartAt(),
+                project.getDescription(),
+                project.getTotalAmount() == 0 || project.getGoalAmount() == 0
+                        ? 0L
+                        : (project.getTotalAmount()) / project.getGoalAmount(),
+                project.getCreatedAt(),
                 project.getEndAt(),
-                imageUrl
+                safeDaysLeft,
+                project.getViews()
         );
     }
 }

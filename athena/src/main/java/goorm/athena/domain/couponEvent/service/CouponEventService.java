@@ -1,5 +1,6 @@
 package goorm.athena.domain.couponEvent.service;
 
+import goorm.athena.domain.coupon.dto.req.CouponCreateRequest;
 import goorm.athena.domain.coupon.entity.Coupon;
 import goorm.athena.domain.coupon.repository.CouponRepository;
 import goorm.athena.domain.couponEvent.dto.req.CouponEventCreateRequest;
@@ -15,6 +16,7 @@ import goorm.athena.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import goorm.athena.domain.notification.service.NotificationService;
 
 import java.util.List;
 import java.util.Set;
@@ -26,20 +28,29 @@ public class CouponEventService {
     private final CouponEventRepository couponEventRepository;
     private final UserCouponRepository userCouponRepository;
     private final UserService userService;
+    private final NotificationService notificationService;
 
     @Transactional
-    public CouponEventCreateResponse createCouponEvent(CouponEventCreateRequest request) {
-        Coupon coupon = couponRepository.findById(request.couponId())
-                .orElseThrow(() -> new CustomException(ErrorCode.COUPON_NOT_FOUND));
-        CouponEvent couponEvent = CouponEvent.create(coupon);
+    public CouponEventCreateResponse createCouponEvent(CouponCreateRequest request) {
 
+        // 쿠폰 생성
+        Coupon coupon = Coupon.create(request);
+        couponRepository.save(coupon);
+
+        // 쿠폰 이벤트 생성
+        CouponEvent couponEvent = CouponEvent.create(coupon);
         couponEventRepository.save(couponEvent);
+
+        List<Long> userIds = userService.getUserIdAll();
+        for (Long userId : userIds) {
+            notificationService.sendCouponEventNotification(userId, couponEvent.getCoupon().getTitle());
+        }
 
         return CouponEventMapper.toCreateResponse(couponEvent);
     }
 
     @Transactional(readOnly = true)
-    public List<CouponEventGetResponse> getCouponEvent(Long userId){
+    public List<CouponEventGetResponse> getCouponEvent(Long userId) {
         List<CouponEvent> couponEventList = couponEventRepository.findByIsActiveTrueWithCoupon();
 
         List<Long> couponIds = couponEventList.stream()

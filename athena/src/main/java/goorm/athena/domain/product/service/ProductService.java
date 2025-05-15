@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -91,7 +92,11 @@ public class ProductService {
         optionRepository.deleteAll(options);
     }
 
-    // Get Product
+    /**
+     * GET
+     */
+
+    // 상품 조회
     public Product getById(Long id) {
         return productRepository.findById(id)
                 .orElseThrow(() -> new CustomException(ErrorCode.PRODUCT_NOT_FOUND));
@@ -103,5 +108,13 @@ public class ProductService {
         List<Option> productOptions = optionRepository.findAllByProduct(product);
         productOptions.forEach(option -> options.add(option.getOptionName()));
         return options;
+    }
+    
+    // 프로젝트 ID 기준으로 상품 리스트 조회
+    public List<ProductResponse> getProductsByProjectId(Long projectId) {
+        List<Product> products = productRepository.findByProjectId(projectId);
+        return products.stream()
+                .map(ProductResponse::from)
+                .toList();
     }
 }

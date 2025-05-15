@@ -7,6 +7,7 @@ import goorm.athena.domain.payment.dto.req.PaymentReadyRequest;
 import goorm.athena.domain.payment.dto.res.KakaoPayApproveResponse;
 import goorm.athena.domain.payment.dto.res.KakaoPayReadyResponse;
 import goorm.athena.domain.payment.entity.Payment;
+import goorm.athena.domain.payment.entity.Status;
 import goorm.athena.domain.payment.repository.PaymentRepository;
 import goorm.athena.domain.project.entity.Project;
 import goorm.athena.domain.user.entity.User;
@@ -36,8 +37,20 @@ public class PaymentService {
         Order order = orderService.getById(orderId);
         User user = order.getUser();
 
-        PaymentReadyRequest requestDto = PaymentReadyRequest.from(order);
+        // 기존 Payment가 있는지 확인
+        paymentRepository.findByOrderId(orderId).ifPresent(payment -> {
+            // 이미 결제 완료된 건이라면 예외 처리
+            if (payment.getStatus() == Status.APPROVED) {
+                throw new CustomException(ErrorCode.ALREADY_PAYMENT_COMPLETED);
+            }
 
+            // 기존 결제 있으면 삭제
+            paymentRepository.delete(payment);
+            paymentRepository.flush();
+        });
+
+        // 카카오 결제 요청
+        PaymentReadyRequest requestDto = PaymentReadyRequest.from(order);
         KakaoPayReadyResponse response;
         try {
             response = kakaoPayService

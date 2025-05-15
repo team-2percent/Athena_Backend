@@ -44,13 +44,12 @@ public class UserMapper {
         );
     }
 
-    public static UserGetResponse toGetResponse(User user){
+    public static UserGetResponse toGetResponse(User user, String imageUrl){
         return new UserGetResponse(
                 user.getId(),
                 user.getEmail(),
-                user.getPassword(),
                 user.getNickname(),
-                user.getRole()
+                imageUrl
         );
     }
 
@@ -59,6 +58,21 @@ public class UserMapper {
                 accessToken,
                 refreshToken,
                 userId
+        );
+    }
+
+    public static UserHeaderGetResponse toHeaderGetResponse(User user, String imageUrl){
+        return new UserHeaderGetResponse(
+                user.getId(),
+                user.getNickname(),
+                imageUrl
+        );
+    }
+
+    public static UserSummaryResponse toSummaryResponse(User user){
+        return new UserSummaryResponse(
+                user.getSellerIntroduction(),
+                user.getLinkUrl()
         );
     }
 }

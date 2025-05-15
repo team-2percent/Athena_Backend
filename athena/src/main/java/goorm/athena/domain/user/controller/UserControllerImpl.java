@@ -8,19 +8,20 @@ import goorm.athena.domain.s3.service.S3Service;
 import goorm.athena.domain.user.dto.request.UserCreateRequest;
 import goorm.athena.domain.user.dto.request.UserLoginRequest;
 import goorm.athena.domain.user.dto.request.UserUpdateRequest;
-import goorm.athena.domain.user.dto.response.UserLoginResponse;
-import goorm.athena.domain.user.dto.response.UserCreateResponse;
-import goorm.athena.domain.user.dto.response.UserGetResponse;
-import goorm.athena.domain.user.dto.response.UserUpdateResponse;
+import goorm.athena.domain.user.dto.response.*;
 import goorm.athena.domain.user.service.RefreshTokenService;
 import goorm.athena.domain.user.service.UserService;
+import goorm.athena.domain.userCoupon.dto.cursor.UserCouponCursorResponse;
+import goorm.athena.domain.userCoupon.service.UserCouponService;
 import goorm.athena.global.exception.CustomException;
 import goorm.athena.global.exception.ErrorCode;
 import goorm.athena.global.jwt.util.CheckLogin;
 import goorm.athena.global.jwt.util.LoginUserRequest;
+import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -38,6 +39,7 @@ public class UserControllerImpl implements UserController {
     private final ImageGroupService imageGroupService;
     private final ImageService imageService;
     private final S3Service s3Service;
+    private final UserCouponService userCouponService;
 
     @Override
     @PostMapping
@@ -96,5 +98,12 @@ public class UserControllerImpl implements UserController {
         refreshTokenService.deleteRefreshToken(response);
 
         return ResponseEntity.ok().build();
+    }
+
+    @Override
+    @PostMapping("/Header")
+    public ResponseEntity<UserHeaderGetResponse> getHeader(@CheckLogin LoginUserRequest request){
+        UserHeaderGetResponse response = userService.getHeaderById(request.userId());
+        return ResponseEntity.ok(response);
     }
 }

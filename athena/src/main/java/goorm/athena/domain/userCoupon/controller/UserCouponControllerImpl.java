@@ -1,5 +1,6 @@
 package goorm.athena.domain.userCoupon.controller;
 
+import goorm.athena.domain.userCoupon.dto.cursor.UserCouponCursorResponse;
 import goorm.athena.domain.userCoupon.dto.req.UserCouponIssueRequest;
 import goorm.athena.domain.userCoupon.dto.req.UserCouponUseRequest;
 import goorm.athena.domain.userCoupon.dto.res.UserCouponGetResponse;
@@ -8,6 +9,7 @@ import goorm.athena.domain.userCoupon.scheduler.UserCouponScheduler;
 import goorm.athena.domain.userCoupon.service.UserCouponService;
 import goorm.athena.global.jwt.util.CheckLogin;
 import goorm.athena.global.jwt.util.LoginUserRequest;
+import io.swagger.v3.oas.annotations.Parameter;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -44,10 +46,4 @@ public class UserCouponControllerImpl implements UserCouponController {
         userCouponScheduler.expiredUserCoupon();
     }
 
-    @Override
-    @GetMapping
-    public ResponseEntity<List<UserCouponGetResponse>> getUserCoupon(@CheckLogin LoginUserRequest loginUserRequest){
-        List<UserCouponGetResponse> response = userCouponService.getUserCoupon(loginUserRequest.userId());
-        return ResponseEntity.ok(response);
-    }
 }

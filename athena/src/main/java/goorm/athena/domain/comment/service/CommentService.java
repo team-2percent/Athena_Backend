@@ -51,4 +51,12 @@ public class CommentService {
                 .toList();
 
     }
+
+    public List<CommentGetResponse> getCommentByUser(Long userId){
+        User user = userService.getUser(userId);
+        List<Comment> comments = commentRepository.findByUser(user);
+        return comments.stream()
+                .map(CommentMapper::toGetResponse)
+                .toList();
+    }
 }

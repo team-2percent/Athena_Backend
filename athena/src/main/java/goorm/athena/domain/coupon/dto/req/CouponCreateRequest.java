@@ -3,7 +3,6 @@ package goorm.athena.domain.coupon.dto.req;
 import java.time.LocalDateTime;
 
 public record CouponCreateRequest(
-        Long code,
         String title,
         String content,
         int price,
