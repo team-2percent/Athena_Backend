@@ -5,12 +5,14 @@ import goorm.athena.domain.coupon.entity.CouponStatus;
 import goorm.athena.domain.coupon.service.CouponService;
 import goorm.athena.domain.user.entity.User;
 import goorm.athena.domain.user.service.UserService;
+import goorm.athena.domain.userCoupon.dto.cursor.UserCouponCursorResponse;
 import goorm.athena.domain.userCoupon.dto.req.UserCouponIssueRequest;
 import goorm.athena.domain.userCoupon.dto.res.UserCouponGetResponse;
 import goorm.athena.domain.userCoupon.dto.res.UserCouponIssueResponse;
 import goorm.athena.domain.userCoupon.entity.Status;
 import goorm.athena.domain.userCoupon.entity.UserCoupon;
 import goorm.athena.domain.userCoupon.mapper.UserCouponMapper;
+import goorm.athena.domain.userCoupon.repository.UserCouponCursorRepository;
 import goorm.athena.domain.userCoupon.repository.UserCouponRepository;
 import goorm.athena.global.exception.CustomException;
 import goorm.athena.global.exception.ErrorCode;
@@ -25,6 +27,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class UserCouponService {
     private final UserCouponRepository userCouponRepository;
+    private final UserCouponCursorRepository userCouponCursorRepository;
     private final UserService userService;
     private final CouponService couponService;
 
@@ -72,5 +75,10 @@ public class UserCouponService {
         return userCouponRepository.findByUser(user).stream()
                 .map(UserCouponMapper::toGetResponse)
                 .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public UserCouponCursorResponse getUserCoupons(Long userId, Long cursorId, int size){
+        return userCouponCursorRepository.getUserCouponByCursor(userId, cursorId, size);
     }
 }

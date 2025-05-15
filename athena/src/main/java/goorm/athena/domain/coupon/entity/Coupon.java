@@ -19,7 +19,6 @@ public class Coupon {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long code;
     private String title;
     private String content;
     private int price;
@@ -36,7 +35,6 @@ public class Coupon {
     @Builder
     public static Coupon create(CouponCreateRequest request){
         Coupon coupon = new Coupon();
-        coupon.code = request.code();
         coupon.title = request.title();
         coupon.content = request.content();
         coupon.price = request.price();

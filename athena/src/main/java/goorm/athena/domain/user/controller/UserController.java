@@ -3,11 +3,9 @@ package goorm.athena.domain.user.controller;
 import goorm.athena.domain.user.dto.request.UserCreateRequest;
 import goorm.athena.domain.user.dto.request.UserLoginRequest;
 import goorm.athena.domain.user.dto.request.UserUpdateRequest;
-import goorm.athena.domain.user.dto.response.UserCreateResponse;
-import goorm.athena.domain.user.dto.response.UserGetResponse;
-import goorm.athena.domain.user.dto.response.UserLoginResponse;
-import goorm.athena.domain.user.dto.response.UserUpdateResponse;
+import goorm.athena.domain.user.dto.response.*;
 import goorm.athena.domain.user.entity.User;
+import goorm.athena.domain.userCoupon.dto.cursor.UserCouponCursorResponse;
 import goorm.athena.global.jwt.util.CheckLogin;
 import goorm.athena.global.jwt.util.LoginUserRequest;
 import io.swagger.v3.oas.annotations.Operation;
@@ -69,4 +67,19 @@ public interface UserController {
     @ApiResponse(responseCode = "200", description = "유저 로그아웃 성공")
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(@Parameter(hidden = true) @CookieValue("refreshToken") String refreshToken, HttpServletResponse response);
+
+    @Operation(summary = "유저 헤더 정보 조회 API", description = "헤더에서 유저의 이름과 이미지를 조회합니다.")
+    @ApiResponse(responseCode = "200", description = "유저 헤더 정보 조회 성공")
+    @PostMapping("/Header")
+    public ResponseEntity<UserHeaderGetResponse> getHeader(@Parameter(hidden = true) @CheckLogin LoginUserRequest request);
+
+    @Operation(summary = "유저 쿠폰 커서 페이지 조회 APi", description = "유저가 현재 보유중인 모든 쿠폰들을 무한 페이징 형식으로 조회합니다.<br>" +
+            "조회가 완료되면 아래의 'nextCouponId'를 위에 입력하면 해당 값을 기준으로 다음 값들이 사이즈만큼 보여집니다.")
+    @ApiResponse(responseCode = "200", description = "유저가 보유하는 모든 쿠폰들을 페이지 형식으로 조회합니다.")
+    @GetMapping("/coupons")
+    public ResponseEntity<UserCouponCursorResponse> getUserCoupons(
+            @Parameter(hidden = true) @CheckLogin LoginUserRequest loginUserRequest,
+            @RequestParam(required = false) Long cursorId,
+            @Parameter(hidden = true) @RequestParam(defaultValue = "5") int size
+    );
 }

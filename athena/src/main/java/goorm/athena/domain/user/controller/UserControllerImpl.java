@@ -3,16 +3,16 @@ package goorm.athena.domain.user.controller;
 import goorm.athena.domain.user.dto.request.UserCreateRequest;
 import goorm.athena.domain.user.dto.request.UserLoginRequest;
 import goorm.athena.domain.user.dto.request.UserUpdateRequest;
-import goorm.athena.domain.user.dto.response.UserLoginResponse;
-import goorm.athena.domain.user.dto.response.UserCreateResponse;
-import goorm.athena.domain.user.dto.response.UserGetResponse;
-import goorm.athena.domain.user.dto.response.UserUpdateResponse;
+import goorm.athena.domain.user.dto.response.*;
 import goorm.athena.domain.user.service.RefreshTokenService;
 import goorm.athena.domain.user.service.UserService;
+import goorm.athena.domain.userCoupon.dto.cursor.UserCouponCursorResponse;
+import goorm.athena.domain.userCoupon.service.UserCouponService;
 import goorm.athena.global.exception.CustomException;
 import goorm.athena.global.exception.ErrorCode;
 import goorm.athena.global.jwt.util.CheckLogin;
 import goorm.athena.global.jwt.util.LoginUserRequest;
+import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +27,7 @@ public class UserControllerImpl implements UserController {
 
     private final UserService userService;
     private final RefreshTokenService refreshTokenService;
+    private final UserCouponService userCouponService;
 
     @Override
     @PostMapping
@@ -81,5 +82,23 @@ public class UserControllerImpl implements UserController {
         refreshTokenService.deleteRefreshToken(response);
 
         return ResponseEntity.ok().build();
+    }
+
+    @Override
+    @PostMapping("/Header")
+    public ResponseEntity<UserHeaderGetResponse> getHeader(@CheckLogin LoginUserRequest request){
+        UserHeaderGetResponse response = userService.getHeaderById(request.userId());
+        return ResponseEntity.ok(response);
+    }
+
+    @Override
+    @GetMapping("/coupons")
+    public ResponseEntity<UserCouponCursorResponse> getUserCoupons(
+            @Parameter(hidden = true) @CheckLogin LoginUserRequest request,
+            @RequestParam(required = false) Long cursorId,
+            @RequestParam(defaultValue = "5") int size
+    ){
+        UserCouponCursorResponse responses = userCouponService.getUserCoupons(request.userId(), cursorId, size);
+        return ResponseEntity.ok(responses);
     }
 }

@@ -4,17 +4,16 @@ import goorm.athena.domain.product.dto.res.ProductResponse;
 import goorm.athena.domain.project.dto.req.ProjectApprovalRequest;
 import goorm.athena.domain.project.dto.cursor.*;
 import goorm.athena.domain.project.dto.req.ProjectCreateRequest;
-import goorm.athena.domain.project.dto.req.ProjectUpdateRequest;
 import goorm.athena.domain.project.dto.res.ProjectIdResponse;
 import goorm.athena.domain.project.dto.res.*;
-import goorm.athena.domain.project.entity.SortType;
+import goorm.athena.domain.project.entity.SortTypeDeadLine;
+import goorm.athena.domain.project.entity.SortTypeLatest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,8 +22,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 
@@ -107,11 +104,18 @@ public interface ProjectController {
             content = @Content(schema = @Schema(implementation = ProjectAllResponse.class)))
     @GetMapping("/new")
     public ResponseEntity<ProjectCursorResponse<ProjectRecentResponse>> getProjectsByNew(@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime cursorValue,
-                                                                                         @RequestParam(required = false) Long lastProjectId, @Parameter(hidden = true) @RequestParam(defaultValue = "20") int pageSize);
+                                                                                         @RequestParam(required = false) Long lastProjectId,  @RequestParam(defaultValue = "20") int pageSize);
     @Operation(summary = "프로젝트 카테고리별 조회", description = "프로젝트를 카테고리별로 조회합니다.<br>" +
-            "페이지는 20개 단위로 구성되며, **맨 처음에는 아무 값도 입력되지 않아도 됩니다.**<br>" +
-            "배열 형식으로 20개가 출력되고 맨 마지막에는 'nextCursorValue', 'nextProjectId'가 주어집니다.<br>" +
+            "페이지는 20개 단위로 구성되며, **입력할 카테고리 id를 입력합니다. (입력하지 않으면 모든 카테고리 조회) **<br>" +
+            "배열 형식으로 20개가 출력되고 **맨 마지막에는 'nextCursorValue', 'nextProjectId'가 주어집니다.**<br>" +
             "다음 페이지 로딩 시 해당 값을 입력값에 입력 하면 **해당 Value의 '다음'값들이 페이지 조회됩니다.**<br>" +
+            "- cursorValue가 “Object”타입으로 여러 값이 들어갈 수 있습니다. (세부 필터)\n" +
+            "- 만약, LATEST = 최근일자를 조회하고자 하신다면 “2025-06-07T00:00:00”값이 cursorValue에 들어갑니다.\n" +
+            "    \n" +
+            "    nextProjectId는 cursorId에 들어갑니다!" +
+            "    \n" +
+            "    total은 해당 ‘카테고리’의 모든 값을 보여주며 세부 필터로 했을 때의 값들은 해당되지 않습니다." +
+            "다음 페이지를 로딩하기 위해 'nextCursorValue', 'nextProjectId' 값을 입력값에 입력 하면 **해당 Value의 '다음'값들이 페이지 조회됩니다.**<br>" +
             """
             <br>⚠️ <b>DEADLINE</b>으로 시작하는 정렬은 사용할 수 없으며, 사용할 시 에러가 리턴됩니다.<br><br>"
                 ✅ 사용 가능한 정렬 방식:
@@ -125,16 +129,17 @@ public interface ProjectController {
     @ApiResponse(responseCode = "200", description = "프로젝트 카테고리별 조회 성공",
             content = @Content(schema = @Schema(implementation = ProjectCategoryResponse.class)))
     @GetMapping("/category")
-    public ResponseEntity<ProjectCursorResponse<ProjectCategoryResponse>> getProjectByCategory(@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime cursorValue,
-                                                                                               @RequestParam(required = false) Long lastProjectId,
-                                                                                               @RequestParam Long categoryId,
-                                                                                               @ModelAttribute SortType sortType,
-                                                                                               @Parameter(hidden = true) @RequestParam(defaultValue = "20") int pageSize);
+    public ResponseEntity<ProjectFilterCursorResponse<?>> getProjectsByCategory(
+            @RequestParam(value = "cursorId", required = false) Long cursorId,
+            @RequestParam(value = "cursorValue", required = false) Object cursorValue,
+            @RequestParam(value = "size", defaultValue = "20") int size,
+            @RequestParam(value = "categoryId", required = false) Long categoryId,
+            @RequestParam SortTypeLatest sortType);
 
     @Operation(summary = "프로젝트 마감별 조회", description =
             "프로젝트의 마감일자를 오름차순으로 조회합니다 ( 빨리 끝나는 순)<br>" +
             "페이지는 20개 단위로 구성되며, **맨 처음에는 아무 값도 입력되지 않아도 됩니다.**<br>" +
-            "배열 형식으로 20개가 출력되고 맨 마지막에는 'nextCursorValue', 'nextProjectId'가 주어집니다.<br>" +
+            "배열 형식으로 20개가 출력되고 **맨 마지막에는 'nextCursorValue', 'nextProjectId'가 주어집니다**.<br>" +
             "다음 페이지 로딩 시 해당 값을 입력값에 입력 하면 **해당 Value의 '다음'값들이 페이지 조회됩니다.**<br>" +
                     "마감일자를 우선으로 정렬됩니다! 1. 마감일자, 2. 세부필터(ex : 성공률, 조회수) 로 정렬됩니다.<br>" +
                     """
@@ -155,16 +160,22 @@ public interface ProjectController {
                                                                                                @Parameter(
                                                                                                        description = "마감 정렬 방식",
                                                                                                        example = "DEADLINE",
-                                                                                                       schema = @Schema(implementation = SortType.class)
+                                                                                                       schema = @Schema(implementation = SortTypeDeadLine.class)
                                                                                                )
-                                                                                               @ModelAttribute SortType sortType,
-                                                                                               @Parameter(hidden = true) @RequestParam(defaultValue = "20") int pageSize);
+                                                                                               @ModelAttribute SortTypeDeadLine sortTypeDeadLine,
+                                                                                               @RequestParam(defaultValue = "20") int pageSize);
 
 
     @Operation(summary = "프로젝트 검색 조회", description = "프로젝트 검색 결과로 제목을 조회합니다.<br>" +
-            "페이지는 20개 단위로 구성되며, **기본적으로 검색값 = searchTerm과 lastProjectId에는 첫 번째 값 '0'을 입력하셔야 합니다.**<br>" +
-            "배열 형식으로 20개가 출력되고 맨 마지막에는 'searchTerm', 'nextProjectId'가 주어집니다.<br>" +
-            "다음 페이지 로딩 시 해당 값을 입력값에 입력 하면 **해당 Value의 '다음'값들이 페이지 조회됩니다.**<br>" +
+            "페이지는 20개 단위로 구성되며, **기본적으로 검색값 = searchTerm입니다.**<br>" +
+            "배열 형식으로 20개가 출력되고 맨 마지막에는 'nextCursorValue', 'nextProjectId'가 주어집니다.<br>" +
+            "- cursorValue가 “Object”타입으로 여러 값이 들어갈 수 있습니다. (세부 필터)\n" +
+            "- 만약, LATEST = 최근일자를 조회하고자 하신다면 “2025-06-07T00:00:00”값이 cursorValue에 들어갑니다.\n" +
+            "    \n" +
+            "    nextProjectId는 cursorId에 들어갑니다!" +
+            "    \n" +
+            "    total은 해당 ‘카테고리’의 모든 값을 보여주며 세부 필터로 했을 때의 값들은 해당되지 않습니다." +
+            "다음 페이지를 로딩하기 위해 'nextCursorValue', 'nextProjectId' 값을 입력값에 입력 하면 **해당 Value의 '다음'값들이 페이지 조회됩니다.**<br>" +
             """
             <br>⚠️ <b>DEADLINE</b>으로 시작하는 정렬은 사용할 수 없으며, 사용할 시 에러가 리턴됩니다.<br><br>"
                 ✅ 사용 가능한 정렬 방식:
@@ -176,12 +187,17 @@ public interface ProjectController {
                 </ul>
             """)
     @ApiResponse(responseCode = "200", description = "프로젝트 검색별 조회 성공",
-            content = @Content(schema = @Schema(implementation = ProjectSearchResponse.class)))
+            content = @Content(schema = @Schema(implementation = ProjectFilterCursorResponse.class)))
     @GetMapping("/search")
-    public ResponseEntity<ProjectSearchCursorResponse<ProjectSearchResponse>> searchProject(@RequestParam String searchTerm,
-                                                                                            @RequestParam(required = false) Long lastProjectId,
-                                                                                            @ModelAttribute SortType sortType,
-                                                                                            @Parameter(hidden = true) @RequestParam(defaultValue = "20") int pageSize);
+    public ResponseEntity<ProjectFilterCursorResponse<ProjectSearchResponse>> searchProject(@RequestParam String searchTerm,
+                                                                                            @RequestParam(required = false) Object cursorValue,
+                                                                                            @RequestParam(required = false) Long cursorId,
+                                                                                            @RequestParam SortTypeLatest sortType,
+                                                                                            @RequestParam(defaultValue = "20") int pageSize);
 
+    @Operation(summary = "프로젝트 메인 카테고리 배너 조회", description = "프로젝트의 메인 배너에서 각 카테고리의 조회수가 제일 높은 것을 조회합니다.")
+    @ApiResponse(responseCode = "200", description = "프로젝트의 카테고리별 조회수 높은 프로젝트 조회 성공")
+    @GetMapping("/categoryTop")
+    public ResponseEntity<List<ProjectTopViewResponse>> getProjectByTopView();
 }
 

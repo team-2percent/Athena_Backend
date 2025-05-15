@@ -15,13 +15,11 @@ import java.util.List;
 
 public interface ProjectRepository extends JpaRepository<Project, Long>, JpaSpecificationExecutor<Project> {
     List<Project> findAllByEndAtBefore(LocalDateTime date);
-  
-    @Query("""
-    SELECT p
-    FROM Project p
-    JOIN FETCH p.imageGroup ig
-    ORDER BY p.views DESC
-    """)
+
+    @Query("SELECT p FROM Project p " +
+            "JOIN FETCH p.seller " +
+            "JOIN FETCH p.imageGroup " +
+            "ORDER BY p.views DESC")
     List<Project> findTop20WithImageGroupByOrderByViewsDesc();
 
     @Query("""
@@ -34,6 +32,17 @@ public interface ProjectRepository extends JpaRepository<Project, Long>, JpaSpec
       AND p.status = 'APPROVED'
     """)
     List<Project> findProjectsWithUnsettledOrders(@Param("endAt") LocalDateTime endAt);
+
+    @Query(value = """
+    SELECT *
+    FROM (
+        SELECT p.*, 
+               ROW_NUMBER() OVER (PARTITION BY p.category_id ORDER BY p.views DESC, p.created_at ASC) AS rn
+        FROM project p
+    ) ranked
+    WHERE ranked.rn = 1
+""", nativeQuery = true)
+    List<Project> findTopViewedProjectsByCategory();
 
     Page<Project> findByIsApproved(ApprovalStatus isApproved, Pageable pageable);
 }

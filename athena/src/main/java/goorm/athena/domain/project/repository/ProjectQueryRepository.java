@@ -12,7 +12,8 @@ import goorm.athena.domain.imageGroup.entity.QImageGroup;
 import goorm.athena.domain.project.dto.cursor.*;
 import goorm.athena.domain.project.dto.req.ProjectCursorRequest;
 import goorm.athena.domain.project.entity.QProject;
-import goorm.athena.domain.project.entity.SortType;
+import goorm.athena.domain.project.entity.SortTypeDeadLine;
+import goorm.athena.domain.project.entity.SortTypeLatest;
 import goorm.athena.global.exception.CustomException;
 import goorm.athena.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -26,23 +27,32 @@ import java.util.List;
 public class ProjectQueryRepository {
     private final JPAQueryFactory queryFactory;
 
-    private List<OrderSpecifier<?>> getSortOrders(SortType sortType, QProject project) {
+    private List<OrderSpecifier<?>> getSortOrdersDeadLine(SortTypeDeadLine sortTypeDeadLine, QProject project) {
         NumberExpression<Long> successRate = project.totalAmount.multiply(100.0)
                 .divide(project.goalAmount.doubleValue());
 
-        return switch (sortType) {
+        return switch (sortTypeDeadLine) {
             case DEADLINE -> List.of(project.endAt.asc(), project.id.asc());
             case DEADLINE_POPULAR -> List.of(project.endAt.asc(), project.views.desc(), project.id.asc());
             case DEADLINE_SUCCESS_RATE -> List.of(project.endAt.asc(), successRate.desc(), project.id.asc());
             case DEADLINE_RECOMMENDED -> List.of(project.endAt.asc(),
                     Expressions.numberTemplate(Double.class, "function('rand')").asc(), project.id.asc());
 
-            case LATEST -> List.of(project.createdAt.desc(), project.id.asc());
-            case POPULAR -> List.of(project.views.desc(), project.id.asc());
-            case SUCCESS_RATE -> List.of(successRate.desc(), project.id.asc());
-            case RECOMMENDED -> List.of(Expressions.numberTemplate(Double.class, "function('rand')").asc(), project.id.asc());
         };
     }
+
+    private List<OrderSpecifier<?>> getSortOrdersLatest(SortTypeLatest sortType, QProject project) {
+        NumberExpression<Long> successRate = project.totalAmount.multiply(100.0)
+                .divide(project.goalAmount.doubleValue());
+
+        return switch (sortType) {
+
+            case LATEST -> List.of(project.createdAt.desc(), project.id.desc());
+            case POPULAR -> List.of(project.views.desc(), project.id.desc());
+            case SUCCESS_RATE -> List.of(successRate.desc(), project.id.desc());
+        };
+    }
+
 
     // 최신 프로젝트 조회 (커서 기반 페이징)
     public ProjectCursorResponse<ProjectRecentResponse> getProjectsByNew(ProjectCursorRequest<LocalDateTime> request) {
@@ -68,15 +78,15 @@ public class ProjectQueryRepository {
                 .select(Projections.constructor(
                         ProjectRecentResponse.class,
                         project.id,
+                        image.originalUrl,
+                        project.seller.sellerName,
                         project.title,
-                        project.views,
                         Expressions.numberTemplate(Long.class,
                                 "floor(({0} * 100.0) / nullif({1}, 0))",
                                 project.totalAmount, project.goalAmount),
-                        project.startAt,
-                        project.endAt,
                         project.createdAt,
-                        image.originalUrl
+                        project.endAt,
+                        Expressions.numberTemplate(Integer.class, "DATEDIFF({0}, CURRENT_DATE)", project.endAt)
                 ))
                 .from(project)
                 .leftJoin(project.imageGroup, imageGroup)
@@ -95,15 +105,19 @@ public class ProjectQueryRepository {
                 .limit(request.getSize())
                 .fetch();
 
+        Long totalCount = queryFactory
+                .select(project.count())
+                .from(project)
+                .fetchOne();
 
         // 다음 커서 계산: 마지막 프로젝트 ID를 nextCursor로 반환
-        return ProjectCursorResponse.ofByCreatedAt(content);// Pageable.unpaged()를 사용하여 페이징 없이 총 수만 반환
+        return ProjectCursorResponse.ofByCreatedAt(content, totalCount);// Pageable.unpaged()를 사용하여 페이징 없이 총 수만 반환
     }
 
     // 카테고리별 프로젝트 조회 (커서 기반 페이징)
-    public ProjectCursorResponse<ProjectCategoryResponse> getProjectsByCategory(ProjectCursorRequest<LocalDateTime> request,
+    public ProjectFilterCursorResponse<?> getProjectsByCategory(ProjectCursorRequest<?> request,
                                                                                 Long categoryId,
-                                                                                SortType sortType) {
+                                                                                SortTypeLatest sortType) {
         if ((sortType.name().startsWith("DEADLINE"))) {
             throw new CustomException(ErrorCode.INVALID_PROJECT_ORDER);
         }
@@ -111,60 +125,125 @@ public class ProjectQueryRepository {
         QProject project = QProject.project;
         QImageGroup imageGroup = QImageGroup.imageGroup;
         QImage image = QImage.image;
+        QImage imageSub = new QImage("imageSub");
 
         // 커서 조건 (startAt < 커서 or (startAt == 커서 and id < 커서Id))
         BooleanBuilder builder = new BooleanBuilder();
-        builder.and(project.category.id.eq(categoryId));
-
-        if (request.cursorValue() != null && request.cursorId() != null) {
-            builder.and(
-                    project.createdAt.lt(request.cursorValue())
-                            .or(project.createdAt.eq(request.cursorValue())
-                                    .and(project.id.lt(request.cursorId())))
-            );
+        if(categoryId != null) {
+            builder.and(project.category.id.eq(categoryId));
         }
 
-        // 서브쿼리: imageGroup 별로 가장 id가 작은 이미지
-        QImage imageSub = new QImage("imageSub");
+        // 커서 조건
+        switch (sortType) {
+            case LATEST -> {
+                String rawCursor = (String) request.cursorValue();
+                LocalDateTime cursorCreatedAt = rawCursor != null ? LocalDateTime.parse(rawCursor) : null;
+                Long cursorId = request.cursorId();
+                if (cursorCreatedAt != null && cursorId != null) {
+                    builder.and(project.createdAt.lt(cursorCreatedAt)
+                            .or(project.createdAt.eq(cursorCreatedAt).and(project.id.lt(cursorId))));
+                }
+            }
+
+            case POPULAR -> {
+                String rawCursor = (String) request.cursorValue();
+                Long cursorViews = rawCursor != null ? Long.parseLong(rawCursor) : null;
+                Long cursorId = request.cursorId();
+                if (cursorViews != null && cursorId != null) {
+                    builder.and(project.views.lt(cursorViews)
+                            .or(project.views.eq(cursorViews).and(project.id.lt(cursorId))));
+                }
+            }
+
+            case SUCCESS_RATE -> {
+                String rawCursor = (String) request.cursorValue();
+                Double cursorRate = rawCursor != null ? Double.parseDouble(rawCursor) : null;
+                Long cursorId = request.cursorId();
+                if (cursorRate != null && cursorId != null) {
+                    NumberExpression<Long> successRate =
+                            project.totalAmount.multiply(100.0).divide(project.goalAmount.doubleValue());
+
+                    builder.and(successRate.lt(cursorRate)
+                            .or(successRate.eq(Expressions.constant(cursorRate)).and(project.id.lt(cursorId))));
+                }
+            }
+
+            default -> {
+                throw new CustomException(ErrorCode.COUPON_NOT_FOUND);
+            }
+        }
 
         List<ProjectCategoryResponse> content = queryFactory
                 .select(Projections.constructor(
                         ProjectCategoryResponse.class,
                         project.id,
+                        image.originalUrl,
+                        project.seller.sellerName,
                         project.title,
-                        project.views,
                         Expressions.numberTemplate(Long.class,
                                 "floor(({0} * 100.0) / nullif({1}, 0))",
                                 project.totalAmount, project.goalAmount),
-                        project.startAt,
-                        project.endAt,
                         project.createdAt,
-                        image.originalUrl
+                        project.endAt,
+                        Expressions.numberTemplate(Integer.class, "DATEDIFF({0}, CURRENT_DATE)", project.endAt, LocalDateTime.now()),
+                        project.views
                 ))
                 .from(project)
                 .leftJoin(project.imageGroup, imageGroup)
                 .leftJoin(image).on(
                         image.imageGroup.id.eq(imageGroup.id)
                                 .and(image.id.eq(
-                                        JPAExpressions
-                                                .select(imageSub.id)
+                                        JPAExpressions.select(imageSub.id)
                                                 .from(imageSub)
                                                 .where(imageSub.imageGroup.id.eq(imageGroup.id)
                                                         .and(imageSub.isDefault.isTrue()))
                                 ))
                 )
                 .where(builder)
-                .orderBy(getSortOrders(sortType, project).toArray(OrderSpecifier[]::new))
+                .orderBy(getSortOrdersLatest(sortType, project).toArray(new OrderSpecifier[0]))
                 .limit(request.getSize())
                 .fetch();
 
-        return ProjectCursorResponse.ofByStartAt(content);
+        BooleanBuilder countCondition = new BooleanBuilder();
+        if (categoryId != null) {
+            countCondition.and(project.category.id.eq(categoryId));
+        }
+
+        Long totalCount = queryFactory
+                .select(project.count())
+                .from(project)
+                .where(countCondition)
+                .fetchOne();
+
+        // next cursor 구하기
+        ProjectCategoryResponse last = content.isEmpty() ? null : content.get(content.size() - 1);
+
+        return switch (sortType) {
+            case LATEST -> ProjectFilterCursorResponse.of(
+                    content,
+                    last != null ? last.createdAt() : null,
+                    last != null ? last.id() : null,
+                    totalCount
+            );
+            case POPULAR -> ProjectFilterCursorResponse.of(
+                    content,
+                    last != null ? last.views() : null,
+                    last != null ? last.id() : null,
+                    totalCount
+            );
+            case SUCCESS_RATE -> ProjectFilterCursorResponse.of(
+                    content,
+                    last != null ? last.achievementRate() : null,
+                    last != null ? last.id() : null,
+                    totalCount
+            );
+        };
     }
 
     // 마감 기한별 프로젝트 조회 (커서 기반 페이징)
     public ProjectCursorResponse<ProjectDeadLineResponse> getProjectsByDeadline(ProjectCursorRequest<LocalDateTime> request,
-                                                                                SortType sortType) {
-        if (!(sortType.name().startsWith("DEADLINE"))) {
+                                                                                SortTypeDeadLine sortTypeDeadLine) {
+        if (!(sortTypeDeadLine.name().startsWith("DEADLINE"))) {
             throw new CustomException(ErrorCode.INVALID_PROJECT_ORDER);
         }
 
@@ -190,14 +269,16 @@ public class ProjectQueryRepository {
                 .select(Projections.constructor(
                         ProjectDeadLineResponse.class,
                         project.id,
+                        image.originalUrl,
+                        project.seller.sellerName,
                         project.title,
-                        project.views,
                         Expressions.numberTemplate(Long.class,
                                 "floor(({0} * 100.0) / nullif({1}, 0))",
                                 project.totalAmount, project.goalAmount),
-                        project.startAt,
+                        project.createdAt,
                         project.endAt,
-                        image.originalUrl
+                        Expressions.numberTemplate(Integer.class, "DATEDIFF({0}, CURRENT_DATE)", project.endAt),
+                        project.views
                 ))
                 .from(project)
                 .leftJoin(project.imageGroup, imageGroup)
@@ -211,17 +292,22 @@ public class ProjectQueryRepository {
                                 ))
                 )
                 .where(builder)
-                .orderBy(getSortOrders(sortType, project).toArray(OrderSpecifier[]::new)) // 마감일 빠른 순
+                .orderBy(getSortOrdersDeadLine(sortTypeDeadLine, project).toArray(OrderSpecifier[]::new)) // 마감일 빠른 순
                 .limit(request.getSize())
                 .fetch();
 
-        return ProjectCursorResponse.ofByEndAt(content);
+        Long totalCount = queryFactory
+                .select(project.count())
+                .from(project)
+                .fetchOne();
+
+        return ProjectCursorResponse.ofByEndAt(content, totalCount);
     }
 
     // 검색 기반 페이지 조회
-    public ProjectSearchCursorResponse<ProjectSearchResponse> searchProjects(ProjectCursorRequest<String> request,
+    public ProjectFilterCursorResponse<ProjectSearchResponse> searchProjects(ProjectCursorRequest<?> request,
                                                                                String searchTerm,
-                                                                               SortType sortType) {
+                                                                               SortTypeLatest sortType) {
         if ((sortType.name().startsWith("DEADLINE"))) {
             throw new CustomException(ErrorCode.INVALID_PROJECT_ORDER);
         }
@@ -229,16 +315,53 @@ public class ProjectQueryRepository {
         QProject project = QProject.project;
         QImageGroup imageGroup = QImageGroup.imageGroup;
         QImage image = QImage.image;
+        QImage imageSub = new QImage("imageSub");
 
-            // 커서 조건 (startAt < 커서 or (startAt == 커서 and id < 커서Id))
+        // 커서 조건 (startAt < 커서 or (startAt == 커서 and id < 커서Id))
         BooleanBuilder builder = new BooleanBuilder();
 
         if (searchTerm != null && !searchTerm.trim().isEmpty()) {
             builder.and(project.title.containsIgnoreCase(searchTerm));
         }
 
-        if (request.cursorId() != null) {
-            builder.and(project.id.gt(request.cursorId()));
+        // 커서 조건
+        switch (sortType) {
+            case LATEST -> {
+                String rawCursor = (String) request.cursorValue();
+                LocalDateTime cursorCreatedAt = rawCursor != null ? LocalDateTime.parse(rawCursor) : null;
+                Long cursorId = request.cursorId();
+                if (cursorCreatedAt != null && cursorId != null) {
+                    builder.and(project.createdAt.lt(cursorCreatedAt)
+                            .or(project.createdAt.eq(cursorCreatedAt).and(project.id.lt(cursorId))));
+                }
+            }
+
+            case POPULAR -> {
+                String rawCursor = (String) request.cursorValue();
+                Long cursorViews = rawCursor != null ? Long.parseLong(rawCursor) : null;
+                Long cursorId = request.cursorId();
+                if (cursorViews != null && cursorId != null) {
+                    builder.and(project.views.lt(cursorViews)
+                            .or(project.views.eq(cursorViews).and(project.id.lt(cursorId))));
+                }
+            }
+
+            case SUCCESS_RATE -> {
+                String rawCursor = (String) request.cursorValue();
+                Double cursorRate = rawCursor != null ? Double.parseDouble(rawCursor) : null;
+                Long cursorId = request.cursorId();
+                if (cursorRate != null && cursorId != null) {
+                    NumberExpression<Long> successRate =
+                            project.totalAmount.multiply(100.0).divide(project.goalAmount.doubleValue());
+
+                    builder.and(successRate.lt(cursorRate)
+                            .or(successRate.eq(Expressions.constant(cursorRate)).and(project.id.lt(cursorId))));
+                }
+            }
+
+            default -> {
+                throw new CustomException(ErrorCode.COUPON_NOT_FOUND);
+            }
         }
 
         // 나머지 fetch, join, 정렬 등 쿼리 작성
@@ -246,15 +369,16 @@ public class ProjectQueryRepository {
                 .select(Projections.constructor(
                         ProjectSearchResponse.class,
                         project.id,
+                        image.originalUrl,
+                        project.seller.sellerName,
                         project.title,
-                        project.views,
                         Expressions.numberTemplate(Long.class,
                                 "floor(({0} * 100.0) / nullif({1}, 0))",
                                 project.totalAmount, project.goalAmount),
-                        project.startAt,
-                        project.endAt,
                         project.createdAt,
-                        image.originalUrl
+                        project.endAt,
+                        Expressions.numberTemplate(Integer.class, "DATEDIFF({0}, CURRENT_DATE)", project.endAt, LocalDateTime.now()),
+                        project.views
                 ))
                 .from(project)
                 .leftJoin(project.imageGroup, imageGroup)
@@ -263,10 +387,38 @@ public class ProjectQueryRepository {
                                 .and(image.isDefault.isTrue())
                 )
                 .where(builder)
-                .orderBy(getSortOrders(sortType, project).toArray(OrderSpecifier[]::new))
+                .orderBy(getSortOrdersLatest(sortType, project).toArray(new OrderSpecifier[0]))
                 .limit(request.getSize())
                 .fetch();
 
-        return ProjectSearchCursorResponse.ofBySearch(content, searchTerm);
+        Long totalCount = queryFactory
+                .select(project.count())
+                .from(project)
+                .where(project.title.containsIgnoreCase(searchTerm))
+                .fetchOne();
+
+        // next cursor 구하기
+        ProjectSearchResponse last = content.isEmpty() ? null : content.get(content.size() - 1);
+
+        return switch (sortType) {
+            case LATEST -> ProjectFilterCursorResponse.ofSearch(
+                    content,
+                    last != null ? last.createdAt() : null,
+                    last != null ? last.id() : null,
+                    totalCount
+            );
+            case POPULAR -> ProjectFilterCursorResponse.ofSearch(
+                    content,
+                    last != null ? last.views() : null,
+                    last != null ? last.id() : null,
+                    totalCount
+            );
+            case SUCCESS_RATE -> ProjectFilterCursorResponse.ofSearch(
+                    content,
+                    last != null ? last.achievementRate() : null,
+                    last != null ? last.id() : null,
+                    totalCount
+            );
+        };
     }
 }

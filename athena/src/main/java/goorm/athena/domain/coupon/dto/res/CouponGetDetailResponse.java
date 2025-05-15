@@ -4,7 +4,7 @@ import goorm.athena.domain.coupon.entity.CouponStatus;
 
 import java.time.LocalDateTime;
 
-public record CouponCreateResponse(
+public record CouponGetDetailResponse(
         Long id,
         String title,
         String content,
