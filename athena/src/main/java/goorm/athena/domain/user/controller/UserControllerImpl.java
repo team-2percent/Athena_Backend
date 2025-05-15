@@ -93,17 +93,6 @@ public class UserControllerImpl implements UserController {
     }
 
     @Override
-    @GetMapping("/coupons")
-    public ResponseEntity<UserCouponCursorResponse> getUserCoupons(
-            @Parameter(hidden = true) @CheckLogin LoginUserRequest request,
-            @RequestParam(required = false) Long cursorId,
-            @RequestParam(defaultValue = "5") int size
-    ){
-        UserCouponCursorResponse responses = userCouponService.getUserCoupons(request.userId(), cursorId, size);
-        return ResponseEntity.ok(responses);
-    }
-
-    @Override
     @GetMapping("/seller")
     public ResponseEntity<UserSellerResponse> getSeller(@CheckLogin LoginUserRequest request){
         UserSellerResponse response = userService.getSellerResponse(request.userId());

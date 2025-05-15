@@ -6,8 +6,11 @@ import goorm.athena.domain.user.dto.request.UserIdValidateRequest;
 import goorm.athena.domain.user.dto.request.UserPasswordRequest;
 import goorm.athena.domain.user.dto.request.UserUpdatePasswordRequest;
 import goorm.athena.domain.user.service.UserService;
+import goorm.athena.domain.userCoupon.dto.cursor.UserCouponCursorResponse;
+import goorm.athena.domain.userCoupon.service.UserCouponService;
 import goorm.athena.global.jwt.util.CheckLogin;
 import goorm.athena.global.jwt.util.LoginUserRequest;
+import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +24,7 @@ import java.util.List;
 public class MyInfoControllerImpl implements MyInfoController{
     private final CommentService commentService;
     private final UserService userService;
+    private final UserCouponService userCouponService;
 
     @Override
     @GetMapping("/comments")
@@ -51,5 +55,16 @@ public class MyInfoControllerImpl implements MyInfoController{
     public ResponseEntity<Boolean> checkUserId(@CheckLogin LoginUserRequest request,
                                                @RequestParam("userId") Long userId){
         return ResponseEntity.ok(request.userId().equals(userId));
+    }
+
+    @Override
+    @GetMapping("/coupons")
+    public ResponseEntity<UserCouponCursorResponse> getUserCoupons(
+            @Parameter(hidden = true) @CheckLogin LoginUserRequest request,
+            @RequestParam(required = false) Long cursorId,
+            @RequestParam(defaultValue = "5") int size
+    ){
+        UserCouponCursorResponse responses = userCouponService.getUserCoupons(request.userId(), cursorId, size);
+        return ResponseEntity.ok(responses);
     }
 }
