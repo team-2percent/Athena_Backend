@@ -42,6 +42,18 @@ public class ImageService {
         return responses;
     }
 
+    // 파일 이름, URL만 담아 이미지 DB 업로드
+    public void uploadImage(String fileName, String url){
+        ImageCreateRequest request = new ImageCreateRequest(
+                null,
+                fileName,
+                url,
+                null
+        );
+        Image image = ImageMapper.toEntity(request, null);
+        imageRepository.save(image);
+    }
+
     /*
         [변경 사항이 있는 이미지만 수정]
         existingUrls: 기존에 존재하는 이미지 중 남아 있는 이미지의 URL
@@ -50,11 +62,8 @@ public class ImageService {
     @Transactional
     public void updateImages(ImageGroup imageGroup,
                              List<String> existingUrls, List<MultipartFile> newImageFiles) {
-        List<Image> images = imageRepository.findAllByImageGroup(imageGroup);
-        List<String> imageUrls = new ArrayList<>();
-        for (Image image : images) {
-            imageUrls.add(image.getOriginalUrl());
-        }
+        List<Image> images = getImages(imageGroup);     // 이미지 리스트
+        List<String> imageUrls = getImageUrls(images);  // 이미지 Url 리스트
 
         List<String> removeUrls = s3Service.compareImages(imageUrls, existingUrls); // Url 대조
         for (Image image : images) {
@@ -72,6 +81,20 @@ public class ImageService {
 
             uploadImages(newImagesDto);                                                 // 새로 들어온 파일 저장 (DB)
         }
+    }
+
+    // Get Image List
+    public List<Image> getImages(ImageGroup imageGroup) {
+        return imageRepository.findAllByImageGroup(imageGroup);
+    }
+
+    // Get Image url List
+    public List<String> getImageUrls(List<Image> images) {
+        List<String> imageUrls = new ArrayList<>();
+        for (Image image : images) {
+            imageUrls.add(image.getOriginalUrl());
+        }
+        return imageUrls;
     }
 
     // 연관 이미지 전체 삭제
