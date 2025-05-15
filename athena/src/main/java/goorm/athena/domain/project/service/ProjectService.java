@@ -3,6 +3,7 @@ package goorm.athena.domain.project.service;
 import goorm.athena.domain.category.entity.Category;
 import goorm.athena.domain.category.service.CategoryService;
 import goorm.athena.domain.image.dto.req.ImageCreateRequest;
+import goorm.athena.domain.image.dto.req.ImageUpdateRequest;
 import goorm.athena.domain.image.entity.Image;
 import goorm.athena.domain.image.service.ImageService;
 import goorm.athena.domain.imageGroup.entity.ImageGroup;
@@ -98,7 +99,7 @@ public class ProjectService {
 
     // 프로젝트 수정
     @Transactional
-    public void updateProject(Long projectId, ProjectUpdateRequest request, List<MultipartFile> newFiles){
+    public void updateProject(Long projectId, ProjectUpdateRequest request, List<ImageUpdateRequest> imageRequests){
         Project project = getById(projectId);
         Category category = categoryService.getCategoryById(request.categoryId());
 
@@ -121,8 +122,17 @@ public class ProjectService {
         createProducts(productUpdateRequests, project);
 
         // 이미지 업데이트
-        List<String> existingImageUrls = new ArrayList<>();
-        imageService.updateImages(project.getImageGroup(), existingImageUrls, newFiles);
+        List<String> existingUrls = new ArrayList<>();
+        List<MultipartFile> newImageFiles = new ArrayList<>();
+        for (ImageUpdateRequest imageRequest : imageRequests) {
+            if (imageRequest.file() != null){
+                newImageFiles.add(imageRequest.file());
+            }
+            else{
+                existingUrls.add(imageRequest.url());
+            }
+        }
+        imageService.updateImages(project.getImageGroup(), existingUrls, newImageFiles);
     }
 
     // 프로젝트 삭제

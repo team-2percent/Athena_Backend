@@ -68,17 +68,6 @@ public class S3Service {
         }
     }
 
-    // S3 이미지 URL 대조
-    public List<String> compareImages(List<String> baseUrls, List<String> existingUrls) {
-        List<String> removeUrls = new ArrayList<>();    // 삭제할 URL
-        for (String baseUrl : baseUrls) {
-            if (!existingUrls.contains(baseUrl)) {
-                removeUrls.add(baseUrl);
-            }
-        }
-        return removeUrls;
-    }
-
     // S3 이미지 삭제 (파일 이름으로 변경해서 삭제)
     public void deleteFiles(List<String> fileUrls) {
         for (String fileUrl : fileUrls){

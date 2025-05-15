@@ -62,10 +62,10 @@ public class ImageService {
     @Transactional
     public void updateImages(ImageGroup imageGroup,
                              List<String> existingUrls, List<MultipartFile> newImageFiles) {
-        List<Image> images = getImages(imageGroup);     // 이미지 리스트
-        List<String> imageUrls = getImageUrls(images);  // 이미지 Url 리스트
+        List<Image> images = getImages(imageGroup);
+        List<String> imageUrls = getImageUrls(images);                      // 기존 이미지 Url 리스트
 
-        List<String> removeUrls = s3Service.compareImages(imageUrls, existingUrls); // Url 대조
+        List<String> removeUrls = compareImages(imageUrls, existingUrls);   // Url 대조 (DB 기준)
         for (Image image : images) {
             if (removeUrls.contains(image.getOriginalUrl())) {
                 imageRepository.delete(image);                                      // 제거할 URL에 해당되는 파일 제거 (DB)
@@ -81,6 +81,17 @@ public class ImageService {
 
             uploadImages(newImagesDto);                                                 // 새로 들어온 파일 저장 (DB)
         }
+    }
+
+    // 저장된 이미지 URL 대조
+    private List<String> compareImages(List<String> baseUrls, List<String> existingUrls) {
+        List<String> removeUrls = new ArrayList<>();    // 삭제할 URL
+        for (String baseUrl : baseUrls) {
+            if (!existingUrls.contains(baseUrl)) {
+                removeUrls.add(baseUrl);
+            }
+        }
+        return removeUrls;
     }
 
     // Get Image List
