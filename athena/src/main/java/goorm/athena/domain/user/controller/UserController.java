@@ -78,6 +78,6 @@ public interface UserController {
 
     @Operation(summary = "유저 조회 APi", description = "유저의 ID를 통해 특정 유저의 정보를 조회합니다.<br>")
     @ApiResponse(responseCode = "200", description = "특정 유저 정보 조회 성공")
-    @GetMapping("/{id}")
+    @GetMapping("/profile/{id}")
     ResponseEntity<UserGetResponse> getUserProfile(@PathVariable Long id);
 }
