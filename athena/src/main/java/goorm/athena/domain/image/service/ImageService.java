@@ -1,12 +1,12 @@
 package goorm.athena.domain.image.service;
 
 import goorm.athena.domain.image.dto.req.ImageCreateRequest;
+import goorm.athena.domain.image.dto.req.ImageUpdateRequest;
 import goorm.athena.domain.image.dto.res.ImageCreateResponse;
 import goorm.athena.domain.image.entity.Image;
 import goorm.athena.domain.image.mapper.ImageMapper;
 import goorm.athena.domain.image.repository.ImageRepository;
 import goorm.athena.domain.imageGroup.entity.ImageGroup;
-import goorm.athena.domain.imageGroup.service.ImageGroupService;
 import goorm.athena.domain.s3.service.S3Service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -14,13 +14,14 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RequiredArgsConstructor
 @Service
 public class ImageService {
     private final ImageRepository imageRepository;
-    private final ImageGroupService imageGroupService;
     private final S3Service s3Service;
 
     // 이미지 저장 응답 DTO 생성
@@ -45,8 +46,12 @@ public class ImageService {
 
         List<Image> images = new ArrayList<>();
 
-        for (ImageCreateRequest request : updatedRequests) {
+        for (int i = 0; i < imageCreateRequests.size(); i++) {
+            ImageCreateRequest request = updatedRequests.get(i);
             Image image = ImageMapper.toEntity(request, imageGroup);
+            if (i == 0){
+                image.setAsDefault();       // 썸네일 구분
+            }
             images.add(image);
         }
         imageRepository.saveAll(images);   // 이미지 DB 저장
@@ -74,7 +79,19 @@ public class ImageService {
     */
     @Transactional
     public void updateImages(ImageGroup imageGroup,
-                             List<String> existingUrls, List<MultipartFile> newImageFiles) {
+                             List<ImageUpdateRequest> imageRequests) {
+        // 응답 값 URL / File 구분
+        List<String> existingUrls = new ArrayList<>();
+        List<MultipartFile> newImageFiles = new ArrayList<>();
+        for (ImageUpdateRequest imageRequest : imageRequests) {
+            if (imageRequest.file() != null){
+                newImageFiles.add(imageRequest.file());
+            }
+            else{
+                existingUrls.add(imageRequest.url());
+            }
+        }
+
         List<Image> images = getImages(imageGroup);
         List<String> imageUrls = getImageUrls(images);                      // 기존 이미지 Url 리스트
 
@@ -86,7 +103,7 @@ public class ImageService {
         }
         s3Service.deleteFiles(removeUrls);                                  // 제거할 URL에 해당되는 파일 제거 (S3)
 
-        if (newImageFiles != null && newImageFiles.isEmpty()) {
+        if (newImageFiles.isEmpty()) {
             uploadImages(newImageFiles, imageGroup);                        // 새로운 이미지 S3 + DB 저장
         }
     }
@@ -136,4 +153,5 @@ public class ImageService {
                 .orElse("");
 
     }
+
 }

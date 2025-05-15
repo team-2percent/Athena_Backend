@@ -23,7 +23,7 @@ public class Image {
     private String originalUrl;
     private String fileType;    // 파일형
 
-    private boolean isDefault;
+    private boolean isDefault = false;  // 썸네일 구분
 
     @Builder
     private Image(ImageGroup imageGroup, String fileName, String originalUrl, String fileType, boolean isDefault) {

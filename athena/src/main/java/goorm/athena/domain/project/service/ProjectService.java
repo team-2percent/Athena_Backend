@@ -99,7 +99,8 @@ public class ProjectService {
 
     // 프로젝트 수정
     @Transactional
-    public void updateProject(Long projectId, ProjectUpdateRequest request, List<ImageUpdateRequest> imageRequests){
+    public void updateProject(Long projectId, ProjectUpdateRequest request,
+                              List<ImageUpdateRequest> imageRequests){
         Project project = getById(projectId);
         Category category = categoryService.getCategoryById(request.categoryId());
 
@@ -122,17 +123,7 @@ public class ProjectService {
         createProducts(productUpdateRequests, project);
 
         // 이미지 업데이트
-        List<String> existingUrls = new ArrayList<>();
-        List<MultipartFile> newImageFiles = new ArrayList<>();
-        for (ImageUpdateRequest imageRequest : imageRequests) {
-            if (imageRequest.file() != null){
-                newImageFiles.add(imageRequest.file());
-            }
-            else{
-                existingUrls.add(imageRequest.url());
-            }
-        }
-        imageService.updateImages(project.getImageGroup(), existingUrls, newImageFiles);
+        imageService.updateImages(project.getImageGroup(), imageRequests);
     }
 
     // 프로젝트 삭제
