@@ -1,6 +1,5 @@
 package goorm.athena.domain.project.dto.req;
 
-import goorm.athena.domain.image.dto.req.ImageUpdateRequest;
 import goorm.athena.domain.product.dto.req.ProductRequest;
 
 import java.time.LocalDateTime;

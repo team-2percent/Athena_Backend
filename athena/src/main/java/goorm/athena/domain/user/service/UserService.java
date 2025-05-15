@@ -2,10 +2,6 @@ package goorm.athena.domain.user.service;
 
 import goorm.athena.domain.image.service.ImageService;
 import goorm.athena.domain.imageGroup.entity.ImageGroup;
-import goorm.athena.domain.comment.dto.res.CommentGetResponse;
-import goorm.athena.domain.comment.entity.Comment;
-import goorm.athena.domain.comment.service.CommentService;
-import goorm.athena.domain.image.service.ImageService;
 import goorm.athena.domain.user.dto.request.UserCreateRequest;
 import goorm.athena.domain.user.dto.request.UserLoginRequest;
 import goorm.athena.domain.user.dto.request.UserUpdatePasswordRequest;
@@ -24,7 +20,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -77,6 +72,13 @@ public class UserService {
     public User getUser(Long userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+    }
+
+    @Transactional
+    public UserHeaderGetResponse getHeaderById(Long userId){
+        User user = getUser(userId);
+        String imageUrl = imageService.getImage(user.getImageGroup().getId());
+        return UserMapper.toHeaderGetResponse(user, imageUrl);
     }
 
     // 내 정보 조회 임시 로직

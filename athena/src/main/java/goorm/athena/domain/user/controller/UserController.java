@@ -17,6 +17,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.ErrorResponse;
@@ -40,7 +41,7 @@ public interface UserController {
             "password는 암호화되어 처리되며 패스워드 확인 검증없이 입력된 정보로 곧바로 수정로직을 진행합니다.",
             security = @SecurityRequirement(name = "bearerAuth"))
     @ApiResponse(responseCode = "200", description = "유저 정보 수정 성공")
-    @PutMapping
+    @PutMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     ResponseEntity<UserUpdateResponse> updateUser(@Parameter(hidden = true) @CheckLogin LoginUserRequest loginUserRequest,
                                                   @RequestParam UserUpdateRequest request,
                                                   @RequestParam MultipartFile image);

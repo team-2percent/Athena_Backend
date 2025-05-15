@@ -5,6 +5,7 @@ import goorm.athena.domain.product.dto.res.ProductResponse;
 import goorm.athena.domain.project.dto.req.ProjectApprovalRequest;
 import goorm.athena.domain.project.dto.cursor.*;
 import goorm.athena.domain.project.dto.req.ProjectCreateRequest;
+import goorm.athena.domain.project.dto.req.ProjectUpdateRequest;
 import goorm.athena.domain.project.dto.res.ProjectIdResponse;
 import goorm.athena.domain.project.dto.res.*;
 import goorm.athena.domain.project.entity.SortTypeDeadLine;
@@ -18,9 +19,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-
-import org.springframework.web.multipart.MultipartFile;
 
 import org.springframework.format.annotation.DateTimeFormat;
 

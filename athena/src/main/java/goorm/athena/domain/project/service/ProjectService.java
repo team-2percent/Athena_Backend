@@ -240,12 +240,6 @@ public class ProjectService {
                 })
                 .toList();
     }
-  
-    // 후원 기간 종료, 목표금액 달성 , 중복 정산 제외  조건이 충족해야함
-    public List<Project> getEligibleProjects(LocalDate baseDate) {
-        LocalDateTime endAt = baseDate.plusDays(1).atStartOfDay();
-        return projectRepository.findProjectsWithUnsettledOrders(endAt);
-    }
 
     @Transactional
     public void updateApprovalStatus(Long projectId, boolean isApproved) {
