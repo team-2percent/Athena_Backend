@@ -1,15 +1,19 @@
 package goorm.athena.domain.admin.dto.res;
+
 import org.springframework.data.domain.Page;
 
 import java.util.List;
+
 public record ProjectSummaryResponse(
         List<Item> content,
-        PageInfo pageInfo
+        PageInfo pageInfo,
+        long pendingCount
 ) {
-    public static ProjectSummaryResponse of(Page<Item> page) {
+
+    public static ProjectSummaryResponse of(Page<Item> page, long pendingCount) {
         return new ProjectSummaryResponse(
                 page.getContent(),
-                new PageInfo(page.getNumber(), page.getTotalPages())
+                new PageInfo(page.getNumber(), page.getTotalPages()),pendingCount
         );
     }
 

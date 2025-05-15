@@ -60,16 +60,6 @@ public class ProjectControllerImpl implements ProjectController {
         List<ProductResponse> productList = productService.getProductsByProjectId(projectId);
         return ResponseEntity.ok(productList);
     }
-
-    @PatchMapping("/{projectId}/approval")
-    public ResponseEntity<String> updateApprovalStatus(
-            @PathVariable Long projectId,
-            @RequestBody ProjectApprovalRequest request
-    ) {
-        projectService.updateApprovalStatus(projectId, request.approve());
-        String resultMessage = request.approve() ? "승인되었습니다." : "거절되었습니다.";
-        return ResponseEntity.ok(resultMessage);
-    }
     
     // 프로젝트 수정
     @Override

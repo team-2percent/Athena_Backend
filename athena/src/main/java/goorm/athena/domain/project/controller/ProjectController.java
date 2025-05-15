@@ -58,21 +58,6 @@ public interface ProjectController {
     @GetMapping("/{projectId}/products")
     ResponseEntity<List<ProductResponse>> getProductsByProject(@PathVariable Long projectId);
 
-    @Operation(
-            summary = "프로젝트 승인/반려 API",
-            description = """
-    관리자가 프로젝트를 승인 또는 반려합니다.<br>
-    - `approve`: true면 승인, false면 반려로 처리됩니다.<br>
-    사용 예시: PATCH /api/project/{projectId}/approval
-    """
-    )
-    @ApiResponse(responseCode = "200", description = "승인/반려 처리 완료")
-    @PatchMapping("/{projectId}/approval")
-    ResponseEntity<String> updateApprovalStatus(
-            @PathVariable Long projectId,
-            @RequestBody ProjectApprovalRequest request
-    );
-
     @Operation(summary = "프로젝트 수정 API", description = "프로젝트 정보를 수정합니다.<br>" +
             "프로젝트를 수정하기 위해서 필수 항목을 모두 입력해야 합니다.")
     @ApiResponse(responseCode = "200", description = "프로젝트 수정 성공")
