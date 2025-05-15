@@ -11,24 +11,26 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public interface ProjectRepository extends JpaRepository<Project, Long>, JpaSpecificationExecutor<Project> {
-    List<Project> findAllByEndAtBefore(LocalDateTime date);
-  
-    @Query("""
-    SELECT p
-    FROM Project p
-    JOIN FETCH p.imageGroup ig
-    ORDER BY p.views DESC
-    """)
-    List<Project> findTop20WithImageGroupByOrderByViewsDesc();
+  List<Project> findAllByEndAtBefore(LocalDateTime date);
 
-    @Query("""
-    SELECT DISTINCT p.order.project FROM Payment p
-    WHERE p.order.project.endAt < :endAt
-      AND p.order.project.status = 'COMPLETED'
-      AND p.order.project.isApproved = 'APPROVED'
-      AND p.order.project.totalAmount >= p.order.project.goalAmount
-      AND p.order.isSettled = false
-      AND p.status = 'APPROVED'
-    """)
-    List<Project> findProjectsWithUnsettledOrders(@Param("endAt") LocalDateTime endAt);
+  @Query("""
+      SELECT p
+      FROM Project p
+      JOIN FETCH p.imageGroup ig
+      ORDER BY p.views DESC
+      """)
+  List<Project> findTop20WithImageGroupByOrderByViewsDesc();
+
+  @Query("""
+      SELECT DISTINCT p.order.project FROM Payment p
+      WHERE p.order.project.endAt < :endAt
+        AND p.order.project.status = 'COMPLETED'
+        AND p.order.project.isApproved = 'APPROVED'
+        AND p.order.project.totalAmount >= p.order.project.goalAmount
+        AND p.order.isSettled = false
+        AND p.status = 'APPROVED'
+      """)
+  List<Project> findProjectsWithUnsettledOrders(@Param("endAt") LocalDateTime endAt);
+
+  List<Project> findByEndAtIn(List<LocalDateTime> endDates);
 }
