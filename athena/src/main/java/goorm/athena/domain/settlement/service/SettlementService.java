@@ -1,5 +1,6 @@
 package goorm.athena.domain.settlement.service;
 
+import goorm.athena.domain.admin.dto.res.ProductSettlementSummaryResponse;
 import goorm.athena.domain.admin.dto.res.SettlementDetailInfoResponse;
 import goorm.athena.domain.admin.dto.res.SettlementHistoryPageResponse;
 import goorm.athena.domain.bankaccount.entity.BankAccount;
@@ -112,5 +113,9 @@ public class SettlementService {
                 pageResult.getContent(),
                 new SettlementHistoryPageResponse.PageInfo(pageResult.getNumber(), pageResult.getTotalPages())
         );
+    }
+
+    public ProductSettlementSummaryResponse getProductSettlementInfo(Long settlementId) {
+        return settlementQueryRepository.findProductSettlementsWithSummary(settlementId);
     }
 }

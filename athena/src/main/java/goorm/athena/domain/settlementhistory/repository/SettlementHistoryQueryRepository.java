@@ -3,7 +3,6 @@ package goorm.athena.domain.settlementhistory.repository;
 import goorm.athena.domain.orderitem.entity.QOrderItem;
 import org.springframework.data.domain.Pageable;
 import com.querydsl.core.types.Projections;
-import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import goorm.athena.domain.admin.dto.res.SettlementHistoryPageResponse;
 import goorm.athena.domain.order.entity.QOrder;

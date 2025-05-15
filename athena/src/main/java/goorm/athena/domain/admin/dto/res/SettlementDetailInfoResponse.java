@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 public record SettlementDetailInfoResponse(
         String projectTitle,
         String sellerNickname,
+        Long userId,
         long targetAmount,
         long totalSales,
         long payoutAmount,

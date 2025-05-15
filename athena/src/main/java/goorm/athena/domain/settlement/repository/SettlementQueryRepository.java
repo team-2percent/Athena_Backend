@@ -4,12 +4,17 @@ import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import goorm.athena.domain.admin.dto.res.ProductSettlementSummaryResponse;
 import goorm.athena.domain.admin.dto.res.SettlementDetailInfoResponse;
 import goorm.athena.domain.bankaccount.entity.QBankAccount;
+import goorm.athena.domain.order.entity.QOrder;
+import goorm.athena.domain.orderitem.entity.QOrderItem;
+import goorm.athena.domain.product.entity.QProduct;
 import goorm.athena.domain.project.entity.QProject;
 import goorm.athena.domain.settlement.dto.res.SettlementSummaryResponse;
 import goorm.athena.domain.settlement.entity.QSettlement;
 import goorm.athena.domain.settlement.entity.Status;
+import goorm.athena.domain.settlementhistory.entity.QSettlementHistory;
 import goorm.athena.domain.user.entity.QUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -79,6 +84,7 @@ public class SettlementQueryRepository {
                 .select(Projections.constructor(SettlementDetailInfoResponse.class,
                         project.title,
                         user.nickname,
+                        user.id,
                         project.goalAmount,
                         settlement.totalSales,
                         settlement.payOutAmount,
@@ -99,5 +105,40 @@ public class SettlementQueryRepository {
                 .join(settlement.bankAccount, bankAccount)
                 .where(settlement.id.eq(settlementId))
                 .fetchOne();
+    }
+
+
+    public ProductSettlementSummaryResponse findProductSettlementsWithSummary(Long settlementId) {
+        QSettlementHistory history = QSettlementHistory.settlementHistory;
+        QOrder order = QOrder.order;
+        QOrderItem orderItem = QOrderItem.orderItem;
+        QProduct product = QProduct.product;
+
+        List<ProductSettlementSummaryResponse.Item> items = queryFactory
+                .select(Projections.constructor(ProductSettlementSummaryResponse.Item.class,
+                        product.name,
+                        orderItem.quantity.sum().castToNum(Long.class),
+                        history.totalPrice.sum().castToNum(Long.class),
+                        history.fee.sum().castToNum(Long.class),
+                        history.amount.sum().castToNum(Long.class)
+                ))
+                .from(history)
+                .join(history.order, order)
+                .join(orderItem).on(orderItem.order.eq(order))
+                .join(orderItem.product, product)
+                .where(history.settlement.id.eq(settlementId))
+                .groupBy(product.id, product.name)
+                .fetch();
+
+        // 전체 요약 계산
+        long totalQuantity = items.stream().mapToLong(ProductSettlementSummaryResponse.Item::totalQuantity).sum();
+        long totalPrice = items.stream().mapToLong(ProductSettlementSummaryResponse.Item::totalPrice).sum();
+        long platformFee = items.stream().mapToLong(ProductSettlementSummaryResponse.Item::platformFee).sum();
+        long payoutAmount = items.stream().mapToLong(ProductSettlementSummaryResponse.Item::payoutAmount).sum();
+
+        ProductSettlementSummaryResponse.Summary summary =
+                new ProductSettlementSummaryResponse.Summary(totalQuantity, totalPrice, platformFee, payoutAmount);
+
+        return new ProductSettlementSummaryResponse(items, summary);
     }
 }
