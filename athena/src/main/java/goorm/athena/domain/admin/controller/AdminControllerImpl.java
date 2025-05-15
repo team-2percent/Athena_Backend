@@ -43,7 +43,7 @@ public class AdminControllerImpl implements AdminController {
     public ResponseEntity<ProjectSummaryResponse> getProjects(
             @CheckLogin LoginUserRequest loginUserRequest,
             @RequestParam(required = false) String keyword,
-            @RequestParam(value = "direction", defaultValue = "desc") String direction,
+            @RequestParam(value = "direction", defaultValue = "asc") String direction,
             @RequestParam(value = "page", defaultValue = "0") int page
     ) {
         adminRoleCheckService.checkAdmin(loginUserRequest);

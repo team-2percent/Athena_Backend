@@ -24,9 +24,7 @@ public class AdminService {
         Sort sort = Sort.by(direction, "createdAt");
         Pageable pageable = PageRequest.of(page, 10, sort);
 
-        Page<ProjectSummaryResponse.Item> pageData = adminProjectQueryService.findProjectList(keyword, pageable);
-
-        return ProjectSummaryResponse.of(pageData);
+        return adminProjectQueryService.findProjectList(keyword, pageable);
     }
 
     public SettlementSummaryPageResponse getSettlementList(Status status, Integer year, Integer month, int page) {
