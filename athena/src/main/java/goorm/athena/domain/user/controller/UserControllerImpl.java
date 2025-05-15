@@ -1,5 +1,7 @@
 package goorm.athena.domain.user.controller;
 
+import goorm.athena.domain.imageGroup.entity.Type;
+import goorm.athena.domain.imageGroup.service.ImageGroupService;
 import goorm.athena.domain.user.dto.request.UserCreateRequest;
 import goorm.athena.domain.user.dto.request.UserLoginRequest;
 import goorm.athena.domain.user.dto.request.UserUpdateRequest;
@@ -27,6 +29,7 @@ public class UserControllerImpl implements UserController {
 
     private final UserService userService;
     private final RefreshTokenService refreshTokenService;
+    private final ImageGroupService imageGroupService;
 
     @Override
     @PostMapping
@@ -41,6 +44,7 @@ public class UserControllerImpl implements UserController {
     @PutMapping
     public ResponseEntity<UserUpdateResponse> updateUser(@CheckLogin LoginUserRequest loginUserRequest,
                                                          @RequestBody UserUpdateRequest request){
+        imageGroupService.createImageGroup(Type.USER);  // User <-> ImageGroup 1:1 매핑되도록 생성
         UserUpdateResponse response = userService.updateUser(loginUserRequest.userId(), request);
         return ResponseEntity.ok(response);
     }

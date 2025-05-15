@@ -2,15 +2,20 @@ package goorm.athena.domain.project.mapper;
 
 import goorm.athena.domain.category.entity.Category;
 import goorm.athena.domain.imageGroup.entity.ImageGroup;
+import goorm.athena.domain.product.dto.res.ProductResponse;
+import goorm.athena.domain.product.entity.Product;
 import goorm.athena.domain.project.dto.req.ProjectCreateRequest;
-import goorm.athena.domain.project.dto.req.ProjectUpdateRequest;
+import goorm.athena.domain.project.dto.res.ProjectDetailResponse;
 import goorm.athena.domain.project.dto.res.ProjectIdResponse;
 import goorm.athena.domain.project.entity.Project;
+import goorm.athena.domain.user.dto.response.UserDetailResponse;
 import goorm.athena.domain.user.entity.User;
+
+import java.util.List;
 
 public class ProjectMapper {
     // ProjectCreateRequest(Dto) -> Entity
-
+    // convertedMarkdown parameter 추가 예정
     public static Project toEntity(ProjectCreateRequest request, User seller, ImageGroup imageGroup, Category category) {
         return Project.builder()
                 .seller(seller)
@@ -35,5 +40,23 @@ public class ProjectMapper {
                 .build();
     }
 
+    // Create response dto
+    public static ProjectDetailResponse toDetailDto(Project project,
+                                                    List<String> imageUrls, UserDetailResponse userDetailResponse, List<ProductResponse> productResponses){
+        return new ProjectDetailResponse(
+                project.getId(),
+                project.getTitle(),
+                project.getDescription(),
+                project.getGoalAmount(),
+                project.getTotalAmount(),
+                project.getContentMarkdown(),
+                project.getStartAt(),
+                project.getEndAt(),
+                project.getShippedAt(),
+                imageUrls,
+                userDetailResponse,
+                productResponses
+        );
+    }
 
 }

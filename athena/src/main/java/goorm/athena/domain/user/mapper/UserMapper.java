@@ -1,10 +1,7 @@
 package goorm.athena.domain.user.mapper;
 
 import goorm.athena.domain.user.dto.request.UserCreateRequest;
-import goorm.athena.domain.user.dto.response.UserCreateResponse;
-import goorm.athena.domain.user.dto.response.UserGetResponse;
-import goorm.athena.domain.user.dto.response.UserLoginResponse;
-import goorm.athena.domain.user.dto.response.UserUpdateResponse;
+import goorm.athena.domain.user.dto.response.*;
 import goorm.athena.domain.user.entity.User;
 
 public class UserMapper {
@@ -25,6 +22,15 @@ public class UserMapper {
                 user.getEmail(),
                 user.getNickname(),
                 user.getRole()
+        );
+    }
+
+    public static UserDetailResponse toDetailResponse(User user){
+        return new UserDetailResponse(
+                user.getId(),
+                user.getNickname(),
+                user.getSellerIntroduction(),
+                user.getLinkUrl()
         );
     }
 
