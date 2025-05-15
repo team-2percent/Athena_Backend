@@ -87,6 +87,7 @@ public class UserInfoControllerImpl implements UserInfoController {
     ){
         UserCouponCursorResponse responses = userCouponService.getUserCoupons(request.userId(), cursorId, size);
         return ResponseEntity.ok(responses);
+    }
 
     @GetMapping("/projects")
     public ResponseEntity<MyProjectScrollResponse> getMyProjects(
