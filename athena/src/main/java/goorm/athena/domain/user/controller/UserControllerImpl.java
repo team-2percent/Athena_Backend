@@ -91,11 +91,4 @@ public class UserControllerImpl implements UserController {
         UserHeaderGetResponse response = userService.getHeaderById(request.userId());
         return ResponseEntity.ok(response);
     }
-
-    @Override
-    @GetMapping("/seller")
-    public ResponseEntity<UserSellerResponse> getSeller(@RequestParam Long userId){
-        UserSellerResponse response = userService.getSellerResponse(userId);
-        return ResponseEntity.ok(response);
-    }
 }

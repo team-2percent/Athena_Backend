@@ -72,10 +72,4 @@ public interface UserController {
     @ApiResponse(responseCode = "200", description = "유저 헤더 정보 조회 성공")
     @PostMapping("/Header")
     public ResponseEntity<UserHeaderGetResponse> getHeader(@Parameter(hidden = true) @CheckLogin LoginUserRequest request);
-
-    @Operation(summary = "유저 판매자 정보 조회 API", description = "유저의 판매자 정보들을 조회합니다.<br>" +
-            "userId, 닉네임, 판매자 소개, 이미지 Url이 해당됩니다.")
-    @ApiResponse(responseCode = "200", description = "유저의 판매자 정보 조회 완료")
-    @GetMapping("/seller")
-    public ResponseEntity<UserSellerResponse> getSeller(@RequestParam Long userId);
 }

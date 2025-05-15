@@ -115,15 +115,6 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 
-    public UserSellerResponse getSellerResponse(Long userId){
-        User user = getUser(userId);
-        String imageUrl = null;
-        if(user.getImageGroup() != null && user.getImageGroup().getId() != null) {
-            imageUrl = imageService.getImage(user.getImageGroup().getId());
-        }
-        return UserMapper.toGetSellerResponse(user, imageUrl);
-    }
-
     public boolean checkPassword(Long userId, String password){
         User user = getUser(userId);
         return passwordEncoder.matches(password, user.getPassword());

@@ -60,15 +60,6 @@ public class UserMapper {
         );
     }
 
-    public static UserSellerResponse toGetSellerResponse(User user, String imageUrl){
-        return new UserSellerResponse(
-                user.getId(),
-                user.getNickname(),
-                user.getSellerIntroduction(),
-                imageUrl
-        );
-    }
-
     public static UserSummaryResponse toSummaryResponse(User user){
         return new UserSummaryResponse(
                 user.getSellerIntroduction(),
