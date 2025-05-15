@@ -92,14 +92,13 @@ public class UserControllerImpl implements UserController {
     }
 
     @Override
-    @GetMapping("/coupons/{userId}")
+    @GetMapping("/coupons")
     public ResponseEntity<UserCouponCursorResponse> getUserCoupons(
-            @Parameter(hidden = true) @CheckLogin LoginUserRequest loginUserRequest,
-            @PathVariable Long userId,
+            @Parameter(hidden = true) @CheckLogin LoginUserRequest request,
             @RequestParam(required = false) Long cursorId,
-            @RequestParam(defaultValue = "20") int size
+            @RequestParam(defaultValue = "5") int size
     ){
-        UserCouponCursorResponse responses = userCouponService.getUserCoupons(userId, cursorId, size);
+        UserCouponCursorResponse responses = userCouponService.getUserCoupons(request.userId(), cursorId, size);
         return ResponseEntity.ok(responses);
     }
 }
