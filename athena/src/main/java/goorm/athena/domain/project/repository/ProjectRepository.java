@@ -23,28 +23,26 @@ public interface ProjectRepository extends JpaRepository<Project, Long>, JpaSpec
     List<Project> findTop20WithImageGroupByOrderByViewsDesc();
 
     @Query("""
-            SELECT DISTINCT p.order.project FROM Payment p
-            WHERE p.order.project.endAt < :endAt
-              AND p.order.project.status = 'COMPLETED'
-              AND p.order.project.isApproved = 'APPROVED'
-              AND p.order.project.totalAmount >= p.order.project.goalAmount
-              AND p.order.isSettled = false
-              AND p.status = 'APPROVED'
-            """)
+    SELECT DISTINCT p.order.project FROM Payment p
+    WHERE p.order.project.endAt < :endAt
+      AND p.order.project.status = 'COMPLETED'
+      AND p.order.project.isApproved = 'APPROVED'
+      AND p.order.project.totalAmount >= p.order.project.goalAmount
+      AND p.order.isSettled = false
+      AND p.status = 'APPROVED'
+    """)
     List<Project> findProjectsWithUnsettledOrders(@Param("endAt") LocalDateTime endAt);
 
     @Query(value = """
-                SELECT *
-                FROM (
-                    SELECT p.*,
-                           ROW_NUMBER() OVER (PARTITION BY p.category_id ORDER BY p.views DESC, p.created_at ASC) AS rn
-                    FROM project p
-                ) ranked
-                WHERE ranked.rn = 1
-            """, nativeQuery = true)
+    SELECT *
+    FROM (
+        SELECT p.*, 
+               ROW_NUMBER() OVER (PARTITION BY p.category_id ORDER BY p.views DESC, p.created_at ASC) AS rn
+        FROM project p
+    ) ranked
+    WHERE ranked.rn = 1
+""", nativeQuery = true)
     List<Project> findTopViewedProjectsByCategory();
 
     Page<Project> findByIsApproved(ApprovalStatus isApproved, Pageable pageable);
-
-    List<Project> findByEndAtIn(List<LocalDateTime> endDates);
 }

@@ -9,6 +9,7 @@ public record ProjectRecentResponse(
         String imageUrl,
         String sellerName,
         String title,
+        String description,
         Long achievementRate,
         LocalDateTime createdAt,
         LocalDateTime endAt,
@@ -29,6 +30,7 @@ public record ProjectRecentResponse(
                 imageUrl,
                 project.getSeller().getNickname(),
                 project.getTitle(),
+                project.getDescription(),
                 project.getTotalAmount() == 0 || project.getGoalAmount() == 0
                             ? 0L
                             : (project.getTotalAmount()) / project.getGoalAmount(),
