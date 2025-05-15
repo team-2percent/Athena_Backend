@@ -6,5 +6,6 @@ public record UserGetResponse(
         Long id,
         String email,
         String nickname,
-        String imageUrl
+        String imageUrl,
+        String sellerDescription
 ) { }
