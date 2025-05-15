@@ -1,5 +1,6 @@
 package goorm.athena.domain.project.dto.res;
 
+import goorm.athena.domain.category.entity.Category;
 import goorm.athena.domain.product.dto.res.ProductResponse;
 import goorm.athena.domain.user.dto.response.UserDetailResponse;
 
@@ -8,6 +9,7 @@ import java.util.List;
 
 public record ProjectDetailResponse (
         Long id,
+        Category category,
         String title,
         String description,
 

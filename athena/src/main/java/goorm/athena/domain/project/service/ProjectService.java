@@ -187,12 +187,13 @@ public class ProjectService {
     public ProjectDetailResponse getProjectDetail(Long projectId){
         Project project = getById(projectId);
 
+        Category category = categoryService.getCategoryById(projectId);
         List<Image> images = imageService.getImages(project.getImageGroup());
         List<String> imageUrls = imageService.getImageUrls(images);
         UserDetailResponse userDetailResponse = UserMapper.toDetailResponse(project.getSeller());
         List<ProductResponse> productResponses = productService.getAllProducts(project);
 
-        return ProjectMapper.toDetailDto(project, imageUrls, userDetailResponse, productResponses);
+        return ProjectMapper.toDetailDto(project, category, imageUrls, userDetailResponse, productResponses);
     }
 
     // 메인 페이지 조회

@@ -44,11 +44,12 @@ public class ProjectMapper {
                 .build();
     }
 
-    // Create response dto
-    public static ProjectDetailResponse toDetailDto(Project project,
-                                                    List<String> imageUrls, UserDetailResponse userDetailResponse, List<ProductResponse> productResponses){
+    // Entity -> ProjectDetailResponse (프로젝트 상세 페이지 조회)
+    public static ProjectDetailResponse toDetailDto(Project project, Category category, List<String> imageUrls,
+                                                    UserDetailResponse userDetailResponse, List<ProductResponse> productResponses){
         return new ProjectDetailResponse(
                 project.getId(),
+                category,
                 project.getTitle(),
                 project.getDescription(),
                 project.getGoalAmount(),
