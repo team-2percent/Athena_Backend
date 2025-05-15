@@ -1,6 +1,7 @@
 package goorm.athena.domain.user.controller;
 
 import goorm.athena.domain.comment.dto.res.CommentGetResponse;
+import goorm.athena.domain.user.dto.request.UserIdValidateRequest;
 import goorm.athena.domain.user.dto.request.UserPasswordRequest;
 import goorm.athena.domain.user.dto.request.UserUpdatePasswordRequest;
 import goorm.athena.global.jwt.util.CheckLogin;
@@ -26,11 +27,17 @@ public interface MyInfoController {
     @Operation(summary = "유저 비밀번호 확인 API", description = "유저의 비밀번호를 확인합니다.")
     @ApiResponse(responseCode = "200", description = "유저 비밀번호 확인 성공")
     @PostMapping("/checkPassword")
-    public boolean checkPassword(@Parameter(hidden = true) @CheckLogin LoginUserRequest request,
-                                 @RequestBody @Valid UserPasswordRequest passwordRequest);
+    public ResponseEntity<Boolean> checkPassword(@Parameter(hidden = true) @CheckLogin LoginUserRequest request,
+                                                 @RequestBody @Valid UserPasswordRequest passwordRequest);
 
     @Operation(summary = "유저 비밀번호 갱신 API", description = "새 비밀번호로 유저의 비밀번호를 갱신합니다.")
     @ApiResponse(responseCode = "204", description = "유저 비밀번호 갱신 성공")
     public ResponseEntity<Void> updatePassword(@Parameter(hidden = true) @CheckLogin LoginUserRequest request,
                                                @RequestBody @Valid UserUpdatePasswordRequest updatePassword);
+
+    @Operation(summary = "유저Id 확인 API", description = "유저의 ID를 검증합니다.")
+    @ApiResponse(responseCode = "200", description = "유저 ID 검증 성공")
+    @GetMapping("/checkUserId")
+    public ResponseEntity<Boolean> checkUserId(@Parameter(hidden = true) @CheckLogin LoginUserRequest request,
+                                               @RequestParam("userId") Long userId);
 }

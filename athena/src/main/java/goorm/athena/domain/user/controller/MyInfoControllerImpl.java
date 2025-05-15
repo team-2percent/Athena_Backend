@@ -2,6 +2,7 @@ package goorm.athena.domain.user.controller;
 
 import goorm.athena.domain.comment.dto.res.CommentGetResponse;
 import goorm.athena.domain.comment.service.CommentService;
+import goorm.athena.domain.user.dto.request.UserIdValidateRequest;
 import goorm.athena.domain.user.dto.request.UserPasswordRequest;
 import goorm.athena.domain.user.dto.request.UserUpdatePasswordRequest;
 import goorm.athena.domain.user.service.UserService;
@@ -29,10 +30,11 @@ public class MyInfoControllerImpl implements MyInfoController{
 
     @Override
     @PostMapping("/checkPassword")
-    public boolean checkPassword(@CheckLogin LoginUserRequest request,
+    public ResponseEntity<Boolean> checkPassword(@CheckLogin LoginUserRequest request,
                                  @RequestBody @Valid UserPasswordRequest passwordRequest){
 
-        return userService.checkPassword(request.userId(), passwordRequest.password());
+        boolean response = userService.checkPassword(request.userId(), passwordRequest.password());
+        return ResponseEntity.ok(response);
     }
 
     @Override
@@ -42,5 +44,12 @@ public class MyInfoControllerImpl implements MyInfoController{
         userService.updatePassword(request.userId(), updatePassword);
 
         return ResponseEntity.noContent().build();
+    }
+
+    @Override
+    @GetMapping("/checkUserId")
+    public ResponseEntity<Boolean> checkUserId(@CheckLogin LoginUserRequest request,
+                                               @RequestParam("userId") Long userId){
+        return ResponseEntity.ok(request.userId().equals(userId));
     }
 }
