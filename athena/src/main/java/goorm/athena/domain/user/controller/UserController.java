@@ -71,10 +71,12 @@ public interface UserController {
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(@Parameter(hidden = true) @CookieValue("refreshToken") String refreshToken, HttpServletResponse response);
 
+    /*
     @Operation(summary = "유저 헤더 정보 조회 API", description = "헤더에서 유저의 이름과 이미지를 조회합니다.")
     @ApiResponse(responseCode = "200", description = "유저 헤더 정보 조회 성공")
     @PostMapping("/Header")
     public ResponseEntity<UserHeaderGetResponse> getHeader(@Parameter(hidden = true) @CheckLogin LoginUserRequest request);
+     */
 
     @Operation(summary = "유저 조회 APi", description = "유저의 ID를 통해 특정 유저의 정보를 조회합니다.<br>")
     @ApiResponse(responseCode = "200", description = "특정 유저 정보 조회 성공")

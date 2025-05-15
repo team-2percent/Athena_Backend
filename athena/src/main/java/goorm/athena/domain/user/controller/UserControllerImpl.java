@@ -100,12 +100,14 @@ public class UserControllerImpl implements UserController {
         return ResponseEntity.ok().build();
     }
 
+    /*
     @Override
     @PostMapping("/Header")
     public ResponseEntity<UserHeaderGetResponse> getHeader(@CheckLogin LoginUserRequest request){
         UserHeaderGetResponse response = userService.getHeaderById(request.userId());
         return ResponseEntity.ok(response);
     }
+     */
 
     @Override
     @GetMapping("/profile/{id}")
