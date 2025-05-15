@@ -9,14 +9,26 @@ import goorm.athena.domain.user.dto.response.UserSummaryResponse;
 import goorm.athena.domain.user.service.UserService;
 import goorm.athena.domain.userCoupon.dto.cursor.UserCouponCursorResponse;
 import goorm.athena.domain.userCoupon.service.UserCouponService;
-import goorm.athena.global.jwt.util.CheckLogin;
-import goorm.athena.global.jwt.util.LoginUserRequest;
 import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import goorm.athena.domain.user.dto.response.MyOrderScrollRequest;
+import goorm.athena.domain.user.dto.response.MyOrderScrollResponse;
+import goorm.athena.domain.user.dto.response.MyProjectScrollRequest;
+import goorm.athena.domain.user.dto.response.MyProjectScrollResponse;
+import goorm.athena.domain.user.service.MyInfoService;
+import goorm.athena.global.jwt.util.CheckLogin;
+import goorm.athena.global.jwt.util.LoginUserRequest;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -24,6 +36,7 @@ import java.util.List;
 @RequestMapping("/api/my")
 public class UserInfoControllerImpl implements UserInfoController {
     private final CommentService commentService;
+    private final MyInfoService myInfoService;
     private final UserService userService;
     private final UserCouponService userCouponService;
 
@@ -74,5 +87,27 @@ public class UserInfoControllerImpl implements UserInfoController {
     ){
         UserCouponCursorResponse responses = userCouponService.getUserCoupons(request.userId(), cursorId, size);
         return ResponseEntity.ok(responses);
+
+    @GetMapping("/projects")
+    public ResponseEntity<MyProjectScrollResponse> getMyProjects(
+            @CheckLogin LoginUserRequest loginUserRequest,
+            @RequestParam(required = false) LocalDateTime nextCursorValue,
+            @RequestParam(required = false) Long nextProjectId,
+            @RequestParam(defaultValue = "10") int pageSize
+    ) {
+        MyProjectScrollRequest request = new MyProjectScrollRequest(nextCursorValue, nextProjectId, pageSize);
+        return ResponseEntity.ok(myInfoService.getMyProjects(loginUserRequest.userId(), request));
+    }
+
+
+    @GetMapping("/orders")
+    public ResponseEntity<MyOrderScrollResponse> getMyOrders(
+            @CheckLogin LoginUserRequest loginUserRequest,
+            @RequestParam(required = false) LocalDateTime nextCursorValue,
+            @RequestParam(required = false) Long nextOrderId,
+            @RequestParam(defaultValue = "10") int pageSize
+    ) {
+        MyOrderScrollRequest request = new MyOrderScrollRequest(nextCursorValue, nextOrderId, pageSize);
+        return ResponseEntity.ok(myInfoService.getMyOrders(loginUserRequest.userId(), request));
     }
 }
