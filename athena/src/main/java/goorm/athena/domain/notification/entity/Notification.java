@@ -3,7 +3,7 @@ package goorm.athena.domain.notification.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
-import goorm.athena.domain.notification.NotificationType;
+import goorm.athena.domain.notification.util.NotificationMessage.NotificationType;
 
 @Entity
 @Table(name = "notification")
