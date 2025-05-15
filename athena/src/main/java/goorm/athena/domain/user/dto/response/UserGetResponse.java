@@ -7,5 +7,6 @@ public record UserGetResponse(
         String email,
         String password,
         String nickname,
-        Role role
+        String sellerIntroduction,
+        String linkUrl
 ) { }

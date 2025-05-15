@@ -16,6 +16,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -100,5 +101,12 @@ public class UserControllerImpl implements UserController {
     ){
         UserCouponCursorResponse responses = userCouponService.getUserCoupons(request.userId(), cursorId, size);
         return ResponseEntity.ok(responses);
+    }
+
+    @Override
+    @GetMapping("/seller")
+    public ResponseEntity<UserSellerResponse> getSeller(@CheckLogin LoginUserRequest request){
+        UserSellerResponse response = userService.getSellerResponse(request.userId());
+        return ResponseEntity.ok(response);
     }
 }

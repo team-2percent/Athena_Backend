@@ -1,5 +1,8 @@
 package goorm.athena.domain.user.service;
 
+import goorm.athena.domain.comment.dto.res.CommentGetResponse;
+import goorm.athena.domain.comment.entity.Comment;
+import goorm.athena.domain.comment.service.CommentService;
 import goorm.athena.domain.image.service.ImageService;
 import goorm.athena.domain.user.dto.request.UserCreateRequest;
 import goorm.athena.domain.user.dto.request.UserLoginRequest;
@@ -78,8 +81,9 @@ public class UserService {
     public UserGetResponse getUserById(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        String imageUrl = imageService.getImage(user.getImageGroup().getId());
 
-        return UserMapper.toGetResponse(user);
+        return UserMapper.toGetResponse(user, imageUrl);
     }
 
     @Transactional
@@ -106,5 +110,14 @@ public class UserService {
         return userRepository.findAll().stream()
                 .map(User::getId)
                 .collect(Collectors.toList());
+    }
+
+    public UserSellerResponse getSellerResponse(Long userId){
+        User user = getUser(userId);
+        String imageUrl = null;
+        if(user.getImageGroup() != null && user.getImageGroup().getId() != null) {
+            imageUrl = imageService.getImage(user.getImageGroup().getId());
+        }
+        return UserMapper.toGetSellerResponse(user, imageUrl);
     }
 }

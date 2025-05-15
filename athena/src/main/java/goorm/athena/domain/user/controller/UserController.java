@@ -82,4 +82,10 @@ public interface UserController {
             @RequestParam(required = false) Long cursorId,
             @Parameter(hidden = true) @RequestParam(defaultValue = "5") int size
     );
+
+    @Operation(summary = "유저 판매자 정보 조회 API", description = "유저의 판매자 정보들을 조회합니다.<br>" +
+            "userId, 닉네임, 판매자 소개, 이미지 Url이 해당됩니다.")
+    @ApiResponse(responseCode = "200", description = "유저의 판매자 정보 조회 완료")
+    @GetMapping("/seller")
+    public ResponseEntity<UserSellerResponse> getSeller(@Parameter(hidden = true) @CheckLogin LoginUserRequest request);
 }

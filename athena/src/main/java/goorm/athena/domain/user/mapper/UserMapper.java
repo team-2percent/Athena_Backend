@@ -30,18 +30,18 @@ public class UserMapper {
                 user.getId(),
                 user.getEmail(),
                 user.getPassword(),
-                user.getNickname(),
-                user.getRole()
+                user.getNickname()
         );
     }
 
-    public static UserGetResponse toGetResponse(User user){
+    public static UserGetResponse toGetResponse(User user, String imageUrl){
         return new UserGetResponse(
                 user.getId(),
                 user.getEmail(),
                 user.getPassword(),
                 user.getNickname(),
-                user.getRole()
+                user.getSellerIntroduction(),
+                imageUrl
         );
     }
 
@@ -57,6 +57,15 @@ public class UserMapper {
         return new UserHeaderGetResponse(
                 user.getId(),
                 user.getNickname(),
+                imageUrl
+        );
+    }
+
+    public static UserSellerResponse toGetSellerResponse(User user, String imageUrl){
+        return new UserSellerResponse(
+                user.getId(),
+                user.getNickname(),
+                user.getSellerIntroduction(),
                 imageUrl
         );
     }
