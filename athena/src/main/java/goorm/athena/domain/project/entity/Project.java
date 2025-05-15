@@ -60,14 +60,14 @@ public class Project {
     private Long views = 0L;
 
     @Builder
-    private Project(User seller, ImageGroup imageGroup, Category category, BankAccount bankAccout,
+    private Project(User seller, ImageGroup imageGroup, Category category, BankAccount bankAccount,
                     String title, String description,
                     Long goalAmount, Long totalAmount, String contentMarkdown,
-                    LocalDateTime startAt, LocalDateTime endAt, LocalDateTime shippedAt) {
+                    LocalDateTime startAt, LocalDateTime endAt, LocalDateTime shippedAt, Status status) {
         this.seller = seller;
         this.imageGroup = imageGroup;
         this.category = category;
-        this.bankAccount = bankAccout;
+        this.bankAccount = bankAccount;
         this.title = title;
         this.description = description;
         this.goalAmount = goalAmount;
@@ -76,6 +76,7 @@ public class Project {
         this.startAt = startAt;
         this.endAt = endAt;
         this.shippedAt = shippedAt;
+        this.status = status;
     }
 
 

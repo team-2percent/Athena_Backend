@@ -24,7 +24,7 @@ public class ProjectMapper {
                 .seller(seller)
                 .imageGroup(imageGroup)
                 .category(category)
-                .bankAccout(bankAccount)
+                .bankAccount(bankAccount)
                 .title(request.title())
                 .description(request.description())
                 .goalAmount(request.goalAmount())
@@ -58,9 +58,11 @@ public class ProjectMapper {
                 project.getStartAt(),
                 project.getEndAt(),
                 project.getShippedAt(),
+                project.getCreatedAt(),
                 imageUrls,
                 userDetailResponse,
-                productResponses
+                productResponses,
+                project.getStatus()
         );
     }
 

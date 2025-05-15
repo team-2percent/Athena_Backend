@@ -2,6 +2,7 @@ package goorm.athena.domain.project.dto.res;
 
 import goorm.athena.domain.category.entity.Category;
 import goorm.athena.domain.product.dto.res.ProductResponse;
+import goorm.athena.domain.project.entity.Status;
 import goorm.athena.domain.user.dto.response.UserDetailResponse;
 
 import java.time.LocalDateTime;
@@ -20,8 +21,11 @@ public record ProjectDetailResponse (
         LocalDateTime startAt,
         LocalDateTime endAt,
         LocalDateTime shippedAt,
+        LocalDateTime createdAt,
 
         List<String> imageUrls,     // 대표 이미지 리스트
         UserDetailResponse sellerResponse,
-        List<ProductResponse> productResponses
+        List<ProductResponse> productResponses,
+
+        Status status
 ){ }
