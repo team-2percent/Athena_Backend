@@ -10,6 +10,7 @@ public record ProjectCreateRequest(
         Long sellerId,
         Long categoryId,
         Long imageGroupId,
+        Long bankAccountId,
 
         String title,
         String description,
