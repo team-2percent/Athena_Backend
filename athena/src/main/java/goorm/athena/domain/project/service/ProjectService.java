@@ -1,6 +1,8 @@
 package goorm.athena.domain.project.service;
 
 import goorm.athena.domain.admin.dto.res.ProjectSummaryResponse;
+import goorm.athena.domain.bankaccount.entity.BankAccount;
+import goorm.athena.domain.bankaccount.service.BankAccountService;
 import goorm.athena.domain.category.entity.Category;
 import goorm.athena.domain.category.service.CategoryService;
 import goorm.athena.domain.image.dto.req.ImageCreateRequest;
@@ -61,6 +63,7 @@ public class ProjectService {
     private final UserService userService;
     private final CategoryService categoryService;
     private final ProductService productService;
+    private final BankAccountService bankAccountService;
     private final ProjectQueryRepository projectQueryRepository;
     private final MarkdownParser markdownParser;
 
@@ -72,9 +75,10 @@ public class ProjectService {
         ImageGroup imageGroup = imageGroupService.getById(request.imageGroupId());
         User seller = userService.getUser(request.sellerId());
         Category category = categoryService.getCategoryById(request.categoryId());
+        BankAccount bankAccount = bankAccountService.getPrimaryAccount(request.bankAccountId());
 
         // String convertedMarkdown = getConvertedMarkdown(request.markdownImages(), request.contentMarkdown());       // 마크다운 변환
-        Project project = ProjectMapper.toEntity(request, seller, imageGroup, category);    // 새 프로젝트 생성
+        Project project = ProjectMapper.toEntity(request, seller, imageGroup, category, bankAccount);    // 새 프로젝트 생성
         Project savedProject = projectRepository.save(project);                             // 프로젝트 저장
         // 프로젝트 생성 시 예외 처리 필요
 
@@ -109,11 +113,13 @@ public class ProjectService {
                               List<ImageUpdateRequest> imageRequests){
         Project project = getById(projectId);
         Category category = categoryService.getCategoryById(request.categoryId());
+        BankAccount bankAccount = bankAccountService.getPrimaryAccount(request.bankAccountId());
 
         // 추후 마크다운에서 수정된 이미지 추적하는 코드 추가
 
         project.update(
                 category,
+                bankAccount,
                 request.title(),
                 request.description(),
                 request.goalAmount(),
@@ -181,12 +187,13 @@ public class ProjectService {
     public ProjectDetailResponse getProjectDetail(Long projectId){
         Project project = getById(projectId);
 
+        Category category = categoryService.getCategoryById(projectId);
         List<Image> images = imageService.getImages(project.getImageGroup());
         List<String> imageUrls = imageService.getImageUrls(images);
         UserDetailResponse userDetailResponse = UserMapper.toDetailResponse(project.getSeller());
         List<ProductResponse> productResponses = productService.getAllProducts(project);
 
-        return ProjectMapper.toDetailDto(project, imageUrls, userDetailResponse, productResponses);
+        return ProjectMapper.toDetailDto(project, category, imageUrls, userDetailResponse, productResponses);
     }
 
     // 메인 페이지 조회

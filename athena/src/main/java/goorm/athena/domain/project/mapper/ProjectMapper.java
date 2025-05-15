@@ -1,5 +1,6 @@
 package goorm.athena.domain.project.mapper;
 
+import goorm.athena.domain.bankaccount.entity.BankAccount;
 import goorm.athena.domain.category.entity.Category;
 import goorm.athena.domain.imageGroup.entity.ImageGroup;
 import goorm.athena.domain.product.dto.res.ProductResponse;
@@ -17,11 +18,13 @@ import java.util.List;
 public class ProjectMapper {
     // ProjectCreateRequest(Dto) -> Entity
     // convertedMarkdown parameter 추가 예정
-    public static Project toEntity(ProjectCreateRequest request, User seller, ImageGroup imageGroup, Category category) {
+    public static Project toEntity(ProjectCreateRequest request, User seller,
+                                   ImageGroup imageGroup, Category category, BankAccount bankAccount) {
         return Project.builder()
                 .seller(seller)
                 .imageGroup(imageGroup)
                 .category(category)
+                .bankAccout(bankAccount)
                 .title(request.title())
                 .description(request.description())
                 .goalAmount(request.goalAmount())
@@ -41,11 +44,12 @@ public class ProjectMapper {
                 .build();
     }
 
-    // Create response dto
-    public static ProjectDetailResponse toDetailDto(Project project,
-                                                    List<String> imageUrls, UserDetailResponse userDetailResponse, List<ProductResponse> productResponses){
+    // Entity -> ProjectDetailResponse (프로젝트 상세 페이지 조회)
+    public static ProjectDetailResponse toDetailDto(Project project, Category category, List<String> imageUrls,
+                                                    UserDetailResponse userDetailResponse, List<ProductResponse> productResponses){
         return new ProjectDetailResponse(
                 project.getId(),
+                category,
                 project.getTitle(),
                 project.getDescription(),
                 project.getGoalAmount(),

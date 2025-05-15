@@ -2,6 +2,7 @@ package goorm.athena.domain.admin.controller;
 
 import goorm.athena.domain.admin.dto.res.*;
 import goorm.athena.domain.project.dto.req.ProjectApprovalRequest;
+import goorm.athena.domain.project.dto.res.ProjectDetailResponse;
 import goorm.athena.domain.settlement.entity.Status;
 import goorm.athena.global.jwt.util.CheckLogin;
 import goorm.athena.global.jwt.util.LoginUserRequest;
@@ -48,6 +49,18 @@ public interface AdminController {
             @Parameter(description = "정렬 방향(desc 또는 asc)", example = "desc") @RequestParam(value = "direction", defaultValue = "desc") String direction,
             @Parameter(description = "페이지 번호 (0부터 시작)", example = "0") @RequestParam(value = "page", defaultValue = "0") int page
     );
+
+    @Operation(
+            summary = "프로젝트 상세 조회",
+            description = "관리자가 확인할 수 있는 프로젝트의 상세 정보를 조회합니다. 관리자는 프로젝트를 승인/거부할 수 있습니다.",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "프로젝트 상세 조회 성공",
+                            content = @Content(schema = @Schema(implementation = ProjectDetailResponse.class)))
+            }
+    )
+    @GetMapping("/projects/{projectId}")
+    ResponseEntity<ProjectDetailResponse> getProjectDetail(@PathVariable Long projectId);
+
 
     @Operation(
             summary = "정산 내역 목록 조회",
@@ -114,4 +127,5 @@ public interface AdminController {
     ResponseEntity<ProductSettlementSummaryResponse> getProductSettlementInfo(
             @Parameter(description = "정산 ID", example = "1") @PathVariable Long settlementId
     );
+
 }

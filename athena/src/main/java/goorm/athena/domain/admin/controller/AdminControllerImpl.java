@@ -4,6 +4,7 @@ import goorm.athena.domain.admin.dto.res.*;
 import goorm.athena.domain.admin.service.AdminRoleCheckService;
 import goorm.athena.domain.admin.service.AdminService;
 import goorm.athena.domain.project.dto.req.ProjectApprovalRequest;
+import goorm.athena.domain.project.dto.res.ProjectDetailResponse;
 import goorm.athena.domain.project.service.ProjectService;
 import goorm.athena.domain.settlement.entity.Status;
 import goorm.athena.domain.settlement.service.SettlementService;
@@ -51,6 +52,12 @@ public class AdminControllerImpl implements AdminController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/projects/{projectId}")
+    public ResponseEntity<ProjectDetailResponse> getProjectDetail(@PathVariable Long projectId){
+        ProjectDetailResponse response = projectService.getProjectDetail(projectId);
+        return ResponseEntity.ok(response);
+    }
+
     @GetMapping("/settlements")
     public ResponseEntity<SettlementSummaryPageResponse> getSettlements(
             @CheckLogin LoginUserRequest loginUserRequest,
@@ -90,4 +97,6 @@ public class AdminControllerImpl implements AdminController {
         ProductSettlementSummaryResponse result = settlementService.getProductSettlementInfo(settlementId);
         return ResponseEntity.ok(result);
     }
+
+
 }

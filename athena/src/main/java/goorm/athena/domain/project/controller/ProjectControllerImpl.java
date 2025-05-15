@@ -114,7 +114,7 @@ public class ProjectControllerImpl implements ProjectController {
     }
 
     // 카테고리별 프로젝트 조회 (커서 기반 페이징)
-    @GetMapping("/category")
+    @Override
     public ResponseEntity<ProjectFilterCursorResponse<?>> getProjectsByCategory(
             @RequestParam(value = "cursorId", required = false) Long cursorId,
             @RequestParam(value = "cursorValue", required = false) Object cursorValue,
