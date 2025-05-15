@@ -65,6 +65,7 @@ public class NotificationService {
     notificationRepository.deleteById(notificationId);
   }
 
+  @Transactional
   public void deleteAllNotifications(Long userId) {
     notificationRepository.deleteAllByUserId(userId);
   }
