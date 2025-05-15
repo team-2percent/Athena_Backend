@@ -80,9 +80,11 @@ public class UserService {
     // 내 정보 조회 임시 로직
     @Transactional(readOnly = true)
     public UserGetResponse getUserById(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
-        String imageUrl = imageService.getImage(user.getImageGroup().getId());
+        User user = getUser(userId);
+        String imageUrl = null;
+        if(user.getImageGroup() != null && user.getImageGroup().getId() != null) {
+            imageUrl = imageService.getImage(user.getImageGroup().getId());
+        }
 
         return UserMapper.toGetResponse(user, imageUrl);
     }
@@ -135,5 +137,10 @@ public class UserService {
         }else{
             throw new CustomException(ErrorCode.INVALID_USER_PASSWORD);
         }
+    }
+
+    public UserSummaryResponse getUserSummary(Long userId){
+        User user = getUser(userId);
+        return UserMapper.toSummaryResponse(user);
     }
 }

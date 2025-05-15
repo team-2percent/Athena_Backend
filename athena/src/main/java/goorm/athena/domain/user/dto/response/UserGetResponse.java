@@ -5,8 +5,6 @@ import goorm.athena.domain.user.entity.Role;
 public record UserGetResponse(
         Long id,
         String email,
-        String password,
         String nickname,
-        String sellerIntroduction,
-        String linkUrl
+        String imageUrl
 ) { }

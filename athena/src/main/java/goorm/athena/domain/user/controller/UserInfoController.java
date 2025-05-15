@@ -1,24 +1,30 @@
 package goorm.athena.domain.user.controller;
 
 import goorm.athena.domain.comment.dto.res.CommentGetResponse;
-import goorm.athena.domain.user.dto.request.UserIdValidateRequest;
 import goorm.athena.domain.user.dto.request.UserPasswordRequest;
 import goorm.athena.domain.user.dto.request.UserUpdatePasswordRequest;
+import goorm.athena.domain.user.dto.response.UserSummaryResponse;
 import goorm.athena.domain.userCoupon.dto.cursor.UserCouponCursorResponse;
 import goorm.athena.global.jwt.util.CheckLogin;
 import goorm.athena.global.jwt.util.LoginUserRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@RestController
+@Tag(name = "MyPage", description = "마이페이지 관련 API")
 @RequestMapping("/api/my")
-public interface MyInfoController {
+public interface UserInfoController {
+
+    @Operation(summary = "유저 소개 조회 API", description = "유저가 작성한 소개를 조회합니다.")
+    @ApiResponse(responseCode = "200", description = "유저 소개 조회 성공")
+    @GetMapping("/info")
+    public ResponseEntity<UserSummaryResponse> getSummary(@Parameter(hidden = true) @CheckLogin LoginUserRequest request);
 
     @Operation(summary = "유저 작성 댓글 조회 API", description = "유저가 작성한 댓글들을 조회합니다.")
     @ApiResponse(responseCode = "200", description = "유저 작성 댓글 조회 성공")

@@ -2,9 +2,10 @@ package goorm.athena.domain.user.controller;
 
 import goorm.athena.domain.comment.dto.res.CommentGetResponse;
 import goorm.athena.domain.comment.service.CommentService;
-import goorm.athena.domain.user.dto.request.UserIdValidateRequest;
 import goorm.athena.domain.user.dto.request.UserPasswordRequest;
 import goorm.athena.domain.user.dto.request.UserUpdatePasswordRequest;
+import goorm.athena.domain.user.dto.response.UserGetResponse;
+import goorm.athena.domain.user.dto.response.UserSummaryResponse;
 import goorm.athena.domain.user.service.UserService;
 import goorm.athena.domain.userCoupon.dto.cursor.UserCouponCursorResponse;
 import goorm.athena.domain.userCoupon.service.UserCouponService;
@@ -21,10 +22,17 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/my")
-public class MyInfoControllerImpl implements MyInfoController{
+public class UserInfoControllerImpl implements UserInfoController {
     private final CommentService commentService;
     private final UserService userService;
     private final UserCouponService userCouponService;
+
+    @Override
+    @GetMapping("/info")
+    public ResponseEntity<UserSummaryResponse> getSummary(@CheckLogin LoginUserRequest request){
+        UserSummaryResponse response = userService.getUserSummary(request.userId());
+        return ResponseEntity.ok(response);
+    }
 
     @Override
     @GetMapping("/comments")

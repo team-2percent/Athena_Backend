@@ -94,8 +94,8 @@ public class UserControllerImpl implements UserController {
 
     @Override
     @GetMapping("/seller")
-    public ResponseEntity<UserSellerResponse> getSeller(@CheckLogin LoginUserRequest request){
-        UserSellerResponse response = userService.getSellerResponse(request.userId());
+    public ResponseEntity<UserSellerResponse> getSeller(@RequestParam Long userId){
+        UserSellerResponse response = userService.getSellerResponse(userId);
         return ResponseEntity.ok(response);
     }
 }

@@ -39,9 +39,7 @@ public class UserMapper {
         return new UserGetResponse(
                 user.getId(),
                 user.getEmail(),
-                user.getPassword(),
                 user.getNickname(),
-                user.getSellerIntroduction(),
                 imageUrl
         );
     }
@@ -68,6 +66,13 @@ public class UserMapper {
                 user.getNickname(),
                 user.getSellerIntroduction(),
                 imageUrl
+        );
+    }
+
+    public static UserSummaryResponse toSummaryResponse(User user){
+        return new UserSummaryResponse(
+                user.getSellerIntroduction(),
+                user.getLinkUrl()
         );
     }
 }
