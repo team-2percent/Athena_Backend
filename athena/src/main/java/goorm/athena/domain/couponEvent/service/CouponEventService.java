@@ -16,6 +16,7 @@ import goorm.athena.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import goorm.athena.domain.notification.service.NotificationService;
 
 import java.util.List;
 import java.util.Set;
@@ -27,6 +28,7 @@ public class CouponEventService {
     private final CouponEventRepository couponEventRepository;
     private final UserCouponRepository userCouponRepository;
     private final UserService userService;
+    private final NotificationService notificationService;
 
     @Transactional
     public CouponEventCreateResponse createCouponEvent(CouponCreateRequest request) {
@@ -39,11 +41,16 @@ public class CouponEventService {
         CouponEvent couponEvent = CouponEvent.create(coupon);
         couponEventRepository.save(couponEvent);
 
+        List<Long> userIds = userService.getUserIdAll();
+        for (Long userId : userIds) {
+            notificationService.sendCouponEventNotification(userId, couponEvent.getCoupon().getTitle());
+        }
+
         return CouponEventMapper.toCreateResponse(couponEvent);
     }
 
     @Transactional(readOnly = true)
-    public List<CouponEventGetResponse> getCouponEvent(Long userId){
+    public List<CouponEventGetResponse> getCouponEvent(Long userId) {
         List<CouponEvent> couponEventList = couponEventRepository.findByIsActiveTrueWithCoupon();
 
         List<Long> couponIds = couponEventList.stream()
