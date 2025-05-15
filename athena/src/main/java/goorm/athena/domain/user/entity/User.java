@@ -34,9 +34,6 @@ public class User {
     @Column(length = 20, nullable = false)
     private Role role;
 
-    @Column(length = 50, nullable = true)
-    private String sellerName;
-
     @Column(length = 3000, nullable = true)
     private String sellerIntroduction;
 
