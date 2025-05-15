@@ -75,6 +75,17 @@ public class ProjectControllerImpl implements ProjectController {
         }
     }
 
+    /**
+     * [GET API]
+     */
+
+    // 상세 조회
+    @Override
+    public ResponseEntity<ProjectDetailResponse> getProjectDetail(@PathVariable Long projectId){
+        ProjectDetailResponse response = projectService.getProjectDetail(projectId);
+        return ResponseEntity.ok(response);
+    }
+
     @Override
     public ResponseEntity<List<ProjectAllResponse>> getProjectsAll(){
         List<ProjectAllResponse> responses = projectService.getProjects();

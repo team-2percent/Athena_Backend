@@ -56,12 +56,18 @@ public interface ProjectController {
     @DeleteMapping("/{projectId}")
     ResponseEntity<Void> deleteProject(@PathVariable Long projectId);
 
+    @Operation(summary = "프로젝트 상세 조회", description = "프로젝트 상세 내용을 조회합니다.")
+    @ApiResponse(responseCode = "200", description = "프로젝트 상세 조회 성공",
+            content = @Content(schema = @Schema(implementation = ProjectDetailResponse.class)))
+    @GetMapping("/{projectId}")
+    ResponseEntity<ProjectDetailResponse> getProjectDetail(@PathVariable Long projectId);
+
     @Operation(summary = "프로젝트 전체 조회", description = "프로젝트를 전체로 조회하면서 인기 순으로 정렬합니다. (조회수 순 정렬)<br>" +
             "테스트 시 기본적으로 Pageable은 sort를 가지기 때문에 요청 파라미터에서 sort 키를 없애주시면 됩니다,, !! ")
     @ApiResponse(responseCode = "200", description = "프로젝트 전체 조회 성공",
             content = @Content(schema = @Schema(implementation = ProjectAllResponse.class)))
     @GetMapping("/all")
-    public ResponseEntity<List<ProjectAllResponse>> getProjectsAll();
+    ResponseEntity<List<ProjectAllResponse>> getProjectsAll();
 
     @Operation(summary = "프로젝트 신규순 조회(무한 페이징)", description = "프로젝트를 신규 순으로 조회합니다. (신규순 정렬)<br>" +
             "페이지는 20개 단위로 구성되며, **맨 처음에는 아무 값도 입력되지 않아도 됩니다.**<br>" +
@@ -70,7 +76,7 @@ public interface ProjectController {
     @ApiResponse(responseCode = "200", description = "프로젝트 신규순 조회 성공",
             content = @Content(schema = @Schema(implementation = ProjectAllResponse.class)))
     @GetMapping("/new")
-    public ResponseEntity<ProjectCursorResponse<ProjectRecentResponse>> getProjectsByNew(@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime cursorValue,
+    ResponseEntity<ProjectCursorResponse<ProjectRecentResponse>> getProjectsByNew(@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime cursorValue,
                                                                                          @RequestParam(required = false) Long lastProjectId, @Parameter(hidden = true) @RequestParam(defaultValue = "20") int pageSize);
     @Operation(summary = "프로젝트 카테고리별 조회", description = "프로젝트를 카테고리별로 조회합니다.<br>" +
             "페이지는 20개 단위로 구성되며, **맨 처음에는 아무 값도 입력되지 않아도 됩니다.**<br>" +
@@ -89,7 +95,7 @@ public interface ProjectController {
     @ApiResponse(responseCode = "200", description = "프로젝트 카테고리별 조회 성공",
             content = @Content(schema = @Schema(implementation = ProjectCategoryResponse.class)))
     @GetMapping("/category")
-    public ResponseEntity<ProjectCursorResponse<ProjectCategoryResponse>> getProjectByCategory(@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime cursorValue,
+    ResponseEntity<ProjectCursorResponse<ProjectCategoryResponse>> getProjectByCategory(@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime cursorValue,
                                                                                                @RequestParam(required = false) Long lastProjectId,
                                                                                                @RequestParam Long categoryId,
                                                                                                @ModelAttribute SortType sortType,
@@ -114,7 +120,7 @@ public interface ProjectController {
     @ApiResponse(responseCode = "200", description = "프로젝트 마감별 조회 성공",
         content = @Content(schema = @Schema(implementation = ProjectDeadLineResponse.class)))
     @GetMapping("/deadLine")
-    public ResponseEntity<ProjectCursorResponse<ProjectDeadLineResponse>> getProjectByDeadLine(@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime cursorValue,
+    ResponseEntity<ProjectCursorResponse<ProjectDeadLineResponse>> getProjectByDeadLine(@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime cursorValue,
                                                                                                @RequestParam(required = false) Long lastProjectId,
                                                                                                @Parameter(
                                                                                                        description = "마감 정렬 방식",
@@ -142,7 +148,7 @@ public interface ProjectController {
     @ApiResponse(responseCode = "200", description = "프로젝트 검색별 조회 성공",
             content = @Content(schema = @Schema(implementation = ProjectSearchResponse.class)))
     @GetMapping("/search")
-    public ResponseEntity<ProjectSearchCursorResponse<ProjectSearchResponse>> searchProject(@RequestParam String searchTerm,
+    ResponseEntity<ProjectSearchCursorResponse<ProjectSearchResponse>> searchProject(@RequestParam String searchTerm,
                                                                                             @RequestParam(required = false) Long lastProjectId,
                                                                                             @ModelAttribute SortType sortType,
                                                                                             @Parameter(hidden = true) @RequestParam(defaultValue = "20") int pageSize);

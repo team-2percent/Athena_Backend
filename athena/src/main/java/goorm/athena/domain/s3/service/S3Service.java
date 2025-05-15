@@ -13,6 +13,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -33,19 +36,7 @@ public class S3Service {
             // S3에 저장할 이름 및 메타데이터 설정
             String fileName = createFileName(file.getOriginalFilename());
             validateFileExtension(fileName);                    // 파일 유효성 검증
-            ObjectMetadata metadata = new ObjectMetadata();
-            metadata.setContentType(file.getContentType());     // File type
-            metadata.setContentLength(file.getSize());          // File size
-
-            // InputStream 으로 추출 후 S3 업로드
-            try(InputStream inputStream = file.getInputStream()) {
-                amazonS3.putObject(new PutObjectRequest(imageBucket, fileName, inputStream, metadata));
-            } catch(IOException e){
-                throw new CustomException(ErrorCode.IMAGE_UPLOAD_FAILED);
-            }
-
-            String originalUrl = amazonS3.getUrl(imageBucket, fileName).toString();
-            // 사이즈 별 이미지 URL 추가
+            String originalUrl = uploadToS3(file, fileName);    // S3 파일 업로드
 
             // S3 업로드가 성공적으로 된다면, 이미지 생성 요청 DTO 생성
             ImageCreateRequest imageRequest = new ImageCreateRequest(
@@ -59,6 +50,22 @@ public class S3Service {
         });
 
         return imageRequests;
+    }
+
+    // S3 파일 업로드
+    public String uploadToS3(MultipartFile file, String fileName) {
+        ObjectMetadata metadata = new ObjectMetadata();     // 메타데이터 설정
+        metadata.setContentType(file.getContentType());     // File type
+        metadata.setContentLength(file.getSize());          // File size
+
+        // InputStream 으로 추출 후 S3 업로드
+        try(InputStream inputStream = file.getInputStream()) {
+            amazonS3.putObject(new PutObjectRequest(imageBucket, fileName, inputStream, metadata));
+            return amazonS3.getUrl(imageBucket, fileName).toString();   // S3 Url return
+            // 사이즈 별 이미지 URL 추가 필요
+        } catch(IOException e){
+            throw new CustomException(ErrorCode.IMAGE_UPLOAD_FAILED);
+        }
     }
 
     // S3 이미지 URL 대조
@@ -80,11 +87,6 @@ public class S3Service {
         }
     }
 
-    // URL에서 파일명 추출 (파일 삭제를 위해)
-    private String extractFileNameFromUrl(String fileUrl) {
-        return fileUrl.substring(fileUrl.lastIndexOf("/") + 1);
-    }
-
     // 파일마다 고유한 이름 부여 (중복 방지)
     private String createFileName(String fileName){
         return UUID.randomUUID().toString().concat(getFileExtension(fileName));
@@ -103,6 +105,10 @@ public class S3Service {
         }
     }
 
+    // URL에서 파일명 추출 (파일 삭제를 위해)
+    private String extractFileNameFromUrl(String fileUrl) {
+        return fileUrl.substring(fileUrl.lastIndexOf("/") + 1);
+    }
 
 
     // 이미지 리사이징
