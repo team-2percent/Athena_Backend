@@ -10,7 +10,7 @@ import java.util.List;
 
 public record ProjectDetailResponse (
         Long id,
-        Category category,
+        Long category,
         String title,
         String description,
 
