@@ -31,7 +31,7 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/projects")
+@RequestMapping("/api/project")
 public class ProjectControllerImpl implements ProjectController {
     private final ProjectService projectService;
     private final ImageGroupService imageGroupService;
