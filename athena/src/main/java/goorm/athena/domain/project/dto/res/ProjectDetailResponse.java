@@ -16,7 +16,7 @@ public record ProjectDetailResponse (
 
         Long goalAmount,
         Long totalAmount,
-        String markdown,
+        String convertedMarkdown,
 
         LocalDateTime startAt,
         LocalDateTime endAt,
