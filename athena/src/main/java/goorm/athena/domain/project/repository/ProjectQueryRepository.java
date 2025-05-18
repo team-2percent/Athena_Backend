@@ -11,6 +11,10 @@ import goorm.athena.domain.image.entity.QImage;
 import goorm.athena.domain.imageGroup.entity.QImageGroup;
 import goorm.athena.domain.project.dto.cursor.*;
 import goorm.athena.domain.project.dto.req.ProjectCursorRequest;
+import goorm.athena.domain.project.dto.res.ProjectCategoryResponse;
+import goorm.athena.domain.project.dto.res.ProjectDeadLineResponse;
+import goorm.athena.domain.project.dto.res.ProjectRecentResponse;
+import goorm.athena.domain.project.dto.res.ProjectSearchResponse;
 import goorm.athena.domain.project.entity.QProject;
 import goorm.athena.domain.project.entity.SortTypeDeadLine;
 import goorm.athena.domain.project.entity.SortTypeLatest;
@@ -46,16 +50,58 @@ public class ProjectQueryRepository {
                 .divide(project.goalAmount.doubleValue());
 
         return switch (sortType) {
-
             case LATEST -> List.of(project.createdAt.desc(), project.id.desc());
             case POPULAR -> List.of(project.views.desc(), project.id.desc());
             case SUCCESS_RATE -> List.of(successRate.desc(), project.id.desc());
         };
     }
 
+    // 최신순 기준 정렬 후 조건에 따른 조회
+    private BooleanBuilder buildCursorLatest(SortTypeLatest sortType, ProjectCursorRequest<?> request,
+                                             QProject project){
+        BooleanBuilder builder = new BooleanBuilder();
+
+        switch (sortType) {
+            case LATEST -> {
+                String rawCursor = (String) request.cursorValue();
+                LocalDateTime cursorCreatedAt = rawCursor != null ? LocalDateTime.parse(rawCursor) : null;
+                Long cursorId = request.cursorId();
+                if (cursorCreatedAt != null && cursorId != null) {
+                    builder.and(project.createdAt.lt(cursorCreatedAt)
+                            .or(project.createdAt.eq(cursorCreatedAt).and(project.id.lt(cursorId))));
+                }
+            }
+
+            case POPULAR -> {
+                String rawCursor = (String) request.cursorValue();
+                Long cursorViews = rawCursor != null ? Long.parseLong(rawCursor) : null;
+                Long cursorId = request.cursorId();
+                if (cursorViews != null && cursorId != null) {
+                    builder.and(project.views.lt(cursorViews)
+                            .or(project.views.eq(cursorViews).and(project.id.lt(cursorId))));
+                }
+            }
+
+            case SUCCESS_RATE -> {
+                String rawCursor = (String) request.cursorValue();
+                Double cursorRate = rawCursor != null ? Double.parseDouble(rawCursor) : null;
+                Long cursorId = request.cursorId();
+                if (cursorRate != null && cursorId != null) {
+                    NumberExpression<Long> successRate =
+                            project.totalAmount.multiply(100.0).divide(project.goalAmount.doubleValue());
+
+                    builder.and(successRate.lt(cursorRate)
+                            .or(successRate.eq(Expressions.constant(cursorRate)).and(project.id.lt(cursorId))));
+                }
+            }
+
+            default -> throw new CustomException(ErrorCode.INVALID_PROJECT_ORDER);
+        }
+        return builder;
+    }
 
     // 최신 프로젝트 조회 (커서 기반 페이징)
-    public ProjectCursorResponse<ProjectRecentResponse> getProjectsByNew(ProjectCursorRequest<LocalDateTime> request) {
+    public ProjectRecentCursorResponse getProjectsByNew(ProjectCursorRequest<LocalDateTime> request) {
         QProject project = QProject.project;
         QImageGroup imageGroup = QImageGroup.imageGroup;
         QImage image = QImage.image;
@@ -112,13 +158,13 @@ public class ProjectQueryRepository {
                 .fetchOne();
 
         // 다음 커서 계산: 마지막 프로젝트 ID를 nextCursor로 반환
-        return ProjectCursorResponse.ofByCreatedAt(content, totalCount);// Pageable.unpaged()를 사용하여 페이징 없이 총 수만 반환
+        return ProjectRecentCursorResponse.ofByCreatedAt(content, totalCount);// Pageable.unpaged()를 사용하여 페이징 없이 총 수만 반환
     }
 
     // 카테고리별 프로젝트 조회 (커서 기반 페이징)
-    public ProjectFilterCursorResponse<?> getProjectsByCategory(ProjectCursorRequest<?> request,
-                                                                                Long categoryId,
-                                                                                SortTypeLatest sortType) {
+    public ProjectCategoryCursorResponse getProjectsByCategory(ProjectCursorRequest<?> request,
+                                                                  Long categoryId,
+                                                                  SortTypeLatest sortType) {
         if ((sortType.name().startsWith("DEADLINE"))) {
             throw new CustomException(ErrorCode.INVALID_PROJECT_ORDER);
         }
@@ -135,44 +181,7 @@ public class ProjectQueryRepository {
         }
 
         // 커서 조건
-        switch (sortType) {
-            case LATEST -> {
-                String rawCursor = (String) request.cursorValue();
-                LocalDateTime cursorCreatedAt = rawCursor != null ? LocalDateTime.parse(rawCursor) : null;
-                Long cursorId = request.cursorId();
-                if (cursorCreatedAt != null && cursorId != null) {
-                    builder.and(project.createdAt.lt(cursorCreatedAt)
-                            .or(project.createdAt.eq(cursorCreatedAt).and(project.id.lt(cursorId))));
-                }
-            }
-
-            case POPULAR -> {
-                String rawCursor = (String) request.cursorValue();
-                Long cursorViews = rawCursor != null ? Long.parseLong(rawCursor) : null;
-                Long cursorId = request.cursorId();
-                if (cursorViews != null && cursorId != null) {
-                    builder.and(project.views.lt(cursorViews)
-                            .or(project.views.eq(cursorViews).and(project.id.lt(cursorId))));
-                }
-            }
-
-            case SUCCESS_RATE -> {
-                String rawCursor = (String) request.cursorValue();
-                Double cursorRate = rawCursor != null ? Double.parseDouble(rawCursor) : null;
-                Long cursorId = request.cursorId();
-                if (cursorRate != null && cursorId != null) {
-                    NumberExpression<Long> successRate =
-                            project.totalAmount.multiply(100.0).divide(project.goalAmount.doubleValue());
-
-                    builder.and(successRate.lt(cursorRate)
-                            .or(successRate.eq(Expressions.constant(cursorRate)).and(project.id.lt(cursorId))));
-                }
-            }
-
-            default -> {
-                throw new CustomException(ErrorCode.COUPON_NOT_FOUND);
-            }
-        }
+        builder.and(buildCursorLatest(sortType, request, project));
 
         List<ProjectCategoryResponse> content = queryFactory
                 .select(Projections.constructor(
@@ -221,19 +230,19 @@ public class ProjectQueryRepository {
         ProjectCategoryResponse last = content.isEmpty() ? null : content.get(content.size() - 1);
 
         return switch (sortType) {
-            case LATEST -> ProjectFilterCursorResponse.of(
+            case LATEST -> ProjectCategoryCursorResponse.of(
                     content,
                     last != null ? last.createdAt() : null,
                     last != null ? last.id() : null,
                     totalCount
             );
-            case POPULAR -> ProjectFilterCursorResponse.of(
+            case POPULAR -> ProjectCategoryCursorResponse.of(
                     content,
                     last != null ? last.views() : null,
                     last != null ? last.id() : null,
                     totalCount
             );
-            case SUCCESS_RATE -> ProjectFilterCursorResponse.of(
+            case SUCCESS_RATE -> ProjectCategoryCursorResponse.of(
                     content,
                     last != null ? last.achievementRate() : null,
                     last != null ? last.id() : null,
@@ -243,7 +252,7 @@ public class ProjectQueryRepository {
     }
 
     // 마감 기한별 프로젝트 조회 (커서 기반 페이징)
-    public ProjectCursorResponse<ProjectDeadLineResponse> getProjectsByDeadline(ProjectCursorRequest<LocalDateTime> request,
+    public ProjectDeadLineCursorResponse getProjectsByDeadline(ProjectCursorRequest<LocalDateTime> request,
                                                                                 SortTypeDeadLine sortTypeDeadLine) {
         if (!(sortTypeDeadLine.name().startsWith("DEADLINE"))) {
             throw new CustomException(ErrorCode.INVALID_PROJECT_ORDER);
@@ -304,13 +313,13 @@ public class ProjectQueryRepository {
                 .from(project)
                 .fetchOne();
 
-        return ProjectCursorResponse.ofByEndAt(content, totalCount);
+        return ProjectDeadLineCursorResponse.ofByEndAt(content, totalCount);
     }
 
     // 검색 기반 페이지 조회
-    public ProjectFilterCursorResponse<ProjectSearchResponse> searchProjects(ProjectCursorRequest<?> request,
-                                                                               String searchTerm,
-                                                                               SortTypeLatest sortType) {
+    public ProjectSearchCursorResponse searchProjects(ProjectCursorRequest<?> request,
+                                                                             String searchTerm,
+                                                                             SortTypeLatest sortType) {
         if ((sortType.name().startsWith("DEADLINE"))) {
             throw new CustomException(ErrorCode.INVALID_PROJECT_ORDER);
         }
@@ -328,44 +337,7 @@ public class ProjectQueryRepository {
         }
 
         // 커서 조건
-        switch (sortType) {
-            case LATEST -> {
-                String rawCursor = (String) request.cursorValue();
-                LocalDateTime cursorCreatedAt = rawCursor != null ? LocalDateTime.parse(rawCursor) : null;
-                Long cursorId = request.cursorId();
-                if (cursorCreatedAt != null && cursorId != null) {
-                    builder.and(project.createdAt.lt(cursorCreatedAt)
-                            .or(project.createdAt.eq(cursorCreatedAt).and(project.id.lt(cursorId))));
-                }
-            }
-
-            case POPULAR -> {
-                String rawCursor = (String) request.cursorValue();
-                Long cursorViews = rawCursor != null ? Long.parseLong(rawCursor) : null;
-                Long cursorId = request.cursorId();
-                if (cursorViews != null && cursorId != null) {
-                    builder.and(project.views.lt(cursorViews)
-                            .or(project.views.eq(cursorViews).and(project.id.lt(cursorId))));
-                }
-            }
-
-            case SUCCESS_RATE -> {
-                String rawCursor = (String) request.cursorValue();
-                Double cursorRate = rawCursor != null ? Double.parseDouble(rawCursor) : null;
-                Long cursorId = request.cursorId();
-                if (cursorRate != null && cursorId != null) {
-                    NumberExpression<Long> successRate =
-                            project.totalAmount.multiply(100.0).divide(project.goalAmount.doubleValue());
-
-                    builder.and(successRate.lt(cursorRate)
-                            .or(successRate.eq(Expressions.constant(cursorRate)).and(project.id.lt(cursorId))));
-                }
-            }
-
-            default -> {
-                throw new CustomException(ErrorCode.COUPON_NOT_FOUND);
-            }
-        }
+        builder.and(buildCursorLatest(sortType, request, project));
 
         // 나머지 fetch, join, 정렬 등 쿼리 작성
         List<ProjectSearchResponse> content = queryFactory
@@ -405,19 +377,19 @@ public class ProjectQueryRepository {
         ProjectSearchResponse last = content.isEmpty() ? null : content.get(content.size() - 1);
 
         return switch (sortType) {
-            case LATEST -> ProjectFilterCursorResponse.ofSearch(
+            case LATEST -> ProjectSearchCursorResponse.ofSearch(
                     content,
                     last != null ? last.createdAt() : null,
                     last != null ? last.id() : null,
                     totalCount
             );
-            case POPULAR -> ProjectFilterCursorResponse.ofSearch(
+            case POPULAR -> ProjectSearchCursorResponse.ofSearch(
                     content,
                     last != null ? last.views() : null,
                     last != null ? last.id() : null,
                     totalCount
             );
-            case SUCCESS_RATE -> ProjectFilterCursorResponse.ofSearch(
+            case SUCCESS_RATE -> ProjectSearchCursorResponse.ofSearch(
                     content,
                     last != null ? last.achievementRate() : null,
                     last != null ? last.id() : null,
