@@ -1,4 +1,4 @@
-package goorm.athena.domain.project.dto.cursor;
+package goorm.athena.domain.project.dto.res;
 
 import goorm.athena.domain.project.entity.Project;
 

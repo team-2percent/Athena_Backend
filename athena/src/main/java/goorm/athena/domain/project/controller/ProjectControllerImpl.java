@@ -106,16 +106,16 @@ public class ProjectControllerImpl implements ProjectController {
     }
 
     @Override
-    public ResponseEntity<ProjectCursorResponse<ProjectRecentResponse>> getProjectsByNew(@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime cursorValue,
-                                                                                         @RequestParam(required = false) Long lastProjectId,
-                                                                                         @RequestParam(defaultValue = "20") int pageSize){
-        ProjectCursorResponse<ProjectRecentResponse> responses = projectService.getProjectsByNew(cursorValue, lastProjectId, pageSize);
+    public ResponseEntity<ProjectRecentCursorResponse> getProjectsByNew(@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime cursorValue,
+                                                                                               @RequestParam(required = false) Long lastProjectId,
+                                                                                               @RequestParam(defaultValue = "20") int pageSize){
+        ProjectRecentCursorResponse responses = projectService.getProjectsByNew(cursorValue, lastProjectId, pageSize);
         return ResponseEntity.ok(responses);
     }
 
     // 카테고리별 프로젝트 조회 (커서 기반 페이징)
     @Override
-    public ResponseEntity<ProjectFilterCursorResponse<?>> getProjectsByCategory(
+    public ResponseEntity<ProjectCategoryCursorResponse> getProjectsByCategory(
             @RequestParam(value = "cursorId", required = false) Long cursorId,
             @RequestParam(value = "cursorValue", required = false) Object cursorValue,
             @RequestParam(value = "size", defaultValue = "20") int size,
@@ -126,31 +126,31 @@ public class ProjectControllerImpl implements ProjectController {
         ProjectCursorRequest<Object> request = new ProjectCursorRequest<>(cursorValue, cursorId, size);
 
         // 서비스 호출
-        ProjectFilterCursorResponse<?> response = projectService.getProjectsByCategory(request, categoryId, sortType);
+        ProjectCategoryCursorResponse response = projectService.getProjectsByCategory(request, categoryId, sortType);
 
         return ResponseEntity.ok(response);
 
     }
 
     @Override
-    public ResponseEntity<ProjectCursorResponse<ProjectDeadLineResponse>> getProjectByDeadLine(@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime cursorValue,
+    public ResponseEntity<ProjectDeadLineCursorResponse> getProjectByDeadLine(@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime cursorValue,
                                                                                                @RequestParam(required = false) Long lastProjectId,
                                                                                                @ModelAttribute SortTypeDeadLine sortTypeDeadLine,
                                                                                                @RequestParam(defaultValue = "20") int pageSize){
-        ProjectCursorResponse<ProjectDeadLineResponse> responses = projectService.getProjectsByDeadLine(cursorValue, sortTypeDeadLine, lastProjectId, pageSize);
+        ProjectDeadLineCursorResponse responses = projectService.getProjectsByDeadLine(cursorValue, sortTypeDeadLine, lastProjectId, pageSize);
         return ResponseEntity.ok(responses);
 
     }
 
     @Override
-    public ResponseEntity<ProjectFilterCursorResponse<ProjectSearchResponse>> searchProject(@RequestParam String searchTerm,
+    public ResponseEntity<ProjectSearchCursorResponse> searchProject(@RequestParam String searchTerm,
                                                                                             @RequestParam(required = false) Object cursorValue,
                                                                                             @RequestParam(required = false) Long cursorId,
                                                                                             @RequestParam SortTypeLatest sortType,
                                                                                             @RequestParam(defaultValue = "20") int pageSize){
         ProjectCursorRequest<Object> request = new ProjectCursorRequest<>(cursorValue, cursorId, pageSize);
 
-        ProjectFilterCursorResponse<ProjectSearchResponse> response = projectService.searchProjects(request, searchTerm, pageSize, sortType);
+        ProjectSearchCursorResponse response = projectService.searchProjects(request, searchTerm, sortType);
         return ResponseEntity.ok(response);
 
     }

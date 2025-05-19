@@ -2,7 +2,6 @@ package goorm.athena.domain.project.controller;
 
 import goorm.athena.domain.image.dto.req.ImageUpdateRequest;
 import goorm.athena.domain.product.dto.res.ProductResponse;
-import goorm.athena.domain.project.dto.req.ProjectApprovalRequest;
 import goorm.athena.domain.project.dto.cursor.*;
 import goorm.athena.domain.project.dto.req.ProjectCreateRequest;
 import goorm.athena.domain.project.dto.req.ProjectUpdateRequest;
@@ -83,7 +82,7 @@ public interface ProjectController {
             "테스트 시 기본적으로 Pageable은 sort를 가지기 때문에 요청 파라미터에서 sort 키를 없애주시면 됩니다,, !! ")
     @ApiResponse(responseCode = "200", description = "프로젝트 전체 조회 성공",
             content = @Content(schema = @Schema(implementation = ProjectAllResponse.class)))
-    @GetMapping("/all")
+    @GetMapping("/allList")
     ResponseEntity<List<ProjectAllResponse>> getProjectsAll();
 
     @Operation(summary = "프로젝트 신규순 조회(무한 페이징)", description = "프로젝트를 신규 순으로 조회합니다. (신규순 정렬)<br>" +
@@ -92,9 +91,9 @@ public interface ProjectController {
             "다음 페이지 로딩 시 해당 값을 입력값에 입력 하면 해당 Value의 '다음'값들이 페이지 조회됩니다.<br>")
     @ApiResponse(responseCode = "200", description = "프로젝트 신규순 조회 성공",
             content = @Content(schema = @Schema(implementation = ProjectAllResponse.class)))
-    @GetMapping("/new")
-    public ResponseEntity<ProjectCursorResponse<ProjectRecentResponse>> getProjectsByNew(@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime cursorValue,
-                                                                                         @RequestParam(required = false) Long lastProjectId,  @RequestParam(defaultValue = "20") int pageSize);
+    @GetMapping("/recentList")
+    public ResponseEntity<ProjectRecentCursorResponse> getProjectsByNew(@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime cursorValue,
+                                                                                               @RequestParam(required = false) Long lastProjectId, @RequestParam(defaultValue = "20") int pageSize);
     @Operation(summary = "프로젝트 카테고리별 조회", description = "프로젝트를 카테고리별로 조회합니다.<br>" +
             "페이지는 20개 단위로 구성되며, **입력할 카테고리 id를 입력합니다. (입력하지 않으면 모든 카테고리 조회) **<br>" +
             "배열 형식으로 20개가 출력되고 **맨 마지막에는 'nextCursorValue', 'nextProjectId'가 주어집니다.**<br>" +
@@ -118,8 +117,8 @@ public interface ProjectController {
             """)
     @ApiResponse(responseCode = "200", description = "프로젝트 카테고리별 조회 성공",
             content = @Content(schema = @Schema(implementation = ProjectCategoryResponse.class)))
-    @GetMapping("/category")
-    public ResponseEntity<ProjectFilterCursorResponse<?>> getProjectsByCategory(
+    @GetMapping("/categoryList")
+    public ResponseEntity<ProjectCategoryCursorResponse> getProjectsByCategory(
             @RequestParam(value = "cursorId", required = false) Long cursorId,
             @RequestParam(value = "cursorValue", required = false) Object cursorValue,
             @RequestParam(value = "size", defaultValue = "20") int size,
@@ -144,8 +143,8 @@ public interface ProjectController {
                     """)
     @ApiResponse(responseCode = "200", description = "프로젝트 마감별 조회 성공",
         content = @Content(schema = @Schema(implementation = ProjectDeadLineResponse.class)))
-    @GetMapping("/deadLine")
-    ResponseEntity<ProjectCursorResponse<ProjectDeadLineResponse>> getProjectByDeadLine(@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime cursorValue,
+    @GetMapping("/deadLineList")
+    ResponseEntity<ProjectDeadLineCursorResponse> getProjectByDeadLine(@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime cursorValue,
                                                                                                @RequestParam(required = false) Long lastProjectId,
                                                                                                @Parameter(
                                                                                                        description = "마감 정렬 방식",
@@ -177,9 +176,9 @@ public interface ProjectController {
                 </ul>
             """)
     @ApiResponse(responseCode = "200", description = "프로젝트 검색별 조회 성공",
-            content = @Content(schema = @Schema(implementation = ProjectFilterCursorResponse.class)))
+            content = @Content(schema = @Schema(implementation = ProjectCategoryCursorResponse.class)))
     @GetMapping("/search")
-    public ResponseEntity<ProjectFilterCursorResponse<ProjectSearchResponse>> searchProject(@RequestParam String searchTerm,
+    public ResponseEntity<ProjectSearchCursorResponse> searchProject(@RequestParam String searchTerm,
                                                                                             @RequestParam(required = false) Object cursorValue,
                                                                                             @RequestParam(required = false) Long cursorId,
                                                                                             @RequestParam SortTypeLatest sortType,
@@ -187,7 +186,7 @@ public interface ProjectController {
 
     @Operation(summary = "프로젝트 메인 카테고리 배너 조회", description = "프로젝트의 메인 배너에서 각 카테고리의 조회수가 제일 높은 것을 조회합니다.")
     @ApiResponse(responseCode = "200", description = "프로젝트의 카테고리별 조회수 높은 프로젝트 조회 성공")
-    @GetMapping("/categoryTop")
+    @GetMapping("/rankingView")
     public ResponseEntity<List<ProjectTopViewResponse>> getProjectByTopView();
 }
 

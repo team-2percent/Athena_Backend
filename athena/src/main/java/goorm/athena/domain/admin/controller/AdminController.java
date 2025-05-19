@@ -27,7 +27,7 @@ public interface AdminController {
                     @ApiResponse(responseCode = "404", description = "프로젝트를 찾을 수 없음")
             }
     )
-    @PatchMapping("/projects/{projectId}/approval")
+    @PatchMapping("/project/{projectId}/approval")
     ResponseEntity<String> updateApprovalStatus(
             @Parameter(hidden = true) @CheckLogin LoginUserRequest loginUserRequest,
             @Parameter(description = "승인 또는 거절할 프로젝트의 ID", example = "1") @PathVariable Long projectId,
@@ -42,7 +42,7 @@ public interface AdminController {
                             content = @Content(schema = @Schema(implementation = ProjectSummaryResponse.class)))
             }
     )
-    @GetMapping("/projects")
+    @GetMapping("/project")
     ResponseEntity<ProjectSummaryResponse> getProjects(
             @Parameter(hidden = true) @CheckLogin LoginUserRequest loginUserRequest,
             @Parameter(description = "프로젝트 제목 검색어 (선택)") @RequestParam(required = false) String keyword,
@@ -58,7 +58,7 @@ public interface AdminController {
                             content = @Content(schema = @Schema(implementation = ProjectDetailResponse.class)))
             }
     )
-    @GetMapping("/projects/{projectId}")
+    @GetMapping("/project/{projectId}")
     ResponseEntity<ProjectDetailResponse> getProjectDetail(@PathVariable Long projectId);
 
 
@@ -70,7 +70,7 @@ public interface AdminController {
                             content = @Content(schema = @Schema(implementation = SettlementSummaryPageResponse.class)))
             }
     )
-    @GetMapping("/settlements")
+    @GetMapping("/settlement")
     ResponseEntity<SettlementSummaryPageResponse> getSettlements(
             @Parameter(hidden = true) @CheckLogin LoginUserRequest loginUserRequest,
             @Parameter(description = "정산 상태 (예: PENDING, COMPLETED)", example = "PENDING")
@@ -94,7 +94,7 @@ public interface AdminController {
                             content = @Content(schema = @Schema(implementation = SettlementDetailInfoResponse.class)))
             }
     )
-    @GetMapping("/settlements/{settlementId}/info")
+    @GetMapping("/settlement/{settlementId}/info")
     ResponseEntity<SettlementDetailInfoResponse> getSettlementInfo(
             @Parameter(description = "정산 ID", example = "1") @PathVariable Long settlementId,
             @Parameter(hidden = true) @CheckLogin LoginUserRequest loginUserRequest
@@ -108,7 +108,7 @@ public interface AdminController {
                             content = @Content(schema = @Schema(implementation = SettlementHistoryPageResponse.class)))
             }
     )
-    @GetMapping("/settlements/{settlementId}/histories")
+    @GetMapping("/settlement/{settlementId}/history")
     ResponseEntity<SettlementHistoryPageResponse> getSettlementHistories(
             @Parameter(description = "정산 ID", example = "1") @PathVariable Long settlementId,
             @Parameter(description = "페이지 번호 (0부터 시작)", example = "0") @RequestParam(defaultValue = "0") int page,
@@ -123,7 +123,7 @@ public interface AdminController {
                             content = @Content(schema = @Schema(implementation = ProductSettlementSummaryResponse.class)))
             }
     )
-    @GetMapping("/settlements/{settlementId}/product-summary")
+    @GetMapping("/settlement/{settlementId}/product-summary")
     ResponseEntity<ProductSettlementSummaryResponse> getProductSettlementInfo(
             @Parameter(description = "정산 ID", example = "1") @PathVariable Long settlementId
     );

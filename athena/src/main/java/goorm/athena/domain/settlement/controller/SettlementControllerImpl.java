@@ -16,7 +16,7 @@ import java.time.LocalDate;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/settlements")
+@RequestMapping("/api/settlement")
 public class SettlementControllerImpl implements SettlementController{
 
     private final SettlementService settlementService;
