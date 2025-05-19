@@ -22,8 +22,10 @@ import goorm.athena.domain.project.entity.Project;
 import goorm.athena.domain.project.entity.SortTypeDeadLine;
 import goorm.athena.domain.project.entity.SortTypeLatest;
 import goorm.athena.domain.project.mapper.ProjectMapper;
-import goorm.athena.domain.project.repository.ProjectQueryRepository;
+import goorm.athena.domain.project.repository.query.ProjectFilterQueryRepository;
+import goorm.athena.domain.project.repository.query.ProjectQueryRepository;
 import goorm.athena.domain.project.repository.ProjectRepository;
+import goorm.athena.domain.project.repository.query.ProjectSearchQueryRepository;
 import goorm.athena.domain.s3.service.S3Service;
 import goorm.athena.domain.user.dto.response.UserDetailResponse;
 import goorm.athena.domain.user.entity.User;
@@ -55,6 +57,8 @@ public class ProjectService {
     private final ProductService productService;
     private final BankAccountService bankAccountService;
     private final ProjectQueryRepository projectQueryRepository;
+    private final ProjectFilterQueryRepository projectFilterQueryRepository;
+    private final ProjectSearchQueryRepository projectSearchQueryRepository;
     private final MarkdownParser markdownParser;
 
     private final S3Service s3Service;
@@ -212,20 +216,20 @@ public class ProjectService {
     @Transactional(readOnly = true)
     public ProjectCategoryCursorResponse getProjectsByCategory(ProjectCursorRequest<?> request, Long categoryId, SortTypeLatest sortType) {
 
-        return projectQueryRepository.getProjectsByCategory(request, categoryId, sortType);
+        return projectFilterQueryRepository.getProjectsByCategory(request, categoryId, sortType);
     }
 
     // 마감 기한별 프로젝트 조회 (커서 기반 페이징)
     @Transactional(readOnly = true)
     public ProjectDeadLineCursorResponse getProjectsByDeadLine(LocalDateTime lastStartAt, SortTypeDeadLine sortTypeDeadLine, Long lastProjectId, int pageSize) {
         ProjectCursorRequest<LocalDateTime> request = new ProjectCursorRequest<>(lastStartAt, lastProjectId, pageSize);
-        return projectQueryRepository.getProjectsByDeadline(request, sortTypeDeadLine);
+        return projectFilterQueryRepository.getProjectsByDeadline(request, sortTypeDeadLine);
     }
 
     // 검색 프로젝트 조회 (커서 기반 페이징)
     @Transactional(readOnly = true)
     public ProjectSearchCursorResponse searchProjects(ProjectCursorRequest<?> request, String searchTerms, SortTypeLatest sortType) {
-        return projectQueryRepository.searchProjects(request, searchTerms, sortType);
+        return projectSearchQueryRepository.searchProjects(request, searchTerms, sortType);
     }
 
     public List<ProjectTopViewResponse> getTopView(){
