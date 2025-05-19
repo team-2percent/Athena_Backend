@@ -29,6 +29,16 @@ spring:
       cancel-url: ${KAKAO_API_CANCEL_URL}
       fail-url: ${KAKAO_API_FAIL_URL}
 
+  server:
+    forward-headers-strategy: framework
+    tomcat:
+      remoteip:
+        host-header: X-Forwarded-Host
+        port-header: X-Forwarded-Port
+        protocol-header: X-Forwarded-Proto
+        remote-ip-header: X-Forwarded-For
+      use-relative-redirects: true
+
 cloud:
   aws:
     credentials:
@@ -44,3 +54,4 @@ cloud:
 jwt:
   secretKey: ${JWT_SECRET_KEY}
   refreshKey: ${JWT_REFRESH_KEY}
+
