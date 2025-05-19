@@ -16,7 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "order", description = "주문 API")
-@RequestMapping("/api/orders")
+@RequestMapping("/api/order")
 public interface OrderController {
 
     @Operation(

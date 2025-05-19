@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.time.LocalDate;
 
 @Tag(name = "Settlement", description = "정산 관련 API")
-@RequestMapping("/api/admin/settlements")
+@RequestMapping("/api/admin/settlement")
 public interface SettlementController {
 
     @Operation(

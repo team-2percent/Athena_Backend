@@ -27,7 +27,7 @@ public class AdminControllerImpl implements AdminController {
 
 
     // 프로젝트 승인/반려
-    @PatchMapping("/projects/{projectId}/approval")
+    @PatchMapping("/project/{projectId}/approval")
     public ResponseEntity<String> updateApprovalStatus(
             @CheckLogin LoginUserRequest loginUserRequest,
             @PathVariable Long projectId,
@@ -40,7 +40,7 @@ public class AdminControllerImpl implements AdminController {
     }
 
 
-    @GetMapping("/projects")
+    @GetMapping("/project")
     public ResponseEntity<ProjectSummaryResponse> getProjects(
             @CheckLogin LoginUserRequest loginUserRequest,
             @RequestParam(required = false) String keyword,
@@ -52,13 +52,13 @@ public class AdminControllerImpl implements AdminController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/projects/{projectId}")
+    @GetMapping("/project/{projectId}")
     public ResponseEntity<ProjectDetailResponse> getProjectDetail(@PathVariable Long projectId){
         ProjectDetailResponse response = projectService.getProjectDetail(projectId);
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/settlements")
+    @GetMapping("/settlement")
     public ResponseEntity<SettlementSummaryPageResponse> getSettlements(
             @CheckLogin LoginUserRequest loginUserRequest,
             @RequestParam(required = false) Status status,
@@ -71,7 +71,7 @@ public class AdminControllerImpl implements AdminController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/settlements/{settlementId}/info")
+    @GetMapping("/settlement/{settlementId}/info")
     public ResponseEntity<SettlementDetailInfoResponse> getSettlementInfo(
             @PathVariable Long settlementId,
             @CheckLogin LoginUserRequest loginUserRequest
@@ -80,7 +80,7 @@ public class AdminControllerImpl implements AdminController {
         return ResponseEntity.ok(settlementService.getSettlementDetailInfo(settlementId));
     }
 
-    @GetMapping("/settlements/{settlementId}/histories")
+    @GetMapping("/settlement/{settlementId}/history")
     public ResponseEntity<SettlementHistoryPageResponse> getSettlementHistories(
             @PathVariable Long settlementId,
             @RequestParam(defaultValue = "0") int page,
@@ -90,7 +90,7 @@ public class AdminControllerImpl implements AdminController {
         return ResponseEntity.ok(settlementService.getSettlementHistories(settlementId, page));
     }
 
-    @GetMapping("/settlements/{settlementId}/product-summary")
+    @GetMapping("/settlement/{settlementId}/product-summary")
     public ResponseEntity<ProductSettlementSummaryResponse> getProductSettlementInfo(
             @PathVariable Long settlementId
     ) {
