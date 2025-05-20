@@ -41,6 +41,8 @@ public class Project {
     private String description;         // 설명 (요약)
     private Long goalAmount;
     private Long totalAmount;
+
+    @Column(columnDefinition = "TEXT")
     private String contentMarkdown;     // 소개글 (마크 다운)
 
     private LocalDateTime startAt;
