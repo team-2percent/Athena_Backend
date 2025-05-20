@@ -12,7 +12,9 @@ public record SettlementHistoryPageResponse(
             String productName,
             Integer quantity,
             Long totalPrice,
-            Integer fee,
+            Long platformFee,
+            Long pgFee,
+            Long vat,
             Long amount,
             LocalDateTime orderedAt
     ) {}

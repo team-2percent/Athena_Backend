@@ -8,6 +8,7 @@ import goorm.athena.domain.bankaccount.service.BankAccountService;
 import goorm.athena.domain.order.entity.Order;
 import goorm.athena.domain.order.service.OrderService;
 import goorm.athena.domain.payment.service.PaymentService;
+import goorm.athena.domain.project.entity.PlatformPlan;
 import goorm.athena.domain.project.entity.Project;
 import goorm.athena.domain.project.service.ProjectService;
 import goorm.athena.domain.settlement.dto.res.SettlementSummaryResponse;
@@ -89,12 +90,32 @@ public class SettlementService {
     private Settlement createSettlement(Project project, List<Order> orders) {
         long totalSales = orders.stream().mapToLong(Order::getTotalPrice).sum();
         int totalCount = orders.size();
-        long fee = Math.round(totalSales * PLATFORM_FEE_RATE);
-        long payout = totalSales - fee;
 
+        // 1. 프로젝트의 PlatformPlan 정보 가져오기
+        PlatformPlan plan = project.getPlatformPlan();
+        double platformRate = plan.getPlatformFeeRate();
+        double pgRate = plan.getPgFeeRate();
+        double vatRate = plan.getVatRate();
+
+        // 2. 수수료 계산
+        long platformFeeTotal = Math.round(totalSales * platformRate);
+        long pgFeeTotal = Math.round(totalSales * pgRate);
+        long vatTotal = Math.round(platformFeeTotal * vatRate);
+        long payOutAmount = totalSales - platformFeeTotal - pgFeeTotal - vatTotal;
+
+        // 3. 판매자 계좌 정보 가져오기
         BankAccount bankAccount = bankAccountService.getPrimaryAccount(project.getSeller().getId());
 
-        return SettlementMapper.toEntity(project, bankAccount, totalCount, totalSales, fee, payout);
+        return SettlementMapper.toEntity(
+                project,
+                bankAccount,
+                totalCount,
+                totalSales,
+                platformFeeTotal,
+                pgFeeTotal,
+                vatTotal,
+                payOutAmount
+        );
     }
 
     public Page<SettlementSummaryResponse> getSettlements(Status status, Integer year, Integer month, Pageable pageable) {

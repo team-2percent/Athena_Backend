@@ -28,17 +28,22 @@ public class SettlementHistory {
 
     @Column(name ="total_price")
     private long totalPrice;
-    private int fee;
     private long amount;
+    private long platformFee;
+    private long pgFee;
+    private long vat;
 
     private LocalDateTime createdAt = LocalDateTime.now();
 
     @Builder
-    public SettlementHistory(Settlement settlement, Order order, long totalPrice, int fee, long amount) {
+    public SettlementHistory(Settlement settlement, Order order, long totalPrice,
+                             long platformFee, long pgFee, long vat, long amount) {
         this.settlement = settlement;
         this.order = order;
         this.totalPrice = totalPrice;
-        this.fee = fee;
+        this.platformFee = platformFee;
+        this.pgFee = pgFee;
+        this.vat = vat;
         this.amount = amount;
         this.createdAt = LocalDateTime.now();
     }
