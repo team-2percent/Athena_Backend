@@ -8,6 +8,7 @@ public record CouponGetResponse(
         Long id,
         String title,
         int stock,
+        int price,
         CouponStatus status,
         LocalDateTime startAt,
         LocalDateTime endAt,
