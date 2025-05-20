@@ -31,7 +31,7 @@ public class SettlementHistoryService {
 
         double platformRate = plan.getPlatformFeeRate();
         double pgRate = plan.getPgFeeRate();
-        double vatRate = plan.getVatRate(); 
+        double vatRate = plan.getVatRate();
 
         List<SettlementHistory> histories = orders.stream()
                 .map(order -> {

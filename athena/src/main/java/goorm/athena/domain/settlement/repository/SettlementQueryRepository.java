@@ -89,6 +89,8 @@ public class SettlementQueryRepository {
                         settlement.totalSales,
                         settlement.payOutAmount,
                         settlement.platformFeeTotal,
+                        settlement.pgFeeTotal,
+                        settlement.vatTotal,
                         settlement.totalCount,
                         settlement.settledAt,
                         settlement.status,
