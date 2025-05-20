@@ -32,7 +32,9 @@ public class SettlementHistoryQueryRepository {
                         product.name,
                         orderItem.quantity,
                         history.totalPrice,
-                        history.fee,
+                        history.platformFee,
+                        history.pgFee,
+                        history.vat,
                         history.amount,
                         order.orderedAt
                 ))

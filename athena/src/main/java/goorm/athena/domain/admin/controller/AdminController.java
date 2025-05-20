@@ -35,7 +35,7 @@ public interface AdminController {
     );
 
     @Operation(
-            summary = "프로젝트 목록 조회",
+            summary = "프로젝트 승인 목록 조회",
             description = "관리자가 확인할 수 있는 프로젝트 목록을 조회합니다. 승인 상태가 PENDING인 프로젝트가 우선 정렬되어 보여집니다.",
             responses = {
                     @ApiResponse(responseCode = "200", description = "프로젝트 목록 조회 성공",

@@ -35,7 +35,9 @@ public class Settlement {
     private int totalCount;
     private long totalSales;
     private long payOutAmount;
-    private long platformFee;
+    private long platformFeeTotal;
+    private long pgFeeTotal;
+    private long vatTotal;
 
     private LocalDateTime requestedAt;
     private LocalDateTime settledAt;
@@ -45,14 +47,17 @@ public class Settlement {
 
     @Builder
     public Settlement(User user, BankAccount bankAccount, Project project,
-                      int totalCount, long totalSales, long platformFee,
+                      int totalCount, long totalSales,
+                      long platformFeeTotal, long pgFeeTotal, long vatTotal,
                       long payOutAmount, Status status) {
         this.user = user;
         this.bankAccount = bankAccount;
         this.project = project;
         this.totalCount = totalCount;
         this.totalSales = totalSales;
-        this.platformFee = platformFee;
+        this.platformFeeTotal = platformFeeTotal;
+        this.pgFeeTotal = pgFeeTotal;
+        this.vatTotal = vatTotal;
         this.payOutAmount = payOutAmount;
         this.status = status;
         this.requestedAt = LocalDateTime.now();
