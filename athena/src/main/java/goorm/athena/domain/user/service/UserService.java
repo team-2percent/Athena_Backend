@@ -77,7 +77,11 @@ public class UserService {
     @Transactional
     public UserHeaderGetResponse getHeaderById(Long userId){
         User user = getUser(userId);
-        String imageUrl = imageService.getImage(user.getImageGroup().getId());
+
+        String imageUrl = "";
+        if(user.getImageGroup() != null){
+            imageUrl = imageService.getImage(user.getImageGroup().getId());
+        }
         return UserMapper.toHeaderGetResponse(user, imageUrl);
     }
 
