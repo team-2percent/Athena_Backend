@@ -20,42 +20,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/coupon")
 public class CouponControllerImpl implements CouponController{
-    private final CouponService couponService;
     private final CouponScheduler couponScheduler;
-
-    @Override
-    @GetMapping
-    public ResponseEntity<Page<CouponGetResponse>> getCouponAll(
-            @CheckLogin LoginUserRequest request,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size){
-        Page<Coupon> coupons = couponService.getCoupons(page, size);
-        Page<CouponGetResponse> response = coupons.map(CouponMapper::toGetResponse);
-
-        return ResponseEntity.ok(response);
-    }
-
-    @Override
-    @GetMapping("/status")
-    public ResponseEntity<Page<CouponGetResponse>> getCouponByStatus(
-            @CheckLogin LoginUserRequest request,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam CouponStatus status){
-        Page<Coupon> coupons = couponService.getCouponByStatus(page, size, status);
-        Page<CouponGetResponse> response = coupons.map(CouponMapper::toGetResponse);
-
-        return ResponseEntity.ok(response);
-    }
-
-    @Override
-    @GetMapping("/{couponId}")
-    public ResponseEntity<CouponGetDetailResponse> getCouponDetail(
-            @CheckLogin LoginUserRequest request,
-            @PathVariable Long couponId) {
-        CouponGetDetailResponse response = couponService.getCouponDetail(couponId);
-        return ResponseEntity.ok(response);
-    }
 
     @Override
     @PostMapping("/scheduler")

@@ -3,6 +3,12 @@ package goorm.athena.domain.admin.controller;
 import goorm.athena.domain.admin.dto.res.*;
 import goorm.athena.domain.admin.service.AdminRoleCheckService;
 import goorm.athena.domain.admin.service.AdminService;
+import goorm.athena.domain.coupon.dto.res.CouponGetDetailResponse;
+import goorm.athena.domain.coupon.dto.res.CouponGetResponse;
+import goorm.athena.domain.coupon.entity.Coupon;
+import goorm.athena.domain.coupon.entity.CouponStatus;
+import goorm.athena.domain.coupon.mapper.CouponMapper;
+import goorm.athena.domain.coupon.service.CouponService;
 import goorm.athena.domain.project.dto.req.ProjectApprovalRequest;
 import goorm.athena.domain.project.dto.res.ProjectDetailResponse;
 import goorm.athena.domain.project.service.ProjectService;
@@ -11,6 +17,7 @@ import goorm.athena.domain.settlement.service.SettlementService;
 import goorm.athena.global.jwt.util.CheckLogin;
 import goorm.athena.global.jwt.util.LoginUserRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,6 +31,7 @@ public class AdminControllerImpl implements AdminController {
     private final AdminService adminService;
     private final AdminRoleCheckService adminRoleCheckService;
     private final SettlementService settlementService;
+    private final CouponService couponService;
 
 
     // 프로젝트 승인/반려
@@ -96,6 +104,40 @@ public class AdminControllerImpl implements AdminController {
     ) {
         ProductSettlementSummaryResponse result = settlementService.getProductSettlementInfo(settlementId);
         return ResponseEntity.ok(result);
+    }
+
+    @Override
+    @GetMapping("/couponList")
+    public ResponseEntity<Page<CouponGetResponse>> getCouponAll(
+            @CheckLogin LoginUserRequest request,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size){
+        Page<Coupon> coupons = couponService.getCoupons(page, size);
+        Page<CouponGetResponse> response = coupons.map(CouponMapper::toGetResponse);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @Override
+    @GetMapping("/couponByStatus")
+    public ResponseEntity<Page<CouponGetResponse>> getCouponByStatus(
+            @CheckLogin LoginUserRequest request,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam CouponStatus status){
+        Page<Coupon> coupons = couponService.getCouponByStatus(page, size, status);
+        Page<CouponGetResponse> response = coupons.map(CouponMapper::toGetResponse);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @Override
+    @GetMapping("/{couponId}")
+    public ResponseEntity<CouponGetDetailResponse> getCouponDetail(
+            @CheckLogin LoginUserRequest request,
+            @PathVariable Long couponId) {
+        CouponGetDetailResponse response = couponService.getCouponDetail(couponId);
+        return ResponseEntity.ok(response);
     }
 
 
