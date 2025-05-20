@@ -19,7 +19,7 @@ import goorm.athena.domain.project.dto.res.ProjectIdResponse;
 import goorm.athena.domain.project.dto.req.ProjectCursorRequest;
 import goorm.athena.domain.project.dto.res.*;
 import goorm.athena.domain.project.entity.Project;
-import goorm.athena.domain.project.entity.SortTypeDeadLine;
+import goorm.athena.domain.project.entity.SortTypeDeadline;
 import goorm.athena.domain.project.entity.SortTypeLatest;
 import goorm.athena.domain.project.mapper.ProjectMapper;
 import goorm.athena.domain.project.repository.query.ProjectFilterQueryRepository;
@@ -219,9 +219,9 @@ public class ProjectService {
 
     // 마감 기한별 프로젝트 조회 (커서 기반 페이징)
     @Transactional(readOnly = true)
-    public ProjectDeadLineCursorResponse getProjectsByDeadLine(LocalDateTime lastStartAt, SortTypeDeadLine sortTypeDeadLine, Long lastProjectId, int pageSize) {
+    public ProjectDeadlineCursorResponse getProjectsByDeadLine(LocalDateTime lastStartAt, SortTypeDeadline sortTypeDeadline, Long lastProjectId, int pageSize) {
         ProjectCursorRequest<LocalDateTime> request = new ProjectCursorRequest<>(lastStartAt, lastProjectId, pageSize);
-        return projectFilterQueryRepository.getProjectsByDeadline(request, sortTypeDeadLine);
+        return projectFilterQueryRepository.getProjectsByDeadline(request, sortTypeDeadline);
     }
 
     // 검색 프로젝트 조회 (커서 기반 페이징)

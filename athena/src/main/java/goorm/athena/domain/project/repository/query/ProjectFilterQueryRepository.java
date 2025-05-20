@@ -9,12 +9,12 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import goorm.athena.domain.image.entity.QImage;
 import goorm.athena.domain.imageGroup.entity.QImageGroup;
 import goorm.athena.domain.project.dto.cursor.ProjectCategoryCursorResponse;
-import goorm.athena.domain.project.dto.cursor.ProjectDeadLineCursorResponse;
+import goorm.athena.domain.project.dto.cursor.ProjectDeadlineCursorResponse;
 import goorm.athena.domain.project.dto.req.ProjectCursorRequest;
 import goorm.athena.domain.project.dto.res.ProjectCategoryResponse;
-import goorm.athena.domain.project.dto.res.ProjectDeadLineResponse;
+import goorm.athena.domain.project.dto.res.ProjectDeadlineResponse;
 import goorm.athena.domain.project.entity.QProject;
-import goorm.athena.domain.project.entity.SortTypeDeadLine;
+import goorm.athena.domain.project.entity.SortTypeDeadline;
 import goorm.athena.domain.project.entity.SortTypeLatest;
 import goorm.athena.global.exception.CustomException;
 import goorm.athena.global.exception.ErrorCode;
@@ -114,9 +114,9 @@ public class ProjectFilterQueryRepository {
     }
 
     // 마감 기한별 프로젝트 조회 (커서 기반 페이징)
-    public ProjectDeadLineCursorResponse getProjectsByDeadline(ProjectCursorRequest<LocalDateTime> request,
-                                                               SortTypeDeadLine sortTypeDeadLine) {
-        if (!(sortTypeDeadLine.name().startsWith("DEADLINE"))) {
+    public ProjectDeadlineCursorResponse getProjectsByDeadline(ProjectCursorRequest<LocalDateTime> request,
+                                                               SortTypeDeadline sortTypeDeadline) {
+        if (!(sortTypeDeadline.name().startsWith("DEADLINE"))) {
             throw new CustomException(ErrorCode.INVALID_PROJECT_ORDER);
         }
 
@@ -136,9 +136,9 @@ public class ProjectFilterQueryRepository {
             );
         }
 
-        List<ProjectDeadLineResponse> content = queryFactory
+        List<ProjectDeadlineResponse> content = queryFactory
                 .select(Projections.constructor(
-                        ProjectDeadLineResponse.class,
+                        ProjectDeadlineResponse.class,
                         project.id,
                         image.originalUrl,
                         project.seller.nickname,
@@ -159,7 +159,7 @@ public class ProjectFilterQueryRepository {
                                 .and(image.isDefault.isTrue())
                 )
                 .where(builder)
-                .orderBy(ProjectQueryHelper.getSortOrdersDeadLine(sortTypeDeadLine, project).toArray(OrderSpecifier[]::new)) // 마감일 빠른 순
+                .orderBy(ProjectQueryHelper.getSortOrdersDeadLine(sortTypeDeadline, project).toArray(OrderSpecifier[]::new)) // 마감일 빠른 순
                 .limit(request.getSize())
                 .fetch();
 
@@ -168,6 +168,6 @@ public class ProjectFilterQueryRepository {
                 .from(project)
                 .fetchOne();
 
-        return ProjectDeadLineCursorResponse.ofByEndAt(content, totalCount);
+        return ProjectDeadlineCursorResponse.ofByEndAt(content, totalCount);
     }
 }

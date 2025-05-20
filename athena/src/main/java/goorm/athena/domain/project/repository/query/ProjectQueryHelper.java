@@ -6,7 +6,7 @@ import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.core.types.dsl.NumberExpression;
 import goorm.athena.domain.project.dto.req.ProjectCursorRequest;
 import goorm.athena.domain.project.entity.QProject;
-import goorm.athena.domain.project.entity.SortTypeDeadLine;
+import goorm.athena.domain.project.entity.SortTypeDeadline;
 import goorm.athena.domain.project.entity.SortTypeLatest;
 import goorm.athena.global.exception.CustomException;
 import goorm.athena.global.exception.ErrorCode;
@@ -18,11 +18,11 @@ import java.util.List;
 public class ProjectQueryHelper {
 
     // 마감순 세부필터 정렬 (orderBy)
-    public static List<OrderSpecifier<?>> getSortOrdersDeadLine(SortTypeDeadLine sortTypeDeadLine, QProject project) {
+    public static List<OrderSpecifier<?>> getSortOrdersDeadLine(SortTypeDeadline sortTypeDeadline, QProject project) {
         NumberExpression<Long> successRate = project.totalAmount.multiply(100.0)
                 .divide(project.goalAmount.doubleValue());
 
-        return switch (sortTypeDeadLine) {
+        return switch (sortTypeDeadline) {
             case DEADLINE -> List.of(project.endAt.asc(), project.id.asc());
             case DEADLINE_POPULAR -> List.of(project.endAt.asc(), project.views.desc(), project.id.asc());
             case DEADLINE_SUCCESS_RATE -> List.of(project.endAt.asc(), successRate.desc(), project.id.asc());
@@ -46,7 +46,7 @@ public class ProjectQueryHelper {
 
     // 최신순 기준의 조회 조건 (where)
     public static BooleanBuilder buildCursorLatest(SortTypeLatest sortType, ProjectCursorRequest<?> request,
-                                             QProject project){
+                                                   QProject project){
         BooleanBuilder builder = new BooleanBuilder();
 
         switch (sortType) {
