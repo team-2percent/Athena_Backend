@@ -14,7 +14,7 @@ import goorm.athena.domain.project.dto.req.ProjectCursorRequest;
 import goorm.athena.domain.project.dto.req.ProjectUpdateRequest;
 import goorm.athena.domain.project.dto.res.ProjectIdResponse;
 import goorm.athena.domain.project.dto.res.*;
-import goorm.athena.domain.project.entity.SortTypeDeadLine;
+import goorm.athena.domain.project.entity.SortTypeDeadline;
 import goorm.athena.domain.project.entity.SortTypeLatest;
 import goorm.athena.domain.project.service.ProjectService;
 import goorm.athena.global.exception.CustomException;
@@ -133,11 +133,11 @@ public class ProjectControllerImpl implements ProjectController {
     }
 
     @Override
-    public ResponseEntity<ProjectDeadLineCursorResponse> getProjectByDeadLine(@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime cursorValue,
+    public ResponseEntity<ProjectDeadlineCursorResponse> getProjectByDeadline(@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime cursorValue,
                                                                                                @RequestParam(required = false) Long lastProjectId,
-                                                                                               @ModelAttribute SortTypeDeadLine sortTypeDeadLine,
+                                                                                               @ModelAttribute SortTypeDeadline sortTypeDeadline,
                                                                                                @RequestParam(defaultValue = "20") int pageSize){
-        ProjectDeadLineCursorResponse responses = projectService.getProjectsByDeadLine(cursorValue, sortTypeDeadLine, lastProjectId, pageSize);
+        ProjectDeadlineCursorResponse responses = projectService.getProjectsByDeadLine(cursorValue, sortTypeDeadline, lastProjectId, pageSize);
         return ResponseEntity.ok(responses);
 
     }
@@ -156,8 +156,8 @@ public class ProjectControllerImpl implements ProjectController {
     }
 
     @Override
-    public ResponseEntity<List<ProjectTopViewResponse>> getProjectByTopView(){
-        List<ProjectTopViewResponse> responses = projectService.getTopView();
+    public ResponseEntity<ProjectTopViewResponseWrapper> getProjectByTopView(){
+        ProjectTopViewResponseWrapper responses = projectService.getTopView();
         return ResponseEntity.ok(responses);
     }
 }

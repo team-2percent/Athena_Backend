@@ -18,7 +18,7 @@ public interface ProjectRepository extends JpaRepository<Project, Long>, JpaSpec
             "JOIN FETCH p.seller " +
             "JOIN FETCH p.imageGroup " +
             "ORDER BY p.views DESC")
-    List<Project> findTop20WithImageGroupByOrderByViewsDesc();
+    List<Project> findTop5WithImageGroupByOrderByViewsDesc();
 
     @Query("""
             SELECT DISTINCT p.order.project FROM Payment p
@@ -38,7 +38,7 @@ public interface ProjectRepository extends JpaRepository<Project, Long>, JpaSpec
                            ROW_NUMBER() OVER (PARTITION BY p.category_id ORDER BY p.views DESC, p.created_at ASC) AS rn
                     FROM project p
                 ) ranked
-                WHERE ranked.rn = 1
+                WHERE ranked.rn <= 5
             """, nativeQuery = true)
     List<Project> findTopViewedProjectsByCategory();
 

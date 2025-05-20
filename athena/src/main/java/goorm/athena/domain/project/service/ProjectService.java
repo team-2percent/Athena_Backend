@@ -19,7 +19,7 @@ import goorm.athena.domain.project.dto.res.ProjectIdResponse;
 import goorm.athena.domain.project.dto.req.ProjectCursorRequest;
 import goorm.athena.domain.project.dto.res.*;
 import goorm.athena.domain.project.entity.Project;
-import goorm.athena.domain.project.entity.SortTypeDeadLine;
+import goorm.athena.domain.project.entity.SortTypeDeadline;
 import goorm.athena.domain.project.entity.SortTypeLatest;
 import goorm.athena.domain.project.mapper.ProjectMapper;
 import goorm.athena.domain.project.repository.query.ProjectFilterQueryRepository;
@@ -40,9 +40,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -193,7 +191,7 @@ public class ProjectService {
     // 메인 페이지 조회
     @Transactional(readOnly = true)
     public List<ProjectAllResponse> getProjects() {
-        List<Project> projects = projectRepository.findTop20WithImageGroupByOrderByViewsDesc();
+        List<Project> projects = projectRepository.findTop5WithImageGroupByOrderByViewsDesc();
 
         AtomicInteger rank = new AtomicInteger(1);
         return projects.stream()
@@ -221,9 +219,9 @@ public class ProjectService {
 
     // 마감 기한별 프로젝트 조회 (커서 기반 페이징)
     @Transactional(readOnly = true)
-    public ProjectDeadLineCursorResponse getProjectsByDeadLine(LocalDateTime lastStartAt, SortTypeDeadLine sortTypeDeadLine, Long lastProjectId, int pageSize) {
+    public ProjectDeadlineCursorResponse getProjectsByDeadLine(LocalDateTime lastStartAt, SortTypeDeadline sortTypeDeadline, Long lastProjectId, int pageSize) {
         ProjectCursorRequest<LocalDateTime> request = new ProjectCursorRequest<>(lastStartAt, lastProjectId, pageSize);
-        return projectFilterQueryRepository.getProjectsByDeadline(request, sortTypeDeadLine);
+        return projectFilterQueryRepository.getProjectsByDeadline(request, sortTypeDeadline);
     }
 
     // 검색 프로젝트 조회 (커서 기반 페이징)
@@ -232,14 +230,39 @@ public class ProjectService {
         return projectSearchQueryRepository.searchProjects(request, searchTerms, sortType);
     }
 
-    public List<ProjectTopViewResponse> getTopView(){
+    public ProjectTopViewResponseWrapper getTopView(){
         List<Project> projects = projectRepository.findTopViewedProjectsByCategory();
-        return projects.stream()
+
+        // 전체 조회수 기준 Top 5 (카테고리 상관없이)
+        List<ProjectTopViewResponse> globalTop5 = projects.stream()
+                .sorted(Comparator.comparingLong(Project::getViews).reversed())
+                .limit(5)
                 .map(project -> {
                     String imageUrl = imageService.getImage(project.getImageGroup().getId());
                     return ProjectMapper.toTopViewResponse(project, imageUrl);
                 })
                 .toList();
+
+        // 카테고리별 Top 5
+        Map<Category, List<Project>> groupedByCategory = projects.stream()
+                .collect(Collectors.groupingBy(Project::getCategory
+                        ,LinkedHashMap::new,
+                        Collectors.toList()));
+
+        List<ProjectCategoryTopViewResponse> categoryTopViews = groupedByCategory.entrySet().stream()
+                .map(entry -> {
+                    Category category = entry.getKey();
+                    List<ProjectTopViewResponse> topViewResponses = entry.getValue().stream()
+                            .map(project -> {
+                                String imageUrl = imageService.getImage(project.getImageGroup().getId());
+                                return ProjectMapper.toTopViewResponse(project, imageUrl);
+                            })
+                            .toList();
+                    return ProjectMapper.toCategoryTopView(category, topViewResponses);
+                })
+                .toList();
+
+        return new ProjectTopViewResponseWrapper(globalTop5, categoryTopViews);
     }
 
     @Transactional

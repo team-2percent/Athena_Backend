@@ -28,6 +28,7 @@ public class CouponMapper {
                 coupon.getId(),
                 coupon.getTitle(),
                 coupon.getStock(),
+                coupon.getPrice(),
                 coupon.getCouponStatus(),
                 coupon.getStartAt(),
                 coupon.getEndAt(),

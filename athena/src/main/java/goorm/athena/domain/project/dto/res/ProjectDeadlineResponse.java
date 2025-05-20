@@ -4,7 +4,7 @@ import goorm.athena.domain.project.entity.Project;
 
 import java.time.LocalDateTime;
 
-public record ProjectDeadLineResponse(
+public record ProjectDeadlineResponse(
         Long id,
         String imageUrl,
         String sellerName,
@@ -16,7 +16,7 @@ public record ProjectDeadLineResponse(
         int daysLeft,
         Long views
 ) {
-    public static ProjectDeadLineResponse from(Project project, String imageUrl) {
+    public static ProjectDeadlineResponse from(Project project, String imageUrl) {
         // 현재 날짜와 종료일 사이의 차이 계산
         long daysLeft = java.time.Duration.between(
                 LocalDateTime.now(),
@@ -26,7 +26,7 @@ public record ProjectDeadLineResponse(
         // 음수 방지 (이미 마감된 경우)
         int safeDaysLeft = (int) Math.max(daysLeft, 0);
 
-        return new ProjectDeadLineResponse(
+        return new ProjectDeadlineResponse(
                 project.getId(),
                 imageUrl,
                 project.getSeller().getNickname(),

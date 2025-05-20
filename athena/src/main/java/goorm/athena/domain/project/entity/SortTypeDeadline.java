@@ -1,6 +1,6 @@
 package goorm.athena.domain.project.entity;
 
-public enum SortTypeDeadLine {
+public enum SortTypeDeadline {
     DEADLINE,
     DEADLINE_RECOMMENDED,
     DEADLINE_POPULAR,

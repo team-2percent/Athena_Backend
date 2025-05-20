@@ -2,9 +2,13 @@ package goorm.athena.domain.project.dto.res;
 
 public record ProjectTopViewResponse(
         Long id,
-        String imageUrl,
+        String sellerName,
         String title,
-        Long categoryId,
-        String categoryName
+        String description,
+        String imageUrl,
+        Long achievementRate,
+        Long projectId
 ) {
 }
+
+// {판매자, 이름, 소개, 대표 사진, 달성률, 프로젝트 아이디}}

@@ -7,7 +7,7 @@ import goorm.athena.domain.project.dto.req.ProjectCreateRequest;
 import goorm.athena.domain.project.dto.req.ProjectUpdateRequest;
 import goorm.athena.domain.project.dto.res.ProjectIdResponse;
 import goorm.athena.domain.project.dto.res.*;
-import goorm.athena.domain.project.entity.SortTypeDeadLine;
+import goorm.athena.domain.project.entity.SortTypeDeadline;
 import goorm.athena.domain.project.entity.SortTypeLatest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -142,16 +142,16 @@ public interface ProjectController {
             </ul>
                     """)
     @ApiResponse(responseCode = "200", description = "프로젝트 마감별 조회 성공",
-        content = @Content(schema = @Schema(implementation = ProjectDeadLineResponse.class)))
-    @GetMapping("/deadLineList")
-    ResponseEntity<ProjectDeadLineCursorResponse> getProjectByDeadLine(@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime cursorValue,
+        content = @Content(schema = @Schema(implementation = ProjectDeadlineResponse.class)))
+    @GetMapping("/deadlineList")
+    ResponseEntity<ProjectDeadlineCursorResponse> getProjectByDeadline(@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime cursorValue,
                                                                                                @RequestParam(required = false) Long lastProjectId,
                                                                                                @Parameter(
                                                                                                        description = "마감 정렬 방식",
                                                                                                        example = "DEADLINE",
-                                                                                                       schema = @Schema(implementation = SortTypeDeadLine.class)
+                                                                                                       schema = @Schema(implementation = SortTypeDeadline.class)
                                                                                                )
-                                                                                               @ModelAttribute SortTypeDeadLine sortTypeDeadLine,
+                                                                                               @ModelAttribute SortTypeDeadline sortTypeDeadLine,
                                                                                                @RequestParam(defaultValue = "20") int pageSize);
 
 
@@ -186,7 +186,7 @@ public interface ProjectController {
 
     @Operation(summary = "프로젝트 메인 카테고리 배너 조회", description = "프로젝트의 메인 배너에서 각 카테고리의 조회수가 제일 높은 것을 조회합니다.")
     @ApiResponse(responseCode = "200", description = "프로젝트의 카테고리별 조회수 높은 프로젝트 조회 성공")
-    @GetMapping("/rankingView")
-    public ResponseEntity<List<ProjectTopViewResponse>> getProjectByTopView();
+    @GetMapping("/categoryRankingView")
+    public ResponseEntity<ProjectTopViewResponseWrapper> getProjectByTopView();
 }
 
