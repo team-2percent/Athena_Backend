@@ -230,7 +230,35 @@ public class ProjectService {
         return projectSearchQueryRepository.searchProjects(request, searchTerms, sortType);
     }
 
-    public ProjectTopViewResponseWrapper getTopView(){
+    @Transactional(readOnly = true)
+    public List<ProjectByPlanGetResponse> getTopViewByPlan(){
+        List<Project> projects = projectRepository.findTop5ProjectsGroupedByPlatformPlan();
+
+        // 요금제 이름(planName) 별로 그룹핑
+        Map<String, List<Project>> groupedByPlan = projects.stream()
+                .collect(Collectors.groupingBy(
+                        p -> p.getPlatformPlan().getName().name(), // PlanName -> String
+                        LinkedHashMap::new,
+                        Collectors.toList()
+                ));
+
+        // 각 그룹을 ProjectByPlanGetResponse 로 매핑
+        return groupedByPlan.entrySet().stream()
+                .map(entry -> {
+                    String planName = entry.getKey();
+                    List<ProjectTopViewResponse> items = entry.getValue().stream()
+                            .map(project -> {
+                                String imageUrl = imageService.getImage(project.getImageGroup().getId());
+                                return ProjectMapper.toTopViewResponse(project, imageUrl);
+                            })
+                            .toList();
+                    return new ProjectByPlanGetResponse(planName, items);
+                })
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public ProjectCategoryTopResponseWrapper getTopView(){
         List<Project> projects = projectRepository.findTopViewedProjectsByCategory();
 
         // 전체 조회수 기준 Top 5 (카테고리 상관없이)
@@ -262,7 +290,7 @@ public class ProjectService {
                 })
                 .toList();
 
-        return new ProjectTopViewResponseWrapper(globalTop5, categoryTopViews);
+        return new ProjectCategoryTopResponseWrapper(globalTop5, categoryTopViews);
     }
 
     @Transactional

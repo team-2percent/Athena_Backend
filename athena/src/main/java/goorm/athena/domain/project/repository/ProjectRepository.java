@@ -42,6 +42,19 @@ public interface ProjectRepository extends JpaRepository<Project, Long>, JpaSpec
             """, nativeQuery = true)
     List<Project> findTopViewedProjectsByCategory();
 
+    // queryDSL로 최적화 예정
+    @Query(value = """
+                SELECT * FROM (
+                    SELECT p.*,
+                           ROW_NUMBER() OVER (PARTITION BY pp.name ORDER BY p.views DESC, p.created_at ASC) AS rn
+                    FROM project p
+                    JOIN platform_plan pp ON p.platform_plan_id = pp.id
+                    WHERE pp.name IN ('PRO', 'PREMIUM')
+                ) ranked
+                WHERE ranked.rn <= 5
+                """, nativeQuery = true)
+    List<Project> findTop5ProjectsGroupedByPlatformPlan();
+
     Page<Project> findByIsApproved(ApprovalStatus isApproved, Pageable pageable);
 
     List<Project> findByEndAtIn(List<LocalDateTime> endDates);
