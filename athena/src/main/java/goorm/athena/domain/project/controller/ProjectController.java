@@ -186,7 +186,7 @@ public interface ProjectController {
 
     @Operation(summary = "프로젝트 메인 카테고리 배너 조회", description = "프로젝트의 메인 배너에서 각 카테고리의 조회수가 제일 높은 것을 조회합니다.")
     @ApiResponse(responseCode = "200", description = "프로젝트의 카테고리별 조회수 높은 프로젝트 조회 성공")
-    @GetMapping("/rankingView")
-    public ResponseEntity<List<ProjectTopViewResponse>> getProjectByTopView();
+    @GetMapping("/categoryRankingView")
+    public ResponseEntity<ProjectTopViewResponseWrapper> getProjectByTopView();
 }
 

@@ -40,9 +40,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -193,7 +191,7 @@ public class ProjectService {
     // 메인 페이지 조회
     @Transactional(readOnly = true)
     public List<ProjectAllResponse> getProjects() {
-        List<Project> projects = projectRepository.findTop20WithImageGroupByOrderByViewsDesc();
+        List<Project> projects = projectRepository.findTop5WithImageGroupByOrderByViewsDesc();
 
         AtomicInteger rank = new AtomicInteger(1);
         return projects.stream()
@@ -232,14 +230,39 @@ public class ProjectService {
         return projectSearchQueryRepository.searchProjects(request, searchTerms, sortType);
     }
 
-    public List<ProjectTopViewResponse> getTopView(){
+    public ProjectTopViewResponseWrapper getTopView(){
         List<Project> projects = projectRepository.findTopViewedProjectsByCategory();
-        return projects.stream()
+
+        // 전체 조회수 기준 Top 5 (카테고리 상관없이)
+        List<ProjectTopViewResponse> globalTop5 = projects.stream()
+                .sorted(Comparator.comparingLong(Project::getViews).reversed())
+                .limit(5)
                 .map(project -> {
                     String imageUrl = imageService.getImage(project.getImageGroup().getId());
                     return ProjectMapper.toTopViewResponse(project, imageUrl);
                 })
                 .toList();
+
+        // 카테고리별 Top 5
+        Map<Category, List<Project>> groupedByCategory = projects.stream()
+                .collect(Collectors.groupingBy(Project::getCategory
+                        ,LinkedHashMap::new,
+                        Collectors.toList()));
+
+        List<ProjectCategoryTopViewResponse> categoryTopViews = groupedByCategory.entrySet().stream()
+                .map(entry -> {
+                    Category category = entry.getKey();
+                    List<ProjectTopViewResponse> topViewResponses = entry.getValue().stream()
+                            .map(project -> {
+                                String imageUrl = imageService.getImage(project.getImageGroup().getId());
+                                return ProjectMapper.toTopViewResponse(project, imageUrl);
+                            })
+                            .toList();
+                    return ProjectMapper.toCategoryTopView(category, topViewResponses);
+                })
+                .toList();
+
+        return new ProjectTopViewResponseWrapper(globalTop5, categoryTopViews);
     }
 
     @Transactional
