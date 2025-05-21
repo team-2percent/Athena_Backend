@@ -72,7 +72,10 @@ public enum ErrorCode {
     SAME_ACCOUNT_STATUS(HttpStatus.CONFLICT, "요청한 계좌가 변경할 계좌와 일치합니다."),
     INACCURATE_BANK_ACCOUNT(HttpStatus.BAD_REQUEST, "사용자가 등록한 계좌 정보가 아닙니다."),
     BASIC_ACCOUNT_NOT_DELETED(HttpStatus.CONFLICT, "기본 계좌는 삭제할 수 없습니다."),
-    BANK_ACCOUNT_NOT_FOUND(HttpStatus.NOT_FOUND, "사용자 은행 계좌를 찾을 수 없습니다.");
+    BANK_ACCOUNT_NOT_FOUND(HttpStatus.NOT_FOUND, "사용자 은행 계좌를 찾을 수 없습니다."),
+
+    // 배송지
+    ALREADY_DEFAULT_DELIVERY(HttpStatus.CONFLICT, "이미 기본 배송지로 설정되어 있습니다.");
 
     private final HttpStatus errorCode;
     private final String errorMessage;
