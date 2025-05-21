@@ -30,6 +30,7 @@ public class BankAccountMapper {
 
     public static BankAccountGetResponse toGetResponse(BankAccount bankAccount){
         return new BankAccountGetResponse(
+                bankAccount.getId(),
                 bankAccount.getAccountNumber(),
                 bankAccount.getAccountHolder(),
                 bankAccount.getBankName(),
