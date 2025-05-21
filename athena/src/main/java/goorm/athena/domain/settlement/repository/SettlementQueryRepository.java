@@ -45,7 +45,7 @@ public class SettlementQueryRepository {
                         settlement.id,
                         settlement.project.title,
                         settlement.totalSales,
-                        settlement.platformFee,
+                        settlement.platformFeeTotal,
                         settlement.payOutAmount,
                         settlement.user.nickname,
                         settlement.requestedAt,
@@ -88,7 +88,9 @@ public class SettlementQueryRepository {
                         project.goalAmount,
                         settlement.totalSales,
                         settlement.payOutAmount,
-                        settlement.platformFee,
+                        settlement.platformFeeTotal,
+                        settlement.pgFeeTotal,
+                        settlement.vatTotal,
                         settlement.totalCount,
                         settlement.settledAt,
                         settlement.status,
@@ -97,7 +99,8 @@ public class SettlementQueryRepository {
                                 bankAccount.accountNumber
                         ),
                         project.startAt,
-                        project.endAt
+                        project.endAt,
+                        project.platformPlan.name
                 ))
                 .from(settlement)
                 .join(settlement.project, project)
@@ -119,7 +122,9 @@ public class SettlementQueryRepository {
                         product.name,
                         orderItem.quantity.sum().castToNum(Long.class),
                         history.totalPrice.sum().castToNum(Long.class),
-                        history.fee.sum().castToNum(Long.class),
+                        history.platformFee.sum().castToNum(Long.class),
+                        history.pgFee.sum().castToNum(Long.class),
+                        history.vat.sum().castToNum(Long.class),
                         history.amount.sum().castToNum(Long.class)
                 ))
                 .from(history)
@@ -130,14 +135,15 @@ public class SettlementQueryRepository {
                 .groupBy(product.id, product.name)
                 .fetch();
 
-        // 전체 요약 계산
         long totalQuantity = items.stream().mapToLong(ProductSettlementSummaryResponse.Item::totalQuantity).sum();
         long totalPrice = items.stream().mapToLong(ProductSettlementSummaryResponse.Item::totalPrice).sum();
         long platformFee = items.stream().mapToLong(ProductSettlementSummaryResponse.Item::platformFee).sum();
+        long pgFee = items.stream().mapToLong(ProductSettlementSummaryResponse.Item::pgFee).sum();
+        long vat = items.stream().mapToLong(ProductSettlementSummaryResponse.Item::vat).sum();
         long payoutAmount = items.stream().mapToLong(ProductSettlementSummaryResponse.Item::payoutAmount).sum();
 
         ProductSettlementSummaryResponse.Summary summary =
-                new ProductSettlementSummaryResponse.Summary(totalQuantity, totalPrice, platformFee, payoutAmount);
+                new ProductSettlementSummaryResponse.Summary(totalQuantity, totalPrice, platformFee, pgFee, vat, payoutAmount);
 
         return new ProductSettlementSummaryResponse(items, summary);
     }

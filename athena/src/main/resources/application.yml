@@ -29,6 +29,9 @@ spring:
       cancel-url: ${KAKAO_API_CANCEL_URL}
       fail-url: ${KAKAO_API_FAIL_URL}
 
+  server:
+    forward-headers-strategy: framework
+
 cloud:
   aws:
     credentials:
@@ -44,3 +47,4 @@ cloud:
 jwt:
   secretKey: ${JWT_SECRET_KEY}
   refreshKey: ${JWT_REFRESH_KEY}
+

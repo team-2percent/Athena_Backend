@@ -6,14 +6,13 @@ import goorm.athena.domain.imageGroup.entity.ImageGroup;
 import goorm.athena.domain.product.dto.res.ProductResponse;
 import goorm.athena.domain.product.entity.Product;
 import goorm.athena.domain.project.dto.req.ProjectCreateRequest;
-import goorm.athena.domain.project.dto.res.ProjectDetailResponse;
-import goorm.athena.domain.project.dto.res.ProjectIdResponse;
-import goorm.athena.domain.project.dto.res.ProjectTopViewResponse;
+import goorm.athena.domain.project.dto.res.*;
 import goorm.athena.domain.project.entity.Project;
 import goorm.athena.domain.user.dto.response.UserDetailResponse;
 import goorm.athena.domain.user.entity.User;
 
 import java.util.List;
+import java.util.Map;
 
 public class ProjectMapper {
     // ProjectCreateRequest(Dto) -> Entity
@@ -49,7 +48,7 @@ public class ProjectMapper {
                                                     UserDetailResponse userDetailResponse, List<ProductResponse> productResponses){
         return new ProjectDetailResponse(
                 project.getId(),
-                category.getId(),
+                category.getCategoryName(),
                 project.getTitle(),
                 project.getDescription(),
                 project.getGoalAmount(),
@@ -62,18 +61,25 @@ public class ProjectMapper {
                 imageUrls,
                 userDetailResponse,
                 productResponses,
-                project.getStatus()
+                project.getStatus(),
+                project.getPlatformPlan().getName()
         );
     }
 
     // Entity -> ProjectTopViewResponse(Dto)
     public static ProjectTopViewResponse toTopViewResponse(Project project, String imageUrl){
         return new ProjectTopViewResponse(
-                project.getId(),
-                imageUrl,
+                project.getSeller().getNickname(),
                 project.getTitle(),
-                project.getCategory().getId(),
-                project.getCategory().getCategoryName()
+                project.getDescription(),
+                imageUrl,
+                (project.getTotalAmount() * 100) / project.getTotalAmount(),
+                project.getId()
         );
+    }
+
+
+    public static ProjectCategoryTopViewResponse toCategoryTopView(Category category, List<ProjectTopViewResponse> responses){
+        return new ProjectCategoryTopViewResponse(category.getId(), category.getCategoryName(), responses);
     }
 }

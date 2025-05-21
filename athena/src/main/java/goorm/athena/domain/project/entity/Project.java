@@ -33,9 +33,13 @@ public class Project {
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;      // 카테고리 ID
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "bank_account_id", nullable = false)
     private BankAccount bankAccount;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "platform_plan_id", nullable = false)
+    private PlatformPlan platformPlan;
 
     private String title;
     private String description;         // 설명 (요약)

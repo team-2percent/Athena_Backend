@@ -48,7 +48,8 @@ public class AdminQueryRepository {
                         project.title,
                         project.createdAt.stringValue(),
                         project.seller.nickname,
-                        project.isApproved.stringValue()
+                        project.isApproved.stringValue(),
+                        project.platformPlan.name
                 ))
                 .from(project)
                 .join(project.seller, user)

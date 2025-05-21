@@ -6,12 +6,15 @@ import goorm.athena.domain.settlementhistory.entity.SettlementHistory;
 
 public class SettlementHistoryMapper {
 
-    public static SettlementHistory toEntity(Settlement settlement, Order order, long totalPrice, int fee, long amount) {
+    public static SettlementHistory toEntity(Settlement settlement, Order order,
+                                             long totalPrice, long platformFee, long pgFee, long vat, long amount) {
         return SettlementHistory.builder()
                 .settlement(settlement)
                 .order(order)
                 .totalPrice(totalPrice)
-                .fee(fee)
+                .platformFee(platformFee)
+                .pgFee(pgFee)
+                .vat(vat)
                 .amount(amount)
                 .build();
     }

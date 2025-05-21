@@ -1,11 +1,9 @@
 package goorm.athena.domain.project.service;
 
-import goorm.athena.domain.admin.dto.res.ProjectSummaryResponse;
 import goorm.athena.domain.bankaccount.entity.BankAccount;
 import goorm.athena.domain.bankaccount.service.BankAccountService;
 import goorm.athena.domain.category.entity.Category;
 import goorm.athena.domain.category.service.CategoryService;
-import goorm.athena.domain.image.dto.req.ImageCreateRequest;
 import goorm.athena.domain.image.dto.req.ImageUpdateRequest;
 import goorm.athena.domain.image.entity.Image;
 import goorm.athena.domain.image.service.ImageService;
@@ -13,21 +11,21 @@ import goorm.athena.domain.imageGroup.entity.ImageGroup;
 import goorm.athena.domain.imageGroup.service.ImageGroupService;
 import goorm.athena.domain.product.dto.req.ProductRequest;
 import goorm.athena.domain.product.dto.res.ProductResponse;
-import goorm.athena.domain.product.entity.Product;
 import goorm.athena.domain.product.service.ProductService;
 import goorm.athena.domain.project.dto.cursor.*;
 import goorm.athena.domain.project.dto.req.ProjectCreateRequest;
 import goorm.athena.domain.project.dto.req.ProjectUpdateRequest;
 import goorm.athena.domain.project.dto.res.ProjectIdResponse;
-import goorm.athena.domain.project.entity.ApprovalStatus;
 import goorm.athena.domain.project.dto.req.ProjectCursorRequest;
 import goorm.athena.domain.project.dto.res.*;
 import goorm.athena.domain.project.entity.Project;
-import goorm.athena.domain.project.entity.SortTypeDeadLine;
+import goorm.athena.domain.project.entity.SortTypeDeadline;
 import goorm.athena.domain.project.entity.SortTypeLatest;
 import goorm.athena.domain.project.mapper.ProjectMapper;
-import goorm.athena.domain.project.repository.ProjectQueryRepository;
+import goorm.athena.domain.project.repository.query.ProjectFilterQueryRepository;
+import goorm.athena.domain.project.repository.query.ProjectQueryRepository;
 import goorm.athena.domain.project.repository.ProjectRepository;
+import goorm.athena.domain.project.repository.query.ProjectSearchQueryRepository;
 import goorm.athena.domain.s3.service.S3Service;
 import goorm.athena.domain.user.dto.response.UserDetailResponse;
 import goorm.athena.domain.user.entity.User;
@@ -36,21 +34,13 @@ import goorm.athena.domain.user.service.UserService;
 import goorm.athena.global.exception.CustomException;
 import goorm.athena.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.InputStream;
-import java.net.URL;
-import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -65,6 +55,8 @@ public class ProjectService {
     private final ProductService productService;
     private final BankAccountService bankAccountService;
     private final ProjectQueryRepository projectQueryRepository;
+    private final ProjectFilterQueryRepository projectFilterQueryRepository;
+    private final ProjectSearchQueryRepository projectSearchQueryRepository;
     private final MarkdownParser markdownParser;
 
     private final S3Service s3Service;
@@ -187,7 +179,7 @@ public class ProjectService {
     public ProjectDetailResponse getProjectDetail(Long projectId){
         Project project = getById(projectId);
 
-        Category category = categoryService.getCategoryById(projectId);
+        Category category = categoryService.getCategoryById(project.getCategory().getId());
         List<Image> images = imageService.getImages(project.getImageGroup());
         List<String> imageUrls = imageService.getImageUrls(images);
         UserDetailResponse userDetailResponse = UserMapper.toDetailResponse(project.getSeller());
@@ -199,7 +191,7 @@ public class ProjectService {
     // 메인 페이지 조회
     @Transactional(readOnly = true)
     public List<ProjectAllResponse> getProjects() {
-        List<Project> projects = projectRepository.findTop20WithImageGroupByOrderByViewsDesc();
+        List<Project> projects = projectRepository.findTop5WithImageGroupByOrderByViewsDesc();
 
         AtomicInteger rank = new AtomicInteger(1);
         return projects.stream()
@@ -213,39 +205,92 @@ public class ProjectService {
 
     // 최신 프로젝트 조회 (커서 기반 페이징)
     @Transactional(readOnly = true)
-    public ProjectCursorResponse<ProjectRecentResponse> getProjectsByNew(LocalDateTime lastStartAt, Long lastProjectId, int pageSize) {
+    public ProjectRecentCursorResponse getProjectsByNew(LocalDateTime lastStartAt, Long lastProjectId, int pageSize) {
         ProjectCursorRequest<LocalDateTime> request = new ProjectCursorRequest<>(lastStartAt, lastProjectId, pageSize);
         return projectQueryRepository.getProjectsByNew(request);
     }
 
     // 카테고리별 프로젝트 조회 (커서 기반 페이징)
     @Transactional(readOnly = true)
-    public ProjectFilterCursorResponse<?> getProjectsByCategory(ProjectCursorRequest<?> request, Long categoryId, SortTypeLatest sortType) {
+    public ProjectCategoryCursorResponse getProjectsByCategory(ProjectCursorRequest<?> request, Long categoryId, SortTypeLatest sortType) {
 
-        return projectQueryRepository.getProjectsByCategory(request, categoryId, sortType);
+        return projectFilterQueryRepository.getProjectsByCategory(request, categoryId, sortType);
     }
 
     // 마감 기한별 프로젝트 조회 (커서 기반 페이징)
     @Transactional(readOnly = true)
-    public ProjectCursorResponse<ProjectDeadLineResponse> getProjectsByDeadLine(LocalDateTime lastStartAt, SortTypeDeadLine sortTypeDeadLine, Long lastProjectId, int pageSize) {
+    public ProjectDeadlineCursorResponse getProjectsByDeadLine(LocalDateTime lastStartAt, SortTypeDeadline sortTypeDeadline, Long lastProjectId, int pageSize) {
         ProjectCursorRequest<LocalDateTime> request = new ProjectCursorRequest<>(lastStartAt, lastProjectId, pageSize);
-        return projectQueryRepository.getProjectsByDeadline(request, sortTypeDeadLine);
+        return projectFilterQueryRepository.getProjectsByDeadline(request, sortTypeDeadline);
     }
 
     // 검색 프로젝트 조회 (커서 기반 페이징)
     @Transactional(readOnly = true)
-    public ProjectFilterCursorResponse<ProjectSearchResponse> searchProjects(ProjectCursorRequest<?> request, String searchTerms, int pageSize, SortTypeLatest sortType) {
-        return projectQueryRepository.searchProjects(request, searchTerms, sortType);
+    public ProjectSearchCursorResponse searchProjects(ProjectCursorRequest<?> request, String searchTerms, SortTypeLatest sortType) {
+        return projectSearchQueryRepository.searchProjects(request, searchTerms, sortType);
     }
 
-    public List<ProjectTopViewResponse> getTopView(){
+    @Transactional(readOnly = true)
+    public List<ProjectByPlanGetResponse> getTopViewByPlan(){
+        List<Project> projects = projectRepository.findTop5ProjectsGroupedByPlatformPlan();
+
+        // 요금제 이름(planName) 별로 그룹핑
+        Map<String, List<Project>> groupedByPlan = projects.stream()
+                .collect(Collectors.groupingBy(
+                        p -> p.getPlatformPlan().getName().name(), // PlanName -> String
+                        LinkedHashMap::new,
+                        Collectors.toList()
+                ));
+
+        // 각 그룹을 ProjectByPlanGetResponse 로 매핑
+        return groupedByPlan.entrySet().stream()
+                .map(entry -> {
+                    String planName = entry.getKey();
+                    List<ProjectTopViewResponse> items = entry.getValue().stream()
+                            .map(project -> {
+                                String imageUrl = imageService.getImage(project.getImageGroup().getId());
+                                return ProjectMapper.toTopViewResponse(project, imageUrl);
+                            })
+                            .toList();
+                    return new ProjectByPlanGetResponse(planName, items);
+                })
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public ProjectCategoryTopResponseWrapper getTopView(){
         List<Project> projects = projectRepository.findTopViewedProjectsByCategory();
-        return projects.stream()
+
+        // 전체 조회수 기준 Top 5 (카테고리 상관없이)
+        List<ProjectTopViewResponse> globalTop5 = projects.stream()
+                .sorted(Comparator.comparingLong(Project::getViews).reversed())
+                .limit(5)
                 .map(project -> {
                     String imageUrl = imageService.getImage(project.getImageGroup().getId());
                     return ProjectMapper.toTopViewResponse(project, imageUrl);
                 })
                 .toList();
+
+        // 카테고리별 Top 5
+        Map<Category, List<Project>> groupedByCategory = projects.stream()
+                .collect(Collectors.groupingBy(Project::getCategory
+                        ,LinkedHashMap::new,
+                        Collectors.toList()));
+
+        List<ProjectCategoryTopViewResponse> categoryTopViews = groupedByCategory.entrySet().stream()
+                .map(entry -> {
+                    Category category = entry.getKey();
+                    List<ProjectTopViewResponse> topViewResponses = entry.getValue().stream()
+                            .map(project -> {
+                                String imageUrl = imageService.getImage(project.getImageGroup().getId());
+                                return ProjectMapper.toTopViewResponse(project, imageUrl);
+                            })
+                            .toList();
+                    return ProjectMapper.toCategoryTopView(category, topViewResponses);
+                })
+                .toList();
+
+        return new ProjectCategoryTopResponseWrapper(globalTop5, categoryTopViews);
     }
 
     @Transactional

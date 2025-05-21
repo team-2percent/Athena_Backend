@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/orders")
+@RequestMapping("/api/order")
 public class OrderControllerImpl implements OrderController {
 
     private final OrderService orderService;

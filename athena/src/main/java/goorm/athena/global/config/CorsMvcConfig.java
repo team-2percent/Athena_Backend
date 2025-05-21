@@ -16,7 +16,7 @@ public class CorsMvcConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**").
-                allowedOrigins("http://localhost:3000", "https://athena-nine-green.vercel.app", "https://athena-84xayn4st-leejinyeong218s-projects.vercel.app")
+                allowedOrigins("http://localhost:3000", "https://athena-nine-green.vercel.app", "https://athena-84xayn4st-leejinyeong218s-projects.vercel.app", "https://athena.i-am-jay.com")
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                 .allowedHeaders("*")
                 .allowCredentials(true);

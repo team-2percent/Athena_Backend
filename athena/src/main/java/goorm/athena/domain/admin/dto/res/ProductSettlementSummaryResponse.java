@@ -11,6 +11,8 @@ public record ProductSettlementSummaryResponse(
             long totalQuantity,
             long totalPrice,
             long platformFee,
+            long pgFee,
+            long vat,
             long payoutAmount
     ) {}
 
@@ -18,6 +20,8 @@ public record ProductSettlementSummaryResponse(
             long totalQuantity,
             long totalPrice,
             long platformFee,
+            long pgFee,
+            long vat,
             long payoutAmount
     ) {}
 }

@@ -69,14 +69,15 @@ public interface UserController {
     @Operation(summary = "유저 로그아웃 API", description = "로그인 된 유저의 refreshToken을 서버에 저장된 쿠키에서 삭제합니다.")
     @ApiResponse(responseCode = "200", description = "유저 로그아웃 성공")
     @PostMapping("/logout")
-    public ResponseEntity<Void> logout(@Parameter(hidden = true) @CookieValue("refreshToken") String refreshToken, HttpServletResponse response);
+    public ResponseEntity<Void> logout(@Parameter(hidden = true) @CheckLogin LoginUserRequest request,
+            @Parameter(hidden = true) @CookieValue("refreshToken") String refreshToken, HttpServletResponse response);
 
-    /*
+
     @Operation(summary = "유저 헤더 정보 조회 API", description = "헤더에서 유저의 이름과 이미지를 조회합니다.")
     @ApiResponse(responseCode = "200", description = "유저 헤더 정보 조회 성공")
     @PostMapping("/Header")
     public ResponseEntity<UserHeaderGetResponse> getHeader(@Parameter(hidden = true) @CheckLogin LoginUserRequest request);
-     */
+
 
     @Operation(summary = "유저 조회 APi", description = "유저의 ID를 통해 특정 유저의 정보를 조회합니다.<br>")
     @ApiResponse(responseCode = "200", description = "특정 유저 정보 조회 성공")

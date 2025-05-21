@@ -3,6 +3,12 @@ package goorm.athena.domain.admin.controller;
 import goorm.athena.domain.admin.dto.res.*;
 import goorm.athena.domain.admin.service.AdminRoleCheckService;
 import goorm.athena.domain.admin.service.AdminService;
+import goorm.athena.domain.coupon.dto.res.CouponGetDetailResponse;
+import goorm.athena.domain.coupon.dto.res.CouponGetResponse;
+import goorm.athena.domain.coupon.entity.Coupon;
+import goorm.athena.domain.coupon.entity.CouponStatus;
+import goorm.athena.domain.coupon.mapper.CouponMapper;
+import goorm.athena.domain.coupon.service.CouponService;
 import goorm.athena.domain.project.dto.req.ProjectApprovalRequest;
 import goorm.athena.domain.project.dto.res.ProjectDetailResponse;
 import goorm.athena.domain.project.service.ProjectService;
@@ -11,6 +17,7 @@ import goorm.athena.domain.settlement.service.SettlementService;
 import goorm.athena.global.jwt.util.CheckLogin;
 import goorm.athena.global.jwt.util.LoginUserRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,10 +31,11 @@ public class AdminControllerImpl implements AdminController {
     private final AdminService adminService;
     private final AdminRoleCheckService adminRoleCheckService;
     private final SettlementService settlementService;
+    private final CouponService couponService;
 
 
     // 프로젝트 승인/반려
-    @PatchMapping("/projects/{projectId}/approval")
+    @PatchMapping("/project/{projectId}/approval")
     public ResponseEntity<String> updateApprovalStatus(
             @CheckLogin LoginUserRequest loginUserRequest,
             @PathVariable Long projectId,
@@ -40,7 +48,7 @@ public class AdminControllerImpl implements AdminController {
     }
 
 
-    @GetMapping("/projects")
+    @GetMapping("/project")
     public ResponseEntity<ProjectSummaryResponse> getProjects(
             @CheckLogin LoginUserRequest loginUserRequest,
             @RequestParam(required = false) String keyword,
@@ -52,13 +60,13 @@ public class AdminControllerImpl implements AdminController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/projects/{projectId}")
+    @GetMapping("/project/{projectId}")
     public ResponseEntity<ProjectDetailResponse> getProjectDetail(@PathVariable Long projectId){
         ProjectDetailResponse response = projectService.getProjectDetail(projectId);
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/settlements")
+    @GetMapping("/settlement")
     public ResponseEntity<SettlementSummaryPageResponse> getSettlements(
             @CheckLogin LoginUserRequest loginUserRequest,
             @RequestParam(required = false) Status status,
@@ -71,7 +79,7 @@ public class AdminControllerImpl implements AdminController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/settlements/{settlementId}/info")
+    @GetMapping("/settlement/{settlementId}/info")
     public ResponseEntity<SettlementDetailInfoResponse> getSettlementInfo(
             @PathVariable Long settlementId,
             @CheckLogin LoginUserRequest loginUserRequest
@@ -80,7 +88,7 @@ public class AdminControllerImpl implements AdminController {
         return ResponseEntity.ok(settlementService.getSettlementDetailInfo(settlementId));
     }
 
-    @GetMapping("/settlements/{settlementId}/histories")
+    @GetMapping("/settlement/{settlementId}/history")
     public ResponseEntity<SettlementHistoryPageResponse> getSettlementHistories(
             @PathVariable Long settlementId,
             @RequestParam(defaultValue = "0") int page,
@@ -90,12 +98,46 @@ public class AdminControllerImpl implements AdminController {
         return ResponseEntity.ok(settlementService.getSettlementHistories(settlementId, page));
     }
 
-    @GetMapping("/settlements/{settlementId}/product-summary")
+    @GetMapping("/settlement/{settlementId}/product-summary")
     public ResponseEntity<ProductSettlementSummaryResponse> getProductSettlementInfo(
             @PathVariable Long settlementId
     ) {
         ProductSettlementSummaryResponse result = settlementService.getProductSettlementInfo(settlementId);
         return ResponseEntity.ok(result);
+    }
+
+    @Override
+    @GetMapping("/couponList")
+    public ResponseEntity<Page<CouponGetResponse>> getCouponAll(
+            @CheckLogin LoginUserRequest request,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size){
+        Page<Coupon> coupons = couponService.getCoupons(page, size);
+        Page<CouponGetResponse> response = coupons.map(CouponMapper::toGetResponse);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @Override
+    @GetMapping("/couponByStatus")
+    public ResponseEntity<Page<CouponGetResponse>> getCouponByStatus(
+            @CheckLogin LoginUserRequest request,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam CouponStatus status){
+        Page<Coupon> coupons = couponService.getCouponByStatus(page, size, status);
+        Page<CouponGetResponse> response = coupons.map(CouponMapper::toGetResponse);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @Override
+    @GetMapping("/{couponId}")
+    public ResponseEntity<CouponGetDetailResponse> getCouponDetail(
+            @CheckLogin LoginUserRequest request,
+            @PathVariable Long couponId) {
+        CouponGetDetailResponse response = couponService.getCouponDetail(couponId);
+        return ResponseEntity.ok(response);
     }
 
 

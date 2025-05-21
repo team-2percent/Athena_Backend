@@ -90,7 +90,8 @@ public class UserControllerImpl implements UserController {
 
     @Override
     @PostMapping("/logout")
-    public ResponseEntity<Void> logout(@CookieValue("refreshToken") String refreshToken, HttpServletResponse response) {
+    public ResponseEntity<Void> logout(@CheckLogin LoginUserRequest request,
+            @CookieValue("refreshToken") String refreshToken, HttpServletResponse response) {
         if (refreshToken == null || refreshToken.isEmpty()) {
             throw new CustomException(ErrorCode.REFRESHTOKEN_NOT_FOUND);
         }
@@ -100,14 +101,14 @@ public class UserControllerImpl implements UserController {
         return ResponseEntity.ok().build();
     }
 
-    /*
+
     @Override
     @PostMapping("/Header")
     public ResponseEntity<UserHeaderGetResponse> getHeader(@CheckLogin LoginUserRequest request){
         UserHeaderGetResponse response = userService.getHeaderById(request.userId());
         return ResponseEntity.ok(response);
     }
-     */
+
 
     @Override
     @GetMapping("/profile/{id}")

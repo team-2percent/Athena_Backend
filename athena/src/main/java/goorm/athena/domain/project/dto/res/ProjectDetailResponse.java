@@ -2,6 +2,7 @@ package goorm.athena.domain.project.dto.res;
 
 import goorm.athena.domain.category.entity.Category;
 import goorm.athena.domain.product.dto.res.ProductResponse;
+import goorm.athena.domain.project.entity.PlanName;
 import goorm.athena.domain.project.entity.Status;
 import goorm.athena.domain.user.dto.response.UserDetailResponse;
 
@@ -10,13 +11,13 @@ import java.util.List;
 
 public record ProjectDetailResponse (
         Long id,
-        Long category,
+        String category,
         String title,
         String description,
 
         Long goalAmount,
         Long totalAmount,
-        String convertedMarkdown,
+        String markdown,
 
         LocalDateTime startAt,
         LocalDateTime endAt,
@@ -27,6 +28,8 @@ public record ProjectDetailResponse (
         UserDetailResponse sellerResponse,
         List<ProductResponse> productResponses,
 
-        Status status
+        Status status,
+
+        PlanName planName
 ){
 }

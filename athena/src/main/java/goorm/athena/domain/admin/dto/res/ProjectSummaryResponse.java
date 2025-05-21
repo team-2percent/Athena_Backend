@@ -1,5 +1,6 @@
 package goorm.athena.domain.admin.dto.res;
 
+import goorm.athena.domain.project.entity.PlanName;
 import org.springframework.data.domain.Page;
 
 import java.util.List;
@@ -22,7 +23,8 @@ public record ProjectSummaryResponse(
             String title,
             String createdAt,
             String sellerName,
-            String approvalStatus
+            String approvalStatus,
+            PlanName platformPlan
     ) {}
 
     public record PageInfo(

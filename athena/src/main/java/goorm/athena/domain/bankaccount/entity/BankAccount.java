@@ -2,6 +2,7 @@ package goorm.athena.domain.bankaccount.entity;
 
 import goorm.athena.domain.user.entity.User;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -28,4 +29,17 @@ public class BankAccount {
     private String bankName;
 
     private boolean isDefault;
+
+    @Builder
+    private BankAccount(User user, String accountNumber, String accountHolder, String bankName, boolean isDefault){
+        this.user = user;
+        this.accountNumber = accountNumber;
+        this.accountHolder = accountHolder;
+        this.bankName = bankName;
+        this.isDefault = isDefault;
+    }
+
+    public void setAsDefault() { this.isDefault = true;}
+
+    public void unsetAsDefault() { this.isDefault = false; }
 }

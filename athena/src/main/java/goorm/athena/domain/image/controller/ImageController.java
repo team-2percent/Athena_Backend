@@ -16,7 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 @Tag(name = "Image", description = "Image API")
-@RequestMapping("/api/images")
+@RequestMapping("/api/image")
 public interface ImageController {
 
     @Operation(summary = "프로젝트 이미지 업로드 API", description = "프로젝트 이미지를 업로드합니다.<br>"

@@ -1,6 +1,9 @@
 package goorm.athena.domain.admin.controller;
 
 import goorm.athena.domain.admin.dto.res.*;
+import goorm.athena.domain.coupon.dto.res.CouponGetDetailResponse;
+import goorm.athena.domain.coupon.dto.res.CouponGetResponse;
+import goorm.athena.domain.coupon.entity.CouponStatus;
 import goorm.athena.domain.project.dto.req.ProjectApprovalRequest;
 import goorm.athena.domain.project.dto.res.ProjectDetailResponse;
 import goorm.athena.domain.settlement.entity.Status;
@@ -12,6 +15,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,7 +31,7 @@ public interface AdminController {
                     @ApiResponse(responseCode = "404", description = "프로젝트를 찾을 수 없음")
             }
     )
-    @PatchMapping("/projects/{projectId}/approval")
+    @PatchMapping("/project/{projectId}/approval")
     ResponseEntity<String> updateApprovalStatus(
             @Parameter(hidden = true) @CheckLogin LoginUserRequest loginUserRequest,
             @Parameter(description = "승인 또는 거절할 프로젝트의 ID", example = "1") @PathVariable Long projectId,
@@ -35,14 +39,14 @@ public interface AdminController {
     );
 
     @Operation(
-            summary = "프로젝트 목록 조회",
+            summary = "프로젝트 승인 목록 조회",
             description = "관리자가 확인할 수 있는 프로젝트 목록을 조회합니다. 승인 상태가 PENDING인 프로젝트가 우선 정렬되어 보여집니다.",
             responses = {
                     @ApiResponse(responseCode = "200", description = "프로젝트 목록 조회 성공",
                             content = @Content(schema = @Schema(implementation = ProjectSummaryResponse.class)))
             }
     )
-    @GetMapping("/projects")
+    @GetMapping("/project")
     ResponseEntity<ProjectSummaryResponse> getProjects(
             @Parameter(hidden = true) @CheckLogin LoginUserRequest loginUserRequest,
             @Parameter(description = "프로젝트 제목 검색어 (선택)") @RequestParam(required = false) String keyword,
@@ -58,7 +62,7 @@ public interface AdminController {
                             content = @Content(schema = @Schema(implementation = ProjectDetailResponse.class)))
             }
     )
-    @GetMapping("/projects/{projectId}")
+    @GetMapping("/project/{projectId}")
     ResponseEntity<ProjectDetailResponse> getProjectDetail(@PathVariable Long projectId);
 
 
@@ -70,7 +74,7 @@ public interface AdminController {
                             content = @Content(schema = @Schema(implementation = SettlementSummaryPageResponse.class)))
             }
     )
-    @GetMapping("/settlements")
+    @GetMapping("/settlement")
     ResponseEntity<SettlementSummaryPageResponse> getSettlements(
             @Parameter(hidden = true) @CheckLogin LoginUserRequest loginUserRequest,
             @Parameter(description = "정산 상태 (예: PENDING, COMPLETED)", example = "PENDING")
@@ -94,7 +98,7 @@ public interface AdminController {
                             content = @Content(schema = @Schema(implementation = SettlementDetailInfoResponse.class)))
             }
     )
-    @GetMapping("/settlements/{settlementId}/info")
+    @GetMapping("/settlement/{settlementId}/info")
     ResponseEntity<SettlementDetailInfoResponse> getSettlementInfo(
             @Parameter(description = "정산 ID", example = "1") @PathVariable Long settlementId,
             @Parameter(hidden = true) @CheckLogin LoginUserRequest loginUserRequest
@@ -108,7 +112,7 @@ public interface AdminController {
                             content = @Content(schema = @Schema(implementation = SettlementHistoryPageResponse.class)))
             }
     )
-    @GetMapping("/settlements/{settlementId}/histories")
+    @GetMapping("/settlement/{settlementId}/history")
     ResponseEntity<SettlementHistoryPageResponse> getSettlementHistories(
             @Parameter(description = "정산 ID", example = "1") @PathVariable Long settlementId,
             @Parameter(description = "페이지 번호 (0부터 시작)", example = "0") @RequestParam(defaultValue = "0") int page,
@@ -123,9 +127,34 @@ public interface AdminController {
                             content = @Content(schema = @Schema(implementation = ProductSettlementSummaryResponse.class)))
             }
     )
-    @GetMapping("/settlements/{settlementId}/product-summary")
+    @GetMapping("/settlement/{settlementId}/product-summary")
     ResponseEntity<ProductSettlementSummaryResponse> getProductSettlementInfo(
             @Parameter(description = "정산 ID", example = "1") @PathVariable Long settlementId
     );
+
+    @Operation(summary = "쿠폰 페이지 조회 API", description = "쿠폰 목록들을 페이지 형식으로 조회합니다.")
+    @ApiResponse(responseCode = "200", description = "쿠폰 목록 페이지 조회 완료")
+    @GetMapping("/couponList")
+    public ResponseEntity<Page<CouponGetResponse>> getCouponAll(
+            @Parameter(hidden = true) @CheckLogin LoginUserRequest request,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size);
+
+    @Operation(summary = "쿠폰 상태값 조회 API", description = "쿠폰 목록들을 상태값을 기준으로 조회합니다.")
+    @ApiResponse(responseCode = "200", description = "쿠폰 상태 기준 목록 조회 완료")
+    @GetMapping("/couponByStatus")
+    public ResponseEntity<Page<CouponGetResponse>> getCouponByStatus(
+            @Parameter(hidden = true) @CheckLogin LoginUserRequest request,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam CouponStatus status);
+
+
+    @Operation(summary = "쿠폰 상세 정보 조회 API", description = "쿠폰의 상세 정보를 조회합니다.")
+    @ApiResponse(responseCode = "200", description = "쿠폰의 상세 정보를 조회합니다.")
+    @GetMapping("/{couponId}")
+    public ResponseEntity<CouponGetDetailResponse> getCouponDetail(
+            @Parameter(hidden = true) @CheckLogin LoginUserRequest request,
+            @PathVariable Long couponId);
 
 }

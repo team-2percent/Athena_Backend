@@ -48,7 +48,7 @@ public class UserInfoControllerImpl implements UserInfoController {
     }
 
     @Override
-    @GetMapping("/comments")
+    @GetMapping("/comment")
     public List<CommentGetResponse> getComments(@CheckLogin LoginUserRequest request){
         return commentService.getCommentByUser(request.userId());
     }
@@ -79,7 +79,7 @@ public class UserInfoControllerImpl implements UserInfoController {
     }
 
     @Override
-    @GetMapping("/coupons")
+    @GetMapping("/coupon")
     public ResponseEntity<UserCouponCursorResponse> getUserCoupons(
             @Parameter(hidden = true) @CheckLogin LoginUserRequest request,
             @RequestParam(required = false) Long cursorId,
@@ -89,7 +89,7 @@ public class UserInfoControllerImpl implements UserInfoController {
         return ResponseEntity.ok(responses);
     }
 
-    @GetMapping("/projects")
+    @GetMapping("/project")
     public ResponseEntity<MyProjectScrollResponse> getMyProjects(
             @CheckLogin LoginUserRequest loginUserRequest,
             @RequestParam(required = false) LocalDateTime nextCursorValue,
@@ -101,7 +101,7 @@ public class UserInfoControllerImpl implements UserInfoController {
     }
 
 
-    @GetMapping("/orders")
+    @GetMapping("/order")
     public ResponseEntity<MyOrderScrollResponse> getMyOrders(
             @CheckLogin LoginUserRequest loginUserRequest,
             @RequestParam(required = false) LocalDateTime nextCursorValue,
