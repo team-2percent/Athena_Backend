@@ -28,4 +28,5 @@ public record ProjectDetailResponse (
         List<ProductResponse> productResponses,
 
         Status status
-){ }
+){
+}

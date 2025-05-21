@@ -75,7 +75,7 @@ public class ProjectService {
         ImageGroup imageGroup = imageGroupService.getById(request.imageGroupId());
         User seller = userService.getUser(request.sellerId());
         Category category = categoryService.getCategoryById(request.categoryId());
-        BankAccount bankAccount = bankAccountService.getPrimaryAccount(request.bankAccountId());
+        BankAccount bankAccount = bankAccountService.getAccount(request.sellerId(), request.bankAccountId());
 
         // String convertedMarkdown = getConvertedMarkdown(request.markdownImages(), request.contentMarkdown());       // 마크다운 변환
         Project project = ProjectMapper.toEntity(request, seller, imageGroup, category, bankAccount);    // 새 프로젝트 생성
