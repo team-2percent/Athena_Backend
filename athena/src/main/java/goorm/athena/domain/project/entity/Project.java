@@ -69,7 +69,8 @@ public class Project {
     private Project(User seller, ImageGroup imageGroup, Category category, BankAccount bankAccount,
                     String title, String description,
                     Long goalAmount, Long totalAmount, String contentMarkdown,
-                    LocalDateTime startAt, LocalDateTime endAt, LocalDateTime shippedAt, Status status) {
+                    LocalDateTime startAt, LocalDateTime endAt, LocalDateTime shippedAt, Status status,
+                    PlatformPlan platformPlan) {
         this.seller = seller;
         this.imageGroup = imageGroup;
         this.category = category;
@@ -83,6 +84,7 @@ public class Project {
         this.endAt = endAt;
         this.shippedAt = shippedAt;
         this.status = status;
+        this.platformPlan = platformPlan;
     }
 
 
