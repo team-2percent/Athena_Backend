@@ -2,6 +2,7 @@ package goorm.athena.domain.bankaccount.service;
 
 import goorm.athena.domain.bankaccount.dto.req.BankAccountCreateRequest;
 import goorm.athena.domain.bankaccount.dto.res.BankAccountCreateResponse;
+import goorm.athena.domain.bankaccount.dto.res.BankAccountGetResponse;
 import goorm.athena.domain.bankaccount.entity.BankAccount;
 import goorm.athena.domain.bankaccount.mapper.BankAccountMapper;
 import goorm.athena.domain.bankaccount.repository.BankAccountRepository;
@@ -15,6 +16,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -44,6 +47,14 @@ public class BankAccountService {
         return BankAccountMapper.toCreateResponse(saveAccount);
     }
 
+    public List<BankAccountGetResponse> getBankAccount(Long userId){
+        User user = userService.getUser(userId);
+        List<BankAccount> bankAccount = bankAccountRepository.findByUser(user);
+        return bankAccountRepository.findByUser(user).stream()
+                .map(BankAccountMapper::toGetResponse)
+                .collect(Collectors.toList());
+    }
+
     public BankAccount getPrimaryAccount(Long userId) {
         return bankAccountRepository.findByUserIdAndIsDefaultTrue(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.BANK_ACCOUNT_NOT_FOUND));
@@ -58,5 +69,12 @@ public class BankAccountService {
             }
         }
         throw new CustomException(ErrorCode.BANK_ACCOUNT_NOT_FOUND);
+    }
+
+    @Transactional
+    public void deleteBankAccount(Long bankAccountId){
+        Optional<BankAccount> bankAccount = bankAccountRepository.findById(bankAccountId);
+
+
     }
 }

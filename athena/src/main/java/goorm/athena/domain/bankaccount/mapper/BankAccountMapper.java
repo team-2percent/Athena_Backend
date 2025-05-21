@@ -2,6 +2,7 @@ package goorm.athena.domain.bankaccount.mapper;
 
 import goorm.athena.domain.bankaccount.dto.req.BankAccountCreateRequest;
 import goorm.athena.domain.bankaccount.dto.res.BankAccountCreateResponse;
+import goorm.athena.domain.bankaccount.dto.res.BankAccountGetResponse;
 import goorm.athena.domain.bankaccount.entity.BankAccount;
 import goorm.athena.domain.user.entity.User;
 
@@ -20,6 +21,15 @@ public class BankAccountMapper {
         return new BankAccountCreateResponse(
                 bankAccount.getId(),
                 bankAccount.getUser().getId(),
+                bankAccount.getAccountNumber(),
+                bankAccount.getAccountHolder(),
+                bankAccount.getBankName(),
+                bankAccount.isDefault()
+        );
+    }
+
+    public static BankAccountGetResponse toGetResponse(BankAccount bankAccount){
+        return new BankAccountGetResponse(
                 bankAccount.getAccountNumber(),
                 bankAccount.getAccountHolder(),
                 bankAccount.getBankName(),
