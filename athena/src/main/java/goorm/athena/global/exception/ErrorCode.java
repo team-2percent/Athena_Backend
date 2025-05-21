@@ -69,6 +69,7 @@ public enum ErrorCode {
     KAKAO_PAY_UNAVAILABLE(HttpStatus.SERVICE_UNAVAILABLE, "카카오페이 서버와의 통신에 실패했습니다. 잠시 후 다시 시도해주세요."),
 
     // 계좌
+    SAME_ACCOUNT_STATUS(HttpStatus.CONFLICT, "요청한 계좌가 변경할 계좌와 일치합니다."),
     INACCURATE_BANK_ACCOUNT(HttpStatus.BAD_REQUEST, "사용자가 등록한 계좌 정보가 아닙니다."),
     BASIC_ACCOUNT_NOT_DELETED(HttpStatus.CONFLICT, "기본 계좌는 삭제할 수 없습니다."),
     BANK_ACCOUNT_NOT_FOUND(HttpStatus.NOT_FOUND, "사용자 은행 계좌를 찾을 수 없습니다.");

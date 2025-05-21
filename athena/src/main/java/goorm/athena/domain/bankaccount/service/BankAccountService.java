@@ -48,6 +48,26 @@ public class BankAccountService {
         return BankAccountMapper.toCreateResponse(saveAccount);
     }
 
+    public void changeAccountState(Long userId, Long bankAccountId){
+        BankAccount previousBankAccount = getPrimaryAccount(userId);
+        BankAccount newBankAccount = getBankAccount(bankAccountId);
+
+        if(!newBankAccount.getUser().getId().equals(userId)){
+            throw new CustomException(ErrorCode.INACCURATE_BANK_ACCOUNT);
+        }
+
+        if(previousBankAccount.getId().equals(bankAccountId)){
+            throw new CustomException(ErrorCode.SAME_ACCOUNT_STATUS);
+        }
+
+        previousBankAccount.unsetAsDefault();
+        newBankAccount.setAsDefault();
+
+        bankAccountRepository.save(previousBankAccount);
+        bankAccountRepository.save(newBankAccount);
+
+    }
+
     public List<BankAccountGetResponse> getBankAccounts(Long userId){
         User user = userService.getUser(userId);
         List<BankAccount> bankAccount = bankAccountRepository.findByUser(user);

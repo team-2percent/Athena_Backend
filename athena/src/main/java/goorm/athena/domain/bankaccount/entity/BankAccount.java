@@ -38,4 +38,8 @@ public class BankAccount {
         this.bankName = bankName;
         this.isDefault = isDefault;
     }
+
+    public void setAsDefault() { this.isDefault = true;}
+
+    public void unsetAsDefault() { this.isDefault = false; }
 }

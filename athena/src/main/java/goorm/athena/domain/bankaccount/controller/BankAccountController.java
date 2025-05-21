@@ -33,4 +33,10 @@ public interface BankAccountController {
     @DeleteMapping
     public ResponseEntity<Void> deleteBankAccount(@Parameter(hidden = true) @CheckLogin LoginUserRequest loginUserRequest,
                                                   @RequestParam Long bankAccountId);
+
+    @Operation(summary = "계좌 상태 변경 API", description = "사용자의 기본 계좌를 일반 계좌로 바꾸고 선택한 계좌를 기본 계좌로 변경합니다.")
+    @ApiResponse(responseCode = "200", description = "사용자 기본 계좌 변경 성공")
+    @PostMapping("/state")
+    public ResponseEntity<Void> changeAccountState(@Parameter(hidden = true) @CheckLogin LoginUserRequest loginUserRequest,
+                                                   @RequestParam Long bankAccountId);
 }

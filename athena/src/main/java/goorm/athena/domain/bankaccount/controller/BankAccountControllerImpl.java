@@ -35,6 +35,13 @@ public class BankAccountControllerImpl implements BankAccountController{
     }
 
     @Override
+    public ResponseEntity<Void> changeAccountState(@CheckLogin LoginUserRequest loginUserRequest,
+                                                   @RequestParam Long bankAccountId){
+        bankAccountService.changeAccountState(loginUserRequest.userId(), bankAccountId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @Override
     public ResponseEntity<Void> deleteBankAccount(@CheckLogin LoginUserRequest loginUserRequest,
                                                   @RequestParam Long bankAccountId){
         bankAccountService.deleteBankAccount(loginUserRequest.userId(), bankAccountId);
