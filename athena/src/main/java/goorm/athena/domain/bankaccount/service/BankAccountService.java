@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -47,12 +48,17 @@ public class BankAccountService {
         return BankAccountMapper.toCreateResponse(saveAccount);
     }
 
-    public List<BankAccountGetResponse> getBankAccount(Long userId){
+    public List<BankAccountGetResponse> getBankAccounts(Long userId){
         User user = userService.getUser(userId);
         List<BankAccount> bankAccount = bankAccountRepository.findByUser(user);
         return bankAccountRepository.findByUser(user).stream()
                 .map(BankAccountMapper::toGetResponse)
                 .collect(Collectors.toList());
+    }
+
+    public BankAccount getBankAccount(Long bankAccountId){
+        return bankAccountRepository.findById(bankAccountId)
+                .orElseThrow(() -> new CustomException(ErrorCode.BANK_ACCOUNT_NOT_FOUND));
     }
 
     public BankAccount getPrimaryAccount(Long userId) {
@@ -72,9 +78,19 @@ public class BankAccountService {
     }
 
     @Transactional
-    public void deleteBankAccount(Long bankAccountId){
-        Optional<BankAccount> bankAccount = bankAccountRepository.findById(bankAccountId);
+    public void deleteBankAccount(Long userId, Long bankAccountId){
+
+        BankAccount bankAccount = getBankAccount(bankAccountId);
+
+        if(!bankAccount.getUser().getId().equals(userId)){
+            throw new CustomException(ErrorCode.INACCURATE_BANK_ACCOUNT);
+        }
+
+        if(bankAccount.isDefault()){
+            throw new CustomException(ErrorCode.BASIC_ACCOUNT_NOT_DELETED);
+        }
 
 
+        bankAccountRepository.delete(bankAccount);
     }
 }

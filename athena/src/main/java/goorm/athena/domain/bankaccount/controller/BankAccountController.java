@@ -10,9 +10,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -29,4 +27,10 @@ public interface BankAccountController {
     @ApiResponse(responseCode = "200", description = "사용자 계좌 조회 성공")
     @GetMapping
     public ResponseEntity<List<BankAccountGetResponse>> getBankAccount(@Parameter(hidden = true) @CheckLogin LoginUserRequest loginUserRequest);
+
+    @Operation(summary = "사용자 계좌 삭제 API", description = "로그인 한 사용자의 해당 계좌 정보를 삭제합니다.")
+    @ApiResponse(responseCode = "204", description = "사용자 계좌 정보 삭제 성공")
+    @DeleteMapping
+    public ResponseEntity<Void> deleteBankAccount(@Parameter(hidden = true) @CheckLogin LoginUserRequest loginUserRequest,
+                                                  @RequestParam Long bankAccountId);
 }
