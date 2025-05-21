@@ -37,10 +37,9 @@ public class UserMapper {
     public static UserUpdateResponse toUpdateResponse(User user){
         return new UserUpdateResponse(
                 user.getId(),
-                user.getEmail(),
-                user.getPassword(),
                 user.getNickname(),
-                user.getRole()
+                user.getSellerIntroduction(),
+                user.getLinkUrl()
         );
     }
 

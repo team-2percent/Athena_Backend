@@ -166,6 +166,7 @@ public class ProjectFilterQueryRepository {
         Long totalCount = queryFactory
                 .select(project.count())
                 .from(project)
+                .where(builder)
                 .fetchOne();
 
         return ProjectDeadlineCursorResponse.ofByEndAt(content, totalCount);

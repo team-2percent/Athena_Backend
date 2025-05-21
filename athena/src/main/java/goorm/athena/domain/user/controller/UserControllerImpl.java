@@ -53,12 +53,11 @@ public class UserControllerImpl implements UserController {
     @Override
     @PutMapping
     public ResponseEntity<UserUpdateResponse> updateUser(@CheckLogin LoginUserRequest loginUserRequest,
-                                                         @RequestParam UserUpdateRequest request,
-                                                         @RequestParam MultipartFile image){
+                                                         @RequestBody UserUpdateRequest request){
         // User <-> ImageGroup 1:1 매핑되도록 생성
         ImageGroup userImageGroup = imageGroupService.createImageGroup(Type.USER);
 
-        UserUpdateResponse response = userService.updateUser(userImageGroup, loginUserRequest.userId(), request, image);
+        UserUpdateResponse response = userService.updateUser(userImageGroup, loginUserRequest.userId(), request);
         return ResponseEntity.ok(response);
     }
 
