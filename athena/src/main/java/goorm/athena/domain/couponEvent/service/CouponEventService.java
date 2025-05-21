@@ -41,11 +41,6 @@ public class CouponEventService {
         CouponEvent couponEvent = CouponEvent.create(coupon);
         couponEventRepository.save(couponEvent);
 
-        List<Long> userIds = userService.getUserIdAll();
-        for (Long userId : userIds) {
-            notificationService.sendCouponEventNotification(userId, couponEvent.getCoupon().getTitle());
-        }
-
         return CouponEventMapper.toCreateResponse(couponEvent);
     }
 
