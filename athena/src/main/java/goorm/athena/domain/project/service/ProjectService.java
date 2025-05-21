@@ -18,10 +18,9 @@ import goorm.athena.domain.project.dto.req.ProjectUpdateRequest;
 import goorm.athena.domain.project.dto.res.ProjectIdResponse;
 import goorm.athena.domain.project.dto.req.ProjectCursorRequest;
 import goorm.athena.domain.project.dto.res.*;
-import goorm.athena.domain.project.entity.Project;
-import goorm.athena.domain.project.entity.SortTypeDeadline;
-import goorm.athena.domain.project.entity.SortTypeLatest;
+import goorm.athena.domain.project.entity.*;
 import goorm.athena.domain.project.mapper.ProjectMapper;
+import goorm.athena.domain.project.repository.PlatformPlanRepository;
 import goorm.athena.domain.project.repository.query.ProjectFilterQueryRepository;
 import goorm.athena.domain.project.repository.query.ProjectQueryRepository;
 import goorm.athena.domain.project.repository.ProjectRepository;
@@ -60,6 +59,7 @@ public class ProjectService {
     private final MarkdownParser markdownParser;
 
     private final S3Service s3Service;
+    private final PlatformPlanRepository platformPlanRepository;
 
     // 프로젝트 생성
     @Transactional
@@ -69,8 +69,11 @@ public class ProjectService {
         Category category = categoryService.getCategoryById(request.categoryId());
         BankAccount bankAccount = bankAccountService.getAccount(request.sellerId(), request.bankAccountId());
 
+        PlanName planName = PlanName.valueOf(request.platformPlan());
+        PlatformPlan platformPlan = platformPlanRepository.findByName(planName);
+
         // String convertedMarkdown = getConvertedMarkdown(request.markdownImages(), request.contentMarkdown());       // 마크다운 변환
-        Project project = ProjectMapper.toEntity(request, seller, imageGroup, category, bankAccount);    // 새 프로젝트 생성
+        Project project = ProjectMapper.toEntity(request, seller, imageGroup, category, bankAccount, platformPlan);    // 새 프로젝트 생성
         Project savedProject = projectRepository.save(project);                             // 프로젝트 저장
         // 프로젝트 생성 시 예외 처리 필요
 

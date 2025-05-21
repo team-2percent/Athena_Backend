@@ -7,7 +7,9 @@ import goorm.athena.domain.product.dto.res.ProductResponse;
 import goorm.athena.domain.product.entity.Product;
 import goorm.athena.domain.project.dto.req.ProjectCreateRequest;
 import goorm.athena.domain.project.dto.res.*;
+import goorm.athena.domain.project.entity.PlatformPlan;
 import goorm.athena.domain.project.entity.Project;
+import goorm.athena.domain.project.entity.QPlatformPlan;
 import goorm.athena.domain.user.dto.response.UserDetailResponse;
 import goorm.athena.domain.user.entity.User;
 
@@ -18,7 +20,7 @@ public class ProjectMapper {
     // ProjectCreateRequest(Dto) -> Entity
     // convertedMarkdown parameter 추가 예정
     public static Project toEntity(ProjectCreateRequest request, User seller,
-                                   ImageGroup imageGroup, Category category, BankAccount bankAccount) {
+                                   ImageGroup imageGroup, Category category, BankAccount bankAccount, PlatformPlan PlatformPlan) {
         return Project.builder()
                 .seller(seller)
                 .imageGroup(imageGroup)
@@ -32,6 +34,7 @@ public class ProjectMapper {
                 .startAt(request.startAt())
                 .endAt(request.endAt())
                 .shippedAt(request.shippedAt())
+                .platformPlan(PlatformPlan)
                 .build();
     }
 

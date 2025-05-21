@@ -31,4 +31,5 @@ public record ProjectDetailResponse (
         Status status,
 
         PlanName planName
-){ }
+){
+}

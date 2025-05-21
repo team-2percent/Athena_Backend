@@ -6,6 +6,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @Entity
 @Getter
 @NoArgsConstructor
@@ -39,4 +42,6 @@ public class PlatformPlan {
         this.vatRate = vatRate;
         this.description = description;
     }
+
+
 }

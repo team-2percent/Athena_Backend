@@ -3,7 +3,7 @@ package goorm.athena.domain.notification.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
-import goorm.athena.domain.notification.util.NotificationMessage.NotificationType;
+import goorm.athena.domain.notification.service.NotificationMessage.NotificationType;
 
 @Entity
 @Table(name = "notification")
@@ -33,6 +33,7 @@ public class Notification {
   @Column(nullable = true)
   private String urlPath;
 
+  @Builder
   public Notification(Long userId, String content, NotificationType type, String urlPath) {
     this.userId = userId;
     this.content = content;

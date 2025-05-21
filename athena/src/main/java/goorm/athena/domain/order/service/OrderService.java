@@ -80,8 +80,6 @@ public class OrderService {
         orderRepository.save(order);
         orderItemRepository.saveAll(orderItems);
 
-        notificationService.sendOrderedNotification(project.getSeller().getId(), user.getNickname(),
-                project.getTitle());
 
         return OrderCreateResponse.from(order, orderItems);
     }

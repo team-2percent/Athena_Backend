@@ -1,72 +1,84 @@
 package goorm.athena.domain.notification.service;
 
+import goorm.athena.domain.notification.dto.NotificationResponse;
 import goorm.athena.domain.notification.entity.Notification;
+import goorm.athena.domain.notification.mapper.NotificationMapper;
 import goorm.athena.domain.notification.repository.NotificationRepository;
+import goorm.athena.domain.notification.util.EmitterService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import goorm.athena.domain.notification.util.NotificationMessage.NotificationType;
+import goorm.athena.domain.notification.service.NotificationMessage.NotificationType;
 import jakarta.persistence.EntityNotFoundException;
+
 import java.util.List;
-import org.springframework.transaction.annotation.Transactional;
-import goorm.athena.domain.notification.util.NotificationMessage;
 
 @Service
 @RequiredArgsConstructor
 public class NotificationService {
   private final NotificationRepository notificationRepository;
+  private final EmitterService emitterService;
 
-  /**
-   * @param urlPath -> nullable
+  /*
+   *  내부 공통 알림 생성 + SSE 전송
    */
-  public Notification createNotification(Long userId, String content, NotificationType notificationType,
-      String urlPath) {
-    Notification notification = new Notification(userId, content, notificationType, urlPath);
-    return notificationRepository.save(notification);
-  }
+  private void notify(Long userId, NotificationType type, String urlPath, Object... args) {
+    // 1. 알림 메시지 생성 (NotificationMessege 템플릿 기반)
+    String content = NotificationMessage.getMessage(type, args);
 
-  public void sendCouponEventNotification(Long userId, String couponEventTitle) {
-    String content = NotificationMessage.getMessage(NotificationType.COUPON, couponEventTitle);
-    createNotification(userId, content, NotificationType.COUPON, null);
-  }
+    // 2. 알림 엔티티 생성 및 DB 저장
+    Notification notification = new Notification(userId, content, type, urlPath);
+    notificationRepository.save(notification);
 
-  // ToDo: 팔로우 기능 구현 이후 주석 해제
-  // public void sendFollowNotification(Long userId, String followerName, Long
-  // followerId) {
-  // String content = NotificationMessage.getMessage(NotificationType.FOLLOW,
-  // followerName);
-  // String urlPath = "/user/" + followerId;
-  // createNotification(userId, content, NotificationType.FOLLOW, urlPath);
-  // }
-
-  public void sendProjectEndNotification(Long userId, Long projectId, String projectTitle, int daysLeft) {
-    String content = NotificationMessage.getMessage(NotificationType.PROJECT_END, projectTitle, daysLeft);
-    String urlPath = "/project/" + projectId;
-    createNotification(userId, content, NotificationType.PROJECT_END, urlPath);
-  }
-
-  // ToDo: urlPath를 별도로 받지 않고, 메시지 자체에서 하이퍼링크를 걸어서 프론트에 반환할 수 있도록 수정
-  public void sendOrderedNotification(Long sellerId, String buyerName, String projectTitle) {
-    String content = NotificationMessage.getMessage(NotificationType.ORDERED, buyerName, projectTitle);
-    createNotification(sellerId, content, NotificationType.ORDERED, null);
+    // 3. DTO로 변환 후 실시간 알림 전송
+    NotificationResponse response = NotificationMapper.toDto(notification);
+    emitterService.sendToUser(userId, response);
   }
 
   @Transactional
-  public void readNotification(Long notificationId) {
-    Notification notification = notificationRepository.findById(notificationId)
-        .orElseThrow(() -> new EntityNotFoundException("Notification not found"));
+  // 결제 이벤트 알림 (구매자 + 판매자)
+  public void notifyPayment(Long buyerId, Long sellerId, String buyerName, String projectTitle, Long projectId) {
+    // 구매자: 결제 완료
+    notify(buyerId, NotificationType.PROJECT_SOLD, "/projects/" + projectId, projectTitle);
+    // 판매자: 주문 알림
+    notify(sellerId, NotificationType.ORDERED, "/seller/projects/" + projectId, buyerName, projectTitle);
+  }
+
+  @Transactional
+  // 후기 등록 알림 (판매자)
+  public void notifyReview(Long sellerId, String projectTitle, Long projectId) {
+    notify(sellerId, NotificationType.REVIEW, "/seller/projects/" + projectId + "/reviews", projectTitle);
+  }
+
+  @Transactional
+  // 쿠폰 발행 알림 (전체)
+  public void notifyCouponToAll(List<Long> userIds, String couponName) {
+    for (Long userId : userIds) {
+      notify(userId, NotificationType.COUPON, "/my/coupons", couponName);
+    }
+  }
+
+  // 사용자 알림 목록 조회
+  public List<NotificationResponse> getAllNotifications(Long userId) {
+    return notificationRepository.findAllByUserIdOrderByCreatedAtDesc(userId).stream()
+            .map(NotificationMapper::toDto)
+            .toList();
+  }
+
+  // 읽음 처리
+  public void markAsRead(Long id) {
+    Notification notification = notificationRepository.findById(id)
+            .orElseThrow(() -> new EntityNotFoundException("Notification not found"));
     notification.markAsRead();
   }
 
-  public List<Notification> getNotifications(Long userId) {
-    return notificationRepository.findByUserId(userId);
+  // 단일 알림 삭제
+  public void delete(Long id) {
+    notificationRepository.deleteById(id);
   }
 
-  public void deleteNotification(Long notificationId) {
-    notificationRepository.deleteById(notificationId);
-  }
-
-  @Transactional
-  public void deleteAllNotifications(Long userId) {
+  // 전체 알림 삭제
+  public void deleteAllByUser(Long userId) {
     notificationRepository.deleteAllByUserId(userId);
   }
 }
