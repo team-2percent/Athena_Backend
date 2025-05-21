@@ -31,7 +31,6 @@ spring:
 
   server:
     forward-headers-strategy: framework
-    use-relative-redirects: true
 
 cloud:
   aws:
