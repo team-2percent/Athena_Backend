@@ -187,6 +187,11 @@ public interface ProjectController {
     @Operation(summary = "프로젝트 메인 카테고리 배너 조회", description = "프로젝트의 메인 배너에서 각 카테고리의 조회수가 제일 높은 것을 조회합니다.")
     @ApiResponse(responseCode = "200", description = "프로젝트의 카테고리별 조회수 높은 프로젝트 조회 성공")
     @GetMapping("/categoryRankingView")
-    public ResponseEntity<ProjectTopViewResponseWrapper> getProjectByTopView();
+    public ResponseEntity<ProjectCategoryTopResponseWrapper> getProjectByTopView();
+
+    @Operation(summary = "프로젝트 메인 요금별 조회", description = "프로젝트의 메인 페이지에서 요금별로 프로젝트들을 조회수 기준 5개 내림차순 조회합니다.")
+    @ApiResponse(responseCode = "200", description = "프로젝트 메인 요금별 5개 내림차순 조회 성공")
+    @GetMapping("/planRankingView")
+    public ResponseEntity<List<ProjectByPlanGetResponse>> getProjectByPlan();
 }
 

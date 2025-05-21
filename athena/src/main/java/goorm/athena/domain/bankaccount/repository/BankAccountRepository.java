@@ -2,6 +2,7 @@ package goorm.athena.domain.bankaccount.repository;
 
 
 import goorm.athena.domain.bankaccount.entity.BankAccount;
+import goorm.athena.domain.user.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -13,4 +14,6 @@ public interface BankAccountRepository extends JpaRepository<BankAccount, Long> 
     Optional<BankAccount> findByUserIdAndIsDefaultTrue(Long userId);
 
     List<BankAccount> findAllByUserId(Long userId);
+
+    List<BankAccount> findByUser(User user);
 }

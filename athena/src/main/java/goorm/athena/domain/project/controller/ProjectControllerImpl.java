@@ -156,8 +156,14 @@ public class ProjectControllerImpl implements ProjectController {
     }
 
     @Override
-    public ResponseEntity<ProjectTopViewResponseWrapper> getProjectByTopView(){
-        ProjectTopViewResponseWrapper responses = projectService.getTopView();
+    public ResponseEntity<ProjectCategoryTopResponseWrapper> getProjectByTopView(){
+        ProjectCategoryTopResponseWrapper responses = projectService.getTopView();
         return ResponseEntity.ok(responses);
+    }
+
+    @Override
+    public ResponseEntity<List<ProjectByPlanGetResponse>> getProjectByPlan(){
+        List<ProjectByPlanGetResponse> response = projectService.getTopViewByPlan();
+        return ResponseEntity.ok(response);
     }
 }
