@@ -1,5 +1,6 @@
 package goorm.athena.domain.admin.dto.res;
 
+import goorm.athena.domain.project.entity.PlanName;
 import goorm.athena.domain.settlement.entity.Status;
 
 import java.time.LocalDateTime;
@@ -19,7 +20,8 @@ public record SettlementDetailInfoResponse(
         Status status,
         BankAccountInfo bankAccount,
         LocalDateTime fundingStartDate,
-        LocalDateTime fundingEndDate
+        LocalDateTime fundingEndDate,
+        PlanName planName
 ) {
     public record BankAccountInfo(
             String bankName,

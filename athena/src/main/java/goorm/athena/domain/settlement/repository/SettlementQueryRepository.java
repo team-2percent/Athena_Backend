@@ -99,7 +99,8 @@ public class SettlementQueryRepository {
                                 bankAccount.accountNumber
                         ),
                         project.startAt,
-                        project.endAt
+                        project.endAt,
+                        project.platformPlan.name
                 ))
                 .from(settlement)
                 .join(settlement.project, project)
