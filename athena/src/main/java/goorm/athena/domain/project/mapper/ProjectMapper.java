@@ -69,7 +69,6 @@ public class ProjectMapper {
     // Entity -> ProjectTopViewResponse(Dto)
     public static ProjectTopViewResponse toTopViewResponse(Project project, String imageUrl){
         return new ProjectTopViewResponse(
-                project.getId(),
                 project.getSeller().getNickname(),
                 project.getTitle(),
                 project.getDescription(),
