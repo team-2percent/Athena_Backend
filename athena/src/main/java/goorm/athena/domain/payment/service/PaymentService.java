@@ -2,6 +2,8 @@ package goorm.athena.domain.payment.service;
 
 import goorm.athena.domain.order.entity.Order;
 import goorm.athena.domain.order.service.OrderService;
+import goorm.athena.domain.orderitem.entity.OrderItem;
+import goorm.athena.domain.orderitem.repository.OrderItemRepository;
 import goorm.athena.domain.payment.dto.req.PaymentApproveRequest;
 import goorm.athena.domain.payment.dto.req.PaymentReadyRequest;
 import goorm.athena.domain.payment.dto.res.KakaoPayApproveResponse;
@@ -27,6 +29,7 @@ public class PaymentService {
     private final KakaoPayService kakaoPayService;
     private final OrderService orderService;
     private final PaymentRepository paymentRepository;
+    private final OrderItemRepository orderItemRepository;
 
     public List<Order> getUnsettledOrdersByProjects(List<Project> projects) {
         return paymentRepository.findUnsettledOrdersByProjects(projects);
@@ -82,6 +85,10 @@ public class PaymentService {
 
         payment.approve(pgToken);
 
+        List<OrderItem> orderItems = orderItemRepository.findByOrderId(payment.getOrder().getId());
+        for (OrderItem item : orderItems) {
+            item.getProduct().decreaseStock(item.getQuantity());
+        }
         return response;
     }
 }
