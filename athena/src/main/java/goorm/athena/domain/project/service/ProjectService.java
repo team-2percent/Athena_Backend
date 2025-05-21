@@ -179,7 +179,7 @@ public class ProjectService {
     public ProjectDetailResponse getProjectDetail(Long projectId){
         Project project = getById(projectId);
 
-        Category category = categoryService.getCategoryById(projectId);
+        Category category = categoryService.getCategoryById(project.getCategory().getId());
         List<Image> images = imageService.getImages(project.getImageGroup());
         List<String> imageUrls = imageService.getImageUrls(images);
         UserDetailResponse userDetailResponse = UserMapper.toDetailResponse(project.getSeller());

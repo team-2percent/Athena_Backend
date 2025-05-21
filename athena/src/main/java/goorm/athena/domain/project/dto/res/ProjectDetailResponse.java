@@ -2,6 +2,7 @@ package goorm.athena.domain.project.dto.res;
 
 import goorm.athena.domain.category.entity.Category;
 import goorm.athena.domain.product.dto.res.ProductResponse;
+import goorm.athena.domain.project.entity.PlanName;
 import goorm.athena.domain.project.entity.Status;
 import goorm.athena.domain.user.dto.response.UserDetailResponse;
 
@@ -27,5 +28,7 @@ public record ProjectDetailResponse (
         UserDetailResponse sellerResponse,
         List<ProductResponse> productResponses,
 
-        Status status
+        Status status,
+
+        PlanName planName
 ){ }

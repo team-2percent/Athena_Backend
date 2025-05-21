@@ -61,7 +61,8 @@ public class ProjectMapper {
                 imageUrls,
                 userDetailResponse,
                 productResponses,
-                project.getStatus()
+                project.getStatus(),
+                project.getPlatformPlan().getName()
         );
     }
 
