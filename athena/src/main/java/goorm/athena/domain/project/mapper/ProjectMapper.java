@@ -48,7 +48,7 @@ public class ProjectMapper {
                                                     UserDetailResponse userDetailResponse, List<ProductResponse> productResponses){
         return new ProjectDetailResponse(
                 project.getId(),
-                category.getId(),
+                category.getCategoryName(),
                 project.getTitle(),
                 project.getDescription(),
                 project.getGoalAmount(),
