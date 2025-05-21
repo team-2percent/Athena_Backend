@@ -68,7 +68,7 @@ public class OrderService {
             if (product.getStock() < item.quantity()) {
                 throw new CustomException(ErrorCode.INSUFFICIENT_INVENTORY);
             }
-            product.decreaseStock(item.quantity());
+//            product.decreaseStock(item.quantity());
 
             OrderItem orderItem = OrderItem.of(order, product, item.quantity());
             totalPrice += orderItem.getPrice();
@@ -84,6 +84,14 @@ public class OrderService {
                 project.getTitle());
 
         return OrderCreateResponse.from(order, orderItems);
+    }
+
+    public void decreaseInventory(Long orderId) {
+        List<OrderItem> orderItems = orderItemRepository.findByOrderId(orderId);
+        for (OrderItem item : orderItems) {
+            Product product = item.getProduct();
+            product.decreaseStock(item.getQuantity());
+        }
     }
 
 }
