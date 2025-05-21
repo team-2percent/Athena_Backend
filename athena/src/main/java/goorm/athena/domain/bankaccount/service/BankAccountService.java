@@ -63,8 +63,7 @@ public class BankAccountService {
         previousBankAccount.unsetAsDefault();
         newBankAccount.setAsDefault();
 
-        bankAccountRepository.save(previousBankAccount);
-        bankAccountRepository.save(newBankAccount);
+        bankAccountRepository.saveAll(List.of(previousBankAccount, newBankAccount));
 
     }
 
