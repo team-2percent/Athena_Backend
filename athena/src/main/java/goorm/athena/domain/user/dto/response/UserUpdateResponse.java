@@ -6,5 +6,5 @@ public record UserUpdateResponse(
         Long id,
         String nickname,
         String sellerIntroduction,
-        String linkurl
+        String linkUrl
 ) { }
