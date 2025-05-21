@@ -80,7 +80,7 @@ public class PaymentService {
             response = kakaoPayService
                     .approveKakaoPayment(payment.getTid(), requestDto, user);
         } catch (Exception e) {
-            throw new CustomException(ErrorCode.KAKAO_PAY_UNAVAILABLE);
+            return KakaoPayApproveResponse.ofFailure();
         }
 
         payment.approve(pgToken);
@@ -89,6 +89,6 @@ public class PaymentService {
         for (OrderItem item : orderItems) {
             item.getProduct().decreaseStock(item.getQuantity());
         }
-        return response;
+        return KakaoPayApproveResponse.ofSuccess(response);
     }
 }
