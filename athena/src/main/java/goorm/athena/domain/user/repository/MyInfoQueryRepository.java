@@ -54,7 +54,8 @@ public class MyInfoQueryRepository {
                         project.id,
                         project.title,
                         project.status.eq(goorm.athena.domain.project.entity.Status.COMPLETED),
-                        project.createdAt
+                        project.createdAt,
+                        project.endAt
                 ))
                 .from(project)
                 .where(whereBuilder)
@@ -96,6 +97,7 @@ public class MyInfoQueryRepository {
                         seller.nickname,
                         image.originalUrl,
                         order.orderedAt,
+                        project.endAt,
                         project.goalAmount,
                         project.totalAmount
                 )
@@ -132,6 +134,7 @@ public class MyInfoQueryRepository {
                             row.get(seller.nickname),
                             row.get(image.originalUrl),
                             row.get(order.orderedAt),
+                            row.get(project.endAt),
                             rate
                     );
                 })
