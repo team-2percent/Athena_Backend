@@ -57,10 +57,10 @@ public class Project {
     private LocalDateTime createdAt = LocalDateTime.now();
 
     @Enumerated(EnumType.STRING)
-    private ApprovalStatus isApproved;
+    private ApprovalStatus isApproved = ApprovalStatus.PENDING;
 
     @Enumerated(EnumType.STRING)
-    private Status status;
+    private Status status = Status.QUEUED;
 
 
     private Long views = 0L;
@@ -89,7 +89,14 @@ public class Project {
 
 
     public void setApprovalStatus(boolean isApproved) {
-        this.isApproved = isApproved ? ApprovalStatus.APPROVED : ApprovalStatus.REJECTED;
+        if (isApproved) {
+            this.isApproved = ApprovalStatus.APPROVED;
+            this.status = Status.ACTIVE;
+        }
+        else {
+            this.isApproved = ApprovalStatus.REJECTED;
+            this.status = Status.CANCELLED;
+        }
     }
 
 
@@ -110,6 +117,10 @@ public class Project {
     // 조회수 증가
     public void increaseViews(){
         this.views++;
+    }
+
+    public void increasePrice(Long price){
+        this.totalAmount += price;
     }
 
 }

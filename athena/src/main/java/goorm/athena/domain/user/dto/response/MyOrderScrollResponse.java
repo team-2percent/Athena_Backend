@@ -11,10 +11,13 @@ public record MyOrderScrollResponse(
     public record Item(
             Long orderId,
             Long productId,
+            Long projectId,
+            String projectTitle,
             String productTitle,
             String sellerNickname,
             String thumbnailUrl,
             LocalDateTime orderedAt,
+            LocalDateTime endAt,
             int achievementRate
     ) {}
 }

@@ -54,7 +54,8 @@ public class MyInfoQueryRepository {
                         project.id,
                         project.title,
                         project.status.eq(goorm.athena.domain.project.entity.Status.COMPLETED),
-                        project.createdAt
+                        project.createdAt,
+                        project.endAt
                 ))
                 .from(project)
                 .where(whereBuilder)
@@ -92,10 +93,13 @@ public class MyInfoQueryRepository {
                 .select(
                         order.id,
                         product.id,
+                        project.id,
+                        project.title,
                         product.name,
                         seller.nickname,
                         image.originalUrl,
                         order.orderedAt,
+                        project.endAt,
                         project.goalAmount,
                         project.totalAmount
                 )
@@ -128,10 +132,13 @@ public class MyInfoQueryRepository {
                     return new MyOrderScrollResponse.Item(
                             row.get(order.id),
                             row.get(product.id),
+                            row.get(project.id),
+                            row.get(project.title),
                             row.get(product.name),
                             row.get(seller.nickname),
                             row.get(image.originalUrl),
                             row.get(order.orderedAt),
+                            row.get(project.endAt),
                             rate
                     );
                 })

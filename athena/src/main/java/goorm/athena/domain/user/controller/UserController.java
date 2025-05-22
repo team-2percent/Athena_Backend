@@ -74,7 +74,7 @@ public interface UserController {
 
     @Operation(summary = "유저 헤더 정보 조회 API", description = "헤더에서 유저의 이름과 이미지를 조회합니다.")
     @ApiResponse(responseCode = "200", description = "유저 헤더 정보 조회 성공")
-    @PostMapping("/Header")
+    @GetMapping("/Header")
     public ResponseEntity<UserHeaderGetResponse> getHeader(@Parameter(hidden = true) @CheckLogin LoginUserRequest request);
 
 

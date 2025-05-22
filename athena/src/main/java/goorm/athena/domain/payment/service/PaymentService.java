@@ -63,6 +63,7 @@ public class PaymentService {
         }
 
         Payment payment = Payment.create(order, user, response.tid(), order.getTotalPrice());
+        order.getProject().increasePrice(requestDto.totalAmount());
         paymentRepository.save(payment);
 
         return response;
