@@ -10,7 +10,7 @@ on:
 jobs:
   build:
     name: Build Docker Image
-    runs-on: goormui-MacBookPro-2
+    runs-on: self-hosted
 
     steps:
       - name: Checkout repository
@@ -27,7 +27,7 @@ jobs:
           
   deploy:
     name: Deploy Athena Service
-    runs-on: goormui-MacBookPro-2
+    runs-on: self-hosted
     needs: build
 
     steps:
