@@ -1,0 +1,49 @@
+name: Build And Deploy Athena Service
+
+on:
+  pull_request:
+    types: [closed]
+    branches:
+      - dev
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build Docker Image
+    runs-on: goormui-MacBookPro-2
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set IMAGE_TAG
+        run: echo "IMAGE_TAG=dev" >> $GITHUB_ENV
+
+      - name: Build via Docker Compose
+        run: |
+          cd infra/docker
+          docker compose --env-file .env build --no-cache
+          docker tag athena:latest athena:${{ env.IMAGE_TAG }}
+          
+  deploy:
+    name: Deploy Athena Service
+    runs-on: goormui-MacBookPro-2
+    needs: build
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Ensure IMAGE_TAG is set
+        run: echo "IMAGE_TAG=dev" >> $GITHUB_ENV
+
+      - name: Bring up athena container
+        run: |
+          cd infra/docker
+          # dev 태그로 빌드된 athena 이미지를 서비스로 기동
+          docker compose --env-file .env up -d athena
+
+      - name: Verify service health
+        run: |
+          # 간단히 컨테이너 상태 확인
+          docker ps --filter "name=athena" --format "table {{.Names}}\t{{.Status}}"
