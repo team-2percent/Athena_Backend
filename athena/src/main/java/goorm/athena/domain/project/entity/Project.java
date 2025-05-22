@@ -57,7 +57,7 @@ public class Project {
     private LocalDateTime createdAt = LocalDateTime.now();
 
     @Enumerated(EnumType.STRING)
-    private ApprovalStatus isApprove = ApprovalStatus.PENDING;
+    private ApprovalStatus isApproved = ApprovalStatus.PENDING;
 
     @Enumerated(EnumType.STRING)
     private Status status = Status.QUEUED;
@@ -90,11 +90,11 @@ public class Project {
 
     public void setApprovalStatus(boolean isApproved) {
         if (isApproved) {
-            this.isApprove = ApprovalStatus.APPROVED;
+            this.isApproved = ApprovalStatus.APPROVED;
             this.status = Status.ACTIVE;
         }
         else {
-            this.isApprove = ApprovalStatus.REJECTED;
+            this.isApproved = ApprovalStatus.REJECTED;
             this.status = Status.CANCELLED;
         }
     }

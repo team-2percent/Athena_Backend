@@ -93,6 +93,8 @@ public class MyInfoQueryRepository {
                 .select(
                         order.id,
                         product.id,
+                        project.id,
+                        project.title,
                         product.name,
                         seller.nickname,
                         image.originalUrl,
@@ -130,6 +132,8 @@ public class MyInfoQueryRepository {
                     return new MyOrderScrollResponse.Item(
                             row.get(order.id),
                             row.get(product.id),
+                            row.get(project.id),
+                            row.get(project.title),
                             row.get(product.name),
                             row.get(seller.nickname),
                             row.get(image.originalUrl),

@@ -18,6 +18,7 @@ public class CommentMapper {
         return new CommentGetResponse(
                 comment.getId(),
                 comment.getUser().getNickname(),
+                comment.getProject().getTitle(),
                 comment.getContent(),
                 comment.getCreatedAt(),
                 comment.getProject().getId()
