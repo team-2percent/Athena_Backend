@@ -12,6 +12,7 @@ public record MyProjectScrollResponse(
             Long projectId,
             String title,
             boolean isCompleted,
-            LocalDateTime createdAt
+            LocalDateTime createdAt,
+            LocalDateTime endAt
     ) {}
 }

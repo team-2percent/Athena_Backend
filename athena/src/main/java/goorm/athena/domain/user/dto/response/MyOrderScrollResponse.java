@@ -15,6 +15,7 @@ public record MyOrderScrollResponse(
             String sellerNickname,
             String thumbnailUrl,
             LocalDateTime orderedAt,
+            LocalDateTime endAt,
             int achievementRate
     ) {}
 }
