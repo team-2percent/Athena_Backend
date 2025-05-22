@@ -21,7 +21,7 @@ public interface BankAccountController {
     @ApiResponse(responseCode = "200", description = "사용자 계좌 추가 생성 성공")
     @PostMapping
     public ResponseEntity<BankAccountCreateResponse> createBankAccount(@Parameter(hidden = true) @CheckLogin LoginUserRequest loginUserRequest,
-                                                                       BankAccountCreateRequest request);
+                                                                       @RequestBody BankAccountCreateRequest request);
 
     @Operation(summary = "사용자 계좌 조회 API", description = "로그인 한 사용자의 계좌 정보들을 조회합니다.")
     @ApiResponse(responseCode = "200", description = "사용자 계좌 조회 성공")

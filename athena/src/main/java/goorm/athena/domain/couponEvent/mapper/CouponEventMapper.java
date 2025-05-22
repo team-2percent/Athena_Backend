@@ -23,6 +23,7 @@ public class CouponEventMapper {
                 couponEvent.getCoupon().getTitle(),
                 couponEvent.getCoupon().getContent(),
                 couponEvent.getCoupon().getStock(),
+                couponEvent.getCoupon().getPrice(),
                 couponEvent.getCoupon().getExpiresAt(),
                 userIssued
         );

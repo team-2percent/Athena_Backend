@@ -8,6 +8,7 @@ public record CouponEventGetResponse(
         String title,
         String content,
         int stock,
+        int price,
         LocalDateTime expiresAt,
         boolean userIssued
 ) {
