@@ -53,7 +53,7 @@ public class MyInfoQueryRepository {
                 .select(Projections.constructor(MyProjectScrollResponse.ProjectPreview.class,
                         project.id,
                         project.title,
-                        project.status.eq(goorm.athena.domain.project.entity.Status.COMPLETED),
+                        project.status.stringValue().eq(goorm.athena.domain.project.entity.Status.COMPLETED.name()),
                         project.createdAt,
                         project.endAt
                 ))
