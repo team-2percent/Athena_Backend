@@ -76,7 +76,9 @@ public class ProjectMapper {
                 project.getTitle(),
                 project.getDescription(),
                 imageUrl,
-                (project.getTotalAmount() * 100) / project.getTotalAmount(),
+                project.getTotalAmount() == 0 || project.getGoalAmount() == 0
+                        ? 0L
+                        : (project.getTotalAmount() * 100) / project.getGoalAmount(),
                 project.getId()
         );
     }
