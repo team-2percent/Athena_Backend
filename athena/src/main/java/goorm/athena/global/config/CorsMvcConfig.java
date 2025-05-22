@@ -15,15 +15,17 @@ import java.util.List;
 public class CorsMvcConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/**").
-                allowedOrigins("http://localhost:3000", "https://athena-nine-green.vercel.app", "https://athena-84xayn4st-leejinyeong218s-projects.vercel.app", "https://athena.i-am-jay.com")
+        registry.addMapping("/**")
+                .allowedOrigins("http://localhost:3000", "https://athena-nine-green.vercel.app",
+                        "https://athena-84xayn4st-leejinyeong218s-projects.vercel.app", "https://athena.i-am-jay.com",
+                        "https://athena-local.i-am-jay.com")
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                 .allowedHeaders("*")
                 .allowCredentials(true);
     }
 
     @Override
-    public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers){
+    public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
         resolvers.add(new CheckLoginArgumentResolver());
     }
 }
