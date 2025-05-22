@@ -40,6 +40,10 @@ jobs:
       - name: Bring up athena container
         run: |
           cd infra/docker
+
+          # 이미 가동중인 컨테이너가 있다면 중지
+          docker compose rm -f athena
+
           # dev 태그로 빌드된 athena 이미지를 서비스로 기동
           docker compose --env-file .env up -d athena
 
