@@ -68,13 +68,14 @@ public class ProjectService {
         User seller = userService.getUser(request.sellerId());
         Category category = categoryService.getCategoryById(request.categoryId());
         BankAccount bankAccount = bankAccountService.getAccount(request.sellerId(), request.bankAccountId());
-
         PlanName planName = PlanName.valueOf(request.platformPlan());
         PlatformPlan platformPlan = platformPlanRepository.findByName(planName);
 
-        // String convertedMarkdown = getConvertedMarkdown(request.markdownImages(), request.contentMarkdown());       // 마크다운 변환
-        Project project = ProjectMapper.toEntity(request, seller, imageGroup, category, bankAccount, platformPlan);    // 새 프로젝트 생성
-        Project savedProject = projectRepository.save(project);                             // 프로젝트 저장
+        validateProduct(request);   // 프로젝트 등록 시 검증
+
+        // String convertedMarkdown = getConvertedMarkdown(request.markdownImages(), request.contentMarkdown());    // 마크다운 변환
+        Project project = ProjectMapper.toEntity(request, seller, imageGroup, category, bankAccount, platformPlan); // 새 프로젝트 생성
+        Project savedProject = projectRepository.save(project);                                                     // 프로젝트 저장
         // 프로젝트 생성 시 예외 처리 필요
 
         // 상품 등록 요청 처리
@@ -83,6 +84,22 @@ public class ProjectService {
         // 상품 생성 예외 처리 추가적으로 있을지 고려
 
         return ProjectMapper.toCreateDto(savedProject);
+    }
+
+    // 프로젝트 등록 검증
+    private void validateProduct(ProjectCreateRequest request) {
+        LocalDateTime now = LocalDateTime.now();
+        if (request.title().length() > 25) {
+            throw new CustomException(ErrorCode.INVALID_TITLE_FORMAT);
+        }
+
+        if (request.description().length() > 50) {
+            throw new CustomException(ErrorCode.INVALID_DESCRIPTION_FORMAT);
+        }
+
+        if (request.startAt().isBefore(now.plusDays(7))) {
+            throw new CustomException(ErrorCode.INVALID_STARTDATE);
+        }
     }
 
     // 기존에 있던 마크 다운 -> S3 url이 포함된 마크 다운
@@ -296,6 +313,7 @@ public class ProjectService {
         return new ProjectCategoryTopResponseWrapper(globalTop5, categoryTopViews);
     }
 
+    // 프로젝트 승인 여부로 상태 변경
     @Transactional
     public void updateApprovalStatus(Long projectId, boolean isApproved) {
         Project project = projectRepository.findById(projectId)
