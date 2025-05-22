@@ -1,8 +1,10 @@
 package goorm.athena.domain.deliveryinfo.controller;
 
+
 import goorm.athena.domain.deliveryinfo.dto.req.DeliveryInfoRequest;
 import goorm.athena.domain.deliveryinfo.dto.req.DeliveryInfoUpdateRequest;
 import goorm.athena.domain.deliveryinfo.dto.res.DeliveryInfoResponse;
+import goorm.athena.global.jwt.util.CheckLogin;
 import goorm.athena.global.jwt.util.LoginUserRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -21,7 +23,7 @@ public interface DeliveryInfoController {
     @ApiResponse(responseCode = "200", description = "배송지 추가 성공")
     @PostMapping("/delivery-info")
     ResponseEntity<Void> addDeliveryInfo(
-            @Parameter(hidden = true) LoginUserRequest loginUser,
+            @Parameter(hidden = true) @CheckLogin LoginUserRequest loginUser,
             @RequestBody DeliveryInfoRequest request
     );
 
@@ -29,7 +31,7 @@ public interface DeliveryInfoController {
     @ApiResponse(responseCode = "200", description = "배송지 수정 성공")
     @PutMapping("/delivery-info/{id}")
     ResponseEntity<Void> updateDeliveryInfo(
-            @Parameter(hidden = true) LoginUserRequest loginUser,
+            @Parameter(hidden = true) @CheckLogin LoginUserRequest loginUser,
             @PathVariable Long id,
             @RequestBody DeliveryInfoUpdateRequest request
     );
@@ -38,7 +40,7 @@ public interface DeliveryInfoController {
     @ApiResponse(responseCode = "204", description = "배송지 삭제 성공")
     @DeleteMapping("/delivery-info/{id}")
     ResponseEntity<Void> deleteDeliveryInfo(
-            @Parameter(hidden = true) LoginUserRequest loginUser,
+            @Parameter(hidden = true) @CheckLogin LoginUserRequest loginUser,
             @PathVariable Long id
     );
 
@@ -46,7 +48,7 @@ public interface DeliveryInfoController {
     @ApiResponse(responseCode = "200", description = "기본 배송지 설정 성공")
     @PatchMapping("/delivery-info/{id}/default")
     ResponseEntity<Void> setDefaultDeliveryInfo(
-            @Parameter(hidden = true) LoginUserRequest loginUser,
+            @Parameter(hidden = true) @CheckLogin LoginUserRequest loginUser,
             @PathVariable Long id
     );
 
@@ -54,6 +56,6 @@ public interface DeliveryInfoController {
     @ApiResponse(responseCode = "200", description = "배송지 목록 조회 성공")
     @GetMapping("/delivery-info")
     ResponseEntity<List<DeliveryInfoResponse>> getDeliveryInfoList(
-            @Parameter(hidden = true) LoginUserRequest loginUser
+            @Parameter(hidden = true) @CheckLogin LoginUserRequest loginUser
     );
 }
