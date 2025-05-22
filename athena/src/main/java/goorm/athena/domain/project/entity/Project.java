@@ -112,4 +112,8 @@ public class Project {
         this.views++;
     }
 
+    public void increasePrice(Long price){
+        this.totalAmount += price;
+    }
+
 }
