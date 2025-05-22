@@ -86,7 +86,7 @@ public class S3Service {
     // 파일 형식 검증
     private void validateFileExtension(String fileName){
         String extension = getFileExtension(fileName).toLowerCase();
-        if (!extension.equals(".jpg") && !extension.equals(".png")){
+        if (!extension.equals(".jpg") && !extension.equals(".png") && !extension.equals(".jpeg")){
             throw new CustomException(ErrorCode.INVALID_IMAGE_EXTENSION);
         }
     }

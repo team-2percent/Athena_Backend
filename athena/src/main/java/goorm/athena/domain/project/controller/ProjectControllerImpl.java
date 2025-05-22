@@ -64,8 +64,8 @@ public class ProjectControllerImpl implements ProjectController {
     @Override
     public ResponseEntity<Void> updateProject(
             @PathVariable Long projectId,
-            @RequestParam("projectUpdateRequest") ProjectUpdateRequest projectUpdateRequest,
-            @RequestParam(value = "images", required = false) List<ImageUpdateRequest> imageUpdateRequests){
+            @RequestPart("projectUpdateRequest") ProjectUpdateRequest projectUpdateRequest,
+            @RequestPart(value = "images", required = false) List<ImageUpdateRequest> imageUpdateRequests){
         // ProjectUpdateRequest projectUpdateRequest = convertJsonToDto(projectUpdateRequestJson);
         projectService.updateProject(projectId, projectUpdateRequest, imageUpdateRequests);
         return ResponseEntity.ok().build();
