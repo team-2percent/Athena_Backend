@@ -6,6 +6,7 @@ public record CommentGetResponse(
         Long id,
         String userName,
         String content,
-        LocalDateTime createdAt
+        LocalDateTime createdAt,
+        Long projectId
 ) {
 }
