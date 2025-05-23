@@ -18,10 +18,10 @@ public record ProjectCreateRequest(
         Long bankAccountId,
 
         @NotBlank
-        @Column(length = 25)
+        @Column(length = 50)
         String title,
 
-        @Column(length = 50)
+        @Size(min = 10, max = 100)
         String description,
 
         @Column(length = 100000000)
