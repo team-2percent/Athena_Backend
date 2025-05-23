@@ -37,6 +37,10 @@ jobs:
       - name: Ensure IMAGE_TAG is set
         run: echo "IMAGE_TAG=dev" >> $GITHUB_ENV
 
+      - name: Check secrets
+        run: |
+          echo "DATABASE_DRIVER: ${{ secrets.DATABASE_DRIVER }}"
+      
       - name: Create .env file
         run: |
           cat <<EOF > ~/Athena_Backend/infra/docker/.env
