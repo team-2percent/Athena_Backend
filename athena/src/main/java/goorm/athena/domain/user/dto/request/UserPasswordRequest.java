@@ -6,7 +6,7 @@ import jakarta.validation.constraints.Size;
 
 public record UserPasswordRequest(
         @NotBlank
-        @Size(min = 4, max = 100)
+        @Size(min = 3, max = 100)
         @Column(length = 100)
         String password
 ) {
