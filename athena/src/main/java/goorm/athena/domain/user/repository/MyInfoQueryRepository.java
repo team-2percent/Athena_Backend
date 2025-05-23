@@ -5,6 +5,7 @@ import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.CaseBuilder;
+import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import goorm.athena.domain.image.entity.QImage;
 import goorm.athena.domain.imageGroup.entity.QImageGroup;
@@ -55,7 +56,11 @@ public class MyInfoQueryRepository {
                         project.title,
                         project.status.stringValue().eq(goorm.athena.domain.project.entity.Status.COMPLETED.name()),
                         project.createdAt,
-                        project.endAt
+                        project.endAt,
+                        Expressions.numberTemplate(Long.class,
+                                "floor(({0} * 100.0) / nullif({1}, 0))",
+                                project.totalAmount, project.goalAmount)
+
                 ))
                 .from(project)
                 .where(whereBuilder)
