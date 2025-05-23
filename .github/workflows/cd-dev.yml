@@ -11,6 +11,7 @@ jobs:
   build:
     name: Build Docker Image
     runs-on: self-hosted
+    environment: dev
 
     steps:
       - name: Checkout repository
@@ -42,7 +43,7 @@ jobs:
         run: |
           cd infra/docker
           docker compose --env-file .env build --no-cache
-          docker tag athena:latest athena:${{ env.IMAGE_TAG }}
+          docker tag docker-athena:latest docker-athena:${{ env.IMAGE_TAG }}
           
   deploy:
     name: Deploy Athena Service
