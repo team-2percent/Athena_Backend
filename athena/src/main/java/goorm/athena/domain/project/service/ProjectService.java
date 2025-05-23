@@ -97,7 +97,10 @@ public class ProjectService {
             throw new CustomException(ErrorCode.INVALID_DESCRIPTION_FORMAT);
         }
 
-        if (request.startAt().isBefore(now.plusDays(7))) {
+        LocalDate todayPlus7 = LocalDate.now().plusDays(7);
+        LocalDate startDate = request.startAt().toLocalDate();
+
+        if (startDate.isBefore(todayPlus7)) {
             throw new CustomException(ErrorCode.INVALID_STARTDATE);
         }
     }

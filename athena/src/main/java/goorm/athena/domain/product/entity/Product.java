@@ -7,6 +7,7 @@ import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.extern.java.Log;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
@@ -24,9 +25,16 @@ public class Product {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Project project;
 
+    @Column(length = 25)
     private String name;                // 상품명
+
+    @Column(length = 50)
     private String description;         // 상품 설명
+
+    @Column(length = 100000000)
     private Long price;                 // 상품 가격
+
+    @Column(length = 10000)
     private Long stock;                 // 상품 재고
 
     @Builder

@@ -3,6 +3,9 @@ package goorm.athena.domain.project.dto.req;
 import goorm.athena.domain.product.dto.req.ProductRequest;
 import goorm.athena.domain.project.entity.PlanName;
 import goorm.athena.domain.project.entity.PlatformPlan;
+import jakarta.persistence.Column;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
@@ -14,9 +17,17 @@ public record ProjectCreateRequest(
         Long imageGroupId,
         Long bankAccountId,
 
+        @NotBlank
+        @Column(length = 25)
         String title,
+
+        @Column(length = 50)
         String description,
+
+        @Column(length = 100000000)
         Long goalAmount,
+
+        @Size(max = 20000)
         String contentMarkdown,
 
         LocalDateTime startAt,

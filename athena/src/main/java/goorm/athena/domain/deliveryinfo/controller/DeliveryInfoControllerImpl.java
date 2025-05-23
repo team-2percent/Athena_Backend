@@ -1,5 +1,6 @@
 package goorm.athena.domain.deliveryinfo.controller;
 
+import goorm.athena.domain.deliveryinfo.dto.req.DeliveryChangeStateRequest;
 import goorm.athena.domain.deliveryinfo.dto.req.DeliveryInfoRequest;
 import goorm.athena.domain.deliveryinfo.dto.req.DeliveryInfoUpdateRequest;
 import goorm.athena.domain.deliveryinfo.dto.res.DeliveryInfoResponse;
@@ -28,6 +29,16 @@ public class DeliveryInfoControllerImpl  implements DeliveryInfoController {
         return ResponseEntity.ok().build();
     }
 
+    @PutMapping("/state")
+    public ResponseEntity<Void> changeDeliveryInfoState(
+            @CheckLogin LoginUserRequest loginUser,
+            @RequestBody DeliveryChangeStateRequest request
+    ) {
+        deliveryInfoService.changeDeliveryState(loginUser.userId(), request.deliveryInfoId());
+        return ResponseEntity.noContent().build();
+    }
+
+    /*
     @PutMapping("/delivery-info/{id}")
     public ResponseEntity<Void> updateDeliveryInfo(
             @CheckLogin LoginUserRequest loginUser,
@@ -37,6 +48,7 @@ public class DeliveryInfoControllerImpl  implements DeliveryInfoController {
         deliveryInfoService.updateDeliveryInfo(loginUser.userId(), id, request);
         return ResponseEntity.ok().build();
     }
+     */
 
     @DeleteMapping("/delivery-info/{id}")
     public ResponseEntity<Void> deleteDeliveryInfo(
@@ -47,6 +59,7 @@ public class DeliveryInfoControllerImpl  implements DeliveryInfoController {
         return ResponseEntity.noContent().build();
     }
 
+    /*
     @PatchMapping("/delivery-info/{id}/default")
     public ResponseEntity<Void> setDefaultDeliveryInfo(
             @CheckLogin LoginUserRequest loginUser,
@@ -55,6 +68,8 @@ public class DeliveryInfoControllerImpl  implements DeliveryInfoController {
         deliveryInfoService.setDefault(loginUser.userId(), id);
         return ResponseEntity.ok().build();
     }
+
+     */
 
     @GetMapping("/delivery-info")
     public ResponseEntity<List<DeliveryInfoResponse>> getDeliveryInfoList(

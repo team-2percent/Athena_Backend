@@ -26,7 +26,7 @@ public class Comment {
     @JoinColumn(name = "project_id")
     private Project project;
 
-    @Column(length = 1000)
+    @Column(length = 1000, nullable = false)
     private String content;
     private LocalDateTime createdAt;
 

@@ -139,7 +139,6 @@ public class MyInfoQueryRepository {
                 .limit(request.pageSize())
                 .fetch();
 
-
         List<MyOrderScrollResponse.Item> items = results.stream()
                 .map(row -> {
                     Long rate = row.get(8, Long.class);

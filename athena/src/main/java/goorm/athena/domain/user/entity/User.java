@@ -3,6 +3,7 @@ package goorm.athena.domain.user.entity;
 import goorm.athena.domain.imageGroup.entity.ImageGroup;
 import jakarta.persistence.*;
 
+import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,12 +22,14 @@ public class User {
     @JoinColumn(name = "image_group_id", nullable = true)
     private ImageGroup imageGroup;  // 이미지 그룹 ID
 
-    @Column(length = 255, nullable = false)
+    @Column(length = 50, nullable = false)
     private String email;
 
-    @Column(length = 255, nullable = false)
+    @Size(min = 3, max = 100)
+    @Column(length = 100, nullable = false)
     private String password;
 
+    @Size(min = 1, max = 50)
     @Column(length = 50, nullable = false)
     private String nickname;
 
@@ -34,7 +37,7 @@ public class User {
     @Column(length = 20, nullable = false)
     private Role role;
 
-    @Column(length = 3000, nullable = true)
+    @Column(length = 200, nullable = true)
     private String sellerIntroduction;
 
     @Column(length = 2000, nullable = true)
