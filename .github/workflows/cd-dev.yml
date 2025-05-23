@@ -1,7 +1,7 @@
 name: Build And Deploy Athena Service
 
 on:
-  pull_request:
+  pull_request_target:
     types: [closed]
     branches:
       - dev
@@ -44,7 +44,7 @@ jobs:
       
       - name: Create .env file
         run: |
-          cat <<EOF > ~/Athena_Backend/infra/docker/.env
+          cat <<EOF > infra/docker/.env
           DATABASE_URL=${{ secrets.DATABASE_URL }}
           DATABASE_USERNAME=${{ secrets.DATABASE_USERNAME }}
           DATABASE_PASSWORD=${{ secrets.DATABASE_PASSWORD }}
@@ -64,9 +64,8 @@ jobs:
 
       - name: Bring up athena container
         run: |
-          cd ~/Athena_Backend/infra/docker
-          docker compose rm -f athena
-          docker compose --env-file .env up -d athena
+          docker compose -f infra/docker/docker-compose.yml rm -f athena
+          docker compose --env-file .env -f infra/docker/docker-compose.yml up -d athena
 
       - name: Verify service health
         run: |
