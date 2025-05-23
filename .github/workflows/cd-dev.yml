@@ -22,8 +22,7 @@ jobs:
 
       - name: Build via Docker
         run: |
-          cd ~/Athena_Backend/athena
-          docker build --no-cache -t docker-athena:${{ env.IMAGE_TAG }} .
+          docker build --no-cache -t docker-athena:${{ env.IMAGE_TAG }} athena/Dockerfile
 
   deploy:
     name: Deploy Athena Service
@@ -37,6 +36,12 @@ jobs:
       - name: Ensure IMAGE_TAG is set
         run: echo "IMAGE_TAG=dev" >> $GITHUB_ENV
 
+      - name: Check secrets from env
+        env:
+          DATABASE_DRIVER: ${{ secrets.DATABASE_DRIVER }}
+        run: |
+          echo "DATABASE_DRIVER: $DATABASE_DRIVER"
+          
       - name: Check secrets
         run: |
           echo "DATABASE_DRIVER: ${{ secrets.DATABASE_DRIVER }}"
