@@ -40,6 +40,7 @@ jobs:
       - name: Check secrets
         run: |
           echo "DATABASE_DRIVER: ${{ secrets.DATABASE_DRIVER }}"
+          pwd
       
       - name: Create .env file
         run: |
