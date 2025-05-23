@@ -100,7 +100,6 @@ public class MyInfoQueryRepository {
         List<Tuple> results = queryFactory
                 .select(
                         order.id,
-                        product.id,
                         project.id,
                         project.title,
                         product.name,
@@ -108,8 +107,11 @@ public class MyInfoQueryRepository {
                         image.originalUrl,
                         order.orderedAt,
                         project.endAt,
-                        project.goalAmount,
-                        project.totalAmount,
+                        project.totalAmount.multiply(100.0)
+                                .divide(project.goalAmount.castToNum(Double.class))
+                                .floor()
+                                .castToNum(Long.class)
+                                .as("achievementRate"),
                         JPAExpressions.selectOne()
                                 .from(comment)
                                 .where(
@@ -140,14 +142,11 @@ public class MyInfoQueryRepository {
 
         List<MyOrderScrollResponse.Item> items = results.stream()
                 .map(row -> {
-                    Long goal = row.get(project.goalAmount);
-                    Long total = row.get(project.totalAmount);
-                    int rate = (goal != null && goal != 0) ? (int) ((double) total * 100 / goal) : 0;
-                    boolean hasCommented = Boolean.TRUE.equals(row.get(11, Boolean.class));
+                    Long rate = row.get(8, Long.class);
+                    boolean hasCommented = Boolean.TRUE.equals(row.get(9, Boolean.class));
 
                     return new MyOrderScrollResponse.Item(
                             row.get(order.id),
-                            row.get(product.id),
                             row.get(project.id),
                             row.get(project.title),
                             row.get(product.name),
