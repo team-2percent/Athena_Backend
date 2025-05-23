@@ -1,6 +1,7 @@
 package goorm.athena.domain.deliveryinfo.controller;
 
 
+import goorm.athena.domain.deliveryinfo.dto.req.DeliveryChangeStateRequest;
 import goorm.athena.domain.deliveryinfo.dto.req.DeliveryInfoRequest;
 import goorm.athena.domain.deliveryinfo.dto.req.DeliveryInfoUpdateRequest;
 import goorm.athena.domain.deliveryinfo.dto.res.DeliveryInfoResponse;
@@ -58,4 +59,11 @@ public interface DeliveryInfoController {
     ResponseEntity<List<DeliveryInfoResponse>> getDeliveryInfoList(
             @Parameter(hidden = true) @CheckLogin LoginUserRequest loginUser
     );
+
+    @Operation(summary = "배송지 상태 변경 API", description = "사용자의 기본 배송지를 일반 배송지로 바꾸고 선택한 배송지를 기본 배송지로 변경합니다.")
+    @ApiResponse(responseCode = "204", description = "사용자 기본 배송지 변경 성공")
+    @PutMapping("/state")
+    public ResponseEntity<Void> changeDeliveryInfoState(
+            @Parameter(hidden = true) @CheckLogin LoginUserRequest loginUser,
+            @RequestBody DeliveryChangeStateRequest request);
 }

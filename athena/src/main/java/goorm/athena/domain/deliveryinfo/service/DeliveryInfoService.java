@@ -38,10 +38,7 @@ public class DeliveryInfoService {
         try {
             // 기본 배송지 존재 여부 확인
             getPrimaryDeliveryInfo(userId);
-            isDefault = request.isDefault();
-            if (isDefault) {
-                unsetPreviousDefault(user); // 기존 기본 해제
-            }
+            isDefault = false;
         } catch (CustomException e) {
             if (e.getErrorCode() == ErrorCode.DELIVERY_NOT_FOUND) {
                 isDefault = true;
@@ -52,6 +49,25 @@ public class DeliveryInfoService {
 
         DeliveryInfo info = DeliveryInfo.of(user, request, isDefault);
         deliveryInfoRepository.save(info);
+    }
+
+    @Transactional
+    public void changeDeliveryState(Long userId, Long deliveryInfoId){
+        DeliveryInfo previousDeliveryInfo = getPrimaryDeliveryInfo(userId);
+        DeliveryInfo newDeliveryInfo = getById(deliveryInfoId);
+
+        if(!newDeliveryInfo.getUser().getId().equals(userId)){
+            throw new CustomException(ErrorCode.DELIVERY_NOT_FOUND);
+        }
+
+        if(previousDeliveryInfo.getId().equals(deliveryInfoId)){
+            throw new CustomException(ErrorCode.ALREADY_DEFAULT_DELIVERY);
+        }
+
+        previousDeliveryInfo.unsetAsDefault();
+        newDeliveryInfo.setAsDefault();
+
+        deliveryInfoRepository.saveAll(List.of(previousDeliveryInfo, newDeliveryInfo));
     }
 
     @Transactional
@@ -66,11 +82,9 @@ public class DeliveryInfoService {
 
     @Transactional
     public void deleteDeliveryInfo(Long userId, Long id) {
-        User user = userService.getUser(userId);
-        DeliveryInfo info = deliveryInfoRepository.findById(id)
-                .orElseThrow(() -> new CustomException(ErrorCode.DELIVERY_NOT_FOUND));
+        DeliveryInfo info = getById(id);
 
-        if (!info.getUser().getId().equals(user.getId())) {
+        if (!info.getUser().getId().equals(userId)) {
             throw new CustomException(ErrorCode.ACCESS_DENIED);
         }
 
@@ -123,4 +137,5 @@ public class DeliveryInfoService {
         return deliveryInfoRepository.findByUserIdAndIsDefaultTrue(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.DELIVERY_NOT_FOUND));
     }
+
 }

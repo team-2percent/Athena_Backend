@@ -1,5 +1,6 @@
 package goorm.athena.domain.deliveryinfo.controller;
 
+import goorm.athena.domain.deliveryinfo.dto.req.DeliveryChangeStateRequest;
 import goorm.athena.domain.deliveryinfo.dto.req.DeliveryInfoRequest;
 import goorm.athena.domain.deliveryinfo.dto.req.DeliveryInfoUpdateRequest;
 import goorm.athena.domain.deliveryinfo.dto.res.DeliveryInfoResponse;
@@ -26,6 +27,15 @@ public class DeliveryInfoControllerImpl  implements DeliveryInfoController {
     ) {
         deliveryInfoService.addDeliveryInfo(loginUser.userId(), request);
         return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/state")
+    public ResponseEntity<Void> changeDeliveryInfoState(
+            @CheckLogin LoginUserRequest loginUser,
+            @RequestBody DeliveryChangeStateRequest request
+    ) {
+        deliveryInfoService.changeDeliveryState(loginUser.userId(), request.deliveryInfoId());
+        return ResponseEntity.noContent().build();
     }
 
     @PutMapping("/delivery-info/{id}")
