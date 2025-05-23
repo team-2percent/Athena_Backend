@@ -28,7 +28,7 @@ public class DeliveryInfo {
     @Column(name = "address")
     private String address;
 
-    @Column(name = "detail_address")
+    @Column(name = "detail_address", length = 100)
     private String detailAddress;
 
     @Column(name = "is_default")

@@ -21,10 +21,10 @@ public class User {
     @JoinColumn(name = "image_group_id", nullable = true)
     private ImageGroup imageGroup;  // 이미지 그룹 ID
 
-    @Column(length = 255, nullable = false)
+    @Column(length = 50, nullable = false)
     private String email;
 
-    @Column(length = 255, nullable = false)
+    @Column(length = 100, nullable = false)
     private String password;
 
     @Column(length = 50, nullable = false)
@@ -34,7 +34,7 @@ public class User {
     @Column(length = 20, nullable = false)
     private Role role;
 
-    @Column(length = 3000, nullable = true)
+    @Column(length = 200, nullable = true)
     private String sellerIntroduction;
 
     @Column(length = 2000, nullable = true)
