@@ -33,13 +33,13 @@ public class CouponService {
 
     @Transactional(readOnly = true)
     public Page<Coupon> getCoupons(int page, int size){
-        Pageable pageable = PageRequest.of(page, size, Sort.by("id"));
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id"));
         return couponRepository.findAll(pageable);
     }
 
     @Transactional(readOnly = true)
     public Page<Coupon> getCouponByStatus(int page, int size, CouponStatus status){
-        Pageable pageable = PageRequest.of(page, size, Sort.by("id"));
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id"));
         return couponRepository.findByCouponStatus(pageable, status);
     }
 
