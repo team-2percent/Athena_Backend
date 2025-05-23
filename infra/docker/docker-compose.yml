@@ -23,9 +23,7 @@ services:
       - --default-authentication-plugin=mysql_native_password
 
   athena:
-    build:
-      context: ../../athena
-      dockerfile: Dockerfile
+    image: docker-athena:${IMAGE_TAG}
     container_name: athena
     depends_on:
       - mysql
