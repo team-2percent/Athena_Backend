@@ -1,5 +1,7 @@
 package goorm.athena.global.jwt.util;
 
+import goorm.athena.global.exception.CustomException;
+import goorm.athena.global.exception.ErrorCode;
 import goorm.athena.global.jwt.token.JwtAuthenticationToken;
 import org.springframework.core.MethodParameter;
 import org.springframework.security.core.Authentication;
@@ -20,14 +22,10 @@ public class CheckLoginArgumentResolver implements HandlerMethodArgumentResolver
     @Override
     public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mvContainer,
                                   NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws Exception {
-        Authentication authentication = null;
-        try{
-            authentication = SecurityContextHolder.getContext().getAuthentication();
-        } catch (Exception ex){
-            return null;
-        }
-        if(authentication == null){
-            return null;
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (!(authentication instanceof JwtAuthenticationToken jwtAuthentication)) {
+            throw new CustomException(ErrorCode.ACCESSTOKEN_EXPIRED);
         }
 
         JwtAuthenticationToken jwtAuthenticationToken = (JwtAuthenticationToken) authentication;

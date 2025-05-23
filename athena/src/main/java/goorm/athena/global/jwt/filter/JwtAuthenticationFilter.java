@@ -26,24 +26,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException{
         String token = "";
-        token = getToken(request);
+        token = getAccessToken(request);
         if (StringUtils.hasText(token)) {
-            getAuthentication(token);
+            try {
+ 
+            } catch (ExpiredJwtException e){
+                return;
+            }
         }
         filterChain.doFilter(request, response);
     }
 
-    private void getAuthentication(String token){
-        if (!StringUtils.hasText(token)) {
-            return;
-        }
-        JwtAuthenticationToken authenticationToken = new JwtAuthenticationToken(token);
-        Authentication authenticate = authenticationManager.authenticate(authenticationToken);
-
-        SecurityContextHolder.getContext().setAuthentication(authenticate);
-    }
-
-    private String getToken(HttpServletRequest request){
+    private String getAccessToken(HttpServletRequest request){
         String authorization = request.getHeader("Authorization");
         if(StringUtils.hasText(authorization) && authorization.startsWith("Bearer")){
             String[] arr = authorization.split(" ");
