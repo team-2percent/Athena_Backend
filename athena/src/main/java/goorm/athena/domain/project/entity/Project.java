@@ -59,7 +59,7 @@ public class Project {
     @Column(length = 1000000000, nullable = false)
     private Long totalAmount;
 
-    @Column(columnDefinition = "TEXT", length = 65535)
+    @Column(columnDefinition = "TEXT")
     private String contentMarkdown;     // 소개글 (마크 다운)
 
     private LocalDateTime startAt;

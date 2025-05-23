@@ -26,6 +26,8 @@ public record ProjectCreateRequest(
 
         @Column(length = 100000000)
         Long goalAmount,
+
+        @Size(max = 20000)
         String contentMarkdown,
 
         LocalDateTime startAt,
