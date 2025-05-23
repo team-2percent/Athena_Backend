@@ -35,17 +35,6 @@ jobs:
 
       - name: Ensure IMAGE_TAG is set
         run: echo "IMAGE_TAG=dev" >> $GITHUB_ENV
-
-      - name: Check secrets from env
-        env:
-          DATABASE_DRIVER: ${{ secrets.DATABASE_DRIVER }}
-        run: |
-          echo "DATABASE_DRIVER: $DATABASE_DRIVER"
-          
-      - name: Check secrets
-        run: |
-          echo "DATABASE_DRIVER: ${{ secrets.DATABASE_DRIVER }}"
-          pwd
       
       - name: Create .env file
         run: |
@@ -70,7 +59,7 @@ jobs:
       - name: Bring up athena container
         run: |
           docker compose -f infra/docker/docker-compose.yml rm -f athena
-          docker compose --env-file .env -f infra/docker/docker-compose.yml up -d athena
+          docker compose --env-file infra/docker/.env -f infra/docker/docker-compose.yml up -d athena
 
       - name: Verify service health
         run: |
