@@ -25,7 +25,8 @@ public class CheckLoginArgumentResolver implements HandlerMethodArgumentResolver
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if (!(authentication instanceof JwtAuthenticationToken jwtAuthentication)) {
-            throw new CustomException(ErrorCode.ACCESSTOKEN_EXPIRED);
+            throw new CustomException(ErrorCode.AUTH_TOKEN_EXPIRED);
+
         }
 
         JwtAuthenticationToken jwtAuthenticationToken = (JwtAuthenticationToken) authentication;
