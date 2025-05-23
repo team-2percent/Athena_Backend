@@ -22,8 +22,7 @@ jobs:
 
       - name: Build via Docker
         run: |
-          pwd
-          docker build --no-cache -t docker-athena:${{ env.IMAGE_TAG }} athena/Dockerfile
+          docker build --no-cache -t docker-athena:${{ env.IMAGE_TAG }} athena
 
   deploy:
     name: Deploy Athena Service
