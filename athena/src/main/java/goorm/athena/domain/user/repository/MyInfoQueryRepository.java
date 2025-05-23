@@ -5,7 +5,10 @@ import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.CaseBuilder;
+import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import goorm.athena.domain.comment.entity.QComment;
 import goorm.athena.domain.image.entity.QImage;
 import goorm.athena.domain.imageGroup.entity.QImageGroup;
 import goorm.athena.domain.order.entity.QOrder;
@@ -55,7 +58,11 @@ public class MyInfoQueryRepository {
                         project.title,
                         project.status.stringValue().eq(goorm.athena.domain.project.entity.Status.COMPLETED.name()),
                         project.createdAt,
-                        project.endAt
+                        project.endAt,
+                        Expressions.numberTemplate(Long.class,
+                                "floor(({0} * 100.0) / nullif({1}, 0))",
+                                project.totalAmount, project.goalAmount)
+
                 ))
                 .from(project)
                 .where(whereBuilder)
@@ -88,11 +95,11 @@ public class MyInfoQueryRepository {
         QUser seller = QUser.user;
         QImage image = QImage.image;
         QImageGroup imageGroup = QImageGroup.imageGroup;
+        QComment comment = QComment.comment;
 
         List<Tuple> results = queryFactory
                 .select(
                         order.id,
-                        product.id,
                         project.id,
                         project.title,
                         product.name,
@@ -100,8 +107,18 @@ public class MyInfoQueryRepository {
                         image.originalUrl,
                         order.orderedAt,
                         project.endAt,
-                        project.goalAmount,
-                        project.totalAmount
+                        project.totalAmount.multiply(100.0)
+                                .divide(project.goalAmount.castToNum(Double.class))
+                                .floor()
+                                .castToNum(Long.class)
+                                .as("achievementRate"),
+                        JPAExpressions.selectOne()
+                                .from(comment)
+                                .where(
+                                        comment.project.id.eq(project.id),
+                                        comment.user.id.eq(order.user.id)
+                                ).exists()
+                                .as("hasCommented")
                 )
                 .from(orderItem)
                 .join(orderItem.order, order)
@@ -125,13 +142,11 @@ public class MyInfoQueryRepository {
 
         List<MyOrderScrollResponse.Item> items = results.stream()
                 .map(row -> {
-                    Long goal = row.get(project.goalAmount);
-                    Long total = row.get(project.totalAmount);
-                    int rate = (goal != null && goal != 0) ? (int) ((double) total * 100 / goal) : 0;
+                    Long rate = row.get(8, Long.class);
+                    boolean hasCommented = Boolean.TRUE.equals(row.get(9, Boolean.class));
 
                     return new MyOrderScrollResponse.Item(
                             row.get(order.id),
-                            row.get(product.id),
                             row.get(project.id),
                             row.get(project.title),
                             row.get(product.name),
@@ -139,7 +154,8 @@ public class MyInfoQueryRepository {
                             row.get(image.originalUrl),
                             row.get(order.orderedAt),
                             row.get(project.endAt),
-                            rate
+                            rate,
+                            hasCommented
                     );
                 })
                 .toList();
