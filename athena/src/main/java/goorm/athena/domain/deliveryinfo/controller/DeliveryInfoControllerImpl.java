@@ -38,6 +38,7 @@ public class DeliveryInfoControllerImpl  implements DeliveryInfoController {
         return ResponseEntity.noContent().build();
     }
 
+    /*
     @PutMapping("/delivery-info/{id}")
     public ResponseEntity<Void> updateDeliveryInfo(
             @CheckLogin LoginUserRequest loginUser,
@@ -47,6 +48,7 @@ public class DeliveryInfoControllerImpl  implements DeliveryInfoController {
         deliveryInfoService.updateDeliveryInfo(loginUser.userId(), id, request);
         return ResponseEntity.ok().build();
     }
+     */
 
     @DeleteMapping("/delivery-info/{id}")
     public ResponseEntity<Void> deleteDeliveryInfo(
@@ -57,6 +59,7 @@ public class DeliveryInfoControllerImpl  implements DeliveryInfoController {
         return ResponseEntity.noContent().build();
     }
 
+    /*
     @PatchMapping("/delivery-info/{id}/default")
     public ResponseEntity<Void> setDefaultDeliveryInfo(
             @CheckLogin LoginUserRequest loginUser,
@@ -65,6 +68,8 @@ public class DeliveryInfoControllerImpl  implements DeliveryInfoController {
         deliveryInfoService.setDefault(loginUser.userId(), id);
         return ResponseEntity.ok().build();
     }
+
+     */
 
     @GetMapping("/delivery-info")
     public ResponseEntity<List<DeliveryInfoResponse>> getDeliveryInfoList(
