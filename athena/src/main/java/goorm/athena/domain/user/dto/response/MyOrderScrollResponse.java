@@ -11,6 +11,7 @@ public record MyOrderScrollResponse(
     public record Item(
             Long orderId,
             Long projectId,
+            Long productId,
             String projectName,
             String productName,
             String sellerName,

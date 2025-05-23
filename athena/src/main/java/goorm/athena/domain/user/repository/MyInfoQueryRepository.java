@@ -101,6 +101,7 @@ public class MyInfoQueryRepository {
                 .select(
                         order.id,
                         project.id,
+                        product.id,
                         project.title,
                         product.name,
                         seller.nickname,
@@ -141,12 +142,13 @@ public class MyInfoQueryRepository {
 
         List<MyOrderScrollResponse.Item> items = results.stream()
                 .map(row -> {
-                    Long rate = row.get(8, Long.class);
-                    boolean hasCommented = Boolean.TRUE.equals(row.get(9, Boolean.class));
+                    Long rate = row.get(9, Long.class);
+                    boolean hasCommented = Boolean.TRUE.equals(row.get(10, Boolean.class));
 
                     return new MyOrderScrollResponse.Item(
                             row.get(order.id),
                             row.get(project.id),
+                            row.get(product.id),
                             row.get(project.title),
                             row.get(product.name),
                             row.get(seller.nickname),
