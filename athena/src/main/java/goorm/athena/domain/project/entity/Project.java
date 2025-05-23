@@ -44,13 +44,13 @@ public class Project {
     private PlatformPlan platformPlan;
 
     @NotBlank
-    @Column(length = 25)
+    @Column(length = 50)
     private String title;
 
     // 설명 (요약)
     @NotBlank
-    @Size(min = 10, max = 50)
-    @Column(length = 50)
+    @Size(min = 10, max = 100)
+    @Column(length = 100)
     private String description;
 
     @Column(length = 1000000000, nullable = false)
