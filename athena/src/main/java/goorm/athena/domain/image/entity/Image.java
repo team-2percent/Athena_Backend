@@ -23,21 +23,15 @@ public class Image {
     private String originalUrl;
     private String fileType;    // 파일형
 
-    private boolean isDefault = false;  // 썸네일 구분
+    private Long imageIndex;    // 이미지 순서 (Markdown = 0)
 
     @Builder
-    private Image(ImageGroup imageGroup, String fileName, String originalUrl, String fileType, boolean isDefault) {
+    private Image(ImageGroup imageGroup, String fileName, String originalUrl, String fileType, Long imageIndex) {
         this.imageGroup = imageGroup;
         this.fileName = fileName;
         this.originalUrl = originalUrl;
         this.fileType = fileType;
+        this.imageIndex = imageIndex;
     }
 
-    public void setAsDefault(){
-        this.isDefault = true;
-    }
-
-    public void unsetAsDefault(){
-        this.isDefault = false;
-    }
 }

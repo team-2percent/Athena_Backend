@@ -57,7 +57,7 @@ public class ProjectQueryRepository {
                 .leftJoin(project.imageGroup, imageGroup)
                 .leftJoin(image).on(
                         image.imageGroup.id.eq(imageGroup.id)
-                                .and(image.isDefault.isTrue())
+                                .and(image.imageIndex.eq(1L))
                 )
                 .where(builder) // 마지막 프로젝트 ID보다 큰 항목 가져오기
                 .orderBy(project.createdAt.desc(), project.id.desc()) // 최신순으로 정렬

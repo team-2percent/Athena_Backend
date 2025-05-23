@@ -67,7 +67,7 @@ public class ProjectControllerImpl implements ProjectController {
             @RequestPart("projectUpdateRequest") ProjectUpdateRequest projectUpdateRequest,
             @RequestPart(value = "images", required = false) List<ImageUpdateRequest> imageUpdateRequests){
         // ProjectUpdateRequest projectUpdateRequest = convertJsonToDto(projectUpdateRequestJson);
-        projectService.updateProject(projectId, projectUpdateRequest, imageUpdateRequests);
+        projectService.updateProject(projectId, projectUpdateRequest);
         return ResponseEntity.ok().build();
     }
 

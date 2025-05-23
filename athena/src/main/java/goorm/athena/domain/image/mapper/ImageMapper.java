@@ -7,23 +7,14 @@ import goorm.athena.domain.imageGroup.entity.ImageGroup;
 
 public class ImageMapper {
     // ImageCreatRequest(Dto) -> Image Entity
-    public static Image toEntity(ImageCreateRequest request, ImageGroup imageGroup) {
+    public static Image toEntity(ImageCreateRequest request, ImageGroup imageGroup, Long imageIndex) {
         return Image.builder()
                 .imageGroup(imageGroup)
                 .fileName(request.fileName())
                 .originalUrl(request.originalUrl())
                 .fileType(request.fileType())
+                .imageIndex(imageIndex)
                 .build();
     }
 
-    // Entity -> ImageCreateResponse(Dto)
-    public static ImageCreateResponse toCreateDto(Image image){
-        return ImageCreateResponse.builder()
-                .id(image.getId())
-                .fileName(image.getFileName())
-                .originalUrl(image.getOriginalUrl())
-                .fileType(image.getFileType())
-                .imageGroupId(image.getImageGroup().getId())
-                .build();
-    }
 }
