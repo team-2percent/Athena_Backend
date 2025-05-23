@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @Tag(name = "Image", description = "Image API")
@@ -24,11 +25,11 @@ public interface ImageController {
     @ApiResponse(responseCode = "200", description = "프로젝트 이미지 업로드 성공",
             content = @Content(schema = @Schema(implementation = ProjectIdResponse.class)))
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    ResponseEntity<List<ImageCreateResponse>> uploadImages(
+    ResponseEntity<Void> uploadImages(
             @Parameter(description = "업로드할 이미지 파일들", required = true)
             @RequestParam("files") List<MultipartFile> files,
 
             @Parameter(description = "이미지 그룹 ID", required = true)
             @RequestParam("imageGroupId") Long imageGroupId
-    );
+    ) throws IOException;
 }

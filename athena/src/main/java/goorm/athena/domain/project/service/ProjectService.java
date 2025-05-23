@@ -58,10 +58,11 @@ public class ProjectService {
     private final ProjectSearchQueryRepository projectSearchQueryRepository;
     private final MarkdownParser markdownParser;
 
-    private final S3Service s3Service;
     private final PlatformPlanRepository platformPlanRepository;
 
-    // 프로젝트 생성
+    /**
+     * [프로젝트 등록 Method]
+     */
     @Transactional
     public ProjectIdResponse createProject(ProjectCreateRequest request) {
         ImageGroup imageGroup = imageGroupService.getById(request.imageGroupId());
@@ -86,6 +87,16 @@ public class ProjectService {
         return ProjectMapper.toCreateDto(savedProject);
     }
 
+    // 상품 리스트 생성
+    private void createProducts(List<ProductRequest> requests, Project project) {
+        if (requests != null && !requests.isEmpty()) {
+            productService.saveProducts(requests, project);
+        }
+        else{
+            throw new CustomException(ErrorCode.PRODUCT_IS_EMPTY);
+        }
+    }
+
     // 프로젝트 등록 검증
     private void validateProduct(ProjectCreateRequest request) {
         LocalDateTime now = LocalDateTime.now();
@@ -97,32 +108,16 @@ public class ProjectService {
             throw new CustomException(ErrorCode.INVALID_DESCRIPTION_FORMAT);
         }
 
-        if (request.startAt().isBefore(now.plusDays(7))) {
+        if (request.startAt().isBefore(now.plusDays(6))) {
             throw new CustomException(ErrorCode.INVALID_STARTDATE);
         }
     }
 
-    // 기존에 있던 마크 다운 -> S3 url이 포함된 마크 다운
-    private String getConvertedMarkdown(List<MultipartFile> images, String markdown){
-        List<String> imagePaths = markdownParser.extractImagePaths(markdown);  // 마크다운 내 url 추출
-
-        Map<String, String> imagePathToS3Url = new HashMap<>();
-        for (int i = 0; i < images.size(); i++) {
-            MultipartFile markdownImage = images.get(i);
-            String imagePath = imagePaths.get(i);
-
-            String s3Url = s3Service.uploadToS3(markdownImage, imagePath);  // S3 파일 저장
-            imageService.uploadImage(imagePath, s3Url);                     // URL + 파일 이름만 DB 저장
-            imagePathToS3Url.put(imagePath, s3Url);
-        }
-
-        return markdownParser.replaceMarkdown(markdown, imagePathToS3Url);
-    }
-
-    // 프로젝트 수정
+    /**
+     * [프로젝트 수정 Method]
+     */
     @Transactional
-    public void updateProject(Long projectId, ProjectUpdateRequest request,
-                              List<ImageUpdateRequest> imageRequests){
+    public void updateProject(Long projectId, ProjectUpdateRequest request){
         Project project = getById(projectId);
         Category category = categoryService.getCategoryById(request.categoryId());
         BankAccount bankAccount = bankAccountService.getPrimaryAccount(request.bankAccountId());
@@ -147,10 +142,30 @@ public class ProjectService {
         createProducts(productUpdateRequests, project);
 
         // 이미지 업데이트
-        imageService.updateImages(project.getImageGroup(), imageRequests);
+        // imageService.updateImages(project.getImageGroup(), imageRequests);
     }
 
-    // 프로젝트 삭제
+    /* 기존에 있던 마크 다운 -> S3 url이 포함된 마크 다운
+    private String getConvertedMarkdown(List<MultipartFile> images, String markdown){
+        List<String> imagePaths = markdownParser.extractImagePaths(markdown);  // 마크다운 내 url 추출
+
+        Map<String, String> imagePathToS3Url = new HashMap<>();
+        for (int i = 0; i < images.size(); i++) {
+            MultipartFile markdownImage = images.get(i);
+            String imagePath = imagePaths.get(i);
+
+            String s3Url = s3Service.uploadToS3(markdownImage, imagePath);  // S3 파일 저장
+            imageService.uploadImage(imagePath, s3Url);                     // URL + 파일 이름만 DB 저장
+            imagePathToS3Url.put(imagePath, s3Url);
+        }
+
+        return markdownParser.replaceMarkdown(markdown, imagePathToS3Url);
+    }
+    */
+
+    /**
+     * [프로젝트 삭제 Method]
+     */
     @Transactional
     public void deleteProject(Long projectId){
         Project project = getById(projectId);
@@ -163,31 +178,9 @@ public class ProjectService {
 
     }
 
-    // 상품 리스트 생성
-    private void createProducts(List<ProductRequest> requests, Project project) {
-        if (requests != null && !requests.isEmpty()) {
-            productService.saveProducts(requests, project);
-        }
-        else{
-            throw new CustomException(ErrorCode.PRODUCT_IS_EMPTY);
-        }
-    }
-
     // 상품 리스트 삭제
     private void deleteProducts(Project project) {
         productService.deleteAllByProject(project);
-    }
-
-    // 후원 기간 종료, 목표금액 달성, 중복 정산 제외 조건이 충족해야함
-    public List<Project> getEligibleProjects(LocalDate baseDate) {
-        LocalDateTime endAt = baseDate.plusDays(1).atStartOfDay();
-        return projectRepository.findProjectsWithUnsettledOrders(endAt);
-    }
-
-    // Get Project
-    public Project getById(Long id) {
-        return projectRepository.findById(id)
-                .orElseThrow(() -> new CustomException(ErrorCode.PROJECT_NOT_FOUND));
     }
 
     /**
@@ -320,6 +313,18 @@ public class ProjectService {
                 .orElseThrow(() -> new CustomException(ErrorCode.PROJECT_NOT_FOUND));
 
         project.setApprovalStatus(isApproved);
+    }
+
+    // 후원 기간 종료, 목표금액 달성, 중복 정산 제외 조건이 충족해야함
+    public List<Project> getEligibleProjects(LocalDate baseDate) {
+        LocalDateTime endAt = baseDate.plusDays(1).atStartOfDay();
+        return projectRepository.findProjectsWithUnsettledOrders(endAt);
+    }
+
+    // Get Project
+    public Project getById(Long id) {
+        return projectRepository.findById(id)
+                .orElseThrow(() -> new CustomException(ErrorCode.PROJECT_NOT_FOUND));
     }
 
 }

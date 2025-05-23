@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -22,13 +23,11 @@ public class ImageControllerImpl implements ImageController {
 
     // 프로젝트 이미지 업로드
     @Override
-    public ResponseEntity<List<ImageCreateResponse>> uploadImages(
+    public ResponseEntity<Void> uploadImages(
             @RequestParam("files") List<MultipartFile> files,
             @RequestParam("imageGroupId") Long imageGroupId
-    ) {
-        ImageGroup imageGroup = imageGroupService.getById(imageGroupId);
-        imageService.uploadImages(files, imageGroup);                                   // 이미지 S3 + DB 업로드
-        List<ImageCreateResponse> responses = imageService.createResponses(imageGroup); // 응답 DTO 생성
-        return ResponseEntity.ok(responses);
+    ) throws IOException {
+        imageService.uploadImages(files, imageGroupId);
+        return ResponseEntity.ok().build();
     }
 }
