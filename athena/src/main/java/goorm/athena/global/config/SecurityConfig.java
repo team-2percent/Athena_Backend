@@ -31,7 +31,7 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http,
-            AuthenticationManager authenticationManager) throws Exception {
+                                                   AuthenticationManager authenticationManager) throws Exception {
 
         http.authorizeHttpRequests(auth -> auth
                 .requestMatchers(HttpMethod.OPTIONS).permitAll()
@@ -44,7 +44,8 @@ public class SecurityConfig {
                         "/api/**",
                         "/swagger-ui/**",
                         "/v3/api-docs/**",
-                        "/swagger-ui.html")
+                        "/swagger-ui.html",
+                        "/images/**")
                 .permitAll()
                 .anyRequest().authenticated());
 
