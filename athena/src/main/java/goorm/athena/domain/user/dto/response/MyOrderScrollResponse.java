@@ -18,6 +18,7 @@ public record MyOrderScrollResponse(
             String thumbnailUrl,
             LocalDateTime orderedAt,
             LocalDateTime endAt,
-            int achievementRate
+            int achievementRate,
+            boolean hasCommented
     ) {}
 }

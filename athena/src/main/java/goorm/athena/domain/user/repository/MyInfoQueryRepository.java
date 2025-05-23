@@ -6,7 +6,9 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import goorm.athena.domain.comment.entity.QComment;
 import goorm.athena.domain.image.entity.QImage;
 import goorm.athena.domain.imageGroup.entity.QImageGroup;
 import goorm.athena.domain.order.entity.QOrder;
@@ -93,6 +95,7 @@ public class MyInfoQueryRepository {
         QUser seller = QUser.user;
         QImage image = QImage.image;
         QImageGroup imageGroup = QImageGroup.imageGroup;
+        QComment comment = QComment.comment;
 
         List<Tuple> results = queryFactory
                 .select(
@@ -106,7 +109,14 @@ public class MyInfoQueryRepository {
                         order.orderedAt,
                         project.endAt,
                         project.goalAmount,
-                        project.totalAmount
+                        project.totalAmount,
+                        JPAExpressions.selectOne()
+                                .from(comment)
+                                .where(
+                                        comment.project.id.eq(project.id),
+                                        comment.user.id.eq(order.user.id)
+                                ).exists()
+                                .as("hasCommented")
                 )
                 .from(orderItem)
                 .join(orderItem.order, order)
@@ -133,6 +143,7 @@ public class MyInfoQueryRepository {
                     Long goal = row.get(project.goalAmount);
                     Long total = row.get(project.totalAmount);
                     int rate = (goal != null && goal != 0) ? (int) ((double) total * 100 / goal) : 0;
+                    boolean hasCommented = Boolean.TRUE.equals(row.get(11, Boolean.class));
 
                     return new MyOrderScrollResponse.Item(
                             row.get(order.id),
@@ -144,7 +155,8 @@ public class MyInfoQueryRepository {
                             row.get(image.originalUrl),
                             row.get(order.orderedAt),
                             row.get(project.endAt),
-                            rate
+                            rate,
+                            hasCommented
                     );
                 })
                 .toList();
