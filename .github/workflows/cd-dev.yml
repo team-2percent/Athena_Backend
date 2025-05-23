@@ -37,6 +37,7 @@ jobs:
           ACCESS_KEY=${{ secrets.ACCESS_KEY }}
           SECRET_KEY=${{ secrets.SECRET_KEY }}
           BUCKET_NAME=${{ secrets.BUCKET_NAME }}
+          IMAGE_TAG=${{ env.IMAGE_TAG }}
           EOF
 
       - name: Build via Docker Compose
@@ -74,6 +75,7 @@ jobs:
           ACCESS_KEY=${{ secrets.ACCESS_KEY }}
           SECRET_KEY=${{ secrets.SECRET_KEY }}
           BUCKET_NAME=${{ secrets.BUCKET_NAME }}
+          IMAGE_TAG=${{ env.IMAGE_TAG }}
           EOF
 
       - name: Bring up athena container
