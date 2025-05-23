@@ -6,6 +6,7 @@ import goorm.athena.domain.imageGroup.entity.ImageGroup;
 import goorm.athena.domain.user.entity.User;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -47,6 +48,8 @@ public class Project {
     private String title;
 
     // 설명 (요약)
+    @NotBlank
+    @Size(min = 10, max = 50)
     @Column(length = 50)
     private String description;
 
