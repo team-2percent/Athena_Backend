@@ -6,4 +6,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface PlatformPlanRepository extends JpaRepository<PlatformPlan, Long> {
     PlatformPlan findByName(PlanName name);
+    boolean existsByName(PlanName name);
 }

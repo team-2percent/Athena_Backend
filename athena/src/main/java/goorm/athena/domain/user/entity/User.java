@@ -71,4 +71,13 @@ public class User {
             this.nickname = nickname;
         }
     }
+
+    public static User createFullUser(String email, String password, String nickname,
+                                      Role role, String sellerIntroduction, String linkUrl) {
+        User user = new User(email, password, nickname);
+        user.role = role;
+        user.sellerIntroduction = sellerIntroduction;
+        user.linkUrl = linkUrl;
+        return user;
+    }
 }
