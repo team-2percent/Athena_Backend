@@ -1,6 +1,7 @@
 package goorm.athena.domain.deliveryinfo.controller;
 
 
+import goorm.athena.domain.deliveryinfo.dto.req.DeliveryChangeStateRequest;
 import goorm.athena.domain.deliveryinfo.dto.req.DeliveryInfoRequest;
 import goorm.athena.domain.deliveryinfo.dto.req.DeliveryInfoUpdateRequest;
 import goorm.athena.domain.deliveryinfo.dto.res.DeliveryInfoResponse;
@@ -27,6 +28,8 @@ public interface DeliveryInfoController {
             @RequestBody DeliveryInfoRequest request
     );
 
+    /*
+
     @Operation(summary = "배송지 수정 API", description = "로그인한 사용자의 기존 배송지 정보를 수정합니다.")
     @ApiResponse(responseCode = "200", description = "배송지 수정 성공")
     @PutMapping("/delivery-info/{id}")
@@ -35,6 +38,7 @@ public interface DeliveryInfoController {
             @PathVariable Long id,
             @RequestBody DeliveryInfoUpdateRequest request
     );
+     */
 
     @Operation(summary = "배송지 삭제 API", description = "로그인한 사용자의 특정 배송지를 삭제합니다.")
     @ApiResponse(responseCode = "204", description = "배송지 삭제 성공")
@@ -44,6 +48,8 @@ public interface DeliveryInfoController {
             @PathVariable Long id
     );
 
+    /*
+
     @Operation(summary = "기본 배송지 설정 API", description = "기존 기본 배송지를 해제하고, 선택한 배송지를 기본 배송지로 설정합니다.")
     @ApiResponse(responseCode = "200", description = "기본 배송지 설정 성공")
     @PatchMapping("/delivery-info/{id}/default")
@@ -51,6 +57,7 @@ public interface DeliveryInfoController {
             @Parameter(hidden = true) @CheckLogin LoginUserRequest loginUser,
             @PathVariable Long id
     );
+     */
 
     @Operation(summary = "배송지 목록 조회 API", description = "로그인한 사용자의 배송지 목록을 조회합니다.")
     @ApiResponse(responseCode = "200", description = "배송지 목록 조회 성공")
@@ -58,4 +65,11 @@ public interface DeliveryInfoController {
     ResponseEntity<List<DeliveryInfoResponse>> getDeliveryInfoList(
             @Parameter(hidden = true) @CheckLogin LoginUserRequest loginUser
     );
+
+    @Operation(summary = "배송지 상태 변경 API", description = "사용자의 기본 배송지를 일반 배송지로 바꾸고 선택한 배송지를 기본 배송지로 변경합니다.")
+    @ApiResponse(responseCode = "204", description = "사용자 기본 배송지 변경 성공")
+    @PutMapping("/state")
+    public ResponseEntity<Void> changeDeliveryInfoState(
+            @Parameter(hidden = true) @CheckLogin LoginUserRequest loginUser,
+            @RequestBody DeliveryChangeStateRequest request);
 }

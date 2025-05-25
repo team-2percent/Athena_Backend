@@ -46,6 +46,7 @@ public enum ErrorCode {
 
     REFRESHTOKEN_NOT_FOUND(HttpStatus.NOT_FOUND, "RefreshToken을 찾지 못했습니다."),
     REFRESHTOKEN_EXPIRED(HttpStatus.UNAUTHORIZED, "리프레시 토큰이 만료되었습니다"),
+    ACCESSTOKEN_EXPIRED(HttpStatus.UNAUTHORIZED, "액세스 토큰이 만료되었습니다"),
 
 
     //유저

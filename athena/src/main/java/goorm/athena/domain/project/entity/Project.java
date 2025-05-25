@@ -5,6 +5,8 @@ import goorm.athena.domain.category.entity.Category;
 import goorm.athena.domain.imageGroup.entity.ImageGroup;
 import goorm.athena.domain.user.entity.User;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -41,9 +43,20 @@ public class Project {
     @JoinColumn(name = "platform_plan_id", nullable = false)
     private PlatformPlan platformPlan;
 
+    @NotBlank
+    @Column(length = 50)
     private String title;
-    private String description;         // 설명 (요약)
+
+    // 설명 (요약)
+    @NotBlank
+    @Size(min = 10, max = 100)
+    @Column(length = 100)
+    private String description;
+
+    @Column(length = 1000000000, nullable = false)
     private Long goalAmount;
+
+    @Column(length = 1000000000, nullable = false)
     private Long totalAmount;
 
     @Column(columnDefinition = "TEXT")

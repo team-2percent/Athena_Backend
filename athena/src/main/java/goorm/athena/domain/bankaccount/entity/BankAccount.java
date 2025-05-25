@@ -19,13 +19,13 @@ public class BankAccount {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @Column(name = "account_number")
+    @Column(name = "account_number", length = 50)
     private String accountNumber;
 
-    @Column(name = "account_holder")
+    @Column(name = "account_holder", length = 50)
     private String accountHolder;
 
-    @Column(name = "bank_name")
+    @Column(name = "bank_name", length = 50)
     private String bankName;
 
     private boolean isDefault;

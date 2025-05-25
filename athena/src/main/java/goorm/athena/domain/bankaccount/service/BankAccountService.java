@@ -50,6 +50,7 @@ public class BankAccountService {
         return BankAccountMapper.toCreateResponse(saveAccount);
     }
 
+    @Transactional
     public void changeAccountState(Long userId, Long bankAccountId){
         BankAccount previousBankAccount = getPrimaryAccount(userId);
         BankAccount newBankAccount = getBankAccount(bankAccountId);

@@ -13,6 +13,7 @@ public record MyProjectScrollResponse(
             String title,
             boolean isCompleted,
             LocalDateTime createdAt,
-            LocalDateTime endAt
+            LocalDateTime endAt,
+            Long achievementRate
     ) {}
 }

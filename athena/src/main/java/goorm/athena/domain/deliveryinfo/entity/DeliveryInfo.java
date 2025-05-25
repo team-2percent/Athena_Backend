@@ -28,7 +28,7 @@ public class DeliveryInfo {
     @Column(name = "address")
     private String address;
 
-    @Column(name = "detail_address")
+    @Column(name = "detail_address", length = 100)
     private String detailAddress;
 
     @Column(name = "is_default")
@@ -49,7 +49,6 @@ public class DeliveryInfo {
                 .zipcode(request.zipcode())
                 .address(request.address())
                 .detailAddress(request.detailAddress())
-                .isDefault(request.isDefault())
                 .build();
     }
 
@@ -68,6 +67,10 @@ public class DeliveryInfo {
         this.address = address;
         this.detailAddress = detailAddress;
     }
+
+    public void setAsDefault() { this.isDefault = true; }
+
+    public void unsetAsDefault() { this.isDefault = false; }
 
     public void updateDefault(boolean isDefault) {
         this.isDefault = isDefault;
