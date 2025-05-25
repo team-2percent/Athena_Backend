@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 
 import java.util.List;
@@ -38,7 +39,7 @@ public interface ProjectController {
     @ApiResponse(responseCode = "200", description = "프로젝트 생성 성공",
         content = @Content(schema = @Schema(implementation = ProjectIdResponse.class)))
     @PostMapping
-    ResponseEntity<ProjectIdResponse> createProject(@RequestBody ProjectCreateRequest request);
+    ResponseEntity<ProjectIdResponse> createProject(@RequestBody ProjectCreateRequest request) throws IOException;
 
     @Operation(
             summary = "프로젝트별 상품 목록 조회 API",

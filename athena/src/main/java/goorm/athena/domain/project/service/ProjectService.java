@@ -4,9 +4,9 @@ import goorm.athena.domain.bankaccount.entity.BankAccount;
 import goorm.athena.domain.bankaccount.service.BankAccountService;
 import goorm.athena.domain.category.entity.Category;
 import goorm.athena.domain.category.service.CategoryService;
-import goorm.athena.domain.image.dto.req.ImageUpdateRequest;
 import goorm.athena.domain.image.entity.Image;
 import goorm.athena.domain.image.service.ImageService;
+import goorm.athena.domain.image.service.NasService;
 import goorm.athena.domain.imageGroup.entity.ImageGroup;
 import goorm.athena.domain.imageGroup.service.ImageGroupService;
 import goorm.athena.domain.product.dto.req.ProductRequest;
@@ -25,7 +25,6 @@ import goorm.athena.domain.project.repository.query.ProjectFilterQueryRepository
 import goorm.athena.domain.project.repository.query.ProjectQueryRepository;
 import goorm.athena.domain.project.repository.ProjectRepository;
 import goorm.athena.domain.project.repository.query.ProjectSearchQueryRepository;
-import goorm.athena.domain.s3.service.S3Service;
 import goorm.athena.domain.user.dto.response.UserDetailResponse;
 import goorm.athena.domain.user.entity.User;
 import goorm.athena.domain.user.mapper.UserMapper;
@@ -37,6 +36,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -57,14 +57,14 @@ public class ProjectService {
     private final ProjectFilterQueryRepository projectFilterQueryRepository;
     private final ProjectSearchQueryRepository projectSearchQueryRepository;
     private final MarkdownParser markdownParser;
-
     private final PlatformPlanRepository platformPlanRepository;
+
 
     /**
      * [프로젝트 등록 Method]
      */
     @Transactional
-    public ProjectIdResponse createProject(ProjectCreateRequest request) {
+    public ProjectIdResponse createProject(ProjectCreateRequest request) throws IOException {
         ImageGroup imageGroup = imageGroupService.getById(request.imageGroupId());
         User seller = userService.getUser(request.sellerId());
         Category category = categoryService.getCategoryById(request.categoryId());
@@ -74,13 +74,15 @@ public class ProjectService {
 
         validateProduct(request);   // 프로젝트 등록 시 검증
 
-        // String convertedMarkdown = getConvertedMarkdown(request.markdownImages(), request.contentMarkdown());    // 마크다운 변환
-        Project project = ProjectMapper.toEntity(request, seller, imageGroup, category, bankAccount, platformPlan); // 새 프로젝트 생성
-        Project savedProject = projectRepository.save(project);                                                     // 프로젝트 저장
-        // 프로젝트 생성 시 예외 처리 필요
+        String convertedMarkdown = request.contentMarkdown();
+        if (request.contentMarkdown() != null) {
+            convertedMarkdown = getConvertedMarkdown(request.markdownImages(), imageGroup, request.contentMarkdown());   // 마크다운 변환
+        }
 
-        // 상품 등록 요청 처리
-        List<ProductRequest> productRequests = request.products();
+        Project project = ProjectMapper.toEntity(request, seller, imageGroup, category, bankAccount, platformPlan, convertedMarkdown);  // 새 프로젝트 생성
+        Project savedProject = projectRepository.save(project);                                                                         // 프로젝트 저장
+
+        List<ProductRequest> productRequests = request.products();  // 상품 등록 요청 처리
         createProducts(productRequests, project);
         // 상품 생성 예외 처리 추가적으로 있을지 고려
 
@@ -95,6 +97,14 @@ public class ProjectService {
         else{
             throw new CustomException(ErrorCode.PRODUCT_IS_EMPTY);
         }
+    }
+
+    // 기존 마크다운 -> URL 치환 마크다운
+    private String getConvertedMarkdown(List<MultipartFile> images, ImageGroup imageGroup, String markdown) throws IOException {
+        List<String> imagePaths = markdownParser.extractImagePaths(markdown);           // 마크다운 내 url 추출
+        List<String> realUrls = imageService.uploadMarkdownImages(images, imageGroup);  // 이미지 저장 및 이미지 서버 url 반환
+
+        return markdownParser.replaceMarkdown(markdown, imagePaths, realUrls);
     }
 
     // 프로젝트 등록 검증
@@ -145,23 +155,6 @@ public class ProjectService {
         // imageService.updateImages(project.getImageGroup(), imageRequests);
     }
 
-    /* 기존에 있던 마크 다운 -> S3 url이 포함된 마크 다운
-    private String getConvertedMarkdown(List<MultipartFile> images, String markdown){
-        List<String> imagePaths = markdownParser.extractImagePaths(markdown);  // 마크다운 내 url 추출
-
-        Map<String, String> imagePathToS3Url = new HashMap<>();
-        for (int i = 0; i < images.size(); i++) {
-            MultipartFile markdownImage = images.get(i);
-            String imagePath = imagePaths.get(i);
-
-            String s3Url = s3Service.uploadToS3(markdownImage, imagePath);  // S3 파일 저장
-            imageService.uploadImage(imagePath, s3Url);                     // URL + 파일 이름만 DB 저장
-            imagePathToS3Url.put(imagePath, s3Url);
-        }
-
-        return markdownParser.replaceMarkdown(markdown, imagePathToS3Url);
-    }
-    */
 
     /**
      * [프로젝트 삭제 Method]
@@ -193,7 +186,7 @@ public class ProjectService {
         Project project = getById(projectId);
 
         Category category = categoryService.getCategoryById(project.getCategory().getId());
-        List<Image> images = imageService.getImages(project.getImageGroup());
+        List<Image> images = imageService.getProjectImages(project.getImageGroup().getId());    // 마크다운 이미지 제외 가져오기
         List<String> imageUrls = imageService.getImageUrls(images);
         UserDetailResponse userDetailResponse = UserMapper.toDetailResponse(project.getSeller());
         List<ProductResponse> productResponses = productService.getAllProducts(project);

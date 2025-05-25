@@ -24,7 +24,7 @@ public record ProjectCreateRequest(
         LocalDateTime shippedAt,
 
         String platformPlan,                // 요금제 구독 상태
-        List<ProductRequest> products       // 상품 리스트
+        List<ProductRequest> products,      // 상품 리스트
 
-        // List<MultipartFile> markdownImages  // 마크다운 첨부 이미지 (로컬)
+        List<MultipartFile> markdownImages  // 마크다운 첨부 이미지 (로컬)
 ) { }

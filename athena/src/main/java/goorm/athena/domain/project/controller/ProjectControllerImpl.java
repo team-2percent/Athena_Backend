@@ -25,7 +25,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 
-
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -47,7 +47,7 @@ public class ProjectControllerImpl implements ProjectController {
 
     // 프로젝트 생성
     @Override
-    public ResponseEntity<ProjectIdResponse> createProject(@RequestBody ProjectCreateRequest request){
+    public ResponseEntity<ProjectIdResponse> createProject(@RequestBody ProjectCreateRequest request) throws IOException {
         ProjectIdResponse response = projectService.createProject(request); // 프로젝트 생성 로직
         return ResponseEntity.ok(response);
     }
