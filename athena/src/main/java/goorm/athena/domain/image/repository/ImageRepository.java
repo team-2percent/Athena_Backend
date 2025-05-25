@@ -20,4 +20,12 @@ public interface ImageRepository extends JpaRepository<Image, Long> {
         AND i.imageIndex = 1
         """)
     Optional<Image> findFirstImageByImageGroupId(@Param("imageGroupId") Long imageGroupId);
+
+    @Query("""
+        SELECT i
+        FROM Image i
+        WHERE i.imageGroup.id = :imageGroupId
+        AND i.imageIndex != 0
+        """)
+    List<Image> findProjectImagesByImageGroupId(@Param("imageGroupId") Long imageGroupId);
 }

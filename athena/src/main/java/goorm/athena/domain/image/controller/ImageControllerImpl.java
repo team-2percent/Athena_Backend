@@ -1,9 +1,7 @@
 package goorm.athena.domain.image.controller;
 
-import goorm.athena.domain.image.dto.res.ImageCreateResponse;
-import goorm.athena.domain.image.service.ImageService;
 
-import goorm.athena.domain.imageGroup.entity.ImageGroup;
+import goorm.athena.domain.image.service.ImageService;
 import goorm.athena.domain.imageGroup.service.ImageGroupService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

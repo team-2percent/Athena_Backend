@@ -47,6 +47,21 @@ public class ImageService {
         imageRepository.deleteAll(images);                      // 이미지 삭제 (DB)
     }
 
+    // 마크다운 이미지 저장 및 주소 반환
+    @Transactional
+    public List<String> uploadMarkdownImages(List<MultipartFile> files, ImageGroup imageGroup) throws IOException {
+        List<ImageCreateRequest> requests = nasService.saveAll(files, imageGroup.getId());
+
+        List<Image> markdownImages = new ArrayList<>();
+        for (ImageCreateRequest request : requests) {
+            Image image = ImageMapper.toEntity(request, imageGroup, (long) (0));
+            markdownImages.add(image);
+        }
+        imageRepository.saveAll(markdownImages);
+
+        return getImageUrls(markdownImages);
+    }
+
     ////////////////////////////////////////////////////////////////////////////
 
     /*  [단일 이미지 저장]
@@ -120,9 +135,10 @@ public class ImageService {
 
     }
 
-    // 이미지 리스트 불러오기
-    public List<Image> getImages(ImageGroup imageGroup) {
-        return imageRepository.findAllByImageGroup(imageGroup);
+    // 프로젝트 이미지 불러오기
+    // (마크다운 이미지는 제외한다.)
+    public List<Image> getProjectImages(Long imageGroupId){
+        return imageRepository.findProjectImagesByImageGroupId(imageGroupId);
     }
 
     // 이미지 url 리스트 불러오기

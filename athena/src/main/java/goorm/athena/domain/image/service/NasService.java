@@ -69,7 +69,7 @@ public class NasService {
 
         }
 
-        String imageUrl = IMAGEDOMAIN + imageGroupId + "/" + fileName + extension;
+        String imageUrl = IMAGEDOMAIN + imageGroupId + "/" + fileName + extension;  // 이미지 URL
         return new ImageCreateRequest(imageGroupId, fileName, imageUrl, extension);
     }
 

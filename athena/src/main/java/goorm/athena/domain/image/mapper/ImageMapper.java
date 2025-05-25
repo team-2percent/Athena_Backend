@@ -1,7 +1,6 @@
 package goorm.athena.domain.image.mapper;
 
 import goorm.athena.domain.image.dto.req.ImageCreateRequest;
-import goorm.athena.domain.image.dto.res.ImageCreateResponse;
 import goorm.athena.domain.image.entity.Image;
 import goorm.athena.domain.imageGroup.entity.ImageGroup;
 
