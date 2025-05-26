@@ -1,12 +1,9 @@
 package goorm.athena.domain.userCoupon.controller;
 
-import goorm.athena.domain.couponEvent.dto.res.CouponEventGetResponse;
-import goorm.athena.domain.userCoupon.dto.cursor.UserCouponCursorResponse;
 import goorm.athena.domain.userCoupon.dto.req.UserCouponIssueRequest;
 import goorm.athena.domain.userCoupon.dto.req.UserCouponUseRequest;
 import goorm.athena.domain.userCoupon.dto.res.UserCouponGetResponse;
 import goorm.athena.domain.userCoupon.dto.res.UserCouponIssueResponse;
-import goorm.athena.domain.userCoupon.entity.UserCoupon;
 import goorm.athena.global.jwt.util.CheckLogin;
 import goorm.athena.global.jwt.util.LoginUserRequest;
 import io.swagger.v3.oas.annotations.Operation;
@@ -17,8 +14,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @Tag(name = "UserCoupon", description = "유저 쿠폰 관련 API")
 @RequestMapping("/api/userCoupon")

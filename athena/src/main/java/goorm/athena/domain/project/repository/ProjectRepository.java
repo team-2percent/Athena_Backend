@@ -17,6 +17,7 @@ public interface ProjectRepository extends JpaRepository<Project, Long>, JpaSpec
     @Query("SELECT p FROM Project p " +
             "JOIN FETCH p.seller " +
             "JOIN FETCH p.imageGroup " +
+            "WHERE p.isApproved = 'APPROVED' " +
             "ORDER BY p.views DESC")
     List<Project> findTop5WithImageGroupByOrderByViewsDesc();
 
@@ -37,6 +38,7 @@ public interface ProjectRepository extends JpaRepository<Project, Long>, JpaSpec
                     SELECT p.*,
                            ROW_NUMBER() OVER (PARTITION BY p.category_id ORDER BY p.views DESC, p.created_at ASC) AS rn
                     FROM project p
+                    WHERE p.is_approved = 'APPROVED'
                 ) ranked
                 WHERE ranked.rn <= 5
             """, nativeQuery = true)
@@ -48,6 +50,7 @@ public interface ProjectRepository extends JpaRepository<Project, Long>, JpaSpec
             FROM project p
             JOIN platform_plan pp ON p.platform_plan_id = pp.id
             WHERE pp.name IN ('PRO', 'PREMIUM')
+                AND p.is_approved = 'APPROVED'
             ORDER BY p.created_at DESC
             """, nativeQuery = true)
     List<Project> findTop5ProjectsGroupedByPlatformPlan();
