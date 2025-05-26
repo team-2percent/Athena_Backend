@@ -73,15 +73,19 @@ public class ProjectService {
         PlatformPlan platformPlan = platformPlanRepository.findByName(planName);
 
         validateProduct(request);   // 프로젝트 등록 시 검증
-
         String convertedMarkdown = request.contentMarkdown();
+
+        /*
+
         if (request.contentMarkdown() != null) {
             try {
                 convertedMarkdown = getConvertedMarkdown(request.markdownImages(), imageGroup, request.contentMarkdown());   // 마크다운 변환
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                throw new CustomException(ErrorCode.IMAGE_UPLOAD_FAILED);
             }
         }
+        */
+
 
         Project project = ProjectMapper.toEntity(request, seller, imageGroup, category, bankAccount, platformPlan, convertedMarkdown);  // 새 프로젝트 생성
         Project savedProject = projectRepository.save(project);                                                                         // 프로젝트 저장
@@ -134,7 +138,7 @@ public class ProjectService {
      * [프로젝트 수정 Method]
      */
     @Transactional
-    public void updateProject(Long projectId, ProjectUpdateRequest request){
+    public void updateProject(Long projectId, ProjectUpdateRequest request, List<MultipartFile> files) {
         Project project = getById(projectId);
         Category category = categoryService.getCategoryById(request.categoryId());
         BankAccount bankAccount = bankAccountService.getPrimaryAccount(request.bankAccountId());
@@ -158,13 +162,8 @@ public class ProjectService {
         deleteProducts(project);
         createProducts(productUpdateRequests, project);
 
-        List<MultipartFile> images = request.images();
         imageService.deleteImages(project.getImageGroup());
-        try {
-            imageService.uploadImages(images, project.getImageGroup().getId());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        imageService.uploadImages(files, project.getImageGroup().getId());
     }
 
 

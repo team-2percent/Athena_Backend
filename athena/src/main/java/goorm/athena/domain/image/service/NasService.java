@@ -1,5 +1,7 @@
 package goorm.athena.domain.image.service;
 
+import com.sksamuel.scrimage.ImmutableImage;
+import com.sksamuel.scrimage.webp.WebpWriter;
 import goorm.athena.domain.image.dto.req.ImageCreateRequest;
 import goorm.athena.global.exception.CustomException;
 import goorm.athena.global.exception.ErrorCode;
@@ -10,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.awt.*;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -23,7 +26,8 @@ public class NasService {
     @Value("${nas.base.path}")
     private String imagePath;
 
-    private final String IMAGEDOMAIN = "http://localhost:8080/images";
+    private static final String IMAGE_FORMAT = "webp";
+    private final String IMAGE_DOMAIN = "http://localhost:8080/images";
 
     private static final Map<String, Dimension> SIZES = Map.of(
             "s", new Dimension(200, 200),
@@ -48,45 +52,43 @@ public class NasService {
      *  MultipartFile -> ImageCreateDto
      */
     public ImageCreateRequest save(MultipartFile file, Long imageGroupId) throws IOException {
-        String fileName = createFileName(file.getOriginalFilename());                     // 고유한 파일 이름 생성
-        validateFileExtension(fileName);
-        String extension = getFileExtension(fileName).replace(".", ""); // ex: jpg
-
+        validateFileExtension(file.getOriginalFilename());
+        String fileName = createFileName();                     // 고유한 파일 이름 생성
         File originalFile = new File(imagePath, fileName);
-        file.transferTo(originalFile);                              // 원본 파일 따로 저장
 
-        for (Map.Entry<String, Dimension> entry : SIZES.entrySet()) {
-            String sizeKey = entry.getKey();
-            String sizedFileName = sizeKey + "_" + fileName;        // 사이즈 별 파일 이름 생성
-            File resizedFile = new File(imagePath, sizedFileName);  // 파일 경로 담은 객체 생성
 
-            // 리사이징 후 저장
+        // 원본 WebP 파일 저장
+        ImmutableImage image = ImmutableImage.loader().fromStream(file.getInputStream());
+        image.output(WebpWriter.DEFAULT, originalFile);
+
+        for (var entry : SIZES.entrySet()) {
+            // 리사이징된 파일 이름 지정
+            String resizedFileName = entry.getKey() + "_" + fileName;
             Dimension dim = entry.getValue();
-            Thumbnails.of(file.getInputStream())
-                    .size(dim.width, dim.height)
-                    .outputFormat("webp")
-                    .toFile(resizedFile);
+            File resizedFile = new File(imagePath, resizedFileName);
 
+            // 리사이즈 후 저장
+            image.fit(dim.width, dim.height).output(WebpWriter.DEFAULT, resizedFile);
         }
 
-        String imageUrl = IMAGEDOMAIN + imageGroupId + "/" + fileName + extension;  // 이미지 URL
-        return new ImageCreateRequest(imageGroupId, fileName, imageUrl, extension);
+        String imageUrl = IMAGE_DOMAIN + "/" + fileName;  // 이미지 URL
+        return new ImageCreateRequest(imageGroupId, fileName, imageUrl, IMAGE_FORMAT);
     }
 
     // 파일마다 고유한 이름 부여 (중복 방지)
-    private String createFileName(String fileName){
-        return UUID.randomUUID().toString().concat(getFileExtension(fileName));
+    private String createFileName(){
+        return UUID.randomUUID() + "." + IMAGE_FORMAT;
     }
 
     // 확장자 추출
     private String getFileExtension(String fileName){
-        return fileName.substring(fileName.lastIndexOf("."));
+        return fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();
     }
 
     // 확장자 검증
     private void validateFileExtension(String fileName){
         String extension = getFileExtension(fileName).toLowerCase();
-        if (!extension.equals(".jpg") && !extension.equals(".png") && !extension.equals(".jpeg")){
+        if (!List.of("jpg", "jpeg", "png").contains(extension)){
             throw new CustomException(ErrorCode.INVALID_IMAGE_EXTENSION);
         }
     }

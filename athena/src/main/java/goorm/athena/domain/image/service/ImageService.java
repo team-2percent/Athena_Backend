@@ -6,6 +6,8 @@ import goorm.athena.domain.image.mapper.ImageMapper;
 import goorm.athena.domain.image.repository.ImageRepository;
 import goorm.athena.domain.imageGroup.entity.ImageGroup;
 import goorm.athena.domain.imageGroup.service.ImageGroupService;
+import goorm.athena.global.exception.CustomException;
+import goorm.athena.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,7 +34,7 @@ public class ImageService {
         try {
             requests = nasService.saveAll(files, imageGroupId); // NAS에 이미지 저장 및 DTO 반환
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new CustomException(ErrorCode.IMAGE_UPLOAD_FAILED);
         }
         ImageGroup imageGroup = imageGroupService.getById(imageGroupId);
 
@@ -52,7 +54,7 @@ public class ImageService {
         try {
             requests = nasService.saveAll(files, imageGroup.getId());
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new CustomException(ErrorCode.IMAGE_UPLOAD_FAILED);
         }
 
         List<Image> markdownImages = new ArrayList<>();
@@ -81,7 +83,7 @@ public class ImageService {
     // 썸네일 이미지 불러오기
     public String getImage(Long imageGroupId){
         return imageRepository.findFirstImageByImageGroupId(imageGroupId)
-                .map(Image::getUrl)
+                .map(Image::getOriginalUrl)
                 .orElse("");
 
     }
@@ -96,7 +98,7 @@ public class ImageService {
     public List<String> getImageUrls(List<Image> images) {
         List<String> imageUrls = new ArrayList<>();
         for (Image image : images) {
-            imageUrls.add(image.getUrl());
+            imageUrls.add(image.getOriginalUrl());
         }
         return imageUrls;
     }
