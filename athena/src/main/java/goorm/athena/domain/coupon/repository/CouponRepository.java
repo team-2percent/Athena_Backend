@@ -14,5 +14,8 @@ public interface CouponRepository extends JpaRepository<Coupon, Long> {
     @Query("SELECT c FROM Coupon c WHERE c.startAt <= :now OR c.endAt <= :now")
     List<Coupon> findCouponsToUpdate(LocalDateTime now);
 
+    @Query("SELECT c FROM Coupon c WHERE c.couponStatus = 'IN_PROGRESS' ORDER BY c.id DESC")
+    List<Coupon> findAllInProgressCoupons();
+
     Page<Coupon> findByCouponStatus(Pageable pageable, CouponStatus status);
 }
