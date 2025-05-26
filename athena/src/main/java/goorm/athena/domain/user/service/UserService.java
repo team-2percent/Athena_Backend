@@ -52,7 +52,7 @@ public class UserService {
 
     @Transactional
     public UserUpdateResponse updateUser(ImageGroup userImageGroup, Long userId,
-                                         UserUpdateRequest request){
+                                         UserUpdateRequest request, MultipartFile file){
         User updateUser = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
@@ -62,7 +62,7 @@ public class UserService {
                 request.sellerIntroduction(),
                 request.linkUrl());
 
-     //   imageService.uploadImages(List.of(image), userImageGroup);   // 프로필 이미지 등록
+        imageService.uploadImages(List.of(file), userImageGroup.getId());   // 프로필 이미지 등록
         User savedUser = userRepository.save(updateUser);
 
         return UserMapper.toUpdateResponse(savedUser);
