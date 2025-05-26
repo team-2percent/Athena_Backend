@@ -4,6 +4,7 @@ import goorm.athena.domain.project.entity.Project;
 import goorm.athena.global.exception.CustomException;
 import goorm.athena.global.exception.ErrorCode;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Max;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -31,10 +32,10 @@ public class Product {
     @Column(length = 50)
     private String description;         // 상품 설명
 
-    @Column(length = 100000000)
+    @Max(1_000_000_000)
     private Long price;                 // 상품 가격
 
-    @Column(length = 10000)
+    @Max(50_000)
     private Long stock;                 // 상품 재고
 
     @Builder

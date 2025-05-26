@@ -9,7 +9,9 @@ import goorm.athena.domain.imageGroup.entity.QImageGroup;
 import goorm.athena.domain.project.dto.cursor.*;
 import goorm.athena.domain.project.dto.req.ProjectCursorRequest;
 import goorm.athena.domain.project.dto.res.ProjectRecentResponse;
+import goorm.athena.domain.project.entity.ApprovalStatus;
 import goorm.athena.domain.project.entity.QProject;
+import goorm.athena.domain.project.entity.Status;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -29,6 +31,8 @@ public class ProjectQueryRepository {
 
         // 커서 조건 (startAt < 커서 or (startAt == 커서 and id < 커서Id))
         BooleanBuilder builder = new BooleanBuilder();
+
+        builder.and(project.isApproved.eq(ApprovalStatus.APPROVED));
 
         if (request.cursorValue() != null && request.cursorId() != null) {
             builder.and(
@@ -67,6 +71,7 @@ public class ProjectQueryRepository {
         Long totalCount = queryFactory
                 .select(project.count())
                 .from(project)
+                .where(builder)
                 .fetchOne();
 
         // 다음 커서 계산: 마지막 프로젝트 ID를 nextCursor로 반환

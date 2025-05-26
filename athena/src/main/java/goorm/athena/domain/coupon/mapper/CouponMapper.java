@@ -1,12 +1,10 @@
 package goorm.athena.domain.coupon.mapper;
 
 import goorm.athena.domain.coupon.dto.res.CouponCreateResponse;
+import goorm.athena.domain.coupon.dto.res.CouponEventGetResponse;
 import goorm.athena.domain.coupon.dto.res.CouponGetDetailResponse;
 import goorm.athena.domain.coupon.dto.res.CouponGetResponse;
 import goorm.athena.domain.coupon.entity.Coupon;
-import org.springframework.data.domain.Page;
-
-import java.util.List;
 
 public class CouponMapper {
     public static CouponCreateResponse toCreateResponse(Coupon coupon){
@@ -47,6 +45,18 @@ public class CouponMapper {
                 coupon.getExpiresAt(),
                 coupon.getStock(),
                 coupon.getCouponStatus()
+        );
+    }
+
+    public static CouponEventGetResponse toGetEventResponse(Coupon coupon, boolean userIssued){
+        return new CouponEventGetResponse(
+                coupon.getId(),
+                coupon.getTitle(),
+                coupon.getContent(),
+                coupon.getStock(),
+                coupon.getPrice(),
+                coupon.getExpiresAt(),
+                userIssued
         );
     }
 }

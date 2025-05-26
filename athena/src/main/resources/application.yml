@@ -18,10 +18,13 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
-    show-sql: true
     properties:
       hibernate:
-        format_sql: true
+        jdbc:
+          default_batch_fetch_size: 100
+        order_inserts: true
+        order_updates: true
+
 
   kakao:
     api:
@@ -45,10 +48,18 @@ cloud:
       static: ap-northeast-2
     stack:
       auto: false
+logging:
+  level:
+    p6spy: info
 
+decorator:
+  datasource:
+    p6spy:
+      enable-logging: true
 jwt:
   secretKey: ${JWT_SECRET_KEY}
   refreshKey: ${JWT_REFRESH_KEY}
 
 nas:
   base.path: /Volumes/Data/images
+

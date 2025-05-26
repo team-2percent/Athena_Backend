@@ -25,6 +25,7 @@ repositories {
 }
 
 dependencies {
+
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
@@ -57,6 +58,15 @@ dependencies {
 	implementation 'net.coobird:thumbnailator:0.4.19'
 	implementation 'com.sksamuel.scrimage:scrimage-core:4.2.0'
 	implementation 'com.sksamuel.scrimage:scrimage-webp:4.2.0'
+	
+	// dummy
+	implementation 'net.datafaker:datafaker:2.0.1'
+	implementation 'org.springframework.boot:spring-boot-starter-jdbc'
+
+	// log
+	implementation 'com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.9.0'
+
+
 }
 
 tasks.named('test') {

@@ -10,6 +10,7 @@ import goorm.athena.domain.imageGroup.entity.QImageGroup;
 import goorm.athena.domain.project.dto.cursor.ProjectSearchCursorResponse;
 import goorm.athena.domain.project.dto.req.ProjectCursorRequest;
 import goorm.athena.domain.project.dto.res.ProjectSearchResponse;
+import goorm.athena.domain.project.entity.ApprovalStatus;
 import goorm.athena.domain.project.entity.QProject;
 import goorm.athena.domain.project.entity.SortTypeLatest;
 import goorm.athena.global.exception.CustomException;
@@ -40,6 +41,8 @@ public class ProjectSearchQueryRepository {
 
         // 커서 조건 (startAt < 커서 or (startAt == 커서 and id < 커서Id))
         BooleanBuilder builder = new BooleanBuilder();
+
+        builder.and(project.isApproved.eq(ApprovalStatus.APPROVED));
 
         if (searchTerm != null && !searchTerm.trim().isEmpty()) {
             builder.and(project.title.containsIgnoreCase(searchTerm));
@@ -79,7 +82,7 @@ public class ProjectSearchQueryRepository {
         Long totalCount = queryFactory
                 .select(project.count())
                 .from(project)
-                .where(project.title.containsIgnoreCase(searchTerm))
+                .where(builder)
                 .fetchOne();
 
         // next cursor 구하기

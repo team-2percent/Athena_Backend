@@ -4,6 +4,8 @@ import goorm.athena.domain.coupon.dto.req.CouponCreateRequest;
 import goorm.athena.global.exception.CustomException;
 import goorm.athena.global.exception.ErrorCode;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -19,14 +21,21 @@ public class Coupon {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(length = 25, nullable = false)
     private String title;
+
+    @Size(min = 10, max = 50)
     private String content;
+
+    @Max(50_000)
     private int price;
 
     private LocalDateTime startAt;
     private LocalDateTime endAt;
 
     private LocalDateTime expiresAt;
+
+    @Max(1_000_000)
     private int stock;
 
     @Enumerated(EnumType.STRING)

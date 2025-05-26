@@ -13,6 +13,7 @@ import goorm.athena.domain.project.dto.cursor.ProjectDeadlineCursorResponse;
 import goorm.athena.domain.project.dto.req.ProjectCursorRequest;
 import goorm.athena.domain.project.dto.res.ProjectCategoryResponse;
 import goorm.athena.domain.project.dto.res.ProjectDeadlineResponse;
+import goorm.athena.domain.project.entity.ApprovalStatus;
 import goorm.athena.domain.project.entity.QProject;
 import goorm.athena.domain.project.entity.SortTypeDeadline;
 import goorm.athena.domain.project.entity.SortTypeLatest;
@@ -43,6 +44,9 @@ public class ProjectFilterQueryRepository {
 
         // 커서 조건 (startAt < 커서 or (startAt == 커서 and id < 커서Id))
         BooleanBuilder builder = new BooleanBuilder();
+
+        builder.and(project.isApproved.eq(ApprovalStatus.APPROVED));
+
         if(categoryId != null) {
             builder.and(project.category.id.eq(categoryId));
         }
@@ -85,7 +89,7 @@ public class ProjectFilterQueryRepository {
         Long totalCount = queryFactory
                 .select(project.count())
                 .from(project)
-                .where(countCondition)
+                .where(builder)
                 .fetchOne();
 
         // next cursor 구하기
@@ -125,6 +129,9 @@ public class ProjectFilterQueryRepository {
         QImage image = QImage.image;
 
         BooleanBuilder builder = new BooleanBuilder();
+
+        builder.and(project.isApproved.eq(ApprovalStatus.APPROVED));
+
         builder.and(project.endAt.after(LocalDateTime.now())); // 마감되지 않은 프로젝트만
 
 

@@ -5,6 +5,7 @@ import goorm.athena.domain.category.entity.Category;
 import goorm.athena.domain.imageGroup.entity.ImageGroup;
 import goorm.athena.domain.user.entity.User;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Builder;
@@ -53,10 +54,10 @@ public class Project {
     @Column(length = 100)
     private String description;
 
-    @Column(length = 1000000000, nullable = false)
+    @Max(1_000_000_000)
     private Long goalAmount;
 
-    @Column(length = 1000000000, nullable = false)
+    @Max(1_000_000_000)
     private Long totalAmount;
 
     @Column(columnDefinition = "TEXT")
