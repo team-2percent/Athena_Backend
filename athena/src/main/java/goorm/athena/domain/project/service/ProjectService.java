@@ -64,7 +64,7 @@ public class ProjectService {
      * [프로젝트 등록 Method]
      */
     @Transactional
-    public ProjectIdResponse createProject(ProjectCreateRequest request) throws IOException {
+    public ProjectIdResponse createProject(ProjectCreateRequest request){
         ImageGroup imageGroup = imageGroupService.getById(request.imageGroupId());
         User seller = userService.getUser(request.sellerId());
         Category category = categoryService.getCategoryById(request.categoryId());
@@ -76,7 +76,11 @@ public class ProjectService {
 
         String convertedMarkdown = request.contentMarkdown();
         if (request.contentMarkdown() != null) {
-            convertedMarkdown = getConvertedMarkdown(request.markdownImages(), imageGroup, request.contentMarkdown());   // 마크다운 변환
+            try {
+                convertedMarkdown = getConvertedMarkdown(request.markdownImages(), imageGroup, request.contentMarkdown());   // 마크다운 변환
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
 
         Project project = ProjectMapper.toEntity(request, seller, imageGroup, category, bankAccount, platformPlan, convertedMarkdown);  // 새 프로젝트 생성
@@ -149,13 +153,18 @@ public class ProjectService {
                 request.shippedAt()
         );
 
-        // 상품 업데이트 (삭제 후 다시 등록)
+        // 상품 및 이미지 업데이트 (PUT)
         List<ProductRequest> productUpdateRequests = request.products();
         deleteProducts(project);
         createProducts(productUpdateRequests, project);
 
-        // 이미지 업데이트
-        // imageService.updateImages(project.getImageGroup(), imageRequests);
+        List<MultipartFile> images = request.images();
+        imageService.deleteImages(project.getImageGroup());
+        try {
+            imageService.uploadImages(images, project.getImageGroup().getId());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 

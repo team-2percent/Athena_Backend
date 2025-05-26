@@ -4,6 +4,7 @@ import goorm.athena.domain.product.dto.req.ProductRequest;
 import jakarta.persistence.Column;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -27,6 +28,7 @@ public record ProjectUpdateRequest (
         LocalDateTime endAt,
         LocalDateTime shippedAt,
 
-        List<ProductRequest> products   // 상품 리스트
+        List<ProductRequest> products,  // 상품 리스트
+        List<MultipartFile> images      // 이미지 리스트
 ){
 }

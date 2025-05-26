@@ -2,7 +2,6 @@ package goorm.athena.domain.project.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import goorm.athena.domain.image.dto.req.ImageUpdateRequest;
 import goorm.athena.domain.imageGroup.entity.ImageGroup;
 import goorm.athena.domain.imageGroup.entity.Type;
 import goorm.athena.domain.imageGroup.service.ImageGroupService;
@@ -24,8 +23,6 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -47,7 +44,7 @@ public class ProjectControllerImpl implements ProjectController {
 
     // 프로젝트 생성
     @Override
-    public ResponseEntity<ProjectIdResponse> createProject(@RequestBody ProjectCreateRequest request) throws IOException {
+    public ResponseEntity<ProjectIdResponse> createProject(@RequestBody ProjectCreateRequest request) {
         ProjectIdResponse response = projectService.createProject(request); // 프로젝트 생성 로직
         return ResponseEntity.ok(response);
     }
@@ -64,9 +61,7 @@ public class ProjectControllerImpl implements ProjectController {
     @Override
     public ResponseEntity<Void> updateProject(
             @PathVariable Long projectId,
-            @RequestPart("projectUpdateRequest") ProjectUpdateRequest projectUpdateRequest,
-            @RequestPart(value = "images", required = false) List<ImageUpdateRequest> imageUpdateRequests){
-        // ProjectUpdateRequest projectUpdateRequest = convertJsonToDto(projectUpdateRequestJson);
+            @RequestPart("projectUpdateRequest") ProjectUpdateRequest projectUpdateRequest){
         projectService.updateProject(projectId, projectUpdateRequest);
         return ResponseEntity.ok().build();
     }

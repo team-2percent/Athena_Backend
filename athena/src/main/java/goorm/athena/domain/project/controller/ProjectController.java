@@ -1,6 +1,5 @@
 package goorm.athena.domain.project.controller;
 
-import goorm.athena.domain.image.dto.req.ImageUpdateRequest;
 import goorm.athena.domain.product.dto.res.ProductResponse;
 import goorm.athena.domain.project.dto.cursor.*;
 import goorm.athena.domain.project.dto.req.ProjectCreateRequest;
@@ -62,8 +61,7 @@ public interface ProjectController {
     @ApiResponse(responseCode = "200", description = "프로젝트 수정 성공")
     @PutMapping(value = "/{projectId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     ResponseEntity<Void> updateProject(@PathVariable Long projectId,
-                                       @RequestPart("projectUpdateRequest") ProjectUpdateRequest projectUpdateRequest,
-                                       @RequestPart(value = "images", required = false) List<ImageUpdateRequest> imageUpdateRequests);
+                                       @RequestPart("projectUpdateRequest") ProjectUpdateRequest projectUpdateRequest);
 
     @Operation(summary = "프로젝트 삭제 API", description = "프로젝트를 영구적으로 삭제합니다.<br>" +
             "삭제한 프로젝트는 다시 되돌릴 수 없습니다.")
