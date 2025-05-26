@@ -20,7 +20,8 @@ configurations {
 }
 
 repositories {
-	mavenCentral()
+    mavenCentral()
+    maven { url 'https://jitpack.io' }
 }
 
 dependencies {
@@ -54,6 +55,8 @@ dependencies {
 
 	// Image
 	implementation 'net.coobird:thumbnailator:0.4.19'
+	implementation 'com.sksamuel.scrimage:scrimage-core:4.2.0'
+	implementation 'com.sksamuel.scrimage:scrimage-webp:4.2.0'
 }
 
 tasks.named('test') {
