@@ -28,7 +28,6 @@ public record ProjectUpdateRequest (
         LocalDateTime endAt,
         LocalDateTime shippedAt,
 
-        List<ProductRequest> products,  // 상품 리스트
-        List<MultipartFile> images      // 이미지 리스트
+        List<ProductRequest> products  // 상품 리스트
 ){
 }

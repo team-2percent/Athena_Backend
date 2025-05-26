@@ -22,6 +22,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -44,7 +45,8 @@ public class ProjectControllerImpl implements ProjectController {
 
     // 프로젝트 생성
     @Override
-    public ResponseEntity<ProjectIdResponse> createProject(@RequestBody ProjectCreateRequest request) {
+    public ResponseEntity<ProjectIdResponse> createProject(@RequestPart ProjectCreateRequest request,
+                                                           @RequestPart(value = "files", required = false) List<MultipartFile> markdownFiles) {
         ProjectIdResponse response = projectService.createProject(request); // 프로젝트 생성 로직
         return ResponseEntity.ok(response);
     }
@@ -61,19 +63,11 @@ public class ProjectControllerImpl implements ProjectController {
     @Override
     public ResponseEntity<Void> updateProject(
             @PathVariable Long projectId,
-            @RequestPart("projectUpdateRequest") ProjectUpdateRequest projectUpdateRequest){
-        projectService.updateProject(projectId, projectUpdateRequest);
+            @RequestPart("projectUpdateRequest") ProjectUpdateRequest projectUpdateRequest,
+            @RequestPart(value = "files", required = false) List<MultipartFile> files,
+            @RequestPart(value = "markdownFiles", required = false) List<MultipartFile> markdownFiles){
+        projectService.updateProject(projectId, projectUpdateRequest, files);
         return ResponseEntity.ok().build();
-    }
-
-    // String -> JSON 처리
-    // Swagger test에서만 문제가 있는 부분이라면 추후 삭제 예정
-    private ProjectUpdateRequest convertJsonToDto(String json) {
-        try {
-            return objectMapper.readValue(json, ProjectUpdateRequest.class);
-        } catch (JsonProcessingException e) {
-            throw new CustomException(ErrorCode.INVALID_JSON_FORMAT);
-        }
     }
 
     // 프로젝트 삭제

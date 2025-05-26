@@ -10,7 +10,7 @@ public class ImageMapper {
         return Image.builder()
                 .imageGroup(imageGroup)
                 .fileName(request.fileName())
-                .url(request.url())
+                .originalUrl(request.originalUrl())
                 .fileType(request.fileType())
                 .imageIndex(imageIndex)
                 .build();

@@ -1,6 +1,5 @@
 package goorm.athena.domain.image.controller;
 
-import goorm.athena.domain.image.dto.res.ImageCreateResponse;
 import goorm.athena.domain.project.dto.res.ProjectIdResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
