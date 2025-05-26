@@ -72,7 +72,7 @@ public class ProjectSearchQueryRepository {
                 .leftJoin(project.imageGroup, imageGroup)
                 .leftJoin(image).on(
                         image.imageGroup.id.eq(imageGroup.id)
-                                .and(image.isDefault.isTrue())
+                                .and(image.imageIndex.eq(1L))
                 )
                 .where(builder)
                 .orderBy(ProjectQueryHelper.getSortOrdersLatest(sortType, project).toArray(new OrderSpecifier[0]))

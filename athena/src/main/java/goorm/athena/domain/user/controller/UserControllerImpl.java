@@ -37,9 +37,6 @@ public class UserControllerImpl implements UserController {
     private final UserService userService;
     private final RefreshTokenService refreshTokenService;
     private final ImageGroupService imageGroupService;
-    private final ImageService imageService;
-    private final S3Service s3Service;
-    private final UserCouponService userCouponService;
 
     @Override
     @PostMapping
@@ -53,11 +50,12 @@ public class UserControllerImpl implements UserController {
     @Override
     @PutMapping
     public ResponseEntity<UserUpdateResponse> updateUser(@CheckLogin LoginUserRequest loginUserRequest,
-                                                         @RequestBody UserUpdateRequest request){
+                                                         @RequestPart UserUpdateRequest request,
+                                                         @RequestPart(value = "files", required = false) MultipartFile file){
         // User <-> ImageGroup 1:1 매핑되도록 생성
         ImageGroup userImageGroup = imageGroupService.createImageGroup(Type.USER);
 
-        UserUpdateResponse response = userService.updateUser(userImageGroup, loginUserRequest.userId(), request);
+        UserUpdateResponse response = userService.updateUser(userImageGroup, loginUserRequest.userId(), request, file);
         return ResponseEntity.ok(response);
     }
 

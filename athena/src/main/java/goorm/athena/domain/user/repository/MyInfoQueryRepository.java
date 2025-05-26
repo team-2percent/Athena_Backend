@@ -129,7 +129,7 @@ public class MyInfoQueryRepository {
                 .leftJoin(project.imageGroup, imageGroup)
                 .leftJoin(image).on(
                         image.imageGroup.eq(imageGroup)
-                                .and(image.isDefault.isTrue())
+                                .and(image.imageIndex.eq(1L))
                 )
                 .where(
                         order.user.id.eq(userId)

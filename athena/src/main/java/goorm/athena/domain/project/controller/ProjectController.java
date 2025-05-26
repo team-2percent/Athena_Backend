@@ -1,6 +1,5 @@
 package goorm.athena.domain.project.controller;
 
-import goorm.athena.domain.image.dto.req.ImageUpdateRequest;
 import goorm.athena.domain.product.dto.res.ProductResponse;
 import goorm.athena.domain.project.dto.cursor.*;
 import goorm.athena.domain.project.dto.req.ProjectCreateRequest;
@@ -20,7 +19,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 
 import java.util.List;
@@ -37,8 +38,9 @@ public interface ProjectController {
                 "프로젝트를 생성하기 위해 관련 정보를 모두 입력해야 합니다.")
     @ApiResponse(responseCode = "200", description = "프로젝트 생성 성공",
         content = @Content(schema = @Schema(implementation = ProjectIdResponse.class)))
-    @PostMapping
-    ResponseEntity<ProjectIdResponse> createProject(@RequestBody ProjectCreateRequest request);
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    ResponseEntity<ProjectIdResponse> createProject(@RequestPart ProjectCreateRequest request,
+                                                    @RequestPart(value = "files", required = false) List<MultipartFile> markdownFiles) throws IOException;
 
     @Operation(
             summary = "프로젝트별 상품 목록 조회 API",
@@ -62,7 +64,8 @@ public interface ProjectController {
     @PutMapping(value = "/{projectId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     ResponseEntity<Void> updateProject(@PathVariable Long projectId,
                                        @RequestPart("projectUpdateRequest") ProjectUpdateRequest projectUpdateRequest,
-                                       @RequestPart(value = "images", required = false) List<ImageUpdateRequest> imageUpdateRequests);
+                                       @RequestPart(value = "files", required = false) List<MultipartFile> files,
+                                       @RequestPart(value = "markdownFiles", required = false) List<MultipartFile> markdownFiles);
 
     @Operation(summary = "프로젝트 삭제 API", description = "프로젝트를 영구적으로 삭제합니다.<br>" +
             "삭제한 프로젝트는 다시 되돌릴 수 없습니다.")

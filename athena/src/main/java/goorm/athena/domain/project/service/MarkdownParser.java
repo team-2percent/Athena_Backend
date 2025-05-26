@@ -31,23 +31,21 @@ public class MarkdownParser {
     }
 
     /**
-     * 마크다운 내 임시 이미지 경로들을 S3 URL로 치환
-     * @param markdown 원본 마크다운
-     * @param imagePathToS3Url 이미지 경로 → S3 URL 매핑
-     * @return 치환된 마크다운
+     * 마크다운 내 임시 이미지 경로들을 URL로 치환
      */
-    public String replaceMarkdown(String markdown, Map<String, String> imagePathToS3Url) {
-        Matcher matcher = MARKDOWN_IMAGE_PATTERN.matcher(markdown);
-        StringBuffer buffer = new StringBuffer();
-
-        while (matcher.find()) {
-            String originalPath = matcher.group(1);                                     // 마크다운에 있는 URL
-            String newUrl = imagePathToS3Url.getOrDefault(originalPath, originalPath);  // S3에 없는 이미지 경로일 경우, 유지
-            matcher.appendReplacement(buffer, Matcher.quoteReplacement("![](" + newUrl + ")")); // URL 치환
+    public String replaceMarkdown(String markdown, List<String> originalPaths, List<String> newUrls) {
+        if (originalPaths.size() != newUrls.size()) {
+            throw new IllegalArgumentException("마크다운 이미지 개수와 업로드된 이미지 개수가 다릅니다.");
         }
 
-        matcher.appendTail(buffer);     // 마지막 매칭 이후 남아 있는 문자열 전부 추가
-        return buffer.toString();
+        String convertedMarkdown = markdown;
+        for (int i = 0; i < originalPaths.size(); i++) {
+            String oldUrl = originalPaths.get(i);
+            String newUrl = newUrls.get(i);
+            convertedMarkdown = convertedMarkdown.replace("](" + oldUrl + ")", "](" + newUrl + ")");
+        }
+
+        return convertedMarkdown;
     }
 
 }

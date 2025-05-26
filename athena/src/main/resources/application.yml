@@ -3,6 +3,8 @@ spring:
   servlet:
     multipart:
       enabled: true
+      max-file-size: 20MB
+      max-request-size: 50MB
 
   config:
     import: optional:file:.env[.properties]
@@ -58,4 +60,6 @@ jwt:
   secretKey: ${JWT_SECRET_KEY}
   refreshKey: ${JWT_REFRESH_KEY}
 
+nas:
+  base.path: /Volumes/Data/images
 

@@ -20,7 +20,8 @@ configurations {
 }
 
 repositories {
-	mavenCentral()
+    mavenCentral()
+    maven { url 'https://jitpack.io' }
 }
 
 dependencies {
@@ -53,6 +54,11 @@ dependencies {
 	annotationProcessor 'jakarta.annotation:jakarta.annotation-api'
 	annotationProcessor 'jakarta.persistence:jakarta.persistence-api'
 
+	// Image
+	implementation 'net.coobird:thumbnailator:0.4.19'
+	implementation 'com.sksamuel.scrimage:scrimage-core:4.2.0'
+	implementation 'com.sksamuel.scrimage:scrimage-webp:4.2.0'
+	
 	// dummy
 	implementation 'net.datafaker:datafaker:2.0.1'
 	implementation 'org.springframework.boot:spring-boot-starter-jdbc'
