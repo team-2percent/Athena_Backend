@@ -40,7 +40,7 @@ public interface ProjectController {
         content = @Content(schema = @Schema(implementation = ProjectIdResponse.class)))
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     ResponseEntity<ProjectIdResponse> createProject(@RequestPart ProjectCreateRequest request,
-                                                    @RequestPart(value = "files", required = false) List<MultipartFile> markdownFiles) throws IOException;
+                                                    @RequestPart(value = "markdownFiles", required = false) List<MultipartFile> markdownFiles) throws IOException;
 
     @Operation(
             summary = "프로젝트별 상품 목록 조회 API",

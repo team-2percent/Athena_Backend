@@ -51,7 +51,7 @@ public class UserControllerImpl implements UserController {
     @PutMapping
     public ResponseEntity<UserUpdateResponse> updateUser(@CheckLogin LoginUserRequest loginUserRequest,
                                                          @RequestPart UserUpdateRequest request,
-                                                         @RequestPart(value = "files", required = false) MultipartFile file){
+                                                         @RequestPart(value = "file", required = false) MultipartFile file){
         // User <-> ImageGroup 1:1 매핑되도록 생성
         ImageGroup userImageGroup = imageGroupService.createImageGroup(Type.USER);
 

@@ -46,7 +46,7 @@ public class ProjectControllerImpl implements ProjectController {
     // 프로젝트 생성
     @Override
     public ResponseEntity<ProjectIdResponse> createProject(@RequestPart ProjectCreateRequest request,
-                                                           @RequestPart(value = "files", required = false) List<MultipartFile> markdownFiles) {
+                                                           @RequestPart(value = "markdownFiles", required = false) List<MultipartFile> markdownFiles) {
         ProjectIdResponse response = projectService.createProject(request); // 프로젝트 생성 로직
         return ResponseEntity.ok(response);
     }
