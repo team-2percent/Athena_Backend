@@ -6,14 +6,11 @@ import goorm.athena.domain.image.mapper.ImageMapper;
 import goorm.athena.domain.image.repository.ImageRepository;
 import goorm.athena.domain.imageGroup.entity.ImageGroup;
 import goorm.athena.domain.imageGroup.service.ImageGroupService;
-import goorm.athena.global.exception.CustomException;
-import goorm.athena.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,11 +28,7 @@ public class ImageService {
     @Transactional
     public void uploadImages(List<MultipartFile> files, Long imageGroupId) {
         List<ImageCreateRequest> requests;
-        try {
-            requests = nasService.saveAll(files, imageGroupId); // NAS에 이미지 저장 및 DTO 반환
-        } catch (IOException e) {
-            throw new CustomException(ErrorCode.IMAGE_UPLOAD_FAILED);
-        }
+        requests = nasService.saveAll(files, imageGroupId); // NAS에 이미지 저장 및 DTO 반환
         ImageGroup imageGroup = imageGroupService.getById(imageGroupId);
 
         List<Image> images = new ArrayList<>();
@@ -51,11 +44,7 @@ public class ImageService {
     @Transactional
     public List<String> uploadMarkdownImages(List<MultipartFile> files, ImageGroup imageGroup) {
         List<ImageCreateRequest> requests;
-        try {
-            requests = nasService.saveAll(files, imageGroup.getId());
-        } catch (IOException e) {
-            throw new CustomException(ErrorCode.IMAGE_UPLOAD_FAILED);
-        }
+        requests = nasService.saveAll(files, imageGroup.getId());
 
         List<Image> markdownImages = new ArrayList<>();
         for (ImageCreateRequest request : requests) {

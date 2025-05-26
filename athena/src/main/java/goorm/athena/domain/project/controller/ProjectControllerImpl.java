@@ -16,8 +16,6 @@ import goorm.athena.domain.project.dto.res.*;
 import goorm.athena.domain.project.entity.SortTypeDeadline;
 import goorm.athena.domain.project.entity.SortTypeLatest;
 import goorm.athena.domain.project.service.ProjectService;
-import goorm.athena.global.exception.CustomException;
-import goorm.athena.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;

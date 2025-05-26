@@ -6,13 +6,13 @@ import goorm.athena.domain.image.dto.req.ImageCreateRequest;
 import goorm.athena.global.exception.CustomException;
 import goorm.athena.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import net.coobird.thumbnailator.Thumbnails;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.awt.*;
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class NasService {
@@ -38,7 +39,7 @@ public class NasService {
     /**
      * [이미지 업로드 Method]
      */
-    public List<ImageCreateRequest> saveAll(List<MultipartFile> files, Long imageGroupId) throws IOException {
+    public List<ImageCreateRequest> saveAll(List<MultipartFile> files, Long imageGroupId) {
         List<ImageCreateRequest> results = new ArrayList<>();
         for (MultipartFile file : files) {
             results.add(save(file, imageGroupId));
@@ -51,15 +52,21 @@ public class NasService {
      *  단일 이미지 저장 method
      *  MultipartFile -> ImageCreateDto
      */
-    public ImageCreateRequest save(MultipartFile file, Long imageGroupId) throws IOException {
+    public ImageCreateRequest save(MultipartFile file, Long imageGroupId)  {
         validateFileExtension(file.getOriginalFilename());
         String fileName = createFileName();                     // 고유한 파일 이름 생성
         File originalFile = new File(imagePath, fileName);
 
 
         // 원본 WebP 파일 저장
-        ImmutableImage image = ImmutableImage.loader().fromStream(file.getInputStream());
-        image.output(WebpWriter.DEFAULT, originalFile);
+        ImmutableImage image = null;
+        try {
+            image = ImmutableImage.loader().fromStream(file.getInputStream());
+            image.output(WebpWriter.DEFAULT, originalFile);
+        } catch (IOException e) {
+            throw new CustomException(ErrorCode.ORIGIN_IMAGE_UPLOAD_FAILED);
+        }
+
 
         for (var entry : SIZES.entrySet()) {
             // 리사이징된 파일 이름 지정
@@ -68,7 +75,11 @@ public class NasService {
             File resizedFile = new File(imagePath, resizedFileName);
 
             // 리사이즈 후 저장
-            image.fit(dim.width, dim.height).output(WebpWriter.DEFAULT, resizedFile);
+            try {
+                image.fit(dim.width, dim.height).output(WebpWriter.DEFAULT, resizedFile);
+            } catch (IOException e) {
+                throw new CustomException(ErrorCode.IMAGES_UPLOAD_FAILED);
+            }
         }
 
         String imageUrl = IMAGE_DOMAIN + "/" + fileName;  // 이미지 URL

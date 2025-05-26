@@ -21,7 +21,8 @@ public enum ErrorCode {
 
     // 이미지
     IMAGE_GROUP_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 이미지 그룹 ID가 존재하지 않습니다."),
-    IMAGE_UPLOAD_FAILED(HttpStatus.SERVICE_UNAVAILABLE, "이미지 업로드에 실패했습니다."),
+    ORIGIN_IMAGE_UPLOAD_FAILED(HttpStatus.SERVICE_UNAVAILABLE, "원본 이미지 업로드에 실패했습니다."),
+    IMAGES_UPLOAD_FAILED(HttpStatus.SERVICE_UNAVAILABLE, "리사이징 이미지 업로드에 실패했습니다."),
     IMAGE_DELETE_FAILED(HttpStatus.SERVICE_UNAVAILABLE, "이미지 삭제에 실패했습니다."),
     INVALID_IMAGE_EXTENSION(HttpStatus.BAD_REQUEST, "이미지 확장자가 올바르지 않습니다."),
 
