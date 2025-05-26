@@ -1,5 +1,7 @@
 package goorm.athena.domain.dummy.service;
 
+import goorm.athena.domain.coupon.repository.CouponRepository;
+import goorm.athena.domain.dummy.dto.UserInfo;
 import goorm.athena.domain.project.entity.PlanName;
 import goorm.athena.domain.project.entity.PlatformPlan;
 import goorm.athena.domain.project.repository.PlatformPlanRepository;
@@ -13,16 +15,20 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.PreparedStatement;
 import java.util.*;
+import java.util.stream.IntStream;
 
 @Service
 @RequiredArgsConstructor
-public class DummyService {
+public class DummyUserService {
 
     private final JdbcTemplate jdbcTemplate;
     private final PlatformPlanRepository platformPlanRepository;
+    private final CouponRepository couponRepository;
 
     private final Faker fakerKo = new Faker(new Locale("ko"));
     private final Faker fakerEn = new Faker(Locale.ENGLISH);
+
+    private static final String ACCOUNT_FORMAT = "%04d-%02d-%07d";
 
     @Transactional
     public void generateDummyUsers(int count) {
@@ -34,26 +40,21 @@ public class DummyService {
         List<UserInfo> users = new ArrayList<>();
 
         if (!adminExists) {
-            users.add(generateUserInfo("admin@admin.com", "admin", "admin", Role.ROLE_ADMIN));
+            users.add(new UserInfo("admin@admin.com", "admin", "admin", Role.ROLE_ADMIN.name(), "관리자입니다", "https://admin.com"));
         }
 
-        for (int i = 0; i < actualCount; i++) {
-            String email = generateEmail();
-            String password = "123";
-            String nickname = fakerKo.name().lastName() + fakerKo.name().firstName();
-            users.add(generateUserInfo(email, password, nickname, Role.ROLE_USER));
-        }
+        IntStream.range(0, actualCount).forEach(i -> users.add(createFakeUserInfo(Role.ROLE_USER)));
 
         List<Long> userIds = insertUsersInBulk(users);
         insertBankAccounts(userIds, users.stream().map(UserInfo::nickname).toList());
         insertDeliveryInfos(userIds);
     }
 
-    private UserInfo generateUserInfo(String email, String password, String nickname, Role role) {
+    private UserInfo createFakeUserInfo(Role role) {
         return new UserInfo(
-                email,
-                password,
-                nickname,
+                generateEmail(),
+                "123",
+                fakerKo.name().lastName() + fakerKo.name().firstName(),
                 role.name(),
                 fakerKo.lorem().sentence(10),
                 fakerEn.internet().url()
@@ -65,7 +66,7 @@ public class DummyService {
     }
 
     private String generateFakeAccountNumber() {
-        return String.format("%04d-%02d-%07d",
+        return String.format(ACCOUNT_FORMAT,
                 fakerKo.number().numberBetween(1000, 9999),
                 fakerKo.number().numberBetween(10, 99),
                 fakerKo.number().numberBetween(1000000, 9999999)
@@ -149,7 +150,7 @@ public class DummyService {
 
     private void insertPlatformPlansIfNotExists() {
         if (!platformPlanRepository.existsByName(PlanName.BASIC)) {
-            platformPlanRepository.saveAll(List.of(
+            List<PlatformPlan> plans = List.of(
                     PlatformPlan.builder()
                             .name(PlanName.BASIC)
                             .platformFeeRate(0.05)
@@ -171,17 +172,9 @@ public class DummyService {
                             .vatRate(0.10)
                             .description("프리미엄 요금제 - 전체 기능 제공 및 우선 지원")
                             .build()
-            ));
-            System.out.println("✅ PlatformPlan 초기 데이터 삽입 완료");
+            );
+            platformPlanRepository.saveAll(plans);
+            System.out.println(" PlatformPlan 초기 데이터 삽입 완료");
         }
     }
-
-    private record UserInfo(
-            String email,
-            String password,
-            String nickname,
-            String role,
-            String introduction,
-            String link
-    ) {}
 }
