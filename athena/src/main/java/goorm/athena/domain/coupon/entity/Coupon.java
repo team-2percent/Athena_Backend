@@ -74,4 +74,5 @@ public class Coupon {
     public void expired(){
         this.couponStatus = CouponStatus.ENDED;
     }
+
 }
