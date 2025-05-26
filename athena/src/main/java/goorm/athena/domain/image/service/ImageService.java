@@ -34,6 +34,7 @@ public class ImageService {
         try {
             requests = nasService.saveAll(files, imageGroupId); // NAS에 이미지 저장 및 DTO 반환
         } catch (IOException e) {
+            System.out.println(e);
             throw new CustomException(ErrorCode.IMAGE_UPLOAD_FAILED);
         }
         ImageGroup imageGroup = imageGroupService.getById(imageGroupId);
