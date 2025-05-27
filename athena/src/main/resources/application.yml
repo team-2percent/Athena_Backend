@@ -61,5 +61,5 @@ jwt:
   refreshKey: ${JWT_REFRESH_KEY}
 
 nas:
-  base.path: /Volumes/Data/images
+  base.path: /image_data
 

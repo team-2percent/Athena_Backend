@@ -44,6 +44,8 @@ services:
       JWT_REFRESH_KEY: ${JWT_REFRESH_KEY}
     ports:
       - "8080:8080"
+    volumes:
+      - image_data:/Volumes/Data/images
     networks:
       - backend_network
 
