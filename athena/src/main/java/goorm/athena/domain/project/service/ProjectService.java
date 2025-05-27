@@ -64,7 +64,7 @@ public class ProjectService {
      * [프로젝트 등록 Method]
      */
     @Transactional
-    public ProjectIdResponse createProject(ProjectCreateRequest request){
+    public ProjectIdResponse createProject(ProjectCreateRequest request, List<MultipartFile> markdownFiles){
         ImageGroup imageGroup = imageGroupService.getById(request.imageGroupId());
         User seller = userService.getUser(request.sellerId());
         Category category = categoryService.getCategoryById(request.categoryId());
@@ -73,19 +73,17 @@ public class ProjectService {
         PlatformPlan platformPlan = platformPlanRepository.findByName(planName);
 
         validateProduct(request);   // 프로젝트 등록 시 검증
+
+        // 마크다운에 로컬 이미지가 삽입된 경우 이를 이미지 URL로 치환
         String convertedMarkdown = request.contentMarkdown();
-
-        /*
-
-        if (request.contentMarkdown() != null) {
+        if (!markdownFiles.isEmpty()) {
             try {
-                convertedMarkdown = getConvertedMarkdown(request.markdownImages(), imageGroup, request.contentMarkdown());   // 마크다운 변환
+                convertedMarkdown = getConvertedMarkdown(markdownFiles, imageGroup, request.contentMarkdown());
             } catch (IOException e) {
-                throw new CustomException(ErrorCode.IMAGE_UPLOAD_FAILED);
+                throw new RuntimeException(e);
             }
-        }
-        */
 
+        }
 
         Project project = ProjectMapper.toEntity(request, seller, imageGroup, category, bankAccount, platformPlan, convertedMarkdown);  // 새 프로젝트 생성
         Project savedProject = projectRepository.save(project);                                                                         // 프로젝트 저장
@@ -107,14 +105,6 @@ public class ProjectService {
         }
     }
 
-    // 기존 마크다운 -> URL 치환 마크다운
-    private String getConvertedMarkdown(List<MultipartFile> images, ImageGroup imageGroup, String markdown) throws IOException {
-        List<String> imagePaths = markdownParser.extractImagePaths(markdown);           // 마크다운 내 url 추출
-        List<String> realUrls = imageService.uploadMarkdownImages(images, imageGroup);  // 이미지 저장 및 이미지 서버 url 반환
-
-        return markdownParser.replaceMarkdown(markdown, imagePaths, realUrls);
-    }
-
     // 프로젝트 등록 검증
     private void validateProduct(ProjectCreateRequest request) {
         LocalDateTime now = LocalDateTime.now();
@@ -134,16 +124,33 @@ public class ProjectService {
         }
     }
 
+    // 기존 마크다운 -> URL 치환 마크다운
+    private String getConvertedMarkdown(List<MultipartFile> markdownFiles, ImageGroup imageGroup, String markdown) throws IOException {
+        List<String> imagePaths = markdownParser.extractImagePaths(markdown);                   // 마크다운 내 url 추출
+        List<String> realUrls = imageService.uploadMarkdownImages(markdownFiles, imageGroup);   // 이미지 저장 및 이미지 서버 url 반환
+
+        return markdownParser.replaceMarkdown(markdown, imagePaths, realUrls);
+    }
+
     /**
      * [프로젝트 수정 Method]
      */
     @Transactional
-    public void updateProject(Long projectId, ProjectUpdateRequest request, List<MultipartFile> files) {
+    public void updateProject(Long projectId, ProjectUpdateRequest request, List<MultipartFile> files, List<MultipartFile> markdownFiles) {
         Project project = getById(projectId);
         Category category = categoryService.getCategoryById(request.categoryId());
         BankAccount bankAccount = bankAccountService.getPrimaryAccount(request.bankAccountId());
 
-        // 추후 마크다운에서 수정된 이미지 추적하는 코드 추가
+        // 마크다운에 로컬 이미지가 삽입된 경우 이를 이미지 URL로 치환
+        String convertedMarkdown = request.contentMarkdown();
+        if (!markdownFiles.isEmpty()) {
+            try {
+                convertedMarkdown = getConvertedMarkdown(markdownFiles, project.getImageGroup(), request.contentMarkdown());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+
+        }
 
         project.update(
                 category,
@@ -151,7 +158,7 @@ public class ProjectService {
                 request.title(),
                 request.description(),
                 request.goalAmount(),
-                request.contentMarkdown(),
+                convertedMarkdown,
                 request.startAt(),
                 request.endAt(),
                 request.shippedAt()
