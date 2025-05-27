@@ -52,6 +52,8 @@ services:
 volumes:
   mysql_data:
     driver: local
+  image_data:
+    driver: local
 
 networks:
   backend_network:
