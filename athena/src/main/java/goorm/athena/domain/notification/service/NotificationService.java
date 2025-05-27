@@ -39,22 +39,22 @@ public class NotificationService {
   // 결제 이벤트 알림 (구매자 + 판매자)
   public void notifyPayment(Long buyerId, Long sellerId) {
     // 구매자: 결제 완료
-    notify(buyerId, NotificationType.PROJECT_SOLD, "/my/order");
+    notify(buyerId, NotificationType.PROJECT_SOLD, "/my");
     // 판매자: 주문 알림
-    notify(sellerId, NotificationType.ORDERED, "/my/project");
+    notify(sellerId, NotificationType.ORDERED, "/my");
   }
 
   @Transactional
   // 후기 등록 알림 (판매자)
   public void notifyReview(Long sellerId, Long projectId) {
-    notify(sellerId, NotificationType.REVIEW, "/project" + projectId + "/review");
+    notify(sellerId, NotificationType.REVIEW, "/project/" + projectId);
   }
 
   @Transactional
   // 쿠폰 발행 알림 (전체)
   public void notifyCouponToAll(List<Long> userIds, String couponName) {
     for (Long userId : userIds) {
-      notify(userId, NotificationType.COUPON, "/my/coupon", couponName);
+      notify(userId, NotificationType.COUPON, "");
     }
   }
 

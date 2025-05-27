@@ -141,6 +141,9 @@ public class ProjectService {
         Category category = categoryService.getCategoryById(request.categoryId());
         BankAccount bankAccount = bankAccountService.getPrimaryAccount(request.bankAccountId());
 
+        // 마크다운 이미지, 대표 이미지 PUT 작업을 위해서 이미지 미리 전체 삭제
+        imageService.deleteImages(project.getImageGroup());
+        
         // 마크다운에 로컬 이미지가 삽입된 경우 이를 이미지 URL로 치환
         String convertedMarkdown = request.contentMarkdown();
         if (!markdownFiles.isEmpty()) {
@@ -169,7 +172,6 @@ public class ProjectService {
         deleteProducts(project);
         createProducts(productUpdateRequests, project);
 
-        imageService.deleteImages(project.getImageGroup());
         imageService.uploadImages(files, project.getImageGroup().getId());
     }
 
