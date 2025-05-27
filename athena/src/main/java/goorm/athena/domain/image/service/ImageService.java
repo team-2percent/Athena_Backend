@@ -97,8 +97,8 @@ public class ImageService {
      */
     private String getFullUrl(String path) {
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-        String scheme = attributes.getRequest().getScheme();
         String domain = attributes.getRequest().getServerName();
+        String scheme = "localhost".equals(domain) ? "http" : "https";
         int port = attributes.getRequest().getServerPort();
         boolean isDefaultPort = port == 80 || port == 443;
         return scheme + "://" + domain + (isDefaultPort ? "" : ":" + port) + path;
