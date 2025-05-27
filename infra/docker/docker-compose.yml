@@ -45,14 +45,12 @@ services:
     ports:
       - "8080:8080"
     volumes:
-      - image_data:/Volumes/Data/images
+      - /Volumes/Data/images:/Volumes/Data/images
     networks:
       - backend_network
 
 volumes:
   mysql_data:
-    driver: local
-  image_data:
     driver: local
 
 networks:
