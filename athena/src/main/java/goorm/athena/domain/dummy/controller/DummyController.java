@@ -12,4 +12,8 @@ public interface DummyController {
     @Operation(summary = "더미 유저 생성", description = "입력된 숫자만큼 유저/계좌/배송지 더미 데이터를 생성합니다.")
     @PostMapping("/api/dev/dummy-users")
     ResponseEntity<String> createDummyUsers(@RequestParam(defaultValue = "10") int count);
+
+    @Operation(summary = "더미 쿠폰 생성", description = "입력된 숫자만큼 쿠폰 더미 데이터를 생성합니다.")
+    @PostMapping("/api/dev/dummy-coupons")
+    ResponseEntity<String> generateCoupons(@RequestParam(defaultValue = "10") int count);
 }
