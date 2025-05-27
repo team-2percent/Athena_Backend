@@ -14,6 +14,7 @@ public record MyProjectScrollResponse(
             boolean isCompleted,
             LocalDateTime createdAt,
             LocalDateTime endAt,
-            Long achievementRate
+            Long achievementRate,
+            String imageUrl
     ) {}
 }

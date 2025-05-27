@@ -40,6 +40,8 @@ public class MyInfoQueryRepository {
             int pageSize
     ) {
         QProject project = QProject.project;
+        QImage image = QImage.image;
+        QImageGroup imageGroup = QImageGroup.imageGroup;
 
         BooleanBuilder whereBuilder = new BooleanBuilder()
                 .and(project.seller.id.eq(userId));
@@ -61,10 +63,16 @@ public class MyInfoQueryRepository {
                         project.endAt,
                         Expressions.numberTemplate(Long.class,
                                 "floor(({0} * 100.0) / nullif({1}, 0))",
-                                project.totalAmount, project.goalAmount)
+                                project.totalAmount, project.goalAmount),
+                        image.originalUrl
 
                 ))
                 .from(project)
+                .leftJoin(project.imageGroup, imageGroup)
+                .leftJoin(image).on(
+                        image.imageGroup.eq(imageGroup)
+                                .and(image.imageIndex.eq(1L))
+                )
                 .where(whereBuilder)
                 .orderBy(
                         new CaseBuilder()
