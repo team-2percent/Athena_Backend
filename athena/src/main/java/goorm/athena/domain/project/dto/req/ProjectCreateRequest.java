@@ -35,6 +35,6 @@ public record ProjectCreateRequest(
         LocalDateTime shippedAt,
 
         String platformPlan,                // 요금제 구독 상태
-        List<ProductRequest> products       // 상품 리스트
+        List<ProductRequest> products      // 상품 리스트
 
 ) { }

@@ -16,8 +16,6 @@ import goorm.athena.domain.project.dto.res.*;
 import goorm.athena.domain.project.entity.SortTypeDeadline;
 import goorm.athena.domain.project.entity.SortTypeLatest;
 import goorm.athena.domain.project.service.ProjectService;
-import goorm.athena.global.exception.CustomException;
-import goorm.athena.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -45,9 +43,9 @@ public class ProjectControllerImpl implements ProjectController {
 
     // 프로젝트 생성
     @Override
-    public ResponseEntity<ProjectIdResponse> createProject(@RequestPart ProjectCreateRequest request,
-                                                           @RequestPart(value = "markdownFiles", required = false) List<MultipartFile> markdownFiles) {
-        ProjectIdResponse response = projectService.createProject(request); // 프로젝트 생성 로직
+    public ResponseEntity<ProjectIdResponse> createProject(@RequestPart (value = "request") ProjectCreateRequest request,
+                                                           @RequestPart (value = "markdownFiles", required = false) List<MultipartFile> markdownFiles) {
+        ProjectIdResponse response = projectService.createProject(request, markdownFiles); // 프로젝트 생성 로직
         return ResponseEntity.ok(response);
     }
   
@@ -63,10 +61,10 @@ public class ProjectControllerImpl implements ProjectController {
     @Override
     public ResponseEntity<Void> updateProject(
             @PathVariable Long projectId,
-            @RequestPart("projectUpdateRequest") ProjectUpdateRequest projectUpdateRequest,
+            @RequestPart(value = "request") ProjectUpdateRequest projectUpdateRequest,
             @RequestPart(value = "files", required = false) List<MultipartFile> files,
             @RequestPart(value = "markdownFiles", required = false) List<MultipartFile> markdownFiles){
-        projectService.updateProject(projectId, projectUpdateRequest, files);
+        projectService.updateProject(projectId, projectUpdateRequest, files, markdownFiles);
         return ResponseEntity.ok().build();
     }
 

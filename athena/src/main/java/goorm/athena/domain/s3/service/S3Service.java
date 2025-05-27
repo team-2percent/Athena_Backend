@@ -61,7 +61,7 @@ public class S3Service {
             return amazonS3.getUrl(imageBucket, fileName).toString();   // S3 Url return
             // 사이즈 별 이미지 URL 추가 필요
         } catch(IOException e){
-            throw new CustomException(ErrorCode.IMAGE_UPLOAD_FAILED);
+            throw new CustomException(ErrorCode.IMAGES_UPLOAD_FAILED);
         }
     }
 
