@@ -7,7 +7,6 @@ import goorm.athena.global.exception.CustomException;
 import goorm.athena.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.coobird.thumbnailator.Thumbnails;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -98,7 +97,7 @@ public class NasService {
     // 확장자 검증
     private void validateFileExtension(String fileName){
         String extension = getFileExtension(fileName).toLowerCase();
-        if (!List.of("jpg", "jpeg", "png").contains(extension)){
+        if (!List.of("jpg", "jpeg", "png", "webp").contains(extension)){
             throw new CustomException(ErrorCode.INVALID_IMAGE_EXTENSION);
         }
     }
