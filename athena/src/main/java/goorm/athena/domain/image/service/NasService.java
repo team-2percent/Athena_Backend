@@ -28,7 +28,7 @@ public class NasService {
     private String imagePath;
 
     private static final String IMAGE_FORMAT = "webp";
-    private final String IMAGE_DOMAIN = "http://localhost:8080/images";
+    private final String IMAGE_DOMAIN = "/images";
 
     private static final Map<String, Dimension> SIZES = Map.of(
             "s", new Dimension(200, 200),
