@@ -39,8 +39,8 @@ public interface ProjectController {
     @ApiResponse(responseCode = "200", description = "프로젝트 생성 성공",
         content = @Content(schema = @Schema(implementation = ProjectIdResponse.class)))
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    ResponseEntity<ProjectIdResponse> createProject(@RequestPart ProjectCreateRequest request,
-                                                    @RequestPart(value = "files", required = false) List<MultipartFile> markdownFiles) throws IOException;
+    ResponseEntity<ProjectIdResponse> createProject(@RequestPart (value = "request")  ProjectCreateRequest request,
+                                                    @RequestPart (value = "markdownFiles", required = false) List<MultipartFile> markdownFiles) throws IOException;
 
     @Operation(
             summary = "프로젝트별 상품 목록 조회 API",
@@ -63,9 +63,9 @@ public interface ProjectController {
     @ApiResponse(responseCode = "200", description = "프로젝트 수정 성공")
     @PutMapping(value = "/{projectId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     ResponseEntity<Void> updateProject(@PathVariable Long projectId,
-                                       @RequestPart("projectUpdateRequest") ProjectUpdateRequest projectUpdateRequest,
-                                       @RequestPart(value = "files", required = false) List<MultipartFile> files,
-                                       @RequestPart(value = "markdownFiles", required = false) List<MultipartFile> markdownFiles);
+                                       @RequestPart (value = "request") ProjectUpdateRequest projectUpdateRequest,
+                                       @RequestPart (value = "files", required = false) List<MultipartFile> files,
+                                       @RequestPart (value = "markdownFiles", required = false) List<MultipartFile> markdownFiles);
 
     @Operation(summary = "프로젝트 삭제 API", description = "프로젝트를 영구적으로 삭제합니다.<br>" +
             "삭제한 프로젝트는 다시 되돌릴 수 없습니다.")

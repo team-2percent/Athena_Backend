@@ -57,7 +57,6 @@ public class NasService {
         String fileName = createFileName();                     // 고유한 파일 이름 생성
         File originalFile = new File(imagePath, fileName);
 
-
         // 원본 WebP 파일 저장
         ImmutableImage image = null;
         try {
