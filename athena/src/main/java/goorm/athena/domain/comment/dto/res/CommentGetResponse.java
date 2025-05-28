@@ -8,6 +8,7 @@ public record CommentGetResponse(
         String projectName,
         String content,
         LocalDateTime createdAt,
-        Long projectId
+        Long projectId,
+        String imageUrl
 ) {
 }

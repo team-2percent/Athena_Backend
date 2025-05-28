@@ -24,7 +24,7 @@ public class Coupon {
     @Column(length = 25, nullable = false)
     private String title;
 
-    @Size(min = 10, max = 50)
+    @Size(min = 10, max = 100)
     private String content;
 
     @Max(50_000)

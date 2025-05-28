@@ -95,12 +95,16 @@ public class ImageService {
     /*
      * Path로 이미지 Full URL 조립
      */
-    private String getFullUrl(String path) {
-        ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-        String domain = attributes.getRequest().getServerName();
-        String scheme = "localhost".equals(domain) ? "http" : "https";
-        int port = attributes.getRequest().getServerPort();
-        boolean isDefaultPort = port == 80 || port == 443;
-        return scheme + "://" + domain + (isDefaultPort ? "" : ":" + port) + path;
+    public String getFullUrl(String path) {
+        if(path != null) {
+            ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+            String domain = attributes.getRequest().getServerName();
+            String scheme = "localhost".equals(domain) ? "http" : "https";
+            int port = attributes.getRequest().getServerPort();
+            boolean isDefaultPort = port == 80 || port == 443;
+            return scheme + "://" + domain + (isDefaultPort ? "" : ":" + port) + path;
+        } else {
+            return "";
+        }
     }
 }
