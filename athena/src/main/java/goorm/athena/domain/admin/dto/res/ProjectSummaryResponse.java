@@ -1,5 +1,6 @@
 package goorm.athena.domain.admin.dto.res;
 
+import goorm.athena.domain.project.entity.ApprovalStatus;
 import goorm.athena.domain.project.entity.PlanName;
 import org.springframework.data.domain.Page;
 
@@ -23,7 +24,7 @@ public record ProjectSummaryResponse(
             String title,
             String createdAt,
             String sellerName,
-            String approvalStatus,
+            ApprovalStatus isApproved,
             PlanName platformPlan
     ) {}
 
