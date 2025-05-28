@@ -43,6 +43,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
         }
 
+        String requestURI = request.getRequestURI();
+
+        // refresh 요청은 accessToken 검증에서 제외
+        if (requestURI.equals("/api/refreshToken/ReissueRefresh")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         // 액세스 토큰 검증
         token = getAccessToken(request);
         if (StringUtils.hasText(token)) {
@@ -50,7 +58,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 getAuthentication(token);
             } catch (ExpiredJwtException e){
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                response.getWriter().write("AccessToken is expired");
+                response.setContentType("application/json");
+                response.getWriter().write("""
+                {
+                  "code": "ACCESS_TOKEN_EXPIRED",
+                  "message": "AccessToken is expired"
+                }
+                """);
+                return;
+            } catch (JwtException e){
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                response.getWriter().write("The token is empty");
                 return;
             }
         }

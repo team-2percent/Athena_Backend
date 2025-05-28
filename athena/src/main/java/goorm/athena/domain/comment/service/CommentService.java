@@ -5,6 +5,7 @@ import goorm.athena.domain.comment.dto.res.CommentGetResponse;
 import goorm.athena.domain.comment.entity.Comment;
 import goorm.athena.domain.comment.mapper.CommentMapper;
 import goorm.athena.domain.comment.repository.CommentRepository;
+import goorm.athena.domain.image.service.ImageService;
 import goorm.athena.domain.project.entity.Project;
 import goorm.athena.domain.project.service.ProjectService;
 import goorm.athena.domain.user.entity.User;
@@ -23,6 +24,7 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final UserService userService;
     private final ProjectService projectService;
+    private final ImageService imageService;
 
     @Transactional
     public CommentCreateResponse createComment(Long projectId, Long userId, String content) {
@@ -44,19 +46,26 @@ public class CommentService {
     @Transactional(readOnly = true)
     public List<CommentGetResponse> getCommentByProject(Long projectId){
         Project project = projectService.getById(projectId);
-        List<Comment> comments = commentRepository.findByProjectWithUser(project);
+        // 쿼리 결과를 Object[] 형태로 받아옴 (Comment, 이미지 URL)
+        List<Comment> results = commentRepository.findByProjectWithUserProfileImage(project);
 
-        return comments.stream()
-                .map(CommentMapper::toGetResponse)
+        return results.stream()
+                .map(comment -> {
+                    String imageUrl = imageService.getImage(comment.getUser().getImageGroup().getId());
+                    return CommentMapper.toGetResponse(comment, imageUrl);
+                })
                 .toList();
-
     }
 
     public List<CommentGetResponse> getCommentByUser(Long userId){
         User user = userService.getUser(userId);
-        List<Comment> comments = commentRepository.findByUser(user);
-        return comments.stream()
-                .map(CommentMapper::toGetResponse)
+        List<Comment> results = commentRepository.findByUserWithProjectImage(user);
+
+        return results.stream()
+                .map(comment -> {
+                    String imageUrl = imageService.getImage(comment.getProject().getImageGroup().getId());
+                    return CommentMapper.toGetResponse(comment, imageUrl);
+                })
                 .toList();
     }
 }

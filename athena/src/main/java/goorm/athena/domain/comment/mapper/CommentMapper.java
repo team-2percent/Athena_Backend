@@ -14,14 +14,15 @@ public class CommentMapper {
         );
     }
 
-    public static CommentGetResponse toGetResponse(Comment comment){
+    public static CommentGetResponse toGetResponse(Comment comment, String imageUrl){
         return new CommentGetResponse(
                 comment.getId(),
                 comment.getUser().getNickname(),
                 comment.getProject().getTitle(),
                 comment.getContent(),
                 comment.getCreatedAt(),
-                comment.getProject().getId()
+                comment.getProject().getId(),
+                imageUrl
         );
     }
 }

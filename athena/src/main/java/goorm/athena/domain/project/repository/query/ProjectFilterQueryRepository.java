@@ -7,6 +7,7 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import goorm.athena.domain.image.entity.QImage;
+import goorm.athena.domain.image.service.ImageService;
 import goorm.athena.domain.imageGroup.entity.QImageGroup;
 import goorm.athena.domain.project.dto.cursor.ProjectCategoryCursorResponse;
 import goorm.athena.domain.project.dto.cursor.ProjectDeadlineCursorResponse;
@@ -21,6 +22,7 @@ import goorm.athena.global.exception.CustomException;
 import goorm.athena.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
+import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -29,6 +31,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ProjectFilterQueryRepository {
     private final JPAQueryFactory queryFactory;
+    private final ImageService imageService;
 
     // 카테고리별 프로젝트 조회 (커서 기반 페이징)
     public ProjectCategoryCursorResponse getProjectsByCategory(ProjectCursorRequest<?> request,
@@ -54,7 +57,7 @@ public class ProjectFilterQueryRepository {
         // 커서 조건
         builder.and(ProjectQueryHelper.buildCursorLatest(sortType, request, project));
 
-        List<ProjectCategoryResponse> content = queryFactory
+        List<ProjectCategoryResponse> rawContent = queryFactory
                 .select(Projections.constructor(
                         ProjectCategoryResponse.class,
                         project.id,
@@ -80,6 +83,23 @@ public class ProjectFilterQueryRepository {
                 .orderBy(ProjectQueryHelper.getSortOrdersLatest(sortType, project).toArray(new OrderSpecifier[0]))
                 .limit(request.getSize())
                 .fetch();
+
+        List<ProjectCategoryResponse> content = rawContent.stream()
+                .map(dto -> new ProjectCategoryResponse(
+                        dto.id(),
+                        StringUtils.hasText(dto.imageUrl())
+                                ? imageService.getFullUrl(dto.imageUrl().trim())
+                                : null,
+                        dto.sellerName(),
+                        dto.title(),
+                        dto.description(),
+                        dto.achievementRate(),
+                        dto.createdAt(),
+                        dto.endAt(),
+                        dto.daysLeft(),
+                        dto.views()
+                ))
+                .toList();
 
         BooleanBuilder countCondition = new BooleanBuilder();
         if (categoryId != null) {
@@ -143,7 +163,7 @@ public class ProjectFilterQueryRepository {
             );
         }
 
-        List<ProjectDeadlineResponse> content = queryFactory
+        List<ProjectDeadlineResponse> rawContent = queryFactory
                 .select(Projections.constructor(
                         ProjectDeadlineResponse.class,
                         project.id,
@@ -169,6 +189,23 @@ public class ProjectFilterQueryRepository {
                 .orderBy(ProjectQueryHelper.getSortOrdersDeadLine(sortTypeDeadline, project).toArray(OrderSpecifier[]::new)) // 마감일 빠른 순
                 .limit(request.getSize())
                 .fetch();
+
+        List<ProjectDeadlineResponse> content = rawContent.stream()
+                .map(dto -> new ProjectDeadlineResponse(
+                        dto.id(),
+                        StringUtils.hasText(dto.imageUrl())
+                                ? imageService.getFullUrl(dto.imageUrl().trim())
+                                : null,
+                        dto.sellerName(),
+                        dto.title(),
+                        dto.description(),
+                        dto.achievementRate(),
+                        dto.createdAt(),
+                        dto.endAt(),
+                        dto.daysLeft(),
+                        dto.views()
+                ))
+                .toList();
 
         Long totalCount = queryFactory
                 .select(project.count())

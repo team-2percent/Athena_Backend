@@ -6,6 +6,7 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import goorm.athena.domain.image.entity.QImage;
+import goorm.athena.domain.image.service.ImageService;
 import goorm.athena.domain.imageGroup.entity.QImageGroup;
 import goorm.athena.domain.project.dto.cursor.ProjectSearchCursorResponse;
 import goorm.athena.domain.project.dto.req.ProjectCursorRequest;
@@ -17,6 +18,7 @@ import goorm.athena.global.exception.CustomException;
 import goorm.athena.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
+import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -25,6 +27,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ProjectSearchQueryRepository {
     private final JPAQueryFactory queryFactory;
+    private final ImageService imageService;
 
 
     // 검색 기반 페이지 조회
@@ -52,7 +55,7 @@ public class ProjectSearchQueryRepository {
         builder.and(ProjectQueryHelper.buildCursorLatest(sortType, request, project));
 
         // 나머지 fetch, join, 정렬 등 쿼리 작성
-        List<ProjectSearchResponse> content = queryFactory
+        List<ProjectSearchResponse> rawContent = queryFactory
                 .select(Projections.constructor(
                         ProjectSearchResponse.class,
                         project.id,
@@ -78,6 +81,23 @@ public class ProjectSearchQueryRepository {
                 .orderBy(ProjectQueryHelper.getSortOrdersLatest(sortType, project).toArray(new OrderSpecifier[0]))
                 .limit(request.getSize())
                 .fetch();
+
+        List<ProjectSearchResponse> content = rawContent.stream()
+                .map(dto -> new ProjectSearchResponse(
+                        dto.id(),
+                        StringUtils.hasText(dto.imageUrl())
+                                ? imageService.getFullUrl(dto.imageUrl().trim())
+                                : null,
+                        dto.sellerName(),
+                        dto.title(),
+                        dto.description(),
+                        dto.achievementRate(),
+                        dto.createdAt(),
+                        dto.endAt(),
+                        dto.daysLeft(),
+                        dto.views()
+                ))
+                .toList();
 
         Long totalCount = queryFactory
                 .select(project.count())
