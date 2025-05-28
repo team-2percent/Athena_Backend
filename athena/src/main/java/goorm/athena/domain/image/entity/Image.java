@@ -21,7 +21,7 @@ public class Image {
 
     private String fileName;
     private String originalUrl;
-    private String fileType;    // 파일형
+    private String fileType;    // 파일 사이즈 표기로 변경
 
     private Long imageIndex;    // 이미지 순서 (Markdown = 0)
 

@@ -34,7 +34,6 @@ public class ImageService {
         Long imageGroupId = imageGroup.getId();
         List<ImageCreateRequest> requests = nasService.saveAll(files, imageGroupId); // NAS에 이미지 저장 및 DTO 반환
 
-
         List<Image> images = new ArrayList<>();
         for (int i = 0; i < requests.size(); i++) {
             ImageCreateRequest request = requests.get(i);
@@ -51,7 +50,7 @@ public class ImageService {
 
         List<Image> markdownImages = new ArrayList<>();
         for (ImageCreateRequest request : requests) {
-            Image image = ImageMapper.toEntity(request, imageGroup, null);
+            Image image = ImageMapper.toEntity(request, imageGroup, (long) 0);
             markdownImages.add(image);
         }
         imageRepository.saveAll(markdownImages);

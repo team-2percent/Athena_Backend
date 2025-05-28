@@ -6,7 +6,6 @@ import goorm.athena.domain.category.entity.Category;
 import goorm.athena.domain.category.service.CategoryService;
 import goorm.athena.domain.image.entity.Image;
 import goorm.athena.domain.image.service.ImageService;
-import goorm.athena.domain.image.service.NasService;
 import goorm.athena.domain.imageGroup.entity.ImageGroup;
 import goorm.athena.domain.imageGroup.service.ImageGroupService;
 import goorm.athena.domain.product.dto.req.ProductRequest;

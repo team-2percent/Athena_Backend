@@ -65,7 +65,7 @@ public class NasService {
             throw new CustomException(ErrorCode.ORIGIN_IMAGE_UPLOAD_FAILED);
         }
 
-
+        /*
         for (var entry : SIZES.entrySet()) {
             // 리사이징된 파일 이름 지정
             String resizedFileName = entry.getKey() + "_" + fileName;
@@ -75,13 +75,15 @@ public class NasService {
             // 리사이즈 후 저장
             try {
                 image.fit(dim.width, dim.height).output(WebpWriter.DEFAULT, resizedFile);
+
             } catch (IOException e) {
                 throw new CustomException(ErrorCode.IMAGES_UPLOAD_FAILED);
             }
         }
+        */
 
         String imageUrl = IMAGE_DOMAIN + "/" + fileName;  // 이미지 URL
-        return new ImageCreateRequest(imageGroupId, fileName, imageUrl, IMAGE_FORMAT);
+        return new ImageCreateRequest(imageGroupId, fileName, imageUrl, "origin");
     }
 
     // 파일마다 고유한 이름 부여 (중복 방지)
@@ -106,6 +108,7 @@ public class NasService {
      * [이미지 삭제 Method]
      */
     public void deleteImageFiles(String fileName) {
+        /*
         // 리사이즈 된 이미지 삭제
         for (String sizeKey : SIZES.keySet()) {
             String sizedFileName = sizeKey + "_" + fileName;
@@ -114,6 +117,7 @@ public class NasService {
                 throw new CustomException(ErrorCode.IMAGE_DELETE_FAILED);
             }
         }
+        */
 
         // 원본 파일 삭제
         File originalFile = new File(imagePath, fileName);
