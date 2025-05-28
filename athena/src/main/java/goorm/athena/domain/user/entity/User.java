@@ -40,7 +40,7 @@ public class User {
     @Column(length = 200, nullable = true)
     private String sellerIntroduction;
 
-    @Column(length = 2000, nullable = true)
+    @Column(length = 1000, nullable = true)
     private String linkUrl;
 
     @Builder

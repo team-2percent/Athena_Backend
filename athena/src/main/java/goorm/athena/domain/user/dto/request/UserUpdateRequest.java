@@ -14,6 +14,6 @@ public record UserUpdateRequest(
         @Column(length = 200)
         String sellerIntroduction,
 
-        @Column(length = 2000)
+        @Column(length = 1000)
         String linkUrl
 ) { }
