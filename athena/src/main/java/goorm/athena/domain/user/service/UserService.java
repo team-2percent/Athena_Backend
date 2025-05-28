@@ -59,9 +59,7 @@ public class UserService {
                 request.sellerIntroduction(),
                 request.linkUrl());
 
-        if(file != null && !file.isEmpty()){
-            imageService.uploadImages(List.of(file), updateUser.getImageGroup());   // 프로필 이미지 등록
-        }
+        imageService.uploadImages(List.of(file), updateUser.getImageGroup());   // 프로필 이미지 등록
 
         User savedUser = userRepository.save(updateUser);
 
