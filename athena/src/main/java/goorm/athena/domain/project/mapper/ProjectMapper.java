@@ -68,6 +68,7 @@ public class ProjectMapper {
                 userDetailResponse,
                 productResponses,
                 project.getStatus(),
+                project.getIsApproved(),
                 project.getPlatformPlan().getName()
         );
     }

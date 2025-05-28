@@ -31,12 +31,9 @@ public class ImageService {
     // 다중 이미지 업로드
     @Transactional
     public void uploadImages(List<MultipartFile> files, ImageGroup imageGroup) {
-        if(!CollectionUtils.isEmpty(files)) {
-            throw new CustomException(ErrorCode.IMAGE_IS_REQUIRED);
-        }
-
         Long imageGroupId = imageGroup.getId();
         List<ImageCreateRequest> requests = nasService.saveAll(files, imageGroupId); // NAS에 이미지 저장 및 DTO 반환
+
 
         List<Image> images = new ArrayList<>();
         for (int i = 0; i < requests.size(); i++) {
