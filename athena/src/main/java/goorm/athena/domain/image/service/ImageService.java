@@ -32,10 +32,6 @@ public class ImageService {
     // 다중 이미지 업로드
     @Transactional
     public void uploadImages(List<MultipartFile> files, Long imageGroupId) {
-        if(!CollectionUtils.isEmpty(files)) {
-            throw new CustomException(ErrorCode.IMAGE_IS_REQUIRED);
-        }
-
         List<ImageCreateRequest> requests = nasService.saveAll(files, imageGroupId); // NAS에 이미지 저장 및 DTO 반환
         ImageGroup imageGroup = imageGroupService.getById(imageGroupId);
 
@@ -51,9 +47,6 @@ public class ImageService {
     // 마크다운 이미지 저장 및 주소 반환
     @Transactional
     public List<String> uploadMarkdownImages(List<MultipartFile> files, ImageGroup imageGroup) {
-        if(!CollectionUtils.isEmpty(files)) {
-            throw new CustomException(ErrorCode.IMAGE_IS_REQUIRED);
-        }
 
         List<ImageCreateRequest> requests = nasService.saveAll(files, imageGroup.getId());
 

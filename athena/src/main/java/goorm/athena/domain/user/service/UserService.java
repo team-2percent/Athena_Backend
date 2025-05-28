@@ -18,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -62,9 +63,11 @@ public class UserService {
                 request.sellerIntroduction(),
                 request.linkUrl());
 
-        imageService.uploadImages(List.of(file), userImageGroup.getId());   // 프로필 이미지 등록
-        User savedUser = userRepository.save(updateUser);
+        if(file != null && !file.isEmpty()) {
+            imageService.uploadImages(List.of(file), userImageGroup.getId());   // 프로필 이미지 등록
+        }
 
+        User savedUser = userRepository.save(updateUser);
         return UserMapper.toUpdateResponse(savedUser);
     }
 
