@@ -31,9 +31,10 @@ public class ImageService {
      */
     // 다중 이미지 업로드
     @Transactional
-    public void uploadImages(List<MultipartFile> files, Long imageGroupId) {
+    public void uploadImages(List<MultipartFile> files, ImageGroup imageGroup) {
+        Long imageGroupId = imageGroup.getId();
         List<ImageCreateRequest> requests = nasService.saveAll(files, imageGroupId); // NAS에 이미지 저장 및 DTO 반환
-        ImageGroup imageGroup = imageGroupService.getById(imageGroupId);
+
 
         List<Image> images = new ArrayList<>();
         for (int i = 0; i < requests.size(); i++) {

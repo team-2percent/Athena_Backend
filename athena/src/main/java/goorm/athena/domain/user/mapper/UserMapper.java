@@ -1,5 +1,6 @@
 package goorm.athena.domain.user.mapper;
 
+import goorm.athena.domain.imageGroup.entity.ImageGroup;
 import goorm.athena.domain.user.dto.request.UserCreateRequest;
 import goorm.athena.domain.user.dto.response.*;
 import goorm.athena.domain.user.entity.User;
@@ -7,8 +8,9 @@ import goorm.athena.domain.user.entity.User;
 public class UserMapper {
 
     // UserCreateRequest -> User 엔티티 변환
-    public static User toEntity(UserCreateRequest request){
+    public static User toEntity(UserCreateRequest request, ImageGroup imageGroup){
         return User.builder()
+                .imageGroup(imageGroup)
                 .email(request.email())
                 .password(request.password())
                 .nickname(request.nickname())

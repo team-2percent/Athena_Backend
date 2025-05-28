@@ -152,7 +152,7 @@ public class ProjectService {
         String convertedMarkdown = convertMarkdownIfNeeded(request.contentMarkdown(), markdownFiles, project.getImageGroup());
 
         if(!CollectionUtils.isEmpty(files)) {
-            imageService.uploadImages(files, project.getImageGroup().getId());
+            imageService.uploadImages(files, project.getImageGroup());
         }
         else{
             throw new CustomException(ErrorCode.IMAGE_IS_REQUIRED);
