@@ -13,11 +13,13 @@ import goorm.athena.domain.user.repository.UserRepository;
 import goorm.athena.global.exception.CustomException;
 import goorm.athena.global.exception.ErrorCode;
 import goorm.athena.global.jwt.util.JwtTokenizer;
+import jakarta.persistence.CollectionTable;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -33,15 +35,11 @@ public class UserService {
     private final ImageService imageService;
 
     @Transactional
-    public UserCreateResponse createUser(UserCreateRequest request) {
+    public UserCreateResponse createUser(UserCreateRequest request, ImageGroup imageGroup) {
         Boolean isExist = userRepository.existsByEmail(request.email());
 
         if (!isExist) {
-            User newUser = User.create(
-                    request.email(),
-                    passwordEncoder.encode(request.password()),
-                    request.nickname());
-
+            User newUser = UserMapper.toEntity(request, imageGroup);
             User savedUser = userRepository.save(newUser);
 
             return UserMapper.toCreateResponse(savedUser);
@@ -51,18 +49,20 @@ public class UserService {
     }
 
     @Transactional
-    public UserUpdateResponse updateUser(ImageGroup userImageGroup, Long userId,
+    public UserUpdateResponse updateUser(Long userId,
                                          UserUpdateRequest request, MultipartFile file){
         User updateUser = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         updateUser.update(
-                userImageGroup,
                 request.nickname(),
                 request.sellerIntroduction(),
                 request.linkUrl());
 
-        imageService.uploadImages(List.of(file), userImageGroup.getId());   // 프로필 이미지 등록
+        if(file != null && !file.isEmpty()){
+            imageService.uploadImages(List.of(file), updateUser.getImageGroup());   // 프로필 이미지 등록
+        }
+
         User savedUser = userRepository.save(updateUser);
 
         return UserMapper.toUpdateResponse(savedUser);

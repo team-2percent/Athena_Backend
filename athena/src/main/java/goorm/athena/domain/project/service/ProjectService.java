@@ -151,7 +151,7 @@ public class ProjectService {
         // 마크다운에 로컬 이미지가 삽입된 경우 이를 이미지 URL로 치환
         String convertedMarkdown = convertMarkdownIfNeeded(request.contentMarkdown(), markdownFiles, project.getImageGroup());
 
-        imageService.uploadImages(files, project.getImageGroup().getId());
+        imageService.uploadImages(files, project.getImageGroup());
 
         project.update(
                 category,

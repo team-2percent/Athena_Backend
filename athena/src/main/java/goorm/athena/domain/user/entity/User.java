@@ -44,19 +44,15 @@ public class User {
     private String linkUrl;
 
     @Builder
-    private User(String email, String password, String nickname){
+    private User(ImageGroup imageGroup, String email, String password, String nickname){
+        this.imageGroup = imageGroup;
         this.email = email;
         this.password = password;
         this.nickname = nickname;
         this.role = Role.ROLE_USER;
     }
 
-    public static User create(String email, String password, String nickname){
-        return new User(email, password, nickname);
-    }
-
-    public void update(ImageGroup imageGroup, String nickname, String sellerIntroduction, String linkUrl){
-        this.imageGroup = imageGroup;
+    public void update(String nickname, String sellerIntroduction, String linkUrl){
         this.nickname = nickname;
         this.sellerIntroduction = sellerIntroduction;
         this.linkUrl = linkUrl;
@@ -66,18 +62,9 @@ public class User {
         this.password = password;
     }
 
-    public void update(String email, String password, String nickname){
-        if(email != null){
-            this.email = email;
-        }
-        if(nickname != null){
-            this.nickname = nickname;
-        }
-    }
-
-    public static User createFullUser(String email, String password, String nickname,
+    public static User createFullUser(ImageGroup imageGroup, String email, String password, String nickname,
                                       Role role, String sellerIntroduction, String linkUrl) {
-        User user = new User(email, password, nickname);
+        User user = new User(imageGroup, email, password, nickname);
         user.role = role;
         user.sellerIntroduction = sellerIntroduction;
         user.linkUrl = linkUrl;

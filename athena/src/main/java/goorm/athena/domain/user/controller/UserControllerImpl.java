@@ -41,7 +41,9 @@ public class UserControllerImpl implements UserController {
     @Override
     @PostMapping
     public ResponseEntity<UserCreateResponse> createUser(@RequestBody UserCreateRequest request) {
-        UserCreateResponse response = userService.createUser(request);
+        // User <-> ImageGroup 1:1 매핑되도록 생성
+        ImageGroup userImageGroup = imageGroupService.createImageGroup(Type.USER);
+        UserCreateResponse response = userService.createUser(request, userImageGroup);
         return ResponseEntity.ok(response);
     }
 
@@ -52,10 +54,8 @@ public class UserControllerImpl implements UserController {
     public ResponseEntity<UserUpdateResponse> updateUser(@CheckLogin LoginUserRequest loginUserRequest,
                                                          @RequestPart (value = "request") UserUpdateRequest request,
                                                          @RequestPart(value = "files", required = false) MultipartFile file){
-        // User <-> ImageGroup 1:1 매핑되도록 생성
-        ImageGroup userImageGroup = imageGroupService.createImageGroup(Type.USER);
 
-        UserUpdateResponse response = userService.updateUser(userImageGroup, loginUserRequest.userId(), request, file);
+        UserUpdateResponse response = userService.updateUser(loginUserRequest.userId(), request, file);
         return ResponseEntity.ok(response);
     }
 
