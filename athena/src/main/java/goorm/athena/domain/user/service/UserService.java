@@ -81,9 +81,6 @@ public class UserService {
         String imageUrl = "";
         if(user.getImageGroup() != null){
             imageUrl = imageService.getImage(user.getImageGroup().getId());
-            if(!imageUrl.isEmpty()) {
-                imageUrl = imageService.getFullUrl(imageUrl);
-            }
         }
         return UserMapper.toHeaderGetResponse(user, imageUrl);
     }
@@ -95,9 +92,6 @@ public class UserService {
         String imageUrl = null;
         if(user.getImageGroup() != null && user.getImageGroup().getId() != null) {
             imageUrl = imageService.getImage(user.getImageGroup().getId());
-            if(!imageUrl.isEmpty()){
-                imageUrl = imageService.getFullUrl(imageUrl);
-            }
         }
 
         return UserMapper.toGetResponse(user, imageUrl);

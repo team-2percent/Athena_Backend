@@ -34,6 +34,7 @@ import goorm.athena.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -75,21 +76,12 @@ public class ProjectService {
         validateProduct(request);   // 프로젝트 등록 시 검증
 
         // 마크다운에 로컬 이미지가 삽입된 경우 이를 이미지 URL로 치환
-        String convertedMarkdown = request.contentMarkdown();
-        if (!markdownFiles.isEmpty()) {
-            try {
-                convertedMarkdown = getConvertedMarkdown(markdownFiles, imageGroup, request.contentMarkdown());
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-
-        }
+        String convertedMarkdown = convertMarkdownIfNeeded(request.contentMarkdown(), markdownFiles, imageGroup);
 
         Project project = ProjectMapper.toEntity(request, seller, imageGroup, category, bankAccount, platformPlan, convertedMarkdown);  // 새 프로젝트 생성
         Project savedProject = projectRepository.save(project);                                                                         // 프로젝트 저장
 
-        List<ProductRequest> productRequests = request.products();  // 상품 등록 요청 처리
-        createProducts(productRequests, project);
+        createProducts(request.products(), project);    // 상품 등록 요청 처리
         // 상품 생성 예외 처리 추가적으로 있을지 고려
 
         return ProjectMapper.toCreateDto(savedProject);
@@ -97,7 +89,7 @@ public class ProjectService {
 
     // 상품 리스트 생성
     private void createProducts(List<ProductRequest> requests, Project project) {
-        if (requests != null && !requests.isEmpty()) {
+        if (!CollectionUtils.isEmpty(requests)) {
             productService.saveProducts(requests, project);
         }
         else{
@@ -107,7 +99,6 @@ public class ProjectService {
 
     // 프로젝트 등록 검증
     private void validateProduct(ProjectCreateRequest request) {
-        LocalDateTime now = LocalDateTime.now();
         if (request.title().length() > 25) {
             throw new CustomException(ErrorCode.INVALID_TITLE_FORMAT);
         }
@@ -124,13 +115,26 @@ public class ProjectService {
         }
     }
 
-    // 기존 마크다운 -> URL 치환 마크다운
+    // 마크 다운 변환
+    private String convertMarkdownIfNeeded(String markdown, List<MultipartFile> markdownFiles, ImageGroup imageGroup) {
+        if (CollectionUtils.isEmpty(markdownFiles)) {
+            return markdown;
+        }
+
+        try {
+            return getConvertedMarkdown(markdownFiles, imageGroup, markdown);   // 기존 마크다운 -> URL 치환 마크다운
+        } catch (IOException e) {
+            throw new CustomException(ErrorCode.IMAGES_UPLOAD_FAILED);
+        }
+    }
+
     private String getConvertedMarkdown(List<MultipartFile> markdownFiles, ImageGroup imageGroup, String markdown) throws IOException {
         List<String> imagePaths = markdownParser.extractImagePaths(markdown);                   // 마크다운 내 url 추출
         List<String> realUrls = imageService.uploadMarkdownImages(markdownFiles, imageGroup);   // 이미지 저장 및 이미지 서버 url 반환
 
         return markdownParser.replaceMarkdown(markdown, imagePaths, realUrls);
     }
+
 
     /**
      * [프로젝트 수정 Method]
@@ -143,17 +147,11 @@ public class ProjectService {
 
         // 마크다운 이미지, 대표 이미지 PUT 작업을 위해서 이미지 미리 전체 삭제
         imageService.deleteImages(project.getImageGroup());
-        
-        // 마크다운에 로컬 이미지가 삽입된 경우 이를 이미지 URL로 치환
-        String convertedMarkdown = request.contentMarkdown();
-        if (!markdownFiles.isEmpty()) {
-            try {
-                convertedMarkdown = getConvertedMarkdown(markdownFiles, project.getImageGroup(), request.contentMarkdown());
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
 
-        }
+        // 마크다운에 로컬 이미지가 삽입된 경우 이를 이미지 URL로 치환
+        String convertedMarkdown = convertMarkdownIfNeeded(request.contentMarkdown(), markdownFiles, project.getImageGroup());
+
+        imageService.uploadImages(files, project.getImageGroup().getId());
 
         project.update(
                 category,
@@ -168,13 +166,9 @@ public class ProjectService {
         );
 
         // 상품 및 이미지 업데이트 (PUT)
-        List<ProductRequest> productUpdateRequests = request.products();
         deleteProducts(project);
-        createProducts(productUpdateRequests, project);
-
-        imageService.uploadImages(files, project.getImageGroup().getId());
+        createProducts(request.products(), project);
     }
-
 
     /**
      * [프로젝트 삭제 Method]
@@ -207,11 +201,7 @@ public class ProjectService {
 
         Category category = categoryService.getCategoryById(project.getCategory().getId());
         List<Image> images = imageService.getProjectImages(project.getImageGroup().getId());    // 마크다운 이미지 제외 가져오기
-
-        // 이미지 URL 전처리 적용
-        List<String> imageUrls = imageService.getImageUrls(images).stream()
-                .map(imageService::getFullUrl)
-                .toList();
+        List<String> imageUrls = imageService.getImageUrls(images);
 
         UserDetailResponse userDetailResponse = UserMapper.toDetailResponse(project.getSeller());
         List<ProductResponse> productResponses = productService.getAllProducts(project);
@@ -228,9 +218,6 @@ public class ProjectService {
         return projects.stream()
                 .map(project -> {
                     String imageUrl = imageService.getImage(project.getImageGroup().getId());
-                    if(imageUrl.isEmpty()){
-                        imageUrl = imageService.getFullUrl(imageUrl);
-                    }
                     int currentRank = rank.getAndIncrement();
                     return ProjectAllResponse.from(project, imageUrl, currentRank);
                 })
@@ -284,9 +271,6 @@ public class ProjectService {
                             .map(project -> {
                                 String imageUrl = imageService.getImage(project.getImageGroup().getId());
                                 System.out.println(imageUrl);
-                                if(!imageUrl.isEmpty()){
-                                    imageUrl = imageService.getFullUrl(imageUrl);
-                                }
                                 return ProjectMapper.toTopViewResponse(project, imageUrl);
                             })
                             .toList();
@@ -305,9 +289,6 @@ public class ProjectService {
                 .limit(5)
                 .map(project -> {
                     String imageUrl = imageService.getImage(project.getImageGroup().getId());
-                    if(!imageUrl.isEmpty()){
-                        imageUrl = imageService.getFullUrl(imageUrl);
-                    }
                     return ProjectMapper.toTopViewResponse(project, imageUrl);
                 })
                 .toList();
@@ -324,9 +305,6 @@ public class ProjectService {
                     List<ProjectTopViewResponse> topViewResponses = entry.getValue().stream()
                             .map(project -> {
                                 String imageUrl = imageService.getImage(project.getImageGroup().getId());
-                                if(imageUrl.isEmpty()){
-                                    imageUrl = imageService.getFullUrl(imageUrl);
-                                }
                                 return ProjectMapper.toTopViewResponse(project, imageUrl);
                             })
                             .toList();
