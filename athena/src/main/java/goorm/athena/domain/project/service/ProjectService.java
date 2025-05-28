@@ -204,7 +204,7 @@ public class ProjectService {
         Category category = categoryService.getCategoryById(project.getCategory().getId());
         List<Image> images = imageService.getProjectImages(project.getImageGroup().getId());    // 마크다운 이미지 제외 가져오기
         List<String> imageUrls = imageService.getImageUrls(images);
-        
+
         UserDetailResponse userDetailResponse = UserMapper.toDetailResponse(project.getSeller());
         List<ProductResponse> productResponses = productService.getAllProducts(project);
 
@@ -220,9 +220,6 @@ public class ProjectService {
         return projects.stream()
                 .map(project -> {
                     String imageUrl = imageService.getImage(project.getImageGroup().getId());
-                    if(imageUrl.isEmpty()){
-                        imageUrl = imageService.getFullUrl(imageUrl);
-                    }
                     int currentRank = rank.getAndIncrement();
                     return ProjectAllResponse.from(project, imageUrl, currentRank);
                 })
@@ -276,9 +273,6 @@ public class ProjectService {
                             .map(project -> {
                                 String imageUrl = imageService.getImage(project.getImageGroup().getId());
                                 System.out.println(imageUrl);
-                                if(!imageUrl.isEmpty()){
-                                    imageUrl = imageService.getFullUrl(imageUrl);
-                                }
                                 return ProjectMapper.toTopViewResponse(project, imageUrl);
                             })
                             .toList();
@@ -297,9 +291,6 @@ public class ProjectService {
                 .limit(5)
                 .map(project -> {
                     String imageUrl = imageService.getImage(project.getImageGroup().getId());
-                    if(!imageUrl.isEmpty()){
-                        imageUrl = imageService.getFullUrl(imageUrl);
-                    }
                     return ProjectMapper.toTopViewResponse(project, imageUrl);
                 })
                 .toList();
@@ -316,9 +307,6 @@ public class ProjectService {
                     List<ProjectTopViewResponse> topViewResponses = entry.getValue().stream()
                             .map(project -> {
                                 String imageUrl = imageService.getImage(project.getImageGroup().getId());
-                                if(imageUrl.isEmpty()){
-                                    imageUrl = imageService.getFullUrl(imageUrl);
-                                }
                                 return ProjectMapper.toTopViewResponse(project, imageUrl);
                             })
                             .toList();
