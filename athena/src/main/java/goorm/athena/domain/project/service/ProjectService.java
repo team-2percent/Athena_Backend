@@ -172,12 +172,6 @@ public class ProjectService {
         createProducts(request.products(), project);
     }
 
-    private void updateProducts(Project project, List<ProductRequest> products) {
-        deleteProducts(project);
-        createProducts(products, project);
-    }
-
-
     /**
      * [프로젝트 삭제 Method]
      */
