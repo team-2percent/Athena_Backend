@@ -25,6 +25,7 @@ public enum ErrorCode {
     IMAGES_UPLOAD_FAILED(HttpStatus.SERVICE_UNAVAILABLE, "리사이징 이미지 업로드에 실패했습니다."),
     IMAGE_DELETE_FAILED(HttpStatus.SERVICE_UNAVAILABLE, "이미지 삭제에 실패했습니다."),
     INVALID_IMAGE_EXTENSION(HttpStatus.BAD_REQUEST, "이미지 확장자가 올바르지 않습니다."),
+    IMAGE_IS_REQUIRED(HttpStatus.NOT_FOUND, "대표 이미지는 필수입니다."),
 
     // 결제
     ORDER_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 ID의 주문이 존재하지 않습니다."),

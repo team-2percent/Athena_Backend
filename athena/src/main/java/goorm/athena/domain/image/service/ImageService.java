@@ -6,9 +6,12 @@ import goorm.athena.domain.image.mapper.ImageMapper;
 import goorm.athena.domain.image.repository.ImageRepository;
 import goorm.athena.domain.imageGroup.entity.ImageGroup;
 import goorm.athena.domain.imageGroup.service.ImageGroupService;
+import goorm.athena.global.exception.CustomException;
+import goorm.athena.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -29,6 +32,10 @@ public class ImageService {
     // 다중 이미지 업로드
     @Transactional
     public void uploadImages(List<MultipartFile> files, Long imageGroupId) {
+        if(!CollectionUtils.isEmpty(files)) {
+            throw new CustomException(ErrorCode.IMAGE_IS_REQUIRED);
+        }
+
         List<ImageCreateRequest> requests = nasService.saveAll(files, imageGroupId); // NAS에 이미지 저장 및 DTO 반환
         ImageGroup imageGroup = imageGroupService.getById(imageGroupId);
 
@@ -44,6 +51,10 @@ public class ImageService {
     // 마크다운 이미지 저장 및 주소 반환
     @Transactional
     public List<String> uploadMarkdownImages(List<MultipartFile> files, ImageGroup imageGroup) {
+        if(!CollectionUtils.isEmpty(files)) {
+            throw new CustomException(ErrorCode.IMAGE_IS_REQUIRED);
+        }
+
         List<ImageCreateRequest> requests = nasService.saveAll(files, imageGroup.getId());
 
         List<Image> markdownImages = new ArrayList<>();
