@@ -203,12 +203,8 @@ public class ProjectService {
 
         Category category = categoryService.getCategoryById(project.getCategory().getId());
         List<Image> images = imageService.getProjectImages(project.getImageGroup().getId());    // 마크다운 이미지 제외 가져오기
-
-        // 이미지 URL 전처리 적용
-        List<String> imageUrls = imageService.getImageUrls(images).stream()
-                .map(imageService::getFullUrl)
-                .toList();
-
+        List<String> imageUrls = imageService.getImageUrls(images);
+        
         UserDetailResponse userDetailResponse = UserMapper.toDetailResponse(project.getSeller());
         List<ProductResponse> productResponses = productService.getAllProducts(project);
 
