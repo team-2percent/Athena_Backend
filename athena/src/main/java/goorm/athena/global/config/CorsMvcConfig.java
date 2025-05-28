@@ -19,7 +19,7 @@ public class CorsMvcConfig implements WebMvcConfigurer {
                 .allowedOrigins("http://localhost:3000", "https://athena-nine-green.vercel.app",
                         "https://athena-84xayn4st-leejinyeong218s-projects.vercel.app", "https://athena.i-am-jay.com",
                         "https://athena-local.i-am-jay.com")
-                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH")
                 .allowedHeaders("*")
                 .allowCredentials(true);
     }
