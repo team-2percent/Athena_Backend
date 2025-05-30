@@ -5,16 +5,13 @@ import goorm.athena.domain.user.service.UserService;
 import goorm.athena.util.IntegrationTestSupport;
 
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
 
-@ExtendWith(MockitoExtension.class)
 public abstract class UserIntegrationTestSupport extends IntegrationTestSupport {
   @Mock
   protected UserRepository userRepository;
