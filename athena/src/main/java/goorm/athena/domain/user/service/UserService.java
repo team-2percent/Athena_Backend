@@ -13,13 +13,11 @@ import goorm.athena.domain.user.repository.UserRepository;
 import goorm.athena.global.exception.CustomException;
 import goorm.athena.global.exception.ErrorCode;
 import goorm.athena.global.jwt.util.JwtTokenizer;
-import jakarta.persistence.CollectionTable;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;

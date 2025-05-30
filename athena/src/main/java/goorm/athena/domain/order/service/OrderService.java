@@ -25,7 +25,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import goorm.athena.domain.notification.service.NotificationService;
 
 @Service
 @RequiredArgsConstructor
@@ -37,7 +36,6 @@ public class OrderService {
     private final DeliveryInfoService deliveryInfoService;
     private final ProductService productService;
     private final ProjectService projectService;
-    private final NotificationService notificationService;
 
     public Order getById(Long id) {
         return orderRepository.findById(id)
@@ -90,6 +88,15 @@ public class OrderService {
             Product product = item.getProduct();
             product.decreaseStock(item.getQuantity());
         }
+    }
+
+    public Long getSeller(Long orderId){
+        User user = orderRepository.findSellerByOrderId(orderId);
+        return user.getId();
+    }
+
+    public User getBuyer(Long orderId){
+        return orderRepository.findBuyerByOrderId(orderId);
     }
 
 }
