@@ -67,6 +67,13 @@ nas:
 fcm:
   certification: ${FCM_CERTIFICATION}
 
+firebase:
+  projectId: ${FIREBASE_PROJECT_ID}
+  privateKeyId: ${FIREBASE_PRIVATE_KEY_ID}
+  privateKey: ${FIREBASE_PRIVATE_KEY}
+  clientEmail: ${FIREBASE_CLIENT_EMAIL}
+  clientId: ${FIREBASE_CLIENT_ID}
+
 ---
 
 spring:
