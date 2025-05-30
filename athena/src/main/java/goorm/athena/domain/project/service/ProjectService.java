@@ -340,4 +340,9 @@ public class ProjectService {
                 .orElseThrow(() -> new CustomException(ErrorCode.PROJECT_NOT_FOUND));
     }
 
+    public Long getSellerId(Long projectId) {
+        User user =  projectRepository.findSellerByProjectId(projectId);
+        return user.getId();
+    }
+
 }
