@@ -38,3 +38,5 @@ logs/
 *.log
 
 .env
+
+**/src/main/resources/firebase/

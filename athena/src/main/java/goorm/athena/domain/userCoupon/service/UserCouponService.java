@@ -81,4 +81,8 @@ public class UserCouponService {
     public UserCouponCursorResponse getUserCoupons(Long userId, Long cursorId, int size){
         return userCouponCursorRepository.getUserCouponByCursor(userId, cursorId, size);
     }
+
+    public String getCouponTitle(Long couponId){
+        return couponService.getCoupon(couponId).getTitle();
+    }
 }

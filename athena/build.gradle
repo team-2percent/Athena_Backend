@@ -67,6 +67,9 @@ dependencies {
 	// log
 	implementation 'com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.9.0'
 
+	// firebase
+	implementation 'com.google.firebase:firebase-admin:9.2.0'
+
 	// test (@SpringBootTest, @DataJpaTest 등에서만 로딩됨 ,운영 빌드 시 포함되지 않음 )
 	testImplementation 'com.h2database:h2'
 }

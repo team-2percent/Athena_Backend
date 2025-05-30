@@ -6,7 +6,6 @@ import goorm.athena.domain.category.entity.Category;
 import goorm.athena.domain.category.service.CategoryService;
 import goorm.athena.domain.image.entity.Image;
 import goorm.athena.domain.image.service.ImageService;
-import goorm.athena.domain.image.service.NasService;
 import goorm.athena.domain.imageGroup.entity.ImageGroup;
 import goorm.athena.domain.imageGroup.service.ImageGroupService;
 import goorm.athena.domain.product.dto.req.ProductRequest;
@@ -339,6 +338,11 @@ public class ProjectService {
     public Project getById(Long id) {
         return projectRepository.findById(id)
                 .orElseThrow(() -> new CustomException(ErrorCode.PROJECT_NOT_FOUND));
+    }
+
+    public Long getSellerId(Long projectId) {
+        User user =  projectRepository.findSellerByProjectId(projectId);
+        return user.getId();
     }
 
 }

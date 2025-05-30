@@ -13,7 +13,7 @@ public enum ErrorCode {
     INVALID_TITLE_FORMAT(HttpStatus.BAD_REQUEST, "제목은 25자 이하여야 합니다"),
     INVALID_DESCRIPTION_FORMAT(HttpStatus.BAD_REQUEST, "내용은 50자 이하여야 합니다."),
     INVALID_STARTDATE(HttpStatus.BAD_REQUEST, "상품 판매 시작일은 등록일로부터 최소 7일 이후여야 합니다."),
-    INVALID_JSON_FORMAT(HttpStatus.NOT_FOUND, "JSON 형태가 올바르지 않습니다."),
+    INVALID_JSON_FORMAT(HttpStatus.BAD_REQUEST, "JSON 형태가 올바르지 않습니다."),
     INVALID_PROJECT_ORDER(HttpStatus.BAD_REQUEST, "해당 카테고리에서는 할 수 없는 정렬입니다."),
 
     // 카테고리
@@ -25,7 +25,12 @@ public enum ErrorCode {
     IMAGES_UPLOAD_FAILED(HttpStatus.SERVICE_UNAVAILABLE, "리사이징 이미지 업로드에 실패했습니다."),
     IMAGE_DELETE_FAILED(HttpStatus.SERVICE_UNAVAILABLE, "이미지 삭제에 실패했습니다."),
     INVALID_IMAGE_EXTENSION(HttpStatus.BAD_REQUEST, "이미지 확장자가 올바르지 않습니다."),
-    IMAGE_IS_REQUIRED(HttpStatus.NOT_FOUND, "대표 이미지는 필수입니다."),
+    IMAGE_IS_REQUIRED(HttpStatus.BAD_REQUEST, "대표 이미지는 필수입니다."),
+
+    // 알림
+    FAILED_TO_SEND(HttpStatus.SERVICE_UNAVAILABLE, "알림 전송에 실패했습니다."),
+    FAILED_TO_DELETE_FCM(HttpStatus.NOT_FOUND, "삭제하려는 사용자의 FCM 토큰이 존재하지 않습니다."),
+
 
     // 결제
     ORDER_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 ID의 주문이 존재하지 않습니다."),
