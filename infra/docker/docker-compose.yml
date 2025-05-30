@@ -42,6 +42,8 @@ services:
       BUCKET_NAME: ${BUCKET_NAME}
       JWT_SECRET_KEY: ${JWT_SECRET_KEY}
       JWT_REFRESH_KEY: ${JWT_REFRESH_KEY}
+      NAS_PATH: ${NAS_PATH}
+      FCM_CERTIFICATION: ${FCM_CERTIFICATION}
     ports:
       - "8080:8080"
     volumes:
