@@ -2,7 +2,9 @@ package goorm.athena.domain.project.service;
 
 import org.junit.jupiter.api.Test;
 
-public class ProjectServiceTest {
+import goorm.athena.domain.project.ProjectIntegrationTestSupport;
+
+public class ProjectServiceTest extends ProjectIntegrationTestSupport {
   @Test
   void testCreateProject() {
 
