@@ -61,5 +61,9 @@ jwt:
   refreshKey: ${JWT_REFRESH_KEY}
 
 nas:
-  base.path: /Volumes/Data/images
+  base.path: ${NAS_PATH}
+
+
+fcm:
+  certification: ${FCM_CERTIFICATION}
 
