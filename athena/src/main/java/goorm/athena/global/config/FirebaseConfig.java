@@ -25,6 +25,8 @@ public class FirebaseConfig {
     private String firebaseClientEmail;
     @Value("${firebase.clientId}")
     private String firebaseClientId;
+    @Value("${firebase.clientX509CertUrl}")
+    private String firebaseClientX509CertUrl;
 
     @PostConstruct
     public void init() {
@@ -40,10 +42,11 @@ public class FirebaseConfig {
                             "  \"auth_uri\": \"https://accounts.google.com/o/oauth2/auth\",\n" +
                             "  \"token_uri\": \"https://oauth2.googleapis.com/token\",\n" +
                             "  \"auth_provider_x509_cert_url\": \"https://www.googleapis.com/oauth2/v1/certs\",\n" +
-                            "  \"client_x509_cert_url\": \"https://www.googleapis.com/robot/v1/metadata/x509/%s\",\n" +
+                            "  \"client_x509_cert_url\": \"%s\",\n" +
                             "  \"universe_domain\": \"googleapis.com\"\n" +
                             "}",
-                    firebaseProjectId, firebasePrivateKeyId, firebasePrivateKey, firebaseClientEmail, firebaseClientId);
+                    firebaseProjectId, firebasePrivateKeyId, firebasePrivateKey, firebaseClientEmail, firebaseClientId,
+                    firebaseClientX509CertUrl);
 
             ByteArrayInputStream serviceAccount = new ByteArrayInputStream(json.getBytes(StandardCharsets.UTF_8));
 
