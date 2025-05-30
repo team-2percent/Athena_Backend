@@ -6,9 +6,8 @@ import com.google.firebase.FirebaseOptions;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.io.ClassPathResource;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 import java.io.FileInputStream;
 import java.io.IOException;
 
@@ -20,19 +19,16 @@ public class FirebaseConfig {
     private String firebaseConfigFilePath;
 
     @PostConstruct
-    public void init(){
-        try{
-            ClassPathResource resource = new ClassPathResource(firebaseConfigFilePath);
-            FileInputStream serviceAccount = new FileInputStream(resource.getFile());
-
+    public void init() {
+        try (FileInputStream serviceAccount = new FileInputStream(firebaseConfigFilePath)) {
             FirebaseOptions options = FirebaseOptions.builder()
                     .setCredentials(GoogleCredentials.fromStream(serviceAccount))
                     .build();
 
-            if (FirebaseApp.getApps().isEmpty()){
+            if (FirebaseApp.getApps().isEmpty()) {
                 FirebaseApp.initializeApp(options);
             }
-        } catch (IOException e){
+        } catch (IOException e) {
             throw new RuntimeException("Firebase 초기화 실패", e);
         }
     }
