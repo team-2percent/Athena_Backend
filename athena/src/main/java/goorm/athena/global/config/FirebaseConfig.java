@@ -15,15 +15,15 @@ import java.nio.charset.StandardCharsets;
 @Slf4j
 @Configuration
 public class FirebaseConfig {
-    @Value("${FIREBASE_PROJECT_ID}")
+    @Value("${firebase.projectId}")
     private String firebaseProjectId;
-    @Value("${FIREBASE_PRIVATE_KEY_ID}")
+    @Value("${firebase.privateKeyId}")
     private String firebasePrivateKeyId;
-    @Value("${FIREBASE_PRIVATE_KEY}")
+    @Value("${firebase.privateKey}")
     private String firebasePrivateKey;
-    @Value("${FIREBASE_CLIENT_EMAIL}")
+    @Value("${firebase.clientEmail}")
     private String firebaseClientEmail;
-    @Value("${FIREBASE_CLIENT_ID}")
+    @Value("${firebase.clientId}")
     private String firebaseClientId;
 
     @PostConstruct
@@ -42,7 +42,7 @@ public class FirebaseConfig {
                             "  \"auth_provider_x509_cert_url\": \"https://www.googleapis.com/oauth2/v1/certs\",\n" +
                             "  \"client_x509_cert_url\": \"https://www.googleapis.com/robot/v1/metadata/x509/%s\",\n" +
                             "  \"universe_domain\": \"googleapis.com\"\n" +
-                        "}",
+                            "}",
                     firebaseProjectId, firebasePrivateKeyId, firebasePrivateKey, firebaseClientEmail, firebaseClientId);
 
             ByteArrayInputStream serviceAccount = new ByteArrayInputStream(json.getBytes(StandardCharsets.UTF_8));
