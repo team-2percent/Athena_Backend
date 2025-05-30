@@ -32,7 +32,6 @@ public class ProjectControllerImpl implements ProjectController {
     private final ProjectService projectService;
     private final ImageGroupService imageGroupService;
     private final ProductService productService;
-    private final ObjectMapper objectMapper;
 
     // 프로젝트 초기 설정 (이미지 그룹 생성)
     @Override

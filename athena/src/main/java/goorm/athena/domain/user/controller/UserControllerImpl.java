@@ -1,33 +1,26 @@
 package goorm.athena.domain.user.controller;
 
-import goorm.athena.domain.image.service.ImageService;
 import goorm.athena.domain.imageGroup.entity.ImageGroup;
 import goorm.athena.domain.imageGroup.entity.Type;
 import goorm.athena.domain.imageGroup.service.ImageGroupService;
-import goorm.athena.domain.s3.service.S3Service;
+import goorm.athena.domain.notification.service.FcmTokenService;
 import goorm.athena.domain.user.dto.request.UserCreateRequest;
 import goorm.athena.domain.user.dto.request.UserLoginRequest;
 import goorm.athena.domain.user.dto.request.UserUpdateRequest;
 import goorm.athena.domain.user.dto.response.*;
 import goorm.athena.domain.user.service.RefreshTokenService;
 import goorm.athena.domain.user.service.UserService;
-import goorm.athena.domain.userCoupon.dto.cursor.UserCouponCursorResponse;
-import goorm.athena.domain.userCoupon.service.UserCouponService;
 import goorm.athena.global.exception.CustomException;
 import goorm.athena.global.exception.ErrorCode;
 import goorm.athena.global.jwt.util.CheckLogin;
 import goorm.athena.global.jwt.util.LoginUserRequest;
-import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
@@ -37,6 +30,7 @@ public class UserControllerImpl implements UserController {
     private final UserService userService;
     private final RefreshTokenService refreshTokenService;
     private final ImageGroupService imageGroupService;
+    private final FcmTokenService fcmTokenService;
 
     @Override
     @PostMapping
@@ -93,6 +87,7 @@ public class UserControllerImpl implements UserController {
             throw new CustomException(ErrorCode.REFRESHTOKEN_NOT_FOUND);
         }
 
+        fcmTokenService.deleteToken(request.userId());      // 특정 유저 FCM 토큰 삭제
         refreshTokenService.deleteRefreshToken(response);
 
         return ResponseEntity.ok().build();
