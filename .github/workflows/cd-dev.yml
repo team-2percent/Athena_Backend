@@ -91,6 +91,8 @@ jobs:
           ACCESS_KEY=${{ secrets.ACCESS_KEY }}
           SECRET_KEY=${{ secrets.SECRET_KEY }}
           BUCKET_NAME=${{ secrets.BUCKET_NAME }}
+          NAS_PATH=${{ secrets.NAS_PATH }}
+          FCM_CERTIFICATION=${{ secrets.FCM_CERTIFICATION }}
           IMAGE_TAG=${{ env.IMAGE_TAG }}
           EOF
 
