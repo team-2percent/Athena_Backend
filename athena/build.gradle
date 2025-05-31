@@ -66,12 +66,25 @@ dependencies {
 
 	// log
 	implementation 'com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.9.0'
-
-	// firebase
+  
+  	// firebase
 	implementation 'com.google.firebase:firebase-admin:9.2.0'
 
 	// test (@SpringBootTest, @DataJpaTest 등에서만 로딩됨 ,운영 빌드 시 포함되지 않음 )
 	testImplementation 'com.h2database:h2'
+
+	testImplementation "org.testcontainers:junit-jupiter"
+	testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
+	testImplementation "org.testcontainers:mysql"
+	testImplementation "org.springframework.boot:spring-boot-testcontainers"
+	testImplementation "org.testcontainers:testcontainers"
+	testImplementation 'org.mockito:mockito-core:5.12.0'
+	testImplementation 'org.mockito:mockito-junit-jupiter:5.12.0'
+
+}
+
+test {
+	useJUnitPlatform()
 }
 
 tasks.named('test') {
