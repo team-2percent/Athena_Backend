@@ -5,13 +5,9 @@ import goorm.athena.domain.image.entity.Image;
 import goorm.athena.domain.image.mapper.ImageMapper;
 import goorm.athena.domain.image.repository.ImageRepository;
 import goorm.athena.domain.imageGroup.entity.ImageGroup;
-import goorm.athena.domain.imageGroup.service.ImageGroupService;
-import goorm.athena.global.exception.CustomException;
-import goorm.athena.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -23,7 +19,6 @@ import java.util.List;
 @Service
 public class ImageService {
     private final ImageRepository imageRepository;
-    private final ImageGroupService imageGroupService;
     private final NasService nasService;
 
     /**
@@ -34,7 +29,6 @@ public class ImageService {
     public void uploadImages(List<MultipartFile> files, ImageGroup imageGroup) {
         Long imageGroupId = imageGroup.getId();
         List<ImageCreateRequest> requests = nasService.saveAll(files, imageGroupId); // NAS에 이미지 저장 및 DTO 반환
-
 
         List<Image> images = new ArrayList<>();
         for (int i = 0; i < requests.size(); i++) {
@@ -48,12 +42,11 @@ public class ImageService {
     // 마크다운 이미지 저장 및 주소 반환
     @Transactional
     public List<String> uploadMarkdownImages(List<MultipartFile> files, ImageGroup imageGroup) {
-
         List<ImageCreateRequest> requests = nasService.saveAll(files, imageGroup.getId());
 
         List<Image> markdownImages = new ArrayList<>();
         for (ImageCreateRequest request : requests) {
-            Image image = ImageMapper.toEntity(request, imageGroup, null);
+            Image image = ImageMapper.toEntity(request, imageGroup, (long) 0);
             markdownImages.add(image);
         }
         imageRepository.saveAll(markdownImages);

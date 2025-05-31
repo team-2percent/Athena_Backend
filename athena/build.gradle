@@ -2,6 +2,7 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.4.5'
 	id 'io.spring.dependency-management' version '1.1.7'
+	id 'jacoco'
 }
 
 group = 'goorm'
@@ -65,9 +66,13 @@ dependencies {
 
 	// log
 	implementation 'com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.9.0'
+  
+  	// firebase
+	implementation 'com.google.firebase:firebase-admin:9.2.0'
 
-	// test
-	// Testcontainers 의존성 추가
+	// test (@SpringBootTest, @DataJpaTest 등에서만 로딩됨 ,운영 빌드 시 포함되지 않음 )
+	testImplementation 'com.h2database:h2'
+
 	testImplementation "org.testcontainers:junit-jupiter"
 	testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
 	testImplementation "org.testcontainers:mysql"
@@ -75,7 +80,6 @@ dependencies {
 	testImplementation "org.testcontainers:testcontainers"
 	testImplementation 'org.mockito:mockito-core:5.12.0'
 	testImplementation 'org.mockito:mockito-junit-jupiter:5.12.0'
-
 
 }
 
@@ -85,4 +89,79 @@ test {
 
 tasks.named('test') {
 	useJUnitPlatform()
+	finalizedBy 'jacocoTestReport'
+}
+
+// jacoco 정보
+jacoco {
+	toolVersion = "0.8.11"
+	layout.buildDirectory.dir("reports/jacoco")
+}
+
+// jacoco Report 생성
+jacocoTestReport {
+	dependsOn test // test 종속성 추가
+
+	reports {
+		xml.required = true
+		csv.required = false
+		html.required = true
+	}
+
+	def QDomainList = []
+	for (qPattern in '**/QA'..'**/QZ') { // QClass 대응
+		QDomainList.add(qPattern + '*')
+	}
+
+	afterEvaluate {
+		classDirectories.setFrom(files(classDirectories.files.collect {
+			fileTree(dir: it, exclude: [
+					'**/repository/**',
+					'**/entity/**',
+					'**/dto/**',
+					'**/*Application*',
+					'**/exception/**',
+					'**/config/**',
+			] + QDomainList)
+		}))
+	}
+
+	finalizedBy 'jacocoTestCoverageVerification' // jacocoTestReport 태스크가 끝난 후 실행
+}
+
+// jacoco Test 유효성 확인
+jacocoTestCoverageVerification {
+	def QDomainList = []
+	for (qPattern in '*.QA'..'*.QZ') { // QClass 대응
+		QDomainList.add(qPattern + '*')
+	}
+
+	violationRules {
+		rule {
+			enabled = true // 규칙 활성화 여부
+			element = 'CLASS' // 커버리지를 체크할 단위 설정
+
+//			// 코드 커버리지를 측정할 때 사용되는 지표
+//			limit {
+//				counter = 'LINE'
+//				value = 'COVEREDRATIO'
+//				minimum = 0.30
+//			}
+//
+//			limit {
+//				counter = 'BRANCH'
+//				value = 'COVEREDRATIO'
+//				minimum = 0.30
+//			}
+
+			excludes = [
+					'**/repository/**',
+					'**/entity/**',
+					'**.dto.**',
+					'**.*Application*',
+					'**.exception.**',
+					'**.config.**',
+			] + QDomainList
+		}
+	}
 }
