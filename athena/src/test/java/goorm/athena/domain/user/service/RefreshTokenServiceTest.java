@@ -23,9 +23,11 @@ class RefreshTokenServiceTest extends RefreshTokenIntegrationTestSupport {
     @DisplayName("토큰을 재발급할 때 리프레시 토큰이 Null이라면 에러를 리턴한다.")
     @Test
     void reissueToken_whenRefreshTokenIsNull_thenThrowException() {
+        // given
         String accessToken = "someAccessToken";
         String refreshToken = null;
 
+        // when & then
         assertThatThrownBy(() -> refreshTokenService.reissueToken(accessToken, refreshToken, response))
                 .isInstanceOf(CustomException.class)
                 .hasMessageContaining(ErrorCode.REFRESHTOKEN_NOT_FOUND.getErrorMessage());
@@ -49,6 +51,7 @@ class RefreshTokenServiceTest extends RefreshTokenIntegrationTestSupport {
     @DisplayName("토큰을 재발급할 때 액세스, 리프레시 토큰의 만료되지 않았다면 그대로 두 토큰을 리턴한다.")
     @Test
     void reissueToken_whenBothTokensValid_thenReturnSameTokens() {
+        // given
         String accessToken = "validAccessToken";
         String refreshToken = "validRefreshToken";
 
@@ -59,10 +62,12 @@ class RefreshTokenServiceTest extends RefreshTokenIntegrationTestSupport {
         given(jwtTokenizer.parseAccessToken(accessToken)).willReturn(claims);
         given(claims.getSubject()).willReturn("1");
 
-        RefreshTokenResponse expectedResponse = new RefreshTokenResponse(1L, accessToken, refreshToken);
+        // when
 
+        RefreshTokenResponse expectedResponse = new RefreshTokenResponse(1L, accessToken, refreshToken);
         RefreshTokenResponse actualResponse = refreshTokenService.reissueToken(accessToken, refreshToken, response);
 
+        // then
         assertThat(expectedResponse.accessToken()).isEqualTo(accessToken);
         assertThat(actualResponse.refreshToken()).isEqualTo(refreshToken);
     }
@@ -70,6 +75,7 @@ class RefreshTokenServiceTest extends RefreshTokenIntegrationTestSupport {
     @DisplayName("토큰을 재발급할 때 액세스 토큰이 만료되고 리프레시 토큰이 만료되지 않았다면 액세스 토큰을 재발급한다.")
     @Test
     void reissueToken_whenAccessExpiredRefreshValid_thenReturnNewAccessToken() {
+        // given
         String accessToken = "expiredAccessToken";
         String refreshToken = "validRefreshToken";
 
@@ -85,10 +91,11 @@ class RefreshTokenServiceTest extends RefreshTokenIntegrationTestSupport {
         given(jwtTokenizer.parseAccessToken(newAccessToken)).willReturn(refreshClaims);
         given(jwtTokenizer.isValidAccessToken(newAccessToken)).willReturn(true);
 
+        // when
         RefreshTokenResponse expectedResponse = new RefreshTokenResponse(1L, newAccessToken, refreshToken);
-
         RefreshTokenResponse actualResponse = refreshTokenService.reissueToken(newAccessToken, refreshToken, response);
 
+        // then
         assertThat(expectedResponse.accessToken()).isEqualTo(newAccessToken);
         assertThat(actualResponse.refreshToken()).isEqualTo(refreshToken);
     }
@@ -96,16 +103,19 @@ class RefreshTokenServiceTest extends RefreshTokenIntegrationTestSupport {
     @DisplayName("토큰을 재발급할 때 액세스 토큰이 만료되지 않고 리프레시 토큰이 만료되었다면 에러를 리턴한다.")
     @Test
     void reissueToken_whenRefreshExpired_thenThrowRefreshTokenExpiredException() {
+        // givem
         String accessToken = "validAccessToken";
         String expiredRefreshToken = "expiredRefreshToken";
 
         given(jwtTokenizer.isValidAccessToken(accessToken)).willReturn(true);
         given(jwtTokenizer.isValidRefreshToken(expiredRefreshToken)).willReturn(false);
 
+        // when
         CustomException exception = assertThrows(CustomException.class, () ->
                 refreshTokenService.reissueToken(accessToken, expiredRefreshToken, response)
         );
 
+        // then
         assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.REFRESHTOKEN_EXPIRED);
         String setCookie = response.getHeader("Set-Cookie");
         assertThat(setCookie).isNotNull(); // 실제로 헤더가 세팅되었는지 확인
@@ -115,16 +125,19 @@ class RefreshTokenServiceTest extends RefreshTokenIntegrationTestSupport {
     @DisplayName("토큰을 재발급할 때 액세스 토큰이 만료되고 리프레시 토큰이 만료되었다면 에러를 리턴한다.")
     @Test
     void reissueToken_whenBothTokensExpired_thenThrowAuthTokenExpiredException() {
+        //given
         String expiredAccessToken = "expiredAccessToken";
         String expiredRefreshToken = "expiredRefreshToken";
 
         given(jwtTokenizer.isValidAccessToken(expiredAccessToken)).willReturn(false);
         given(jwtTokenizer.isValidRefreshToken(expiredRefreshToken)).willReturn(false);
 
+        // when
         CustomException exception = assertThrows(CustomException.class, () ->
                 refreshTokenService.reissueToken(expiredAccessToken, expiredRefreshToken, response)
         );
 
+        // then
         assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.AUTH_TOKEN_EXPIRED);
         assertThat(response.getHeader("Set-Cookie")).contains("Max-Age=0");
     }
