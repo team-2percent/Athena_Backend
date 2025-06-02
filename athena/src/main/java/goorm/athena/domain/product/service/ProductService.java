@@ -16,7 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -55,6 +54,18 @@ public class ProductService {
             productRepository.delete(product);
         }
     }
+
+    public void updateProducts(List<ProductRequest> requests, Project project) {
+        List<Product> products = productRepository.findAllByProject(project);
+        List<Long> prices = requests.stream()
+                .map(ProductRequest::price)
+                .toList();
+
+        for (int i = 0; i < products.size(); i++) {
+            products.get(i).updatePrice(prices.get(i)); // 순서대로 가격 업데이트
+        }
+    }
+
 
     // 상품 리스트 전체 조회
     public List<ProductResponse> getAllProducts(Project project){

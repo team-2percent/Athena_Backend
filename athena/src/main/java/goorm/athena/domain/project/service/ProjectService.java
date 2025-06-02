@@ -10,6 +10,7 @@ import goorm.athena.domain.imageGroup.entity.ImageGroup;
 import goorm.athena.domain.imageGroup.service.ImageGroupService;
 import goorm.athena.domain.product.dto.req.ProductRequest;
 import goorm.athena.domain.product.dto.res.ProductResponse;
+import goorm.athena.domain.product.entity.Product;
 import goorm.athena.domain.product.service.ProductService;
 import goorm.athena.domain.project.dto.cursor.*;
 import goorm.athena.domain.project.dto.req.ProjectCreateRequest;
@@ -157,6 +158,9 @@ public class ProjectService {
             throw new CustomException(ErrorCode.IMAGE_IS_REQUIRED);
         }
 
+        // 상품 업데이트 (가격만)
+        productService.updateProducts(request.products(), project);
+
         project.update(
                 category,
                 bankAccount,
@@ -168,10 +172,6 @@ public class ProjectService {
                 request.endAt(),
                 request.shippedAt()
         );
-
-        // 상품 및 이미지 업데이트 (PUT)
-        deleteProducts(project);
-        createProducts(request.products(), project);
     }
 
     /**

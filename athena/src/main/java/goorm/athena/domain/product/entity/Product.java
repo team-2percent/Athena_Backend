@@ -62,4 +62,8 @@ public class Product {
         return price;
     }
 
+    public void updatePrice(Long price) {
+        this.price = price;
+    }
+
 }
