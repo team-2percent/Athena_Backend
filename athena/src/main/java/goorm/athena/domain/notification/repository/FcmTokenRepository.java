@@ -12,5 +12,12 @@ public interface FcmTokenRepository extends JpaRepository<FcmToken, Long> {
 
     @Query(value = "SELECT * FROM fcm_token", nativeQuery = true)
     List<FcmToken> findAllTokens();
+
+    Optional<FcmToken> findByToken(String token);
+
+    void deleteByToken(String token);
+
+    void deleteByUserId(Long userId);
+
 }
 

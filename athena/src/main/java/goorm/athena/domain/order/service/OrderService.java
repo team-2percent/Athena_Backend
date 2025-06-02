@@ -95,8 +95,9 @@ public class OrderService {
         return user.getId();
     }
 
-    public User getBuyer(Long orderId){
-        return orderRepository.findBuyerByOrderId(orderId);
+    public Long getBuyer(Long orderId){
+        User user =  orderRepository.findBuyerByOrderId(orderId);
+        return user.getId();
     }
 
 }

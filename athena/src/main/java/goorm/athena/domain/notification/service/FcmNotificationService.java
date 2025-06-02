@@ -5,7 +5,6 @@ import com.google.firebase.messaging.FirebaseMessagingException;
 import com.google.firebase.messaging.Message;
 import com.google.firebase.messaging.Notification;
 import goorm.athena.domain.notification.entity.FcmToken;
-import goorm.athena.domain.notification.repository.FcmTokenRepository;
 import goorm.athena.global.exception.CustomException;
 import goorm.athena.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -51,7 +50,10 @@ public class FcmNotificationService {
     }
 
     private void sendToUser(Long userId, FcmMessageFactory.FcmMessage fcmMessage){
-        send(fcmTokenService.getToken(userId), fcmMessage);
+        String token = fcmTokenService.getToken(userId);
+        if (token != null) {
+            send(token, fcmMessage);
+        }
     }
 
     // 실제 알림 전송 로직
