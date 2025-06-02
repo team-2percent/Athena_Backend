@@ -2,29 +2,19 @@ package goorm.athena.domain.user.controller;
 
 import goorm.athena.domain.imageGroup.entity.ImageGroup;
 import goorm.athena.domain.imageGroup.entity.Type;
-import goorm.athena.domain.imageGroup.service.ImageGroupService;
-import goorm.athena.domain.notification.service.FcmTokenService;
 import goorm.athena.domain.user.UserControllerIntegrationTestSupport;
 import goorm.athena.domain.user.dto.request.UserCreateRequest;
 import goorm.athena.domain.user.dto.request.UserLoginRequest;
 import goorm.athena.domain.user.dto.request.UserUpdateRequest;
 import goorm.athena.domain.user.dto.response.*;
 import goorm.athena.domain.user.entity.Role;
-import goorm.athena.domain.user.service.RefreshTokenService;
-import goorm.athena.domain.user.service.UserService;
 import goorm.athena.global.exception.CustomException;
 import goorm.athena.global.exception.ErrorCode;
 import goorm.athena.global.jwt.util.LoginUserRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.lang.reflect.Field;
@@ -32,42 +22,15 @@ import java.lang.reflect.Field;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-class UserControllerImplTest {
-    @Mock
-    protected UserService userService;
-
-    @Mock
-    protected RefreshTokenService refreshTokenService;
-
-    @Mock
-    protected ImageGroupService imageGroupService;
-
-    @Mock
-    protected FcmTokenService fcmTokenService;
-
-    @Mock
-    protected HttpServletResponse httpServletResponse;
-
-    @Mock
-    protected BindingResult bindingResult;
-
-    @InjectMocks
-    protected UserControllerImpl userController;
-
-    @BeforeEach
-    void setUp() {
-        MockitoAnnotations.openMocks(this);
-    }
-
-    @DisplayName("로긔인 한 사용자가 로그아웃을 성공했다면 쿠키에 저장된 리프레시 토큰을 삭제한다.")
+class UserControllerImplTest extends UserControllerIntegrationTestSupport{
+    @DisplayName("로그인 한 사용자가 로그아웃을 성공했다면 쿠키에 저장된 리프레시 토큰을 삭제한다.")
     @Test
     void logout_success() {
         // given
-        LoginUserRequest loginUserRequest = new LoginUserRequest("123", 1L, Role.ROLE_USER);
         String refreshToken = "valid-refresh-token";
 
         // when
-        ResponseEntity<Void> response = userController.logout(loginUserRequest, refreshToken, httpServletResponse);
+        ResponseEntity<Void> response = controller.logout(loginUserRequest, refreshToken, httpServletResponse);
 
         // then
         assertEquals(200, response.getStatusCodeValue());
@@ -79,12 +42,11 @@ class UserControllerImplTest {
     @Test
     void logout_throwsException_whenRefreshTokenIsNull() {
         // given
-        LoginUserRequest loginUserRequest = new LoginUserRequest("123", 1L, Role.ROLE_USER);
         String refreshToken = null;
 
         // when & then
         CustomException exception = assertThrows(CustomException.class, () -> {
-            userController.logout(loginUserRequest, refreshToken, httpServletResponse);
+            controller.logout(loginUserRequest, refreshToken, httpServletResponse);
         });
 
         assertEquals(ErrorCode.REFRESHTOKEN_NOT_FOUND, exception.getErrorCode());
@@ -96,12 +58,11 @@ class UserControllerImplTest {
     @Test
     void logout_throwsException_whenRefreshTokenIsEmpty() {
         // given
-        LoginUserRequest loginUserRequest = new LoginUserRequest("123", 1L, Role.ROLE_USER);
         String refreshToken = "";
 
         // when & then
         CustomException exception = assertThrows(CustomException.class, () -> {
-            userController.logout(loginUserRequest, refreshToken, httpServletResponse);
+            controller.logout(loginUserRequest, refreshToken, httpServletResponse);
         });
 
         assertEquals(ErrorCode.REFRESHTOKEN_NOT_FOUND, exception.getErrorCode());
@@ -123,7 +84,7 @@ class UserControllerImplTest {
         when(userService.createUser(request, mockImageGroup)).thenReturn(mockResponse);
 
         // when
-        ResponseEntity<UserCreateResponse> response = userController.createUser(request);
+        ResponseEntity<UserCreateResponse> response = controller.createUser(request);
 
         // then
         assertEquals(200, response.getStatusCodeValue());
@@ -148,7 +109,7 @@ class UserControllerImplTest {
         when(userService.validateUserCredentials(loginRequest, httpServletResponse)).thenReturn(expectedResponse);
 
         // when
-        ResponseEntity<UserLoginResponse> response = userController.login(loginRequest, bindingResult, httpServletResponse);
+        ResponseEntity<UserLoginResponse> response = controller.login(loginRequest, bindingResult, httpServletResponse);
 
         // then
         assertEquals(200, response.getStatusCodeValue());
@@ -169,7 +130,7 @@ class UserControllerImplTest {
 
         // when & then
         CustomException exception = assertThrows(CustomException.class, () -> {
-            userController.login(loginRequest, bindingResult, httpServletResponse);
+            controller.login(loginRequest, bindingResult, httpServletResponse);
         });
 
         assertEquals(ErrorCode.VALIDATION_ERROR, exception.getErrorCode());
@@ -186,7 +147,7 @@ class UserControllerImplTest {
 
         when(userService.updateUser(1L, request, file)).thenReturn(expected);
 
-        ResponseEntity<UserUpdateResponse> response = userController.updateUser(loginUserRequest, request, file);
+        ResponseEntity<UserUpdateResponse> response = controller.updateUser(loginUserRequest, request, file);
 
         assertEquals(200, response.getStatusCodeValue());
         assertEquals(expected, response.getBody());
@@ -200,7 +161,7 @@ class UserControllerImplTest {
 
         when(userService.getUserById(userId)).thenReturn(expected);
 
-        ResponseEntity<UserGetResponse> response = userController.getUserById(userId);
+        ResponseEntity<UserGetResponse> response = controller.getUserById(userId);
 
         assertEquals(200, response.getStatusCodeValue());
         assertEquals(expected, response.getBody());
@@ -213,7 +174,7 @@ class UserControllerImplTest {
 
         doNothing().when(userService).deleteUser(userId);
 
-        ResponseEntity<Void> response = userController.deleteUser(userId);
+        ResponseEntity<Void> response = controller.deleteUser(userId);
 
         assertEquals(204, response.getStatusCodeValue());
         verify(userService).deleteUser(userId);
@@ -223,12 +184,11 @@ class UserControllerImplTest {
     @Test
     void getHeader_success() {
         //given
-        LoginUserRequest request = new LoginUserRequest("123", 1L, Role.ROLE_USER);
         UserHeaderGetResponse expected = new UserHeaderGetResponse(1L, "imageUrl", "123");
 
         //when
         when(userService.getHeaderById(1L)).thenReturn(expected);
-        ResponseEntity<UserHeaderGetResponse> response = userController.getHeader(request);
+        ResponseEntity<UserHeaderGetResponse> response = controller.getHeader(loginUserRequest);
 
         // then
         assertEquals(200, response.getStatusCodeValue());
@@ -243,7 +203,7 @@ class UserControllerImplTest {
 
         when(userService.getUserById(userId)).thenReturn(expected);
 
-        ResponseEntity<UserGetResponse> response = userController.getUserProfile(userId);
+        ResponseEntity<UserGetResponse> response = controller.getUserProfile(userId);
 
         assertEquals(200, response.getStatusCodeValue());
         assertEquals(expected, response.getBody());

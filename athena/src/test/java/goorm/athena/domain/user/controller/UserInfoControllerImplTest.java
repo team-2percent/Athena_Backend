@@ -1,164 +1,38 @@
 package goorm.athena.domain.user.controller;
 
 import goorm.athena.domain.comment.dto.res.CommentGetResponse;
-import goorm.athena.domain.comment.service.CommentService;
-import goorm.athena.domain.coupon.entity.CouponStatus;
 import goorm.athena.domain.user.UserInfoIntegrationTestSupport;
 import goorm.athena.domain.user.dto.request.UserPasswordRequest;
 import goorm.athena.domain.user.dto.request.UserUpdatePasswordRequest;
 import goorm.athena.domain.user.dto.response.*;
 import goorm.athena.domain.user.entity.Role;
-import goorm.athena.domain.user.service.MyInfoService;
-import goorm.athena.domain.user.service.RefreshTokenService;
-import goorm.athena.domain.user.service.UserService;
 import goorm.athena.domain.userCoupon.dto.cursor.UserCouponCursorResponse;
 import goorm.athena.domain.userCoupon.dto.res.UserCouponGetResponse;
 import goorm.athena.domain.userCoupon.entity.Status;
-import goorm.athena.domain.userCoupon.service.UserCouponService;
 import goorm.athena.global.exception.CustomException;
 import goorm.athena.global.exception.ErrorCode;
-import goorm.athena.global.jwt.util.CheckLoginArgumentResolver;
-import goorm.athena.global.jwt.util.JwtTokenizer;
 import goorm.athena.global.jwt.util.LoginUserRequest;
-import io.jsonwebtoken.JwtException;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.io.Decoders;
-import io.jsonwebtoken.security.Keys;
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletResponse;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.web.servlet.MockMvc;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import javax.crypto.SecretKey;
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-/*
-@WebMvcTest(controllers = UserInfoControllerImpl.class)
-@AutoConfigureMockMvc
-@ActiveProfiles("test")
-class UserInfoControllerImplTest {
 
-    @Autowired
-    private MockMvc mockMvc;
-
-    @Autowired
-    private ObjectMapper objectMapper;
-
-    @MockBean
-    private UserService userService;
-
-    @MockBean
-    private CommentService commentService;
-
-    @MockBean
-    private UserCouponService userCouponService;
-
-    @MockBean
-    private MyInfoService myInfoService;
-
-    @MockBean
-    private JwtTokenizer jwtTokenizer;
-
-    @MockBean
-    private RefreshTokenService refreshTokenService;
-
-    @MockBean
-    private CheckLoginArgumentResolver checkLoginArgumentResolver;
-
-    @BeforeEach
-    void setup() {
-        // jwtTokenizer가 항상 true 반환하도록 목 설정
-        given(jwtTokenizer.isValidAccessToken(anyString())).willReturn(true);
-        given(jwtTokenizer.isValidRefreshToken(anyString())).willReturn(true);
-        given(jwtTokenizer.extractBearerToken(anyString())).willAnswer(invocation -> {
-            String header = invocation.getArgument(0);
-            return header.replace("Bearer ", "");
-        });
-        given(jwtTokenizer.getUserIdFromToken(anyString())).willReturn(12L);
-
-        // userService도 임의 데이터 반환
-        given(userService.getUserSummary(12L))
-                .willReturn(new UserSummaryResponse("123", "홍길동"));
-    }
-
-    private static final SecretKey TEST_KEY = Keys.hmacShaKeyFor(
-            Decoders.BASE64.decode("zXh45hKJ7nbgvklMZxAz9OYxGq8RqG9H7a5XsL6EOGI="));
-
-    @Test
-    @WithMockUser(username = "string", roles = {"USER"})
-    void getSummary_returns200() throws Exception {
-        String validAccessToken = "test-access-token";
-        String refreshToken = "test-refresh-token";
-
-        mockMvc.perform(get("/api/my/info"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.userId").value("123"))
-                .andExpect(jsonPath("$.userName").value("홍길동"));
-    }
-}
-
- */
-
-class UserInfoControllerImplTest{
-    @Mock
-    protected UserService userService;
-
-    @Mock
-    protected CommentService commentService;
-
-    @Mock
-    protected UserCouponService userCouponService;
-
-    @Mock
-    protected MyInfoService myInfoService;
-
-    @InjectMocks
-    protected UserInfoControllerImpl userInfoController;
-
-    @BeforeEach
-    void setUp() {
-        MockitoAnnotations.openMocks(this);
-    }
-
+class UserInfoControllerImplTest extends UserInfoIntegrationTestSupport{
     @DisplayName("로그인 한 유저의 소개문구를 리턴한다.")
     @Test
     void getSummary() {
         // given
         UserSummaryResponse expected = new UserSummaryResponse("123", "123");
-        LoginUserRequest loginUserRequest = new LoginUserRequest("123", 1L, Role.ROLE_USER);
 
         // when
         when(userService.getUserSummary(1L)).thenReturn(expected);
-        ResponseEntity<UserSummaryResponse> response = userInfoController.getSummary(loginUserRequest);
+        ResponseEntity<UserSummaryResponse> response = controller.getSummary(request);
 
         // then
         assertEquals(200, response.getStatusCodeValue());
@@ -171,11 +45,10 @@ class UserInfoControllerImplTest{
         // given
         CommentGetResponse expected1 = new CommentGetResponse(1L, "123", "123", "123", LocalDateTime.now(), 1L, "123");
         CommentGetResponse expected2 = new CommentGetResponse(2L, "12343", "1234", "1234", LocalDateTime.now(), 1L, "1234");
-        LoginUserRequest request = new LoginUserRequest("123", 1L, Role.ROLE_USER);
 
         // when
         when(commentService.getCommentByUser(request.userId())).thenReturn(List.of(expected1, expected2));
-        List<CommentGetResponse> response = userInfoController.getComments(request);
+        List<CommentGetResponse> response = controller.getComments(request);
 
         // then
         assertNotNull(response);
@@ -194,16 +67,16 @@ class UserInfoControllerImplTest{
         LoginUserRequest request = new LoginUserRequest("123", 1L, Role.ROLE_USER);
         UserPasswordRequest passwordRequest = new UserPasswordRequest("123123");
 
-
         // when
         when(userService.checkPassword(1L, passwordRequest.password())).thenReturn(true);
-        ResponseEntity<Boolean> response = userInfoController.checkPassword(request, passwordRequest);
+        ResponseEntity<Boolean> response = controller.checkPassword(request, passwordRequest);
 
         // then
         assertEquals(200, response.getStatusCodeValue());
         assertTrue(response.getBody());
         verify(userService).checkPassword(1L, password);
     }
+
     @DisplayName("로그인 한 유저가 입력한 비밀번호와 DB에 저장된 비밀번호가 서로 다르다면 false를 리턴한다.")
     @Test
     void wrongCheckPassword() {
@@ -214,7 +87,7 @@ class UserInfoControllerImplTest{
 
         // when
         when(userService.checkPassword(1L, password)).thenReturn(false);
-        ResponseEntity<Boolean> response = userInfoController.checkPassword(request, passwordRequest);
+        ResponseEntity<Boolean> response = controller.checkPassword(request, passwordRequest);
 
         // then
         assertEquals(200, response.getStatusCodeValue());
@@ -231,7 +104,7 @@ class UserInfoControllerImplTest{
 
         // when
         doNothing().when(userService).updatePassword(1L, updatePassword);
-        ResponseEntity<Void> response = userInfoController.updatePassword(request, updatePassword);
+        ResponseEntity<Void> response = controller.updatePassword(request, updatePassword);
 
         // then
         assertEquals(204, response.getStatusCodeValue());
@@ -251,7 +124,7 @@ class UserInfoControllerImplTest{
 
         // then
         CustomException exception = assertThrows(CustomException.class,
-                () -> userInfoController.updatePassword(request, updatePassword));
+                () -> controller.updatePassword(request, updatePassword));
         assertEquals(ErrorCode.INVALID_USER_PASSWORD, exception.getErrorCode());
         verify(userService).updatePassword(1L, updatePassword);
     }
@@ -263,7 +136,7 @@ class UserInfoControllerImplTest{
         LoginUserRequest request = new LoginUserRequest("123", 1L, Role.ROLE_USER);
 
         // when
-        ResponseEntity<Boolean> response = userInfoController.checkUserId(request, 1L);
+        ResponseEntity<Boolean> response = controller.checkUserId(request, 1L);
 
         // then
         assertEquals(200, response.getStatusCodeValue());
@@ -278,7 +151,7 @@ class UserInfoControllerImplTest{
         LoginUserRequest request = new LoginUserRequest("123", 1L, Role.ROLE_USER);
 
         // when
-        ResponseEntity<Boolean> response = userInfoController.checkUserId(request, 2L);
+        ResponseEntity<Boolean> response = controller.checkUserId(request, 2L);
 
         // then
         assertEquals(200, response.getStatusCodeValue());
@@ -311,7 +184,7 @@ class UserInfoControllerImplTest{
 
         // when
         when(userCouponService.getUserCoupons(userId, cursorId, size)).thenReturn(expectedResponse);
-        ResponseEntity<UserCouponCursorResponse> response = userInfoController.getUserCoupons(request, cursorId, size);
+        ResponseEntity<UserCouponCursorResponse> response = controller.getUserCoupons(request, cursorId, size);
 
         // then
         assertEquals(200, response.getStatusCodeValue());
@@ -349,7 +222,7 @@ class UserInfoControllerImplTest{
         // when
         when(myInfoService.getMyProjects(1L, scrollRequest)).thenReturn(expectedResponse);
         ResponseEntity<MyProjectScrollResponse> response =
-                userInfoController.getMyProjects(request, nextCursor, nextProjectId, pageSize);
+                controller.getMyProjects(request, nextCursor, nextProjectId, pageSize);
 
         // then
         assertEquals(200, response.getStatusCodeValue());
@@ -388,7 +261,7 @@ class UserInfoControllerImplTest{
         // when
         when(myInfoService.getMyOrders(1L, scrollRequest)).thenReturn(expectedResponse);
         ResponseEntity<MyOrderScrollResponse> response =
-                userInfoController.getMyOrders(request, nextCursor, nextOrderId, pageSize);
+                controller.getMyOrders(request, nextCursor, nextOrderId, pageSize);
 
         // then
         assertEquals(200, response.getStatusCodeValue());

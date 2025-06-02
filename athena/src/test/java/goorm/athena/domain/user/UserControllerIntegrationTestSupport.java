@@ -5,42 +5,53 @@ import goorm.athena.domain.imageGroup.service.ImageGroupService;
 import goorm.athena.domain.notification.service.FcmTokenService;
 import goorm.athena.domain.user.controller.UserControllerImpl;
 import goorm.athena.domain.user.controller.UserInfoControllerImpl;
+import goorm.athena.domain.user.entity.Role;
 import goorm.athena.domain.user.service.MyInfoService;
 import goorm.athena.domain.user.service.RefreshTokenService;
 import goorm.athena.domain.user.service.UserService;
 import goorm.athena.domain.userCoupon.service.UserCouponService;
+import goorm.athena.global.jwt.util.LoginUserRequest;
 import goorm.athena.util.IntegrationTestSupport;
 import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.validation.BindingResult;
 
+@AutoConfigureMockMvc
 public abstract class UserControllerIntegrationTestSupport extends IntegrationTestSupport {
-    @Mock
+    protected UserControllerImpl controller;
+    protected LoginUserRequest loginUserRequest;
+
+    @Autowired
+    protected MockMvc mockMvc;
+
+    @MockBean
     protected UserService userService;
 
-    @Mock
+    @MockBean
     protected RefreshTokenService refreshTokenService;
 
-    @Mock
+    @MockBean
     protected ImageGroupService imageGroupService;
 
-    @Mock
+    @MockBean
     protected FcmTokenService fcmTokenService;
 
-    @Mock
+    @MockBean
     protected HttpServletResponse httpServletResponse;
 
-    @Mock
+    @MockBean
     protected BindingResult bindingResult;
-
-    @InjectMocks
-    protected UserControllerImpl userController;
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
+        controller = new UserControllerImpl(userService, refreshTokenService, imageGroupService, fcmTokenService);
+        loginUserRequest = new LoginUserRequest("123", 1L, Role.ROLE_USER);
     }
 }
