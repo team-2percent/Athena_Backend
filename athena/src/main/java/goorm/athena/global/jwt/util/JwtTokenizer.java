@@ -50,6 +50,14 @@ public class JwtTokenizer {
         return createToken(id, nickname, roles, REFRESH_TOKEN_EXPIRE_COUNT, refreshSecret);
     }
 
+    public String createAccessToken(Long id, String nickname, String roles, Long expires){
+        return createToken(id, nickname, roles, expires, accessSecret);
+    }
+
+    public String createRefreshToken(Long id, String nickname, String roles, Long expires){
+        return createToken(id, nickname, roles, expires, refreshSecret);
+    }
+
     public Claims parseToken(String token, byte[] secretKey){
         return Jwts.parser()
                 .verifyWith(Keys.hmacShaKeyFor(secretKey))
@@ -73,12 +81,6 @@ public class JwtTokenizer {
         return headerValue;
     }
 
-    public Long getUserIdFromToken(String token){
-        token = extractBearerToken(token);
-        Claims claims = parseToken(token, accessSecret);
-        return Long.parseLong(claims.getSubject());
-    }
-
     public boolean isValidAccessToken(String accessToken) {
         return validateSilently(extractBearerToken(accessToken), accessSecret);
     }
@@ -95,7 +97,7 @@ public class JwtTokenizer {
                     .parseSignedClaims(token);
             return true;
         } catch (ExpiredJwtException e) {
-            throw new CustomException(ErrorCode.AUTH_TOKEN_EXPIRED);
+            return false;
         } catch (UnsupportedJwtException e) {
             throw new CustomException(ErrorCode.AUTH_UNSUPPORTED_TOKEN);
         } catch (MalformedJwtException e){
