@@ -1,7 +1,7 @@
 package goorm.athena.domain.user.service;
 
+import goorm.athena.domain.image.entity.Image;
 import goorm.athena.domain.imageGroup.entity.ImageGroup;
-import goorm.athena.domain.imageGroup.entity.Type;
 import goorm.athena.domain.user.dto.request.UserCreateRequest;
 import goorm.athena.domain.user.dto.request.UserLoginRequest;
 import goorm.athena.domain.user.dto.request.UserUpdatePasswordRequest;
@@ -10,109 +10,97 @@ import goorm.athena.domain.user.dto.response.*;
 import goorm.athena.domain.user.entity.User;
 import goorm.athena.global.exception.CustomException;
 import goorm.athena.global.exception.ErrorCode;
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import goorm.athena.domain.user.UserIntegrationTestSupport;
-import org.mockito.Mockito;
-import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.lang.reflect.Field;
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.*;
+import static org.springframework.test.util.ReflectionTestUtils.setField;
 
-
+@Transactional
 class UserServiceTest extends UserIntegrationTestSupport {
 
     @DisplayName("사용자 정보와 프로필 이미지가 주어지면 사용자 정보를 업데이트한다")
     @Test
-    void updateUser_withImage_thenUpdateUserAndUploadImage() {
+    void updateUser_withImage_thenUpdateUserAndUploadImage() throws IOException {
         // given
-        Long userId = 1L;
+        ImageGroup imageGroup = setupImageGroup();
+        User user = setupUser("123", "123", "123", imageGroup);
+        userRepository.save(user);
+
         UserUpdateRequest request = new UserUpdateRequest("newNick", "소개글", "https://link.com");
 
-        MultipartFile file = mock(MultipartFile.class);
-        when(file.isEmpty()).thenReturn(false);
+        // MultipartFile 생성 (임시 WebP 이미지)
+        BufferedImage bufferedImage = new BufferedImage(100, 100, BufferedImage.TYPE_INT_RGB);
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        ImageIO.write(bufferedImage, "webp", os); // WebP 포맷 지원 라이브러리 필요
 
-        ImageGroup imageGroup = new ImageGroup();
+        MockMultipartFile multipartFile = new MockMultipartFile(
+                "file",
+                "test.webp",
+                "image/webp",
+                new ByteArrayInputStream(os.toByteArray())
+        );
 
-        User user = User.builder()
-                .email("user@example.com")
-                .password("encodedPwd")
-                .nickname("oldNick")
-                .imageGroup(imageGroup)
-                .build();
-
-        // when
-        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
-        when(userRepository.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
-
-        UserUpdateResponse response = userService.updateUser(userId, request, file);
+        UserUpdateResponse response = userService.updateUser(user.getId(), request, multipartFile);
 
         // then
         assertThat(response).isNotNull();
-        assertThat(response.nickname()).isEqualTo("newNick");
+        User updated = userService.getUser(user.getId());
+        assertThat(updated.getNickname()).isEqualTo("newNick");
 
-        verify(userRepository).findById(userId);
-        verify(imageService).uploadImages(List.of(file), imageGroup);
-        verify(userRepository).save(any(User.class));
+
+        /*
+        File savedFile = new File("src/test/resources/static/images/" +
+        assertThat(savedFile.exists()).isTrue();
+
+         */
     }
 
     @DisplayName("프로필 이미지 없이 사용자의 정보를 업데이트한다")
     @Test
     void updateUser_withoutImage_thenUpdateOnlyUser() {
         // given
-        Long userId = 1L;
+        ImageGroup imageGroup = setupImageGroup();
+        User user = setupUser("123", "123", "123", imageGroup);
+        userRepository.save(user);
+
         UserUpdateRequest request = new UserUpdateRequest("newNick", "소개글", "https://link.com");
 
-        MultipartFile file = null;
-
-        ImageGroup imageGroup = new ImageGroup();
-
-        User user = User.builder()
-                .email("user@example.com")
-                .password("encodedPwd")
-                .nickname("oldNick")
-                .imageGroup(imageGroup)
-                .build();
-
-        // when
-        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
-        when(userRepository.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
-
-        UserUpdateResponse response = userService.updateUser(userId, request, file);
+        UserUpdateResponse response = userService.updateUser(user.getId(), request, null);
 
         // then
         assertThat(response).isNotNull();
-        assertThat(response.nickname()).isEqualTo("newNick");
-
-        verify(userRepository).findById(userId);
-        verify(userRepository).save(any(User.class));
+        User updated = userService.getUser(user.getId());
+        assertThat(updated.getNickname()).isEqualTo("newNick");
     }
 
     @DisplayName("로그인 한 유저의 자신의 유저 정보를 조회한다.")
     @Test
     void getUserById_withValidUser_returnsResponse() {
         // given
-        Long userId = 1L;
-        ImageGroup imageGroup = new ImageGroup();
-        User user = User.builder().
-                nickname("nick").
-                imageGroup(imageGroup).
-                build();
+        ImageGroup imageGroup = setupImageGroup();
+        User user = setupUser("123", "123", "nick", imageGroup);
+        userRepository.save(user);
 
         // when
-        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
-
-        UserGetResponse response = userService.getUserById(userId);
+        UserGetResponse response = userService.getUserById(user.getId());
 
         // then
         assertThat(response.nickname()).isEqualTo("nick");
@@ -122,49 +110,46 @@ class UserServiceTest extends UserIntegrationTestSupport {
     @Test
     void getHeaderById_returnsHeaderResponse() {
         // given
-        Long userId = 1L;
-        ImageGroup imageGroup = new ImageGroup();
-        User user = User.builder().nickname("nick").imageGroup(imageGroup).build();
-        setId(user, 1L);
+        ImageGroup imageGroup = setupImageGroup();
+        User user = setupUser("123", "123", "nick", imageGroup);
+        userRepository.save(user);
 
         // when
-        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
-
-        UserHeaderGetResponse response = userService.getHeaderById(userId);
+        UserHeaderGetResponse response = userService.getHeaderById(user.getId());
+        String imageUrl = imageService.getImage(user.getImageGroup().getId());
 
         // then
         assertThat(response.nickname()).isEqualTo("nick");
+        assertThat(response.imageUrl()).isEqualTo(imageUrl);
     }
 
     @DisplayName("해당 유저 id의 유저 정보를 성공적으로 삭제한다.")
     @Test
     void deleteUser_successfullyDeletesUser() {
-        // given
-        Long userId = 1L;
+        ImageGroup imageGroup = setupImageGroup();
+        User user = setupUser("123", passwordEncoder.encode("123"), "nick", imageGroup);
+        userRepository.save(user);
 
         // when
-        userService.deleteUser(userId);
+        userService.deleteUser(user.getId());
 
         // then
-        verify(userRepository).deleteById(userId);
+        boolean exists = userRepository.findById(user.getId()).isPresent();
+        assertThat(exists).isFalse(); // 삭제되었는지 확인
     }
 
     @DisplayName("로그인한 유저의 저장된 비밀번호와 입력된 비밀번호가 같다면 true를 리턴한다.")
     @Test
     void checkPassword_returnsTrueWhenMatches() {
-        // given
-        Long userId = 1L;
-        String rawPw = "raw";
-        String encPw = "encoded";
+        ImageGroup imageGroup = setupImageGroup();
+        User user = setupUser("123", passwordEncoder.encode("123"), "nick", imageGroup);
+        userRepository.save(user);
 
-        User user = User.builder().password(encPw).build();
-        setId(user, 1L);
+        // given
+        String encPw = "123";
 
         // when
-        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
-        when(passwordEncoder.matches(rawPw, encPw)).thenReturn(true);
-
-        boolean result = userService.checkPassword(userId, rawPw);
+        boolean result = userService.checkPassword(user.getId(), encPw);
 
         // then
         assertThat(result).isTrue();
@@ -173,90 +158,68 @@ class UserServiceTest extends UserIntegrationTestSupport {
     @DisplayName("복수의 유저 정보들을 조회한다.")
     @Test
     void getUserIdAll_returnsAllUserIds() {
-        // given
-        User user1 = User.builder().email("1l").build();
-        User user2 = User.builder().email("2l").build();
-
-        setId(user1, 1L);
-        setId(user2, 2L);
-
-        List<User> users = List.of(user1, user2);
+        ImageGroup imageGroup = setupImageGroup();
+        User user1 = setupUser("123", passwordEncoder.encode("123"), "nick", imageGroup);
+        User user2 = setupUser("124", passwordEncoder.encode("123"), "nick2", null);
+        userRepository.saveAll(List.of(user1, user2));
 
         // when
-        when(userRepository.findAll()).thenReturn(users);
-
         List<Long> result = userService.getUserIdAll();
 
         // then
-        assertThat(result).containsExactly(1l, 2l);
+        assertThat(result).hasSize(2);
     }
 
     @DisplayName("로그인 한 유저의 저장된 비밀번호와 입력된 비밀번호가 같다면 새 토큰을 발급한다.")
     @Test
     void validateUserCredentials_returnsLoginResponse() {
         // given
-        String email = "user@example.com";
-        String rawPassword = "pw";
-        UserLoginRequest request = new UserLoginRequest(email, rawPassword);
-        User user = User.builder().
-                email(email).
-                password("encodedPw").
-                nickname("nick").
-                build();
-        setId(user, 1L);
+        UserLoginRequest request = new UserLoginRequest("124", "123");
+        User user = setupUser("124", passwordEncoder.encode("123"), "nick2", null);
+        userRepository.save(user);
 
         // when
-        when(userRepository.findByEmail(email)).thenReturn(user);
-        when(passwordEncoder.matches(rawPassword, "encodedPw")).thenReturn(true);
-        when(jwtTokenizer.createAccessToken(1L, "nick", "ROLE_USER")).thenReturn("access-token");
-        when(tokenService.issueToken(eq(user), any())).thenReturn("refresh-token");
-
         UserLoginResponse response = userService.validateUserCredentials(request, httpServletResponse);
+        String accessToken = jwtTokenizer.createAccessToken(user.getId(), user.getNickname(), user.getRole().name());
+        String refreshToken = jwtTokenizer.createRefreshToken(user.getId(), user.getNickname(), user.getRole().name());
 
         // then
-        assertThat(response.userId()).isEqualTo(1L);
-        assertThat(response.accessToken()).isEqualTo("access-token");
-        assertThat(response.refreshToken()).isEqualTo("refresh-token");
+        assertThat(response.accessToken()).isNotNull();
+        assertThat(response.refreshToken()).isNotNull();
+        assertThat(response.accessToken()).isEqualTo(accessToken);
+        assertThat(response.refreshToken()).isEqualTo(refreshToken);
     }
 
     @DisplayName("로그인 한 유저의 저장된 비밀번호와 입력된 비밀번호가 같다면 성공적으로 새 비밀번호로 변경한다.")
     @Test
     void updatePassword_success() {
         // given
-        Long userId = 1L;
-        String oldPw = "oldPw";
-        String newPw = "newPw";
-        String encodedPw = "encodedNewPw";
+        User user = setupUser("124", passwordEncoder.encode("123"), "nick2", null);
+        userRepository.save(user);
+        String oldPw = "123";
+        String newPw = "125";
 
         UserUpdatePasswordRequest req = new UserUpdatePasswordRequest(oldPw, newPw);
-        User user = User.builder().password("oldEncoded").build();
-        setId(user, 1L);
 
         // when
-        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
-        when(passwordEncoder.matches(oldPw, "oldEncoded")).thenReturn(true);
-        when(passwordEncoder.encode(newPw)).thenReturn(encodedPw);
-
-        userService.updatePassword(userId, req);
+        userService.updatePassword(user.getId(), req);
 
         // then
-        assertThat(user.getPassword()).isEqualTo(encodedPw);
+        User updatedUser = userRepository.findById(user.getId()).orElseThrow();
+        assertThat(passwordEncoder.matches(newPw, updatedUser.getPassword())).isTrue();
     }
 
     @DisplayName("로그인 한 유저의 요약 정보들을 성공적으로 리턴한다.")
     @Test
     void getUserSummary_returnsSummaryResponse() {
         // given
-        Long userId = 1L;
-        User user = User.builder().nickname("nick").build();
-        setId(user, 1L);
+        User user = setupUser("124", passwordEncoder.encode("123"), "nick2", null);
+        userRepository.save(user);
 
         user.update("nick", "소개", "https://example.com");
 
         // when
-        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
-
-        UserSummaryResponse response = userService.getUserSummary(userId);
+        UserSummaryResponse response = userService.getUserSummary(user.getId());
 
         // then
         assertThat(response.linkUrl()).isEqualTo("https://example.com");
@@ -264,47 +227,46 @@ class UserServiceTest extends UserIntegrationTestSupport {
 
     @DisplayName("로그인한 유저의 이미지 그룹으로 연결된 이미지를 성공적으로 조회한다.")
     @Test
-    void getUserById_withImageGroup_returnsImageUrl() {
+    void getUserById_withImageGroup_returnsImageUrl() throws IOException {
         // given
-        Long userId = 1L;
-        Long imageGroupId = 100L;
+        ImageGroup imageGroup = setupImageGroup();
+        User user = setupUser("124", passwordEncoder.encode("123"), "nick2", imageGroup);
+        userRepository.save(user);
 
-        ImageGroup imageGroup = ImageGroup.builder()
-                .type(Type.USER)
-                .build();
-        ReflectionTestUtils.setField(imageGroup, "id", imageGroupId);
+        // 실제 이미지 파일 생성
+        BufferedImage bufferedImage = new BufferedImage(100, 100, BufferedImage.TYPE_INT_RGB);
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        ImageIO.write(bufferedImage, "png", os);
 
-        User user = User.builder()
-                .imageGroup(imageGroup)
-                .email("test@example.com")
-                .password("encodedPassword")
-                .nickname("tester")
-                .build();
-
-        given(imageService.getImage(imageGroupId)).willReturn("http://image.url/sample.jpg");
+        MockMultipartFile multipartFile = new MockMultipartFile(
+                "file", "test.webp", "image/webp", new ByteArrayInputStream(os.toByteArray())
+        );
 
         // when
-        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
-        UserGetResponse response = userService.getUserById(userId);
+        UserUpdateRequest request = new UserUpdateRequest("123", "123" , "123");
+        userService.updateUser(user.getId(), request, multipartFile);
+        UserGetResponse response = userService.getUserById(user.getId());
 
         // then
         assertThat(response).isNotNull();
-        assertThat(response.imageUrl()).isEqualTo("http://image.url/sample.jpg");
+        assertThat(response.imageUrl()).isNotBlank();
+        assertThat(response.imageUrl()).startsWith("http"); // 도메인 붙었는지 확인
+
+        Optional<Image> savedImage = imageRepository.findFirstImageByImageGroupId(imageGroup.getId());
+        assertThat(savedImage).isPresent();
+        assertThat(savedImage.get().getFileName()).matches("[a-f0-9\\-]{36}\\.webp");
+        assertThat(savedImage.get().getOriginalUrl()).endsWith(".webp"); // 확장자 포함 여부 확인
     }
 
     @DisplayName("로그인 한 유저의 헤더 정보를 조회할 때 이미지 그룹이 없다면 이미지를 null로 리턴한다.")
     @Test
     void getHeaderById_whenImageGroupIsNull() {
         // given
-        Long userId = 1L;
-        User user = User.builder()
-                .imageGroup(null) // imageGroup이 null인 유저
-                .build();
+        User user = setupUser("124", passwordEncoder.encode("123"), "nick2", null);
+        userRepository.save(user);
 
         // when
-        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
-
-        UserHeaderGetResponse response = userService.getHeaderById(userId);
+        UserHeaderGetResponse response = userService.getHeaderById(user.getId());
 
         // then
         assertThat(response.imageUrl()).isEmpty();
@@ -312,41 +274,46 @@ class UserServiceTest extends UserIntegrationTestSupport {
 
     @DisplayName("로그인 한 유저의 헤더 정보를 조회할 때 이미지 그룹이 있다면 이미지를 리턴한다.")
     @Test
-    void getHeaderById_whenImageGroupIsNotNull() {
+    void getHeaderById_whenImageGroupIsNotNull() throws IOException {
         // given
-        Long userId = 1L;
-        ImageGroup imageGroup = ImageGroup.builder().build();
-        ReflectionTestUtils.setField(imageGroup, "id", 123L); // id 강제 세팅
+        ImageGroup imageGroup = setupImageGroup();
+        User user = setupUser("124", passwordEncoder.encode("123"), "nick2", imageGroup);
+        userRepository.save(user);
 
-        User user = User.builder()
-                .imageGroup(imageGroup)
-                .build();
+        // 실제 이미지 파일 생성
+        BufferedImage bufferedImage = new BufferedImage(100, 100, BufferedImage.TYPE_INT_RGB);
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        ImageIO.write(bufferedImage, "png", os);
 
-
-        given(imageService.getImage(123L)).willReturn("http://image.url/sample.jpg");
+        MockMultipartFile multipartFile = new MockMultipartFile(
+                "file", "test.webp", "image/webp", new ByteArrayInputStream(os.toByteArray())
+        );
 
         // when
-        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
-
-        UserHeaderGetResponse response = userService.getHeaderById(userId);
+        UserUpdateRequest request = new UserUpdateRequest("123", "123" , "123");
+        userService.updateUser(user.getId(), request, multipartFile);
+        UserGetResponse response = userService.getUserById(user.getId());
 
         // then
-        assertThat(response.imageUrl()).isEqualTo("http://image.url/sample.jpg");
+        assertThat(response).isNotNull();
+        assertThat(response.imageUrl()).isNotBlank();
+        assertThat(response.imageUrl()).startsWith("http"); // 도메인 붙었는지 확인
+
+        Optional<Image> savedImage = imageRepository.findFirstImageByImageGroupId(imageGroup.getId());
+        assertThat(savedImage).isPresent();
+        assertThat(savedImage.get().getFileName()).matches("[a-f0-9\\-]{36}\\.webp");
+        assertThat(savedImage.get().getOriginalUrl()).endsWith(".webp"); // 확장자 포함 여부 확인
     }
 
     @DisplayName("로그인 한 유저의 정보를 조회할 때 이미지 그룹이 없다면 이미지를 null로 조회한다.")
     @Test
     void getUserById_whenImageGroupIsNull() {
         // given
-        Long userId = 1L;
-        User user = User.builder()
-                .imageGroup(null)
-                .build();
+        User user = setupUser("123", passwordEncoder.encode("123"), "nick", null);
+        userRepository.save(user);
 
         // when
-        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
-
-        UserGetResponse response = userService.getUserById(userId);
+        UserGetResponse response = userService.getUserById(user.getId());
 
         // then
         assertThat(response.imageUrl()).isNull();
@@ -354,27 +321,55 @@ class UserServiceTest extends UserIntegrationTestSupport {
 
     @DisplayName("로그인 한 유저의 정보를 조회할 때 이미지 그룹이 있다면 이미지를 조회한다.")
     @Test
-    void getUserById_whenImageGroupIdIsNotNull() {
+    void getUserById_whenImageGroupIdIsNotNull() throws IOException {
         // given
-        Long userId = 1L;
-        ImageGroup imageGroup = ImageGroup.builder().build();
-        ReflectionTestUtils.setField(imageGroup, "id", 123L); // id 강제 세팅
+        ImageGroup imageGroup = setupImageGroup();
+        User user = setupUser("124", passwordEncoder.encode("123"), "nick2", imageGroup);
+        userRepository.save(user);
 
-        User user = User.builder()
-                .imageGroup(imageGroup)
-                .build();
+        // 실제 이미지 파일 생성
+        BufferedImage bufferedImage = new BufferedImage(100, 100, BufferedImage.TYPE_INT_RGB);
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        ImageIO.write(bufferedImage, "png", os);
 
-        given(imageService.getImage(123L)).willReturn("http://image.url/sample.jpg");
+        MockMultipartFile multipartFile = new MockMultipartFile(
+                "file", "test.webp", "image/webp", new ByteArrayInputStream(os.toByteArray())
+        );
 
         // when
-        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
-
-        UserGetResponse response = userService.getUserById(userId);
+        UserUpdateRequest request = new UserUpdateRequest("123", "123" , "123");
+        userService.updateUser(user.getId(), request, multipartFile);
+        UserGetResponse response = userService.getUserById(user.getId());
 
         // then
-        assertThat(response.imageUrl()).isEqualTo("http://image.url/sample.jpg");
+        assertThat(response).isNotNull();
+        assertThat(response.imageUrl()).isNotBlank();
+        assertThat(response.imageUrl()).startsWith("http"); // 도메인 붙었는지 확인
+
+        Optional<Image> savedImage = imageRepository.findFirstImageByImageGroupId(imageGroup.getId());
+        assertThat(savedImage).isPresent();
+        assertThat(savedImage.get().getFileName()).matches("[a-f0-9\\-]{36}\\.webp");
+        assertThat(savedImage.get().getOriginalUrl()).endsWith(".webp"); // 확장자 포함 여부 확인
     }
 
+    @DisplayName("로그인 한 유저의 정보를 조회할 때 이미지 그룹의 Id가 null이라면 이미지를 null로 리턴한다.")
+    @Test
+    void getUserById_whenImageGroupExistsButIdIsNull() throws Exception {
+        // given
+        ImageGroup imageGroup = new ImageGroup();
+        setField(imageGroup, "id", null); // 리플렉션으로 ID를 null로 설정
+
+        User user = setupUser("test@email.com", passwordEncoder.encode("123"), "nickname", imageGroup);
+        userRepository.save(user);
+
+        // when
+        UserGetResponse response = userService.getUserById(user.getId());
+
+        // then
+        assertThat(response.imageUrl()).isNull(); // 혹은 비어있음
+    }
+
+    @DisplayName("유저 회원가입 시 기존에 저장된 이메일이 없다면 회원가입을 성공적으로 진행한다.")
     @Test
     void createUser_whenEmailNotExist_shouldSaveUser() {
         // given
@@ -382,14 +377,10 @@ class UserServiceTest extends UserIntegrationTestSupport {
         ImageGroup imageGroup = new ImageGroup();
 
         // when
-        when(userRepository.existsByEmail(request.email())).thenReturn(false);
-        when(userRepository.save(any(User.class))).thenAnswer(i -> i.getArguments()[0]);
-
         UserCreateResponse response = userService.createUser(request, imageGroup);
 
         // then
         assertEquals(request.email(), response.email());
-        verify(userRepository).save(any(User.class));
     }
 
     // 실패
@@ -398,11 +389,11 @@ class UserServiceTest extends UserIntegrationTestSupport {
     @Test
     void getUserSummary_throwsException_whenUserNotFound() {
         // given
-        Long userId = 99L;
-        when(userRepository.findById(userId)).thenReturn(Optional.empty());
+        User user = setupUser("123", passwordEncoder.encode("123"), "nick", null);
+        userRepository.save(user);
 
         // when & then
-        assertThatThrownBy(() -> userService.getUserSummary(userId))
+        assertThatThrownBy(() -> userService.getUserSummary(99L))
                 .isInstanceOf(CustomException.class)
                 .hasMessageContaining(ErrorCode.USER_NOT_FOUND.getErrorMessage());
     }
@@ -411,12 +402,14 @@ class UserServiceTest extends UserIntegrationTestSupport {
     @Test
     void createUser_throwsException_whenEmailAlreadyExists() {
         // given
-        String email = "existing@example.com";
-        UserCreateRequest request = new UserCreateRequest(email, "password", "nickname");
+        User user = setupUser("123", passwordEncoder.encode("123"), "nick", null);
+        userRepository.save(user);
+
         ImageGroup imageGroup = new ImageGroup();
 
         // when
-        when(userRepository.existsByEmail(email)).thenReturn(true);
+        String email2 = "existing@example.com";
+        UserCreateRequest request = new UserCreateRequest("123", "password", "nickname");
 
         // then
         assertThatThrownBy(() -> userService.createUser(request, imageGroup))
@@ -428,15 +421,13 @@ class UserServiceTest extends UserIntegrationTestSupport {
     @Test
     void updateUser_throwsException_whenUserNotFound() {
         // given
-        Long userId = 123L;
+        User user = setupUser("123", passwordEncoder.encode("123"), "nick", null);
+        userRepository.save(user);
         UserUpdateRequest request = new UserUpdateRequest("newNick", "소개글", "https://link.com");
         MultipartFile file = null;
 
-        // when
-        when(userRepository.findById(userId)).thenReturn(Optional.empty());
-
-        // then
-        assertThatThrownBy(() -> userService.updateUser(userId, request, file))
+        // when & then
+        assertThatThrownBy(() -> userService.updateUser(2L, request, file))
                 .isInstanceOf(CustomException.class)
                 .hasMessageContaining(ErrorCode.USER_NOT_FOUND.getErrorMessage());
     }
@@ -445,17 +436,12 @@ class UserServiceTest extends UserIntegrationTestSupport {
     @Test
     void checkPassword_returnsFalse_whenPasswordDoesNotMatch() {
         // given
-        Long userId = 1L;
+        User user = setupUser("123", passwordEncoder.encode("123"), "nick", null);
+        userRepository.save(user);
         String rawPw = "wrongPw";
-        String encPw = "encoded";
-
-        User user = User.builder().password(encPw).build();
-        setId(user, userId);
-        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
-        when(passwordEncoder.matches(rawPw, encPw)).thenReturn(false);
 
         // when
-        boolean result = userService.checkPassword(userId, rawPw);
+        boolean result = userService.checkPassword(user.getId(), rawPw);
 
         // then
         assertThat(result).isFalse();
@@ -465,80 +451,87 @@ class UserServiceTest extends UserIntegrationTestSupport {
     @DisplayName("유저를 수정할 때 파일이 null 또는 비어있으면 이미지 업로드가 호출되지 않고 정상 처리된다")
     void updateUser_fileNullOrEmpty_success() {
         // given
-        Long userId = 1L;
-        User user = User.builder().build();
-        setId(user, 1L);
+        User user = setupUser("123", passwordEncoder.encode("123"), "nick", null);
+        userRepository.save(user);
+
         UserUpdateRequest request = new UserUpdateRequest("newNick", "newIntro", "newUrl");
-        MultipartFile file = Mockito.mock(MultipartFile.class);
-
-        given(userRepository.findById(userId)).willReturn(Optional.of(user));
-        given(file.isEmpty()).willReturn(true);  // 비어있음
-
-        given(userRepository.save(any(User.class))).willReturn(user);
 
         // when
-        UserUpdateResponse response = userService.updateUser(userId, request, file);
+        UserUpdateResponse response = userService.updateUser(user.getId(), request, null);
 
         // then
-        verify(imageService, never()).uploadImages(anyList(), any());
         assertThat(response).isNotNull();
+        assertThat(response.nickname()).isEqualTo("newNick");
     }
 
     @Test
-    @DisplayName("이미지 업로드 중 예외가 발생하면 에러를 리턴한다")
-    void updateUser_imageUploadException_throwsException() {
+    @DisplayName("유저의 정보를 수정할 때 이미지 업로드 중 예외가 발생하면 에러를 리턴한다")
+    void updateUser_imageUploadException_throwsException() throws IOException {
         // given
-        Long userId = 1L;
-        User user = User.builder().build();
-        setId(user, 1L);
-        UserUpdateRequest request = new UserUpdateRequest("newNick", "newIntro", "newUrl");
+        ImageGroup imageGroup = setupImageGroup();
+        User user = setupUser("124", passwordEncoder.encode("123"), "nick2", imageGroup);
+        userRepository.save(user);
 
-        MultipartFile file = Mockito.mock(MultipartFile.class);
-        given(file.isEmpty()).willReturn(false);
+        // 실제 이미지 파일 생성
+        UserUpdateRequest request = new UserUpdateRequest("123", "123", "123");
 
-        given(userRepository.findById(userId)).willReturn(Optional.of(user));
-        doThrow(new RuntimeException("upload failed")).when(imageService).uploadImages(anyList(), any());
+        MockMultipartFile multipartFile = new MockMultipartFile(
+                "file", "test.webp", "image/webp", "!".getBytes()
+        );
 
         // when
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
-            userService.updateUser(userId, request, file);
+        RuntimeException exception = assertThrows(CustomException.class, () -> {
+            userService.updateUser(user.getId(), request, multipartFile);
         });
 
         // then
-        assertThat(exception.getMessage()).isEqualTo("upload failed");
+        assertThat(exception.getMessage()).isEqualTo("원본 이미지 업로드에 실패했습니다.");
+    }
+
+    @Test
+    @DisplayName("유저의 정보를 수정할 때 이미지 업로드 중 예외가 발생하면 에러를 리턴한다")
+    void updateUser_imageUploadFileException_throwsException() throws IOException {
+        // given
+        ImageGroup imageGroup = setupImageGroup();
+        User user = setupUser("124", passwordEncoder.encode("123"), "nick2", imageGroup);
+        userRepository.save(user);
+
+        // 실제 이미지 파일 생성
+        BufferedImage bufferedImage = new BufferedImage(100, 100, BufferedImage.TYPE_INT_RGB);
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        ImageIO.write(bufferedImage, "123", os);
+
+        UserUpdateRequest request = new UserUpdateRequest("123", "123", "123");
+
+        MockMultipartFile multipartFile = new MockMultipartFile(
+                "file", "test.exe", "image/exe", "fake image".getBytes()
+        );
+
+        // when
+        RuntimeException exception = assertThrows(CustomException.class, () -> {
+            userService.updateUser(user.getId(), request, multipartFile);
+        });
+
+        // then
+        assertThat(exception.getMessage()).isEqualTo("이미지 확장자가 올바르지 않습니다.");
     }
 
     @DisplayName("비밀번호를 변경할 때 로그인 한 유저의 비밀번호와 저장된 비밀번호가 같지 않다면 에러를 리턴한다.")
     @Test
     void updatePassword_비밀번호_틀렸을_때_예외_발생() {
         // given
-        Long userId = 1L;
+        User user = setupUser("123", passwordEncoder.encode("123"), "nick", null);
+        userRepository.save(user);
         UserUpdatePasswordRequest request = new UserUpdatePasswordRequest("wrongOldPassword", "newPassword");
-
-        User user = new User();
-
-        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
-        given(userService.checkPassword(userId, request.oldPassword())).willReturn(false);
-
 
         // when
         CustomException exception = assertThrows(CustomException.class, () -> {
-            userService.updatePassword(userId, request);
+            userService.updatePassword(user.getId(), request);
         });
 
         // then
         assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.INVALID_USER_PASSWORD);
     }
 
-
-    public static void setId(Object entity, Long id) {
-        try {
-            Field field = entity.getClass().getDeclaredField("id");
-            field.setAccessible(true);
-            field.set(entity, id);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
 
 }
