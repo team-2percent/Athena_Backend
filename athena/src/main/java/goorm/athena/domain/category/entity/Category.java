@@ -1,6 +1,7 @@
 package goorm.athena.domain.category.entity;
 
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 
 @Entity
@@ -12,4 +13,9 @@ public class Category {
     private Long id;
 
     private String categoryName;
+
+    @Builder
+    public Category(String categoryName) {
+        this.categoryName = categoryName;
+    }
 }

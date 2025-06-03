@@ -6,5 +6,12 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface PlatformPlanRepository extends JpaRepository<PlatformPlan, Long> {
     PlatformPlan findByName(PlanName name);
+
     boolean existsByName(PlanName name);
+
+    default PlatformPlan saveIfNotExist(PlatformPlan plan) {
+        return existsByName(plan.getName())
+                ? findByName(plan.getName())
+                : save(plan);
+    }
 }
