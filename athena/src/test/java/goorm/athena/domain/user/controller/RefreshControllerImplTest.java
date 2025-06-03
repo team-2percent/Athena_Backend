@@ -2,51 +2,23 @@ package goorm.athena.domain.user.controller;
 
 import goorm.athena.domain.user.RefreshControllerIntegrationTestSupport;
 import goorm.athena.domain.user.dto.response.RefreshTokenResponse;
-import goorm.athena.domain.user.service.RefreshTokenService;
-import goorm.athena.global.jwt.util.JwtTokenizer;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Import;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.web.bind.annotation.RestControllerAdvice;
-
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(controllers = RefreshControllerImpl.class)
 @AutoConfigureMockMvc(addFilters = false)
-class RefreshControllerImplTest {
+class RefreshControllerImplTest extends RefreshControllerIntegrationTestSupport{
 
-    @Autowired
-    private MockMvc mockMvc;
-
-    @MockBean
-    private RefreshTokenService refreshTokenService;
-
-    @MockBean
-    private JwtTokenizer jwtTokenizer;
 
     @DisplayName("액세스 토큰을 갱신할 때 리프레시 토큰이 유효하면 새로운 액세스 토큰을 발급한다.")
     @WithMockUser(username = "user", roles = {"USER"})
