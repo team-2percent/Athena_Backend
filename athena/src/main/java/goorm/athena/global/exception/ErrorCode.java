@@ -87,6 +87,7 @@ public enum ErrorCode {
     BANK_ACCOUNT_NOT_FOUND(HttpStatus.NOT_FOUND, "사용자 은행 계좌를 찾을 수 없습니다."),
 
     // 배송지
+    BASIC_DELIVERY_NOT_DELETED(HttpStatus.CONFLICT, "기본 배송지는 삭제할 수 없습니다."),
     ALREADY_DEFAULT_DELIVERY(HttpStatus.CONFLICT, "이미 기본 배송지로 설정되어 있습니다.");
 
     private final HttpStatus errorCode;
