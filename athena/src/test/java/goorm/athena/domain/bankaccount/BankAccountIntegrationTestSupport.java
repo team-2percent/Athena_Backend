@@ -6,6 +6,7 @@ import goorm.athena.domain.bankaccount.service.BankAccountService;
 import goorm.athena.domain.imageGroup.entity.ImageGroup;
 import goorm.athena.domain.imageGroup.entity.Type;
 import goorm.athena.domain.imageGroup.service.ImageGroupService;
+import goorm.athena.domain.user.entity.Role;
 import goorm.athena.domain.user.entity.User;
 import goorm.athena.domain.user.repository.UserRepository;
 import goorm.athena.util.IntegrationServiceTestSupport;
@@ -38,7 +39,7 @@ public abstract class BankAccountIntegrationTestSupport extends IntegrationServi
     }
 
     protected User setupUser(String email, String password, String nickname, ImageGroup imageGroup) {
-        User user = TestEntityFactory.createUser(email, password, nickname, imageGroup);
+        User user = TestEntityFactory.createUser(email, password, nickname, imageGroup, Role.ROLE_USER);
         return user;
     }
 

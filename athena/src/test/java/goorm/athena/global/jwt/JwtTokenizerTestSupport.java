@@ -1,6 +1,7 @@
 package goorm.athena.global.jwt;
 
 import goorm.athena.domain.imageGroup.entity.ImageGroup;
+import goorm.athena.domain.user.entity.Role;
 import goorm.athena.domain.user.entity.User;
 import goorm.athena.domain.user.repository.UserRepository;
 import goorm.athena.domain.user.service.RefreshTokenService;
@@ -48,7 +49,7 @@ public abstract class JwtTokenizerTestSupport extends IntegrationServiceTestSupp
     }
 
     protected User setupUser(String email, String password, String nickname, ImageGroup imageGroup) {
-        User user = TestEntityFactory.createUser(email, password, nickname, imageGroup);
+        User user = TestEntityFactory.createUser(email, password, nickname, imageGroup, Role.ROLE_USER);
         return user;
     }
 

@@ -16,6 +16,7 @@ import goorm.athena.domain.product.entity.Product;
 import goorm.athena.domain.project.entity.PlanName;
 import goorm.athena.domain.project.entity.PlatformPlan;
 import goorm.athena.domain.project.entity.Project;
+import goorm.athena.domain.user.entity.Role;
 import goorm.athena.domain.user.entity.User;
 import goorm.athena.domain.user.repository.UserRepository;
 import goorm.athena.domain.user.service.UserService;
@@ -96,7 +97,7 @@ public abstract class UserIntegrationTestSupport extends IntegrationServiceTestS
   }
 
   protected User setupUser(String email, String password, String nickname, ImageGroup imageGroup) {
-    User user = TestEntityFactory.createUser(email, password, nickname, imageGroup);
+    User user = TestEntityFactory.createUser(email, password, nickname, imageGroup, Role.ROLE_USER);
     return user;
   }
 

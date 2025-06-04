@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
 
 public class TestEntityFactory {
 
-    public static User createUser(String email, String password, String nickname, ImageGroup imageGroup) {
+    public static User createUser(String email, String password, String nickname, ImageGroup imageGroup, Role role) {
         User user = User.builder()
                 .email(email)
                 .password(password)
@@ -26,8 +26,8 @@ public class TestEntityFactory {
                 .imageGroup(imageGroup)
                 .build();
 
-        // 기본 ROLE_USER가 들어가므로 필요 시 변경
-        ReflectionTestUtils.setField(user, "role", Role.ROLE_USER);
+        // Role 리플렉터로 관리자 권한 필요시 직접 주입
+        ReflectionTestUtils.setField(user, "role", role);
         return user;
     }
 

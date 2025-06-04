@@ -12,6 +12,7 @@ import goorm.athena.domain.orderitem.repository.OrderItemRepository;
 import goorm.athena.domain.product.repository.ProductRepository;
 import goorm.athena.domain.project.repository.PlatformPlanRepository;
 import goorm.athena.domain.project.repository.ProjectRepository;
+import goorm.athena.domain.user.entity.Role;
 import goorm.athena.domain.user.entity.User;
 import goorm.athena.domain.user.repository.UserRepository;
 import goorm.athena.domain.user.service.RefreshTokenService;
@@ -85,7 +86,7 @@ public abstract class RefreshTokenIntegrationTestSupport extends IntegrationServ
     }
 
     protected User setupUser(String email, String password, String nickname, ImageGroup imageGroup) {
-        User user = TestEntityFactory.createUser(email, password, nickname, imageGroup);
+        User user = TestEntityFactory.createUser(email, password, nickname, imageGroup, Role.ROLE_USER);
         return user;
     }
 }
