@@ -50,6 +50,8 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
+import java.util.Optional;
+
 @RequiredArgsConstructor
 @Service
 public class ProjectService {
@@ -240,7 +242,7 @@ public class ProjectService {
     @Transactional(readOnly = true)
     public <T extends ProjectQueryBaseRequest> ProjectCursorBaseResponse getProjectsWithCursor(
             ProjectQueryType queryType,
-            ProjectCursorRequest<?> cursorRequest,
+            Optional<ProjectCursorRequest<?>> cursorRequest,
             T requestDto // queryType에 따라 requestDto 타입이 달라지도록 추상화
     ) {
         switch (queryType) {
