@@ -68,12 +68,11 @@ public class ProjectService {
     private final MarkdownParser markdownParser;
     private final PlatformPlanRepository platformPlanRepository;
 
-
     /**
      * [프로젝트 등록 Method]
      */
     @Transactional
-    public ProjectIdResponse createProject(ProjectCreateRequest request, List<MultipartFile> markdownFiles){
+    public ProjectIdResponse createProject(ProjectCreateRequest request, List<MultipartFile> markdownFiles) {
         ImageGroup imageGroup = imageGroupService.getById(request.imageGroupId());
         User seller = userService.getUser(request.sellerId());
         Category category = categoryService.getCategoryById(request.categoryId());
@@ -81,15 +80,16 @@ public class ProjectService {
         PlanName planName = PlanName.valueOf(request.platformPlan());
         PlatformPlan platformPlan = platformPlanRepository.findByName(planName);
 
-        validateProduct(request);   // 프로젝트 등록 시 검증
+        validateProduct(request); // 프로젝트 등록 시 검증
 
         // 마크다운에 로컬 이미지가 삽입된 경우 이를 이미지 URL로 치환
         String convertedMarkdown = convertMarkdownIfNeeded(request.contentMarkdown(), markdownFiles, imageGroup);
 
-        Project project = ProjectMapper.toEntity(request, seller, imageGroup, category, bankAccount, platformPlan, convertedMarkdown);  // 새 프로젝트 생성
-        Project savedProject = projectRepository.save(project);                                                                         // 프로젝트 저장
+        Project project = ProjectMapper.toEntity(request, seller, imageGroup, category, bankAccount, platformPlan,
+                convertedMarkdown); // 새 프로젝트 생성
+        Project savedProject = projectRepository.save(project); // 프로젝트 저장
 
-        createProducts(request.products(), project);    // 상품 등록 요청 처리
+        createProducts(request.products(), project); // 상품 등록 요청 처리
         // 상품 생성 예외 처리 추가적으로 있을지 고려
 
         return ProjectMapper.toCreateDto(savedProject);
@@ -99,8 +99,7 @@ public class ProjectService {
     private void createProducts(List<ProductRequest> requests, Project project) {
         if (!CollectionUtils.isEmpty(requests)) {
             productService.saveProducts(requests, project);
-        }
-        else{
+        } else {
             throw new CustomException(ErrorCode.PRODUCT_IS_EMPTY);
         }
     }
@@ -130,25 +129,26 @@ public class ProjectService {
         }
 
         try {
-            return getConvertedMarkdown(markdownFiles, imageGroup, markdown);   // 기존 마크다운 -> URL 치환 마크다운
+            return getConvertedMarkdown(markdownFiles, imageGroup, markdown); // 기존 마크다운 -> URL 치환 마크다운
         } catch (IOException e) {
             throw new CustomException(ErrorCode.IMAGES_UPLOAD_FAILED);
         }
     }
 
-    private String getConvertedMarkdown(List<MultipartFile> markdownFiles, ImageGroup imageGroup, String markdown) throws IOException {
-        List<String> imagePaths = markdownParser.extractImagePaths(markdown);                   // 마크다운 내 url 추출
-        List<String> realUrls = imageService.uploadMarkdownImages(markdownFiles, imageGroup);   // 이미지 저장 및 이미지 서버 url 반환
+    private String getConvertedMarkdown(List<MultipartFile> markdownFiles, ImageGroup imageGroup, String markdown)
+            throws IOException {
+        List<String> imagePaths = markdownParser.extractImagePaths(markdown); // 마크다운 내 url 추출
+        List<String> realUrls = imageService.uploadMarkdownImages(markdownFiles, imageGroup); // 이미지 저장 및 이미지 서버 url 반환
 
         return markdownParser.replaceMarkdown(markdown, imagePaths, realUrls);
     }
-
 
     /**
      * [프로젝트 수정 Method]
      */
     @Transactional
-    public void updateProject(Long projectId, ProjectUpdateRequest request, List<MultipartFile> files, List<MultipartFile> markdownFiles) {
+    public void updateProject(Long projectId, ProjectUpdateRequest request, List<MultipartFile> files,
+            List<MultipartFile> markdownFiles) {
         Project project = getById(projectId);
         Category category = categoryService.getCategoryById(request.categoryId());
         BankAccount bankAccount = bankAccountService.getPrimaryAccount(request.bankAccountId());
@@ -157,12 +157,12 @@ public class ProjectService {
         imageService.deleteImages(project.getImageGroup());
 
         // 마크다운에 로컬 이미지가 삽입된 경우 이를 이미지 URL로 치환
-        String convertedMarkdown = convertMarkdownIfNeeded(request.contentMarkdown(), markdownFiles, project.getImageGroup());
+        String convertedMarkdown = convertMarkdownIfNeeded(request.contentMarkdown(), markdownFiles,
+                project.getImageGroup());
 
-        if(!CollectionUtils.isEmpty(files)) {
+        if (!CollectionUtils.isEmpty(files)) {
             imageService.uploadImages(files, project.getImageGroup());
-        }
-        else{
+        } else {
             throw new CustomException(ErrorCode.IMAGE_IS_REQUIRED);
         }
 
@@ -175,8 +175,7 @@ public class ProjectService {
                 convertedMarkdown,
                 request.startAt(),
                 request.endAt(),
-                request.shippedAt()
-        );
+                request.shippedAt());
 
         // 상품 및 이미지 업데이트 (PUT)
         deleteProducts(project);
@@ -187,7 +186,7 @@ public class ProjectService {
      * [프로젝트 삭제 Method]
      */
     @Transactional
-    public void deleteProject(Long projectId){
+    public void deleteProject(Long projectId) {
         Project project = getById(projectId);
         ImageGroup imageGroup = project.getImageGroup();
 
