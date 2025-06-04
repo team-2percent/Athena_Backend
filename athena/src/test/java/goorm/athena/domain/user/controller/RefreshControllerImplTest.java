@@ -7,7 +7,6 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.security.test.context.support.WithMockUser;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -18,8 +17,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 class RefreshControllerImplTest extends RefreshControllerIntegrationTestSupport{
 
-
-    /*
     @DisplayName("액세스 토큰을 갱신할 때 리프레시 토큰이 유효하면 새로운 액세스 토큰을 발급한다.")
     @WithMockUser(username = "user", roles = {"USER"})
     @Test
@@ -66,46 +63,6 @@ class RefreshControllerImplTest extends RefreshControllerIntegrationTestSupport{
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.message").value("토큰이 만료되었습니다."));
     }
-}
-
-
-
-// Mock을 사용한 방법 (성공)
-
-/*
-class RefreshControllerImplTest extends RefreshControllerIntegrationTestSupport {
-
-    @Test
-    void requestRefresh_success() {
-        // given
-        String bearerHeader = "Bearer oldAccessToken";
-        String accessToken = "oldAccessToken";
-        String refreshToken = "validRefreshToken";
-
-        String newAccessToken = "newAccessToken";
-        String newRefreshToken = "newRefreshToken";
-
-        RefreshTokenResponse expectedResponse = new RefreshTokenResponse(1L, newAccessToken, newRefreshToken);
-
-        // stub
-        when(jwtTokenizer.extractBearerToken(bearerHeader)).thenReturn(accessToken);
-        when(refreshTokenService.reissueToken(accessToken, refreshToken, httpServletResponse))
-                .thenReturn(expectedResponse);
-
-        // when
-        ResponseEntity<RefreshTokenResponse> response = refreshController.requestRefresh(
-                refreshToken, bearerHeader, httpServletResponse
-        );
-
-        // then
-        assertEquals(200, response.getStatusCodeValue());
-        assertEquals(expectedResponse, response.getBody());
-
-        verify(jwtTokenizer).extractBearerToken(bearerHeader);
-        verify(refreshTokenService).reissueToken(accessToken, refreshToken, httpServletResponse);
-    }
-
-     */
 }
 
 

@@ -6,7 +6,6 @@ import org.mockito.Mock;
 
 import goorm.athena.domain.project.repository.ProjectRepository;
 import goorm.athena.domain.project.service.ProjectService;
-import goorm.athena.util.IntegrationTestSupport;
 
 public abstract class ProjectIntegrationTestSupport extends IntegrationServiceTestSupport {
   @Mock
