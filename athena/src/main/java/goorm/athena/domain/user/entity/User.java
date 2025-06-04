@@ -43,6 +43,7 @@ public class User {
     @Column(length = 1000, nullable = true)
     private String linkUrl;
 
+    // ToDo `createFullUser` 메서드 제거 후 매개변수가 null일 때, 기본값 설정하도록 수정
     @Builder
     private User(ImageGroup imageGroup, String email, String password, String nickname){
         this.imageGroup = imageGroup;
@@ -62,6 +63,7 @@ public class User {
         this.password = password;
     }
 
+    // ToDo `createFullUser` 메서드 제거 후 Builder에서 매개변수가 null일 때, 기본값 설정하도록 수정
     public static User createFullUser(ImageGroup imageGroup, String email, String password, String nickname,
                                       Role role, String sellerIntroduction, String linkUrl) {
         User user = new User(imageGroup, email, password, nickname);
