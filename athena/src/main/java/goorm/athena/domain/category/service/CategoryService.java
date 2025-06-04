@@ -21,8 +21,7 @@ public class CategoryService {
         // '기타' 카테고리가 없으면 생성
         boolean hasDefault = categories.stream().anyMatch(c -> c.getCategoryName().equals("기타"));
         if (!hasDefault) {
-            Category etc = new Category();
-            etc.setCategoryName("기타");
+            Category etc = Category.builder().categoryName("기타").build();
             categoryRepository.save(etc);
             categories = categoryRepository.findAll();
         }
