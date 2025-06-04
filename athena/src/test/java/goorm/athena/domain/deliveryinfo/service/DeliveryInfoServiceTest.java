@@ -31,7 +31,7 @@ class DeliveryInfoServiceTest extends DeliveryIntegrationTestSupport {
         deliveryInfoRepository.save(deliveryInfo);
 
         // when & then
-        assertThatThrownBy(() -> deliveryInfoService.changeDeliveryState(user.getId(), 99L))
+        assertThatThrownBy(() -> deliveryInfoService.getById(99L))
                 .isInstanceOf(CustomException.class)
                 .hasMessageContaining(ErrorCode.DELIVERY_NOT_FOUND.getErrorMessage());
     }
@@ -74,7 +74,7 @@ class DeliveryInfoServiceTest extends DeliveryIntegrationTestSupport {
     }
 
 
-    @DisplayName("getPrimaryDeliveryInfo에서 배송지 없으면 DELIVERY_NOT_FOUND 예외가 던져진다")
+    @DisplayName("기본 배송 정보를 조회할 시 해당 정보가 존재하지 않을 경우 에러를 리턴한다.")
     @Test
     void getPrimaryDeliveryInfo_ThrowsDeliveryNotFound() {
         // given
@@ -87,8 +87,7 @@ class DeliveryInfoServiceTest extends DeliveryIntegrationTestSupport {
         // when & then
         assertThatThrownBy(() -> deliveryInfoService.getPrimaryDeliveryInfo(user.getId()))
                 .isInstanceOf(CustomException.class)
-                .extracting("errorCode")
-                .isEqualTo(ErrorCode.DELIVERY_NOT_FOUND);
+                .hasMessageContaining(ErrorCode.DELIVERY_NOT_FOUND.getErrorMessage());
     }
 
     @DisplayName("유저가 이미 기존 배송 정보를 저장했었다면 현재 배송 정보는 일반 배송 정보로 저장한다.")
@@ -243,7 +242,7 @@ class DeliveryInfoServiceTest extends DeliveryIntegrationTestSupport {
         assertThat(responses.get(1).zipcode()).isEqualTo("!234");
     }
 
-    @DisplayName("유저가 자신이 등록한 기보 배송 정보를 조회한다.")
+    @DisplayName("유저가 자신이 등록한 기본 배송 정보를 조회한다.")
     @Test
     void getPrimaryDeliveryInfo() {
         // given
