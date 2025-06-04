@@ -216,7 +216,7 @@ public class ProjectService {
     // 메인 페이지 조회
     @Transactional(readOnly = true)
     public List<ProjectAllResponse> getProjects() {
-        List<Project> projects = projectRepository.findTop5WithImageGroupByOrderByViewsDesc();
+        List<Project> projects = projectRepository.findTopNWithImageGroupByOrderByViewsDesc(20);
 
         AtomicInteger rank = new AtomicInteger(1);
         return projects.stream()
@@ -283,6 +283,8 @@ public class ProjectService {
                 .toList();
     }
 
+    // ToDo 아래 코드에서 TOP 5 뽑는 부분들은 `findTopNWithImageGroupByOrderByViewsDesc` 메서드로
+    // 대체할 예정
     @Transactional(readOnly = true)
     public ProjectCategoryTopResponseWrapper getTopView(){
         List<Project> projects = projectRepository.findTopViewedProjectsByCategory();
