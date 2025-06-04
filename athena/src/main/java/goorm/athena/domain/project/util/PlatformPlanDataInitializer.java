@@ -10,10 +10,10 @@ import goorm.athena.domain.project.entity.PlanName;
 import java.util.List;
 
 @Component
-public class PlatformPlayDataInitializer implements ApplicationRunner {
+public class PlatformPlanDataInitializer implements ApplicationRunner {
   private final PlatformPlanRepository platformPlanRepository;
 
-  public PlatformPlayDataInitializer(PlatformPlanRepository platformPlanRepository) {
+  public PlatformPlanDataInitializer(PlatformPlanRepository platformPlanRepository) {
     this.platformPlanRepository = platformPlanRepository;
   }
 
