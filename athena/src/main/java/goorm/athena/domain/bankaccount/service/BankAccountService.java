@@ -32,18 +32,7 @@ public class BankAccountService {
     public BankAccountCreateResponse createBankAccount(Long userId, BankAccountCreateRequest request){
         User user = userService.getUser(userId);
 
-        boolean isDefault;
-        try{
-            getPrimaryAccount(userId);
-            isDefault = false;
-        } catch (CustomException e){
-            if(e.getErrorCode() == ErrorCode.BANK_ACCOUNT_NOT_FOUND) {
-                isDefault = true;
-            } else {
-                throw e;
-            }
-        }
-
+        boolean isDefault = !hasPrimaryDeliveryInfo(userId);
         BankAccount bankAccount = BankAccountMapper.toEntity(user, request, isDefault);
         BankAccount saveAccount = bankAccountRepository.save(bankAccount);
 
@@ -114,5 +103,9 @@ public class BankAccountService {
 
 
         bankAccountRepository.delete(bankAccount);
+    }
+
+    public boolean hasPrimaryDeliveryInfo(Long userId) {
+        return bankAccountRepository.existsByUserIdAndIsDefaultTrue(userId);
     }
 }
