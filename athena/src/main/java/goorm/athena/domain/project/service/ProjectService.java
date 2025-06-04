@@ -190,10 +190,10 @@ public class ProjectService {
         Project project = getById(projectId);
         ImageGroup imageGroup = project.getImageGroup();
 
-        imageService.deleteImages(imageGroup);              // 이미지 삭제
-        deleteProducts(project);                            // 상품 -> 옵션 삭제
-        projectRepository.delete(project);                  // 프로젝트 삭제
-        imageGroupService.deleteImageGroup(imageGroup);     // 이미지 그룹 삭제
+        imageService.deleteImages(imageGroup); // 이미지 삭제
+        deleteProducts(project); // 상품 -> 옵션 삭제
+        projectRepository.delete(project); // 프로젝트 삭제
+        imageGroupService.deleteImageGroup(imageGroup); // 이미지 그룹 삭제
 
     }
 
@@ -208,11 +208,11 @@ public class ProjectService {
 
     // 상세 페이지 조회
     @Transactional(readOnly = true)
-    public ProjectDetailResponse getProjectDetail(Long projectId){
+    public ProjectDetailResponse getProjectDetail(Long projectId) {
         Project project = getById(projectId);
 
         Category category = categoryService.getCategoryById(project.getCategory().getId());
-        List<Image> images = imageService.getProjectImages(project.getImageGroup().getId());    // 마크다운 이미지 제외 가져오기
+        List<Image> images = imageService.getProjectImages(project.getImageGroup().getId()); // 마크다운 이미지 제외 가져오기
         List<String> imageUrls = imageService.getImageUrls(images);
 
         UserDetailResponse userDetailResponse = UserMapper.toDetailResponse(project.getSeller());
@@ -250,12 +250,13 @@ public class ProjectService {
                     return getProjectsByNew(latestRequest.lastStartAt(), latestRequest.lastProjectId(),
                             latestRequest.pageSize());
                 }
-            // ToDo 팔로워 수 기준 조회 기능 추가 예정
-            // case POPULAR:
-            //     if (requestDto instanceof ProjectQueryPopularRequest popularRequest) {
-            //         return getProjectsByPopular(popularRequest.lastStartAt(), popularRequest.lastProjectId(),
-            //                 popularRequest.pageSize());
-            //     }
+                // ToDo 팔로워 수 기준 조회 기능 추가 예정
+                // case POPULAR:
+                // if (requestDto instanceof ProjectQueryPopularRequest popularRequest) {
+                // return getProjectsByPopular(popularRequest.lastStartAt(),
+                // popularRequest.lastProjectId(),
+                // popularRequest.pageSize());
+                // }
             case CATEGORY:
                 if (requestDto instanceof ProjectQueryCategoryRequest categoryRequest) {
                     if (cursorRequest.isEmpty()) {
@@ -269,11 +270,12 @@ public class ProjectService {
                     return getProjectsByDeadLine(deadlineRequest.lastStartAt(), deadlineRequest.sortTypeDeadline(),
                             deadlineRequest.lastProjectId(), deadlineRequest.pageSize());
                 }
-            // ToDo 성공률 기준 조회 기능 추가 예정
-            // case SUCCESS_RATE:
-            //     if (requestDto instanceof ProjectQuerySuccessRateRequest successRateRequest) {
-            //         return getProjectsBySuccessRate(cursorRequest);
-            //     }
+                // ToDo 성공률 기준 조회 기능 추가 예정
+                // case SUCCESS_RATE:
+                // if (requestDto instanceof ProjectQuerySuccessRateRequest successRateRequest)
+                // {
+                // return getProjectsBySuccessRate(cursorRequest);
+                // }
             case SEARCH:
                 if (requestDto instanceof ProjectQuerySearchRequest searchRequest) {
                     if (cursorRequest.isEmpty()) {
@@ -294,26 +296,29 @@ public class ProjectService {
 
     // 카테고리별 프로젝트 조회 (커서 기반 페이징)
     @Transactional(readOnly = true)
-    public ProjectCategoryCursorResponse getProjectsByCategory(ProjectCursorRequest<?> request, Long categoryId, SortTypeLatest sortType) {
+    public ProjectCategoryCursorResponse getProjectsByCategory(ProjectCursorRequest<?> request, Long categoryId,
+            SortTypeLatest sortType) {
 
         return projectFilterQueryRepository.getProjectsByCategory(request, categoryId, sortType);
     }
 
     // 마감 기한별 프로젝트 조회 (커서 기반 페이징)
     @Transactional(readOnly = true)
-    public ProjectDeadlineCursorResponse getProjectsByDeadLine(LocalDateTime lastStartAt, SortTypeDeadline sortTypeDeadline, Long lastProjectId, int pageSize) {
+    public ProjectDeadlineCursorResponse getProjectsByDeadLine(LocalDateTime lastStartAt,
+            SortTypeDeadline sortTypeDeadline, Long lastProjectId, int pageSize) {
         ProjectCursorRequest<LocalDateTime> request = new ProjectCursorRequest<>(lastStartAt, lastProjectId, pageSize);
         return projectFilterQueryRepository.getProjectsByDeadline(request, sortTypeDeadline);
     }
 
     // 검색 프로젝트 조회 (커서 기반 페이징)
     @Transactional(readOnly = true)
-    public ProjectSearchCursorResponse searchProjects(ProjectCursorRequest<?> request, String searchTerms, SortTypeLatest sortType) {
+    public ProjectSearchCursorResponse searchProjects(ProjectCursorRequest<?> request, String searchTerms,
+            SortTypeLatest sortType) {
         return projectSearchQueryRepository.searchProjects(request, searchTerms, sortType);
     }
 
     @Transactional(readOnly = true)
-    public List<ProjectByPlanGetResponse> getTopViewByPlan(){
+    public List<ProjectByPlanGetResponse> getTopViewByPlan() {
         List<Project> projects = projectRepository.findTop5ProjectsGroupedByPlatformPlan();
 
         // 요금제 이름(planName) 별로 그룹핑
@@ -321,8 +326,7 @@ public class ProjectService {
                 .collect(Collectors.groupingBy(
                         p -> p.getPlatformPlan().getName().name(), // PlanName -> String
                         LinkedHashMap::new,
-                        Collectors.toList()
-                ));
+                        Collectors.toList()));
 
         // 각 그룹을 ProjectByPlanGetResponse 로 매핑
         return groupedByPlan.entrySet().stream()
@@ -343,7 +347,7 @@ public class ProjectService {
     // ToDo 아래 코드에서 TOP 5 뽑는 부분들은 `findTopNWithImageGroupByOrderByViewsDesc` 메서드로
     // 대체할 예정
     @Transactional(readOnly = true)
-    public ProjectCategoryTopResponseWrapper getTopView(){
+    public ProjectCategoryTopResponseWrapper getTopView() {
         List<Project> projects = projectRepository.findTopViewedProjectsByCategory();
 
         // 전체 조회수 기준 Top 5 (카테고리 상관없이)
@@ -358,8 +362,7 @@ public class ProjectService {
 
         // 카테고리별 Top 5
         Map<Category, List<Project>> groupedByCategory = projects.stream()
-                .collect(Collectors.groupingBy(Project::getCategory
-                        ,LinkedHashMap::new,
+                .collect(Collectors.groupingBy(Project::getCategory, LinkedHashMap::new,
                         Collectors.toList()));
 
         List<ProjectCategoryTopViewResponse> categoryTopViews = groupedByCategory.entrySet().stream()
@@ -400,7 +403,7 @@ public class ProjectService {
     }
 
     public Long getSellerId(Long projectId) {
-        User user =  projectRepository.findSellerByProjectId(projectId);
+        User user = projectRepository.findSellerByProjectId(projectId);
         return user.getId();
     }
 
