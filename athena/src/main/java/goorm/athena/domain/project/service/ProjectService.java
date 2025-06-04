@@ -13,6 +13,11 @@ import goorm.athena.domain.product.dto.res.ProductResponse;
 import goorm.athena.domain.product.service.ProductService;
 import goorm.athena.domain.project.dto.cursor.*;
 import goorm.athena.domain.project.dto.req.ProjectCreateRequest;
+import goorm.athena.domain.project.dto.req.ProjectQueryBaseRequest;
+import goorm.athena.domain.project.dto.req.ProjectQueryLatestRequest;
+import goorm.athena.domain.project.dto.req.ProjectQueryCategoryRequest;
+import goorm.athena.domain.project.dto.req.ProjectQueryDeadlineRequest;
+import goorm.athena.domain.project.dto.req.ProjectQuerySearchRequest;
 import goorm.athena.domain.project.dto.req.ProjectUpdateRequest;
 import goorm.athena.domain.project.dto.res.ProjectIdResponse;
 import goorm.athena.domain.project.dto.req.ProjectCursorRequest;
@@ -30,6 +35,8 @@ import goorm.athena.domain.user.mapper.UserMapper;
 import goorm.athena.domain.user.service.UserService;
 import goorm.athena.global.exception.CustomException;
 import goorm.athena.global.exception.ErrorCode;
+import goorm.athena.domain.project.util.ProjectQueryType;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -226,6 +233,49 @@ public class ProjectService {
                     return ProjectAllResponse.from(project, imageUrl, currentRank);
                 })
                 .collect(Collectors.toList());
+    }
+
+    // ToDo 커서 기반 페이징 조회 메서드 통합 중
+    // ToDo 각 case 안에서 requestDto를 다운캐스팅하여 사용하고 있지만, 추후 일반화 할 예정
+    @Transactional(readOnly = true)
+    public <T extends ProjectQueryBaseRequest> ProjectCursorBaseResponse getProjectsWithCursor(
+            ProjectQueryType queryType,
+            ProjectCursorRequest<?> cursorRequest,
+            T requestDto // queryType에 따라 requestDto 타입이 달라지도록 추상화
+    ) {
+        switch (queryType) {
+            case LATEST:
+                if (requestDto instanceof ProjectQueryLatestRequest latestRequest) {
+                    return getProjectsByNew(latestRequest.lastStartAt(), latestRequest.lastProjectId(),
+                            latestRequest.pageSize());
+                }
+            // ToDo 팔로워 수 기준 조회 기능 추가 예정
+            // case POPULAR:
+            //     if (requestDto instanceof ProjectQueryPopularRequest popularRequest) {
+            //         return getProjectsByPopular(popularRequest.lastStartAt(), popularRequest.lastProjectId(),
+            //                 popularRequest.pageSize());
+            //     }
+            case CATEGORY:
+                if (requestDto instanceof ProjectQueryCategoryRequest categoryRequest) {
+                    return getProjectsByCategory(cursorRequest, categoryRequest.categoryId(),
+                            categoryRequest.sortType());
+                }
+            case DEADLINE:
+                if (requestDto instanceof ProjectQueryDeadlineRequest deadlineRequest) {
+                    return getProjectsByDeadLine(deadlineRequest.lastStartAt(), deadlineRequest.sortTypeDeadline(),
+                            deadlineRequest.lastProjectId(), deadlineRequest.pageSize());
+                }
+            // ToDo 성공률 기준 조회 기능 추가 예정
+            // case SUCCESS_RATE:
+            //     if (requestDto instanceof ProjectQuerySuccessRateRequest successRateRequest) {
+            //         return getProjectsBySuccessRate(cursorRequest);
+            //     }
+            case SEARCH:
+                if (requestDto instanceof ProjectQuerySearchRequest searchRequest) {
+                    return searchProjects(cursorRequest, searchRequest.searchTerms(), searchRequest.sortType());
+                }
+        }
+        return null;
     }
 
     // 최신 프로젝트 조회 (커서 기반 페이징)

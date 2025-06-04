@@ -1,6 +1,7 @@
 package goorm.athena.domain.project.dto.cursor;
 
 import goorm.athena.domain.project.dto.res.ProjectRecentResponse;
+import goorm.athena.domain.project.dto.cursor.ProjectCursorBaseResponse;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -10,7 +11,7 @@ public record ProjectRecentCursorResponse(
         LocalDateTime nextCursorValue,
         Long nextProjectId,
         Long total
-) {
+) implements ProjectCursorBaseResponse {
     public static ProjectRecentCursorResponse ofByCreatedAt(List<ProjectRecentResponse> content, Long total) {
         if (content.isEmpty()) {
             return new ProjectRecentCursorResponse(content, null, null, null);
