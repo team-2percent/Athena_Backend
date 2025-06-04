@@ -259,7 +259,10 @@ public class ProjectService {
             //     }
             case CATEGORY:
                 if (requestDto instanceof ProjectQueryCategoryRequest categoryRequest) {
-                    return getProjectsByCategory(cursorRequest, categoryRequest.categoryId(),
+                    if (cursorRequest.isEmpty()) {
+                        throw new IllegalArgumentException("cursorRequest는 null일 수 없습니다.");
+                    }
+                    return getProjectsByCategory(cursorRequest.get(), categoryRequest.categoryId(),
                             categoryRequest.sortType());
                 }
             case DEADLINE:
@@ -274,7 +277,10 @@ public class ProjectService {
             //     }
             case SEARCH:
                 if (requestDto instanceof ProjectQuerySearchRequest searchRequest) {
-                    return searchProjects(cursorRequest, searchRequest.searchTerms(), searchRequest.sortType());
+                    if (cursorRequest.isEmpty()) {
+                        throw new IllegalArgumentException("cursorRequest는 null일 수 없습니다.");
+                    }
+                    return searchProjects(cursorRequest.get(), searchRequest.searchTerms(), searchRequest.sortType());
                 }
         }
         return null;
