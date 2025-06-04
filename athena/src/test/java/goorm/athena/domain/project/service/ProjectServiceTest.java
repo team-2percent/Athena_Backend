@@ -1,6 +1,5 @@
 package goorm.athena.domain.project.service;
 
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import goorm.athena.domain.project.util.ProjectIntegrationTestSupport;
@@ -30,7 +29,6 @@ public class ProjectServiceTest extends ProjectIntegrationTestSupport {
   void testGetProjectDetail() {
 
   }
-
 
   @Test
   void testGetTopView() {

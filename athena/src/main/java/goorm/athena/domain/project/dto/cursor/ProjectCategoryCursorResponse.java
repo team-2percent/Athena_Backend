@@ -1,7 +1,6 @@
 package goorm.athena.domain.project.dto.cursor;
 
 import goorm.athena.domain.project.dto.res.ProjectCategoryResponse;
-import goorm.athena.domain.project.dto.cursor.ProjectCursorBaseResponse;
 
 import java.util.List;
 

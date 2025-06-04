@@ -5,7 +5,6 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
 
 import goorm.athena.domain.category.repository.CategoryRepository;
-import goorm.athena.domain.category.util.DefaultCategories;
 
 @Component
 public class CategoryDataInitializer implements ApplicationRunner {

@@ -1,7 +1,6 @@
 package goorm.athena.domain.project.dto.cursor;
 
 import goorm.athena.domain.project.dto.res.ProjectDeadlineResponse;
-import goorm.athena.domain.project.dto.cursor.ProjectCursorBaseResponse;
 
 import java.time.LocalDateTime;
 import java.util.List;
