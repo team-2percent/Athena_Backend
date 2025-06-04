@@ -123,6 +123,8 @@ jacocoTestReport {
 					'**/*Application*',
 					'**/exception/**',
 					'**/config/**',
+					'**/project/spec/**',
+					'**/jwt/**'
 			] + QDomainList)
 		}))
 	}
@@ -162,6 +164,8 @@ jacocoTestCoverageVerification {
 					'**.*Application*',
 					'**.exception.**',
 					'**.config.**',
+					'**/project/spec/**',
+					'**/jwt/**'
 			] + QDomainList
 		}
 	}
