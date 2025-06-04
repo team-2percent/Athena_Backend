@@ -4,11 +4,9 @@ import goorm.athena.domain.comment.CommentControllerIntegrationSupport;
 import goorm.athena.domain.comment.dto.req.CommentCreateRequest;
 import goorm.athena.domain.comment.dto.res.CommentCreateResponse;
 import goorm.athena.domain.comment.dto.res.CommentGetResponse;
-import goorm.athena.domain.project.dto.req.ProjectCreateRequest;
 import goorm.athena.domain.project.entity.Project;
 import goorm.athena.domain.user.entity.Role;
 import goorm.athena.global.jwt.util.LoginUserRequest;
-import org.hibernate.sql.ast.tree.expression.Over;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +16,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 

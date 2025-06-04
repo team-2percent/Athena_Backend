@@ -12,7 +12,6 @@ import goorm.athena.domain.project.entity.PlatformPlan;
 import goorm.athena.domain.project.entity.Project;
 import goorm.athena.domain.user.entity.Role;
 import goorm.athena.domain.user.entity.User;
-import org.aspectj.weaver.ast.Or;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDateTime;

@@ -3,7 +3,6 @@ package goorm.athena.domain.user;
 import goorm.athena.domain.bankaccount.entity.BankAccount;
 import goorm.athena.domain.category.entity.Category;
 import goorm.athena.domain.deliveryinfo.entity.DeliveryInfo;
-import goorm.athena.domain.image.dto.req.ImageCreateRequest;
 import goorm.athena.domain.image.repository.ImageRepository;
 import goorm.athena.domain.image.service.ImageService;
 import goorm.athena.domain.image.service.NasService;
@@ -11,7 +10,6 @@ import goorm.athena.domain.imageGroup.entity.ImageGroup;
 import goorm.athena.domain.imageGroup.entity.Type;
 import goorm.athena.domain.imageGroup.repository.ImageGroupRepository;
 import goorm.athena.domain.imageGroup.service.ImageGroupService;
-import goorm.athena.domain.notification.service.FcmTokenService;
 import goorm.athena.domain.order.entity.Order;
 import goorm.athena.domain.orderitem.entity.OrderItem;
 import goorm.athena.domain.product.entity.Product;
@@ -20,39 +18,27 @@ import goorm.athena.domain.project.entity.PlatformPlan;
 import goorm.athena.domain.project.entity.Project;
 import goorm.athena.domain.user.entity.User;
 import goorm.athena.domain.user.repository.UserRepository;
-import goorm.athena.domain.user.service.MyInfoService;
-import goorm.athena.domain.user.service.TokenService;
 import goorm.athena.domain.user.service.UserService;
 import goorm.athena.global.jwt.util.JwtTokenizer;
-import goorm.athena.util.IntegrationTestSupport;
+import goorm.athena.util.IntegrationServiceTestSupport;
 
 import goorm.athena.util.TestEntityFactory;
 import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.io.TempDir;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.util.ReflectionUtils;
-import org.testcontainers.shaded.org.checkerframework.checker.units.qual.A;
-
-import java.io.File;
 import java.lang.reflect.Field;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
-import java.util.List;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
-
-public abstract class UserIntegrationTestSupport extends IntegrationTestSupport {
+public abstract class UserIntegrationTestSupport extends IntegrationServiceTestSupport {
   @Autowired
   protected UserRepository userRepository;
 

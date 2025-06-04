@@ -21,24 +21,17 @@ import goorm.athena.domain.project.entity.PlatformPlan;
 import goorm.athena.domain.project.entity.Project;
 import goorm.athena.domain.project.repository.PlatformPlanRepository;
 import goorm.athena.domain.project.repository.ProjectRepository;
-import goorm.athena.domain.user.dto.response.MyProjectScrollResponse;
 import goorm.athena.domain.user.entity.User;
-import goorm.athena.domain.user.mapper.MyProjectScrollResponseMapper;
-import goorm.athena.domain.user.repository.MyInfoQueryRepository;
 import goorm.athena.domain.user.repository.UserRepository;
 import goorm.athena.domain.user.service.MyInfoService;
-import goorm.athena.util.IntegrationTestSupport;
+import goorm.athena.util.IntegrationServiceTestSupport;
 import goorm.athena.util.TestEntityFactory;
-import org.aspectj.weaver.ast.Or;
 import org.junit.jupiter.api.BeforeEach;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.testcontainers.shaded.org.checkerframework.checker.units.qual.A;
 
 import java.time.LocalDateTime;
 
-public abstract class MyInfoIntegrationTestSupport extends IntegrationTestSupport {
+public abstract class MyInfoIntegrationTestSupport extends IntegrationServiceTestSupport {
 
     @Autowired
     protected MyInfoService myInfoService;

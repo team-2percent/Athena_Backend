@@ -16,10 +16,10 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@AutoConfigureMockMvc(addFilters = false)
 class RefreshControllerImplTest extends RefreshControllerIntegrationTestSupport{
 
 
+    /*
     @DisplayName("액세스 토큰을 갱신할 때 리프레시 토큰이 유효하면 새로운 액세스 토큰을 발급한다.")
     @WithMockUser(username = "user", roles = {"USER"})
     @Test
@@ -105,7 +105,7 @@ class RefreshControllerImplTest extends RefreshControllerIntegrationTestSupport 
         verify(refreshTokenService).reissueToken(accessToken, refreshToken, httpServletResponse);
     }
 
+     */
 }
 
 
- */

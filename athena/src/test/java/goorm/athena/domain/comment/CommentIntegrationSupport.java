@@ -19,11 +19,11 @@ import goorm.athena.domain.project.repository.ProjectRepository;
 import goorm.athena.domain.project.service.ProjectService;
 import goorm.athena.domain.user.entity.User;
 import goorm.athena.domain.user.repository.UserRepository;
-import goorm.athena.util.IntegrationTestSupport;
+import goorm.athena.util.IntegrationServiceTestSupport;
 import goorm.athena.util.TestEntityFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-public abstract class CommentIntegrationSupport extends IntegrationTestSupport {
+public abstract class CommentIntegrationSupport extends IntegrationServiceTestSupport {
     @Autowired
     protected CommentRepository commentRepository;
 

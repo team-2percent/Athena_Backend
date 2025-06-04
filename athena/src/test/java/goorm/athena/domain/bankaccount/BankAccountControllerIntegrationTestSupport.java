@@ -6,6 +6,7 @@ import goorm.athena.domain.deliveryinfo.controller.DeliveryInfoControllerImpl;
 import goorm.athena.domain.user.entity.Role;
 import goorm.athena.domain.user.service.UserService;
 import goorm.athena.global.jwt.util.LoginUserRequest;
+import goorm.athena.util.IntegrationControllerTestSupport;
 import goorm.athena.util.IntegrationTestSupport;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,19 +14,9 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 
-@AutoConfigureMockMvc
-public abstract class BankAccountControllerIntegrationTestSupport extends IntegrationTestSupport {
+public abstract class BankAccountControllerIntegrationTestSupport extends IntegrationControllerTestSupport {
     protected BankAccountControllerImpl controller;
     protected LoginUserRequest loginUserRequest;
-
-    @Autowired
-    protected MockMvc mockMvc;
-
-    @MockBean
-    protected BankAccountService bankAccountService;
-
-    @MockBean
-    protected UserService userService;
 
     @BeforeEach
     void setUp() {

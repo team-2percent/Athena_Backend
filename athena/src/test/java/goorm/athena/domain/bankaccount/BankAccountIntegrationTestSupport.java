@@ -8,14 +8,12 @@ import goorm.athena.domain.imageGroup.entity.Type;
 import goorm.athena.domain.imageGroup.service.ImageGroupService;
 import goorm.athena.domain.user.entity.User;
 import goorm.athena.domain.user.repository.UserRepository;
-import goorm.athena.util.IntegrationTestSupport;
+import goorm.athena.util.IntegrationServiceTestSupport;
 import goorm.athena.util.TestEntityFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 
-@AutoConfigureMockMvc
-public abstract class BankAccountIntegrationTestSupport extends IntegrationTestSupport {
+public abstract class BankAccountIntegrationTestSupport extends IntegrationServiceTestSupport {
 
     @Autowired
     protected UserRepository userRepository;
