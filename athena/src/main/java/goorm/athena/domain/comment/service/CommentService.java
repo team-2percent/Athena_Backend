@@ -57,6 +57,7 @@ public class CommentService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
     public List<CommentGetResponse> getCommentByUser(Long userId){
         User user = userService.getUser(userId);
         List<Comment> results = commentRepository.findByUserWithProjectImage(user);
