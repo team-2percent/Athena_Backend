@@ -1,0 +1,13 @@
+{
+  "version": "0.1.0",
+  "configurations": [
+    {
+      "type": "java",
+      "name": "AthenaApplication",
+      "request": "launch",
+      "mainClass": "goorm.athena.AthenaApplication",
+      "projectName": "athena",
+      "envFile": "${workspaceFolder}/athena/.env",
+    }
+  ]
+}

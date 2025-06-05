@@ -1,5 +1,11 @@
 spring:
 
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 10MB
+      max-request-size: 50MB
+
   config:
     import: optional:file:.env[.properties]
 
@@ -12,7 +18,84 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
+    properties:
+      hibernate:
+        jdbc:
+          default_batch_fetch_size: 100
+        order_inserts: true
+        order_updates: true
+
+
+  kakao:
+    api:
+      cid: ${KAKAO_API_CID}
+      admin-key: ${KAKAO_API_ADMIN_KEY}
+      approval-url: ${KAKAO_API_APPROVAL_URL}
+      cancel-url: ${KAKAO_API_CANCEL_URL}
+      fail-url: ${KAKAO_API_FAIL_URL}
+
+  server:
+    forward-headers-strategy: framework
+
+cloud:
+  aws:
+    credentials:
+      access-key: ${ACCESS_KEY}
+      secret-key: ${SECRET_KEY}
+    s3:
+      bucket: ${BUCKET_NAME}
+    region:
+      static: ap-northeast-2
+    stack:
+      auto: false
+logging:
+  level:
+    p6spy: info
+
+decorator:
+  datasource:
+    p6spy:
+      enable-logging: true
+jwt:
+  secretKey: ${JWT_SECRET_KEY}
+  refreshKey: ${JWT_REFRESH_KEY}
+
+nas:
+  base.path: ${NAS_PATH}
+
+
+fcm:
+  certification: ${FCM_CERTIFICATION}
+
+firebase:
+  projectId: ${FIREBASE_PROJECT_ID}
+  privateKeyId: ${FIREBASE_PRIVATE_KEY_ID}
+  privateKey: ${FIREBASE_PRIVATE_KEY}
+  clientEmail: ${FIREBASE_CLIENT_EMAIL}
+  clientId: ${FIREBASE_CLIENT_ID}
+  clientX509CertUrl: ${FIREBASE_CLIENT_X509_CERT_URL}
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: test
+
+  datasource:
+    url:  jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    database-platform: org.hibernate.dialect.H2Dialect
     show-sql: true
     properties:
       hibernate:
         format_sql: true
+
+---
+

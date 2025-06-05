@@ -2,6 +2,7 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.4.5'
 	id 'io.spring.dependency-management' version '1.1.7'
+	id 'jacoco'
 }
 
 group = 'goorm'
@@ -20,13 +21,16 @@ configurations {
 }
 
 repositories {
-	mavenCentral()
+    mavenCentral()
+    maven { url 'https://jitpack.io' }
 }
 
 dependencies {
+
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	compileOnly 'org.projectlombok:lombok'
 	runtimeOnly 'com.mysql:mysql-connector-j'
 	annotationProcessor 'org.projectlombok:lombok'
@@ -34,11 +38,135 @@ dependencies {
 	testImplementation 'org.springframework.security:spring-security-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
+	// Spring cloud AWS
+	implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
+
 	// swagger
 	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.3'
 
+	// jwts
+	implementation group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.12.4'
+	runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-impl', version: '0.12.4'
+	runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: '0.12.4'
+
+	// queryDSL
+	implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
+	annotationProcessor 'com.querydsl:querydsl-apt:5.0.0:jakarta'
+	annotationProcessor 'jakarta.annotation:jakarta.annotation-api'
+	annotationProcessor 'jakarta.persistence:jakarta.persistence-api'
+
+	// Image
+	implementation 'net.coobird:thumbnailator:0.4.19'
+	implementation 'com.sksamuel.scrimage:scrimage-core:4.2.0'
+	implementation 'com.sksamuel.scrimage:scrimage-webp:4.2.0'
+	
+	// dummy
+	implementation 'net.datafaker:datafaker:2.0.1'
+	implementation 'org.springframework.boot:spring-boot-starter-jdbc'
+
+	// log
+	implementation 'com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.9.0'
+  
+  	// firebase
+	implementation 'com.google.firebase:firebase-admin:9.2.0'
+
+	// test (@SpringBootTest, @DataJpaTest 등에서만 로딩됨 ,운영 빌드 시 포함되지 않음 )
+	testImplementation 'com.h2database:h2'
+
+	testImplementation "org.testcontainers:junit-jupiter"
+	testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
+	testImplementation "org.testcontainers:mysql"
+	testImplementation "org.springframework.boot:spring-boot-testcontainers"
+	testImplementation "org.testcontainers:testcontainers"
+	testImplementation 'org.mockito:mockito-core:5.12.0'
+	testImplementation 'org.mockito:mockito-junit-jupiter:5.12.0'
+
+}
+
+test {
+	useJUnitPlatform()
 }
 
 tasks.named('test') {
 	useJUnitPlatform()
+	finalizedBy 'jacocoTestReport'
+}
+
+// jacoco 정보
+jacoco {
+	toolVersion = "0.8.11"
+	layout.buildDirectory.dir("reports/jacoco")
+}
+
+// jacoco Report 생성
+jacocoTestReport {
+	dependsOn test // test 종속성 추가
+
+	reports {
+		xml.required = true
+		csv.required = false
+		html.required = true
+	}
+
+	def QDomainList = []
+	for (qPattern in '**/QA'..'**/QZ') { // QClass 대응
+		QDomainList.add(qPattern + '*')
+	}
+
+	afterEvaluate {
+		classDirectories.setFrom(files(classDirectories.files.collect {
+			fileTree(dir: it, exclude: [
+					'**/mapper/**',
+					'**/repository/**',
+					'**/entity/**',
+					'**/dto/**',
+					'**/*Application*',
+					'**/exception/**',
+					'**/config/**',
+					'**/project/spec/**',
+					'**/jwt/**'
+			] + QDomainList)
+		}))
+	}
+
+	finalizedBy 'jacocoTestCoverageVerification' // jacocoTestReport 태스크가 끝난 후 실행
+}
+
+// jacoco Test 유효성 확인
+jacocoTestCoverageVerification {
+	def QDomainList = []
+	for (qPattern in '*.QA'..'*.QZ') { // QClass 대응
+		QDomainList.add(qPattern + '*')
+	}
+
+	violationRules {
+		rule {
+			enabled = true // 규칙 활성화 여부
+			element = 'CLASS' // 커버리지를 체크할 단위 설정
+
+//			// 코드 커버리지를 측정할 때 사용되는 지표
+//			limit {
+//				counter = 'LINE'
+//				value = 'COVEREDRATIO'
+//				minimum = 0.30
+//			}
+//
+//			limit {
+//				counter = 'BRANCH'
+//				value = 'COVEREDRATIO'
+//				minimum = 0.30
+//			}
+
+			excludes = [
+					'**/repository/**',
+					'**/entity/**',
+					'**.dto.**',
+					'**.*Application*',
+					'**.exception.**',
+					'**.config.**',
+					'**/project/spec/**',
+					'**/jwt/**'
+			] + QDomainList
+		}
+	}
 }

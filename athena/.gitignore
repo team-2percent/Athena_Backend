@@ -33,11 +33,10 @@ out/
 /nbdist/
 /.nb-gradle/
 
-### VS Code ###
-.vscode/
-
 # 로그 파일 제외
 logs/
 *.log
 
 .env
+
+**/src/main/resources/firebase/

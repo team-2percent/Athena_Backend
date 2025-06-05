@@ -10,7 +10,7 @@ on:
 jobs:
   build:
     name: Build Docker Image
-    runs-on: goormui-MacBookPro-2
+    runs-on: self-hosted
 
     steps:
       - name: Checkout repository
@@ -19,31 +19,56 @@ jobs:
       - name: Set IMAGE_TAG
         run: echo "IMAGE_TAG=dev" >> $GITHUB_ENV
 
-      - name: Build via Docker Compose
+      - name: Build via Docker
         run: |
-          cd infra/docker
-          docker compose --env-file .env build --no-cache
-          docker tag athena:latest athena:${{ env.IMAGE_TAG }}
-          
+          docker build --no-cache -t docker-athena:${{ env.IMAGE_TAG }} athena
+
   deploy:
     name: Deploy Athena Service
-    runs-on: goormui-MacBookPro-2
+    runs-on: self-hosted
+    environment: dev
     needs: build
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Ensure IMAGE_TAG is set
+      - name: Set IMAGE_TAG
         run: echo "IMAGE_TAG=dev" >> $GITHUB_ENV
+
+      - name: Create .env file
+        run: |
+          cat <<EOF > infra/docker/.env
+          DATABASE_URL=${{ secrets.DATABASE_URL }}
+          DATABASE_USERNAME=${{ secrets.DATABASE_USERNAME }}
+          DATABASE_PASSWORD=${{ secrets.DATABASE_PASSWORD }}
+          DATABASE_DRIVER=${{ secrets.DATABASE_DRIVER }}
+          KAKAO_API_CID=${{ secrets.KAKAO_API_CID }}
+          KAKAO_API_ADMIN_KEY=${{ secrets.KAKAO_API_ADMIN_KEY }}
+          KAKAO_API_APPROVAL_URL=${{ secrets.KAKAO_API_APPROVAL_URL }}
+          KAKAO_API_CANCEL_URL=${{ secrets.KAKAO_API_CANCEL_URL }}
+          KAKAO_API_FAIL_URL=${{ secrets.KAKAO_API_FAIL_URL }}
+          JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }}
+          JWT_REFRESH_KEY=${{ secrets.JWT_REFRESH_KEY }}
+          ACCESS_KEY=${{ secrets.ACCESS_KEY }}
+          SECRET_KEY=${{ secrets.SECRET_KEY }}
+          BUCKET_NAME=${{ secrets.BUCKET_NAME }}
+          NAS_PATH=${{ secrets.NAS_PATH }}
+          FCM_CERTIFICATION=${{ secrets.FCM_CERTIFICATION }}
+          FIREBASE_PROJECT_ID=${{ secrets.FIREBASE_PROJECT_ID }}
+          FIREBASE_PRIVATE_KEY_ID=${{ secrets.FIREBASE_PRIVATE_KEY_ID }}
+          FIREBASE_PRIVATE_KEY=${{ secrets.FIREBASE_PRIVATE_KEY }}
+          FIREBASE_CLIENT_EMAIL=${{ secrets.FIREBASE_CLIENT_EMAIL }}
+          FIREBASE_CLIENT_ID=${{ secrets.FIREBASE_CLIENT_ID }}
+          FIREBASE_CLIENT_X509_CERT_URL=${{ secrets.FIREBASE_CLIENT_X509_CERT_URL }}
+          IMAGE_TAG=${{ env.IMAGE_TAG }}
+          EOF
 
       - name: Bring up athena container
         run: |
-          cd infra/docker
-          # dev 태그로 빌드된 athena 이미지를 서비스로 기동
-          docker compose --env-file .env up -d athena
+          docker compose -f infra/docker/docker-compose.yml rm -f athena
+          docker compose --env-file infra/docker/.env -f infra/docker/docker-compose.yml up -d athena
 
       - name: Verify service health
         run: |
-          # 간단히 컨테이너 상태 확인
           docker ps --filter "name=athena" --format "table {{.Names}}\t{{.Status}}"
