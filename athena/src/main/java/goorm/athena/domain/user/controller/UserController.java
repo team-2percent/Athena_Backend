@@ -70,7 +70,7 @@ public interface UserController {
     @ApiResponse(responseCode = "200", description = "유저 로그아웃 성공")
     @PostMapping("/logout")
     ResponseEntity<Void> logout(@Parameter(hidden = true) @CheckLogin LoginUserRequest request,
-        //    @Parameter(hidden = true) @CookieValue("refreshToken") String refreshToken,
+            @Parameter(hidden = true) @CookieValue("refreshToken") String refreshToken,
                                        HttpServletResponse response);
 
 
