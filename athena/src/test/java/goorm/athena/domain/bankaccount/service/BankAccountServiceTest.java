@@ -129,7 +129,7 @@ class BankAccountServiceTest extends BankAccountIntegrationTestSupport {
                 .hasMessageContaining(ErrorCode.INACCURATE_BANK_ACCOUNT.getErrorMessage());
     }
 
-    @DisplayName("유저가 계좌 정보 상태를 변경할 때 다른 유저의 계좌 정보를 변경하면 에러를 리턴한다.")
+    @DisplayName("유저가 기본 계좌를 기본 계좌 상태로 변경하려 하면 에러를 리턴한다.")
     @Test
     void changeBankAccountState_ALREADY() {
         // given
@@ -182,7 +182,7 @@ class BankAccountServiceTest extends BankAccountIntegrationTestSupport {
                 .hasMessageContaining(ErrorCode.INACCURATE_BANK_ACCOUNT.getErrorMessage());
     }
 
-    @DisplayName("유저가 다른 사람의 계좌 정보를 삭제하고자 하면 접근 거부 에러를 리턴한다.")
+    @DisplayName("유저가 자신의 기본 계좌 정보를 삭제하고자 하면 접근 거부 에러를 리턴한다.")
     @Test
     void deleteBankAccountInfo_Primary() {
         // given
@@ -197,7 +197,7 @@ class BankAccountServiceTest extends BankAccountIntegrationTestSupport {
                 .hasMessageContaining(ErrorCode.BASIC_ACCOUNT_NOT_DELETED.getErrorMessage());
     }
 
-    @DisplayName("유저의 일반 계좌 정보를 삭제한다.")
+    @DisplayName("유저가 등록했던 자신의 일반 계좌 정보 중 하나를 삭제한다.")
     @Test
     void deleteBankAccountInfo_Normal() {
         // given

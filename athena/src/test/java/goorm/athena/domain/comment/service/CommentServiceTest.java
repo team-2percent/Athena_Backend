@@ -57,7 +57,7 @@ class CommentServiceTest extends CommentIntegrationSupport {
 
     }
 
-    @DisplayName("유저가 해당 프로젝트에 코멘트를 작성한다.")
+    @DisplayName("유저가 해당 프로젝트에 후기를 작성한다.")
     @Test
     void createComment() {
         // given
@@ -85,7 +85,7 @@ class CommentServiceTest extends CommentIntegrationSupport {
         assertThat(response.content()).isEqualTo("123123");
     }
 
-    @DisplayName("해당 프로젝트의 코멘트들을 조회한다.")
+    @DisplayName("프로젝트 ID로 조회하여 등록된 후기들을 유저 닉네임과 함께 조회한다.")
     @Test
     void getCommentByProject() {
         // given
@@ -122,6 +122,7 @@ class CommentServiceTest extends CommentIntegrationSupport {
         assertThat(commentResponse.imageUrl()).isEqualTo(expectedImageUrl);
     }
 
+    @DisplayName("로그인 한 유저가 자신이 작성한 후기들을 프로젝트 정보와 함께 조회한다.")
     @Test
     void getCommentByUser() {
         // given

@@ -14,7 +14,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;
 
 class JwtTokenizerTest extends JwtTokenizerTestSupport {
-    @DisplayName("헤더 값이 'Bearer '로 시작하면 'Bearer '를 제거한 토큰을 리턴한다.")
+    @DisplayName("로그인 관련 api를 진행 시 인증 헤더 값이 'Bearer '로 시작하면 'Bearer '를 제거한 토큰을 리턴한다.")
     @Test
     void extractBearerToken_withBearerPrefix() {
         String tokenWithBearer = "Bearer abc.def.ghi";
@@ -24,7 +24,7 @@ class JwtTokenizerTest extends JwtTokenizerTestSupport {
         assertThat(extracted).isEqualTo("abc.def.ghi");
     }
 
-    @DisplayName("헤더 값이 'Bearer '로 시작하지 않으면 원래 값을 리턴한다.")
+    @DisplayName("로그인 관련 api를 진행 시 인증 헤더 값이 'Bearer '로 시작하지 않으면 원래 값을 리턴한다.")
     @Test
     void extractBearerToken_withoutBearerPrefix() {
         String rawToken = "abc.def.ghi";
@@ -34,7 +34,7 @@ class JwtTokenizerTest extends JwtTokenizerTestSupport {
         assertThat(extracted).isEqualTo(rawToken);
     }
 
-    @DisplayName("헤더 값이 null이면 null을 리턴한다.")
+    @DisplayName("로그인 관련 api를 진행 시 인증 헤더 값이 null이면 null을 리턴한다.")
     @Test
     void extractBearerToken_nullHeader() {
         String extracted = jwtTokenizer.extractBearerToken(null);
