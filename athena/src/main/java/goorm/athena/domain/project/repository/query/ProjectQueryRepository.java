@@ -58,8 +58,9 @@ public class ProjectQueryRepository {
                                 project.totalAmount, project.goalAmount),
                         project.createdAt,
                         project.endAt,
-                        Expressions.numberTemplate(Integer.class, "DATEDIFF({0}, CURRENT_DATE)", project.endAt)
-                ))
+                                                Expressions.numberTemplate(Integer.class,
+                                                                "TIMESTAMPDIFF(DAY, {0}, {1})",
+                                                                Expressions.currentDate(), project.endAt)))
                 .from(project)
                 .leftJoin(project.imageGroup, imageGroup)
                 .leftJoin(image).on(
