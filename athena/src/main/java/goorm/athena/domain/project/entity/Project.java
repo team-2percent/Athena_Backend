@@ -84,7 +84,7 @@ public class Project {
                     String title, String description,
                     Long goalAmount, Long totalAmount, String contentMarkdown,
                     LocalDateTime startAt, LocalDateTime endAt, LocalDateTime shippedAt,
-                    PlatformPlan platformPlan) {
+            PlatformPlan platformPlan, Long views) {
         this.seller = seller;
         this.imageGroup = imageGroup;
         this.category = category;
@@ -98,6 +98,7 @@ public class Project {
         this.endAt = endAt;
         this.shippedAt = shippedAt;
         this.platformPlan = platformPlan;
+        this.views = views;
     }
 
 
