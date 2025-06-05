@@ -2,6 +2,7 @@ package goorm.athena.domain.project.service;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.Random;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -26,6 +27,7 @@ import goorm.athena.domain.category.util.DefaultCategories;
 import goorm.athena.domain.project.util.ProjectQueryType;
 import goorm.athena.domain.project.dto.cursor.ProjectRecentCursorResponse;
 import goorm.athena.domain.project.dto.req.ProjectQueryLatestRequest;
+import goorm.athena.domain.project.dto.res.ProjectCategoryTopResponseWrapper;
 
 /*
  * 프로젝트 서비스 중 조회 관련 메서드를 테스트합니다.
@@ -48,11 +50,12 @@ public class ProjectQueryServiceTest extends ProjectIntegrationTestSupport {
   private BankAccountRepository bankAccountRepository;
 
   private Project createProjectWithDependencies(String categoryName, PlanName planName, LocalDateTime startAt,
-      LocalDateTime endAt) {
+      LocalDateTime endAt, Long views) {
     categoryName = categoryName == null ? "기타" : categoryName;
     planName = planName == null ? PlanName.BASIC : planName;
     startAt = startAt == null ? LocalDateTime.now() : startAt;
     endAt = endAt == null ? LocalDateTime.now().plusDays(30) : endAt;
+    views = views == null ? 0L : views;
 
     ImageGroup userImageGroup = ImageGroup.builder()
         .type(Type.USER)
@@ -97,7 +100,9 @@ public class ProjectQueryServiceTest extends ProjectIntegrationTestSupport {
         .startAt(startAt)
         .endAt(endAt)
         .shippedAt(null)
+        .views(views)
         .build();
+    project.setApprovalStatus(true);
     return projectRepository.save(project);
   }
 
@@ -108,16 +113,35 @@ public class ProjectQueryServiceTest extends ProjectIntegrationTestSupport {
     DefaultCategories.VALUES.forEach(categoryName -> {
       for (int i = 0; i < 6; i++) {
         createProjectWithDependencies(categoryName, PlanName.BASIC, LocalDateTime.now(),
-            LocalDateTime.now().plusDays(30));
+            LocalDateTime.now().plusDays(30), 0L);
       }
     });
 
     // when
     ProjectRecentCursorResponse result = (ProjectRecentCursorResponse) projectService.getProjectsWithCursor(
         ProjectQueryType.LATEST, Optional.empty(),
-        new ProjectQueryLatestRequest(LocalDateTime.now(), null, 10));
+        new ProjectQueryLatestRequest(LocalDateTime.now(), null, 20));
 
     // then
     assertThat(result.content().size()).isGreaterThanOrEqualTo(20);
+  }
+
+  @DisplayName("프로젝트 전체 조회에서 조회수 기준 TOP 5 항목을 조회합니다.")
+  @Test
+  void testGetTop5ProjectsByViews() {
+    // given
+    DefaultCategories.VALUES.forEach(categoryName -> {
+      Random random = new Random();
+      for (int i = 0; i < 6; i++) {
+        createProjectWithDependencies(categoryName, PlanName.BASIC, LocalDateTime.now(),
+            LocalDateTime.now().plusDays(30), random.nextLong(1000));
+      }
+    });
+
+    // when
+    ProjectCategoryTopResponseWrapper result = projectService.getTopView();
+
+    // then
+    assertThat(result.allTopView().size()).isEqualTo(5);
   }
 }

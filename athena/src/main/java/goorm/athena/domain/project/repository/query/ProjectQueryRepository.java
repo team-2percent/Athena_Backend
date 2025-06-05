@@ -53,13 +53,14 @@ public class ProjectQueryRepository {
                         project.seller.nickname,
                         project.title,
                         project.description,
-                        Expressions.numberTemplate(Long.class,
+                        Expressions.numberTemplate(Integer.class,
                                 "floor(({0} * 100.0) / nullif({1}, 0))",
                                 project.totalAmount, project.goalAmount),
                         project.createdAt,
                         project.endAt,
-                        Expressions.numberTemplate(Integer.class, "DATEDIFF({0}, CURRENT_DATE)", project.endAt)
-                ))
+                                                Expressions.numberTemplate(Integer.class,
+                                                                "TIMESTAMPDIFF(DAY, {0}, {1})",
+                                                                Expressions.currentDate(), project.endAt)))
                 .from(project)
                 .leftJoin(project.imageGroup, imageGroup)
                 .leftJoin(image).on(

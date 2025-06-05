@@ -10,10 +10,10 @@ public record ProjectRecentResponse(
         String sellerName,
         String title,
         String description,
-        Long achievementRate,
+        Integer achievementRate,
         LocalDateTime createdAt,
         LocalDateTime endAt,
-        int daysLeft
+        Integer daysLeft
 ){
     public static ProjectRecentResponse from(Project project, String imageUrl) {
         // 현재 날짜와 종료일 사이의 차이 계산
@@ -23,7 +23,7 @@ public record ProjectRecentResponse(
         ).toDays();
 
         // 음수 방지 (이미 마감된 경우)
-        int safeDaysLeft = (int) Math.max(daysLeft, 0);
+        Integer safeDaysLeft = (int) Math.max(daysLeft, 0);
 
         return new ProjectRecentResponse(
                 project.getId(),
@@ -32,8 +32,8 @@ public record ProjectRecentResponse(
                 project.getTitle(),
                 project.getDescription(),
                 project.getTotalAmount() == 0 || project.getGoalAmount() == 0
-                            ? 0L
-                            : (project.getTotalAmount()) / project.getGoalAmount(),
+                            ? 0
+                            : (int) (project.getTotalAmount() / project.getGoalAmount()),
                 project.getCreatedAt(),
                 project.getEndAt(),
                 safeDaysLeft
