@@ -48,11 +48,12 @@ public class ProjectQueryServiceTest extends ProjectIntegrationTestSupport {
   private BankAccountRepository bankAccountRepository;
 
   private Project createProjectWithDependencies(String categoryName, PlanName planName, LocalDateTime startAt,
-      LocalDateTime endAt) {
+      LocalDateTime endAt, Long views) {
     categoryName = categoryName == null ? "기타" : categoryName;
     planName = planName == null ? PlanName.BASIC : planName;
     startAt = startAt == null ? LocalDateTime.now() : startAt;
     endAt = endAt == null ? LocalDateTime.now().plusDays(30) : endAt;
+    views = views == null ? 0L : views;
 
     ImageGroup userImageGroup = ImageGroup.builder()
         .type(Type.USER)
@@ -97,7 +98,9 @@ public class ProjectQueryServiceTest extends ProjectIntegrationTestSupport {
         .startAt(startAt)
         .endAt(endAt)
         .shippedAt(null)
+        .views(views)
         .build();
+    project.setApprovalStatus(true);
     return projectRepository.save(project);
   }
 
@@ -108,7 +111,7 @@ public class ProjectQueryServiceTest extends ProjectIntegrationTestSupport {
     DefaultCategories.VALUES.forEach(categoryName -> {
       for (int i = 0; i < 6; i++) {
         createProjectWithDependencies(categoryName, PlanName.BASIC, LocalDateTime.now(),
-            LocalDateTime.now().plusDays(30));
+            LocalDateTime.now().plusDays(30), 0L);
       }
     });
 
