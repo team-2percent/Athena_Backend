@@ -2,6 +2,7 @@ package goorm.athena.domain.project.service;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.Random;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -26,6 +27,7 @@ import goorm.athena.domain.category.util.DefaultCategories;
 import goorm.athena.domain.project.util.ProjectQueryType;
 import goorm.athena.domain.project.dto.cursor.ProjectRecentCursorResponse;
 import goorm.athena.domain.project.dto.req.ProjectQueryLatestRequest;
+import goorm.athena.domain.project.dto.res.ProjectCategoryTopResponseWrapper;
 
 /*
  * 프로젝트 서비스 중 조회 관련 메서드를 테스트합니다.
@@ -122,5 +124,24 @@ public class ProjectQueryServiceTest extends ProjectIntegrationTestSupport {
 
     // then
     assertThat(result.content().size()).isGreaterThanOrEqualTo(20);
+  }
+
+  @DisplayName("프로젝트 전체 조회에서 조회수 기준 TOP 5 항목을 조회합니다.")
+  @Test
+  void testGetTop5ProjectsByViews() {
+    // given
+    DefaultCategories.VALUES.forEach(categoryName -> {
+      Random random = new Random();
+      for (int i = 0; i < 6; i++) {
+        createProjectWithDependencies(categoryName, PlanName.BASIC, LocalDateTime.now(),
+            LocalDateTime.now().plusDays(30), random.nextLong(1000));
+      }
+    });
+
+    // when
+    ProjectCategoryTopResponseWrapper result = projectService.getTopView();
+
+    // then
+    assertThat(result.allTopView().size()).isEqualTo(5);
   }
 }
