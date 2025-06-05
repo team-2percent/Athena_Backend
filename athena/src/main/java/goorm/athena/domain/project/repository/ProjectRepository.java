@@ -19,8 +19,8 @@ public interface ProjectRepository extends JpaRepository<Project, Long>, JpaSpec
             "JOIN FETCH p.seller " +
             "JOIN FETCH p.imageGroup " +
             "WHERE p.isApproved = 'APPROVED' " +
-            "ORDER BY p.views DESC")
-    List<Project> findTop5WithImageGroupByOrderByViewsDesc();
+                        "ORDER BY p.views DESC LIMIT :limit")
+        List<Project> findTopNWithImageGroupByOrderByViewsDesc(@Param("limit") int limit);
 
     @Query("""
             SELECT DISTINCT p.order.project FROM Payment p

@@ -8,14 +8,12 @@ public record ProjectCategoryCursorResponse(
         List<ProjectCategoryResponse> content,
         Object nextCursorValue,
         Long nextProjectId,
-        Long total
-) {
+        Long total) implements ProjectCursorBaseResponse {
     public static ProjectCategoryCursorResponse of(
             List<ProjectCategoryResponse> content,
             Object nextCursorValue,
             Long nextProjectId,
-            Long total
-    ) {
+            Long total) {
         return new ProjectCategoryCursorResponse(content, nextCursorValue, nextProjectId, total);
     }
 }

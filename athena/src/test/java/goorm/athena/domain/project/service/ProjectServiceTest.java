@@ -2,7 +2,7 @@ package goorm.athena.domain.project.service;
 
 import org.junit.jupiter.api.Test;
 
-import goorm.athena.domain.project.ProjectIntegrationTestSupport;
+import goorm.athena.domain.project.util.ProjectIntegrationTestSupport;
 
 public class ProjectServiceTest extends ProjectIntegrationTestSupport {
   @Test
@@ -31,37 +31,12 @@ public class ProjectServiceTest extends ProjectIntegrationTestSupport {
   }
 
   @Test
-  void testGetProjects() {
-
-  }
-
-  @Test
-  void testGetProjectsByCategory() {
-
-  }
-
-  @Test
-  void testGetProjectsByDeadLine() {
-
-  }
-
-  @Test
-  void testGetProjectsByNew() {
-
-  }
-
-  @Test
   void testGetTopView() {
 
   }
 
   @Test
   void testGetTopViewByPlan() {
-
-  }
-
-  @Test
-  void testSearchProjects() {
 
   }
 
