@@ -53,7 +53,7 @@ public class ProjectQueryRepository {
                         project.seller.nickname,
                         project.title,
                         project.description,
-                        Expressions.numberTemplate(Long.class,
+                        Expressions.numberTemplate(Integer.class,
                                 "floor(({0} * 100.0) / nullif({1}, 0))",
                                 project.totalAmount, project.goalAmount),
                         project.createdAt,
