@@ -7,6 +7,7 @@ import goorm.athena.domain.payment.dto.res.KakaoPayReadyResponse;
 import goorm.athena.domain.payment.service.PaymentService;
 import goorm.athena.domain.project.service.ProjectService;
 import goorm.athena.domain.user.entity.User;
+import goorm.athena.domain.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,16 +20,13 @@ public class PaymentControllerImpl implements PaymentController {
     private final PaymentService paymentService;
     private final OrderService orderService;
     private final FcmNotificationService fcmNotificationService;
+    private final UserService userService;
 
     @PostMapping("/ready/{orderId}")
     public ResponseEntity<KakaoPayReadyResponse> readyPayment(
             @PathVariable Long orderId
     ) {
         KakaoPayReadyResponse response = paymentService.readyPayment(orderId);
-
-        Long sellerId = orderService.getSeller(orderId);
-        User buyer = orderService.getBuyer(orderId);
-        fcmNotificationService.notifyPurchase(buyer.getId(), sellerId, buyer.getNickname());
 
         return ResponseEntity.ok(response);
     }
@@ -39,6 +37,12 @@ public class PaymentControllerImpl implements PaymentController {
             @RequestParam("pg_token") String pgToken
     ) {
         KakaoPayApproveResponse response = paymentService.approvePayment(pgToken, orderId);
+
+        Long sellerId = orderService.getSeller(orderId);
+        Long buyerId = orderService.getBuyer(orderId);
+        String buyerName = userService.getUser(buyerId).getNickname();
+        fcmNotificationService.notifyPurchase(buyerId, sellerId, buyerName);
+
         return ResponseEntity.ok(response);
     }
 }

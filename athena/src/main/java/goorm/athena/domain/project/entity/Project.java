@@ -60,7 +60,7 @@ public class Project {
     @Max(1_000_000_000)
     private Long totalAmount;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(columnDefinition = "MEDIUMTEXT")
     private String contentMarkdown;     // 소개글 (마크 다운)
 
     private LocalDateTime startAt;

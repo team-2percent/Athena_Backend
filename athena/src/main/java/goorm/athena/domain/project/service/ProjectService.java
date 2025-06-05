@@ -10,9 +10,15 @@ import goorm.athena.domain.imageGroup.entity.ImageGroup;
 import goorm.athena.domain.imageGroup.service.ImageGroupService;
 import goorm.athena.domain.product.dto.req.ProductRequest;
 import goorm.athena.domain.product.dto.res.ProductResponse;
+import goorm.athena.domain.product.entity.Product;
 import goorm.athena.domain.product.service.ProductService;
 import goorm.athena.domain.project.dto.cursor.*;
 import goorm.athena.domain.project.dto.req.ProjectCreateRequest;
+import goorm.athena.domain.project.dto.req.ProjectQueryBaseRequest;
+import goorm.athena.domain.project.dto.req.ProjectQueryLatestRequest;
+import goorm.athena.domain.project.dto.req.ProjectQueryCategoryRequest;
+import goorm.athena.domain.project.dto.req.ProjectQueryDeadlineRequest;
+import goorm.athena.domain.project.dto.req.ProjectQuerySearchRequest;
 import goorm.athena.domain.project.dto.req.ProjectUpdateRequest;
 import goorm.athena.domain.project.dto.res.ProjectIdResponse;
 import goorm.athena.domain.project.dto.req.ProjectCursorRequest;
@@ -30,6 +36,8 @@ import goorm.athena.domain.user.mapper.UserMapper;
 import goorm.athena.domain.user.service.UserService;
 import goorm.athena.global.exception.CustomException;
 import goorm.athena.global.exception.ErrorCode;
+import goorm.athena.domain.project.util.ProjectQueryType;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,6 +50,8 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
+
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
@@ -59,12 +69,11 @@ public class ProjectService {
     private final MarkdownParser markdownParser;
     private final PlatformPlanRepository platformPlanRepository;
 
-
     /**
      * [프로젝트 등록 Method]
      */
     @Transactional
-    public ProjectIdResponse createProject(ProjectCreateRequest request, List<MultipartFile> markdownFiles){
+    public ProjectIdResponse createProject(ProjectCreateRequest request, List<MultipartFile> markdownFiles) {
         ImageGroup imageGroup = imageGroupService.getById(request.imageGroupId());
         User seller = userService.getUser(request.sellerId());
         Category category = categoryService.getCategoryById(request.categoryId());
@@ -72,15 +81,16 @@ public class ProjectService {
         PlanName planName = PlanName.valueOf(request.platformPlan());
         PlatformPlan platformPlan = platformPlanRepository.findByName(planName);
 
-        validateProduct(request);   // 프로젝트 등록 시 검증
+        validateProduct(request); // 프로젝트 등록 시 검증
 
         // 마크다운에 로컬 이미지가 삽입된 경우 이를 이미지 URL로 치환
         String convertedMarkdown = convertMarkdownIfNeeded(request.contentMarkdown(), markdownFiles, imageGroup);
 
-        Project project = ProjectMapper.toEntity(request, seller, imageGroup, category, bankAccount, platformPlan, convertedMarkdown);  // 새 프로젝트 생성
-        Project savedProject = projectRepository.save(project);                                                                         // 프로젝트 저장
+        Project project = ProjectMapper.toEntity(request, seller, imageGroup, category, bankAccount, platformPlan,
+                convertedMarkdown); // 새 프로젝트 생성
+        Project savedProject = projectRepository.save(project); // 프로젝트 저장
 
-        createProducts(request.products(), project);    // 상품 등록 요청 처리
+        createProducts(request.products(), project); // 상품 등록 요청 처리
         // 상품 생성 예외 처리 추가적으로 있을지 고려
 
         return ProjectMapper.toCreateDto(savedProject);
@@ -90,8 +100,7 @@ public class ProjectService {
     private void createProducts(List<ProductRequest> requests, Project project) {
         if (!CollectionUtils.isEmpty(requests)) {
             productService.saveProducts(requests, project);
-        }
-        else{
+        } else {
             throw new CustomException(ErrorCode.PRODUCT_IS_EMPTY);
         }
     }
@@ -121,25 +130,26 @@ public class ProjectService {
         }
 
         try {
-            return getConvertedMarkdown(markdownFiles, imageGroup, markdown);   // 기존 마크다운 -> URL 치환 마크다운
+            return getConvertedMarkdown(markdownFiles, imageGroup, markdown); // 기존 마크다운 -> URL 치환 마크다운
         } catch (IOException e) {
             throw new CustomException(ErrorCode.IMAGES_UPLOAD_FAILED);
         }
     }
 
-    private String getConvertedMarkdown(List<MultipartFile> markdownFiles, ImageGroup imageGroup, String markdown) throws IOException {
-        List<String> imagePaths = markdownParser.extractImagePaths(markdown);                   // 마크다운 내 url 추출
-        List<String> realUrls = imageService.uploadMarkdownImages(markdownFiles, imageGroup);   // 이미지 저장 및 이미지 서버 url 반환
+    private String getConvertedMarkdown(List<MultipartFile> markdownFiles, ImageGroup imageGroup, String markdown)
+            throws IOException {
+        List<String> imagePaths = markdownParser.extractImagePaths(markdown); // 마크다운 내 url 추출
+        List<String> realUrls = imageService.uploadMarkdownImages(markdownFiles, imageGroup); // 이미지 저장 및 이미지 서버 url 반환
 
         return markdownParser.replaceMarkdown(markdown, imagePaths, realUrls);
     }
-
 
     /**
      * [프로젝트 수정 Method]
      */
     @Transactional
-    public void updateProject(Long projectId, ProjectUpdateRequest request, List<MultipartFile> files, List<MultipartFile> markdownFiles) {
+    public void updateProject(Long projectId, ProjectUpdateRequest request, List<MultipartFile> files,
+            List<MultipartFile> markdownFiles) {
         Project project = getById(projectId);
         Category category = categoryService.getCategoryById(request.categoryId());
         BankAccount bankAccount = bankAccountService.getPrimaryAccount(request.bankAccountId());
@@ -148,14 +158,17 @@ public class ProjectService {
         imageService.deleteImages(project.getImageGroup());
 
         // 마크다운에 로컬 이미지가 삽입된 경우 이를 이미지 URL로 치환
-        String convertedMarkdown = convertMarkdownIfNeeded(request.contentMarkdown(), markdownFiles, project.getImageGroup());
+        String convertedMarkdown = convertMarkdownIfNeeded(request.contentMarkdown(), markdownFiles,
+                project.getImageGroup());
 
-        if(!CollectionUtils.isEmpty(files)) {
+        if (!CollectionUtils.isEmpty(files)) {
             imageService.uploadImages(files, project.getImageGroup());
-        }
-        else{
+        } else {
             throw new CustomException(ErrorCode.IMAGE_IS_REQUIRED);
         }
+
+        // 상품 업데이트 (가격만)
+        productService.updateProducts(request.products(), project);
 
         project.update(
                 category,
@@ -166,8 +179,7 @@ public class ProjectService {
                 convertedMarkdown,
                 request.startAt(),
                 request.endAt(),
-                request.shippedAt()
-        );
+                request.shippedAt());
 
         // 상품 및 이미지 업데이트 (PUT)
         deleteProducts(project);
@@ -178,14 +190,14 @@ public class ProjectService {
      * [프로젝트 삭제 Method]
      */
     @Transactional
-    public void deleteProject(Long projectId){
+    public void deleteProject(Long projectId) {
         Project project = getById(projectId);
         ImageGroup imageGroup = project.getImageGroup();
 
-        imageService.deleteImages(imageGroup);              // 이미지 삭제
-        deleteProducts(project);                            // 상품 -> 옵션 삭제
-        projectRepository.delete(project);                  // 프로젝트 삭제
-        imageGroupService.deleteImageGroup(imageGroup);     // 이미지 그룹 삭제
+        imageService.deleteImages(imageGroup); // 이미지 삭제
+        deleteProducts(project); // 상품 -> 옵션 삭제
+        projectRepository.delete(project); // 프로젝트 삭제
+        imageGroupService.deleteImageGroup(imageGroup); // 이미지 그룹 삭제
 
     }
 
@@ -200,11 +212,11 @@ public class ProjectService {
 
     // 상세 페이지 조회
     @Transactional(readOnly = true)
-    public ProjectDetailResponse getProjectDetail(Long projectId){
+    public ProjectDetailResponse getProjectDetail(Long projectId) {
         Project project = getById(projectId);
 
         Category category = categoryService.getCategoryById(project.getCategory().getId());
-        List<Image> images = imageService.getProjectImages(project.getImageGroup().getId());    // 마크다운 이미지 제외 가져오기
+        List<Image> images = imageService.getProjectImages(project.getImageGroup().getId()); // 마크다운 이미지 제외 가져오기
         List<String> imageUrls = imageService.getImageUrls(images);
 
         UserDetailResponse userDetailResponse = UserMapper.toDetailResponse(project.getSeller());
@@ -216,7 +228,7 @@ public class ProjectService {
     // 메인 페이지 조회
     @Transactional(readOnly = true)
     public List<ProjectAllResponse> getProjects() {
-        List<Project> projects = projectRepository.findTop5WithImageGroupByOrderByViewsDesc();
+        List<Project> projects = projectRepository.findTopNWithImageGroupByOrderByViewsDesc(20);
 
         AtomicInteger rank = new AtomicInteger(1);
         return projects.stream()
@@ -228,6 +240,57 @@ public class ProjectService {
                 .collect(Collectors.toList());
     }
 
+    // ToDo 커서 기반 페이징 조회 메서드 통합 중
+    // ToDo 각 case 안에서 requestDto를 다운캐스팅하여 사용하고 있지만, 추후 일반화 할 예정
+    @Transactional(readOnly = true)
+    public <T extends ProjectQueryBaseRequest> ProjectCursorBaseResponse getProjectsWithCursor(
+            ProjectQueryType queryType,
+            Optional<ProjectCursorRequest<?>> cursorRequest,
+            T requestDto // queryType에 따라 requestDto 타입이 달라지도록 추상화
+    ) {
+        switch (queryType) {
+            case LATEST:
+                if (requestDto instanceof ProjectQueryLatestRequest latestRequest) {
+                    return getProjectsByNew(latestRequest.lastStartAt(), latestRequest.lastProjectId(),
+                            latestRequest.pageSize());
+                }
+                // ToDo 팔로워 수 기준 조회 기능 추가 예정
+                // case POPULAR:
+                // if (requestDto instanceof ProjectQueryPopularRequest popularRequest) {
+                // return getProjectsByPopular(popularRequest.lastStartAt(),
+                // popularRequest.lastProjectId(),
+                // popularRequest.pageSize());
+                // }
+            case CATEGORY:
+                if (requestDto instanceof ProjectQueryCategoryRequest categoryRequest) {
+                    if (cursorRequest.isEmpty()) {
+                        throw new IllegalArgumentException("cursorRequest는 null일 수 없습니다.");
+                    }
+                    return getProjectsByCategory(cursorRequest.get(), categoryRequest.categoryId(),
+                            categoryRequest.sortType());
+                }
+            case DEADLINE:
+                if (requestDto instanceof ProjectQueryDeadlineRequest deadlineRequest) {
+                    return getProjectsByDeadLine(deadlineRequest.lastStartAt(), deadlineRequest.sortTypeDeadline(),
+                            deadlineRequest.lastProjectId(), deadlineRequest.pageSize());
+                }
+                // ToDo 성공률 기준 조회 기능 추가 예정
+                // case SUCCESS_RATE:
+                // if (requestDto instanceof ProjectQuerySuccessRateRequest successRateRequest)
+                // {
+                // return getProjectsBySuccessRate(cursorRequest);
+                // }
+            case SEARCH:
+                if (requestDto instanceof ProjectQuerySearchRequest searchRequest) {
+                    if (cursorRequest.isEmpty()) {
+                        throw new IllegalArgumentException("cursorRequest는 null일 수 없습니다.");
+                    }
+                    return searchProjects(cursorRequest.get(), searchRequest.searchTerms(), searchRequest.sortType());
+                }
+        }
+        return null;
+    }
+
     // 최신 프로젝트 조회 (커서 기반 페이징)
     @Transactional(readOnly = true)
     public ProjectRecentCursorResponse getProjectsByNew(LocalDateTime lastStartAt, Long lastProjectId, int pageSize) {
@@ -237,26 +300,29 @@ public class ProjectService {
 
     // 카테고리별 프로젝트 조회 (커서 기반 페이징)
     @Transactional(readOnly = true)
-    public ProjectCategoryCursorResponse getProjectsByCategory(ProjectCursorRequest<?> request, Long categoryId, SortTypeLatest sortType) {
+    public ProjectCategoryCursorResponse getProjectsByCategory(ProjectCursorRequest<?> request, Long categoryId,
+            SortTypeLatest sortType) {
 
         return projectFilterQueryRepository.getProjectsByCategory(request, categoryId, sortType);
     }
 
     // 마감 기한별 프로젝트 조회 (커서 기반 페이징)
     @Transactional(readOnly = true)
-    public ProjectDeadlineCursorResponse getProjectsByDeadLine(LocalDateTime lastStartAt, SortTypeDeadline sortTypeDeadline, Long lastProjectId, int pageSize) {
+    public ProjectDeadlineCursorResponse getProjectsByDeadLine(LocalDateTime lastStartAt,
+            SortTypeDeadline sortTypeDeadline, Long lastProjectId, int pageSize) {
         ProjectCursorRequest<LocalDateTime> request = new ProjectCursorRequest<>(lastStartAt, lastProjectId, pageSize);
         return projectFilterQueryRepository.getProjectsByDeadline(request, sortTypeDeadline);
     }
 
     // 검색 프로젝트 조회 (커서 기반 페이징)
     @Transactional(readOnly = true)
-    public ProjectSearchCursorResponse searchProjects(ProjectCursorRequest<?> request, String searchTerms, SortTypeLatest sortType) {
+    public ProjectSearchCursorResponse searchProjects(ProjectCursorRequest<?> request, String searchTerms,
+            SortTypeLatest sortType) {
         return projectSearchQueryRepository.searchProjects(request, searchTerms, sortType);
     }
 
     @Transactional(readOnly = true)
-    public List<ProjectByPlanGetResponse> getTopViewByPlan(){
+    public List<ProjectByPlanGetResponse> getTopViewByPlan() {
         List<Project> projects = projectRepository.findTop5ProjectsGroupedByPlatformPlan();
 
         // 요금제 이름(planName) 별로 그룹핑
@@ -264,8 +330,7 @@ public class ProjectService {
                 .collect(Collectors.groupingBy(
                         p -> p.getPlatformPlan().getName().name(), // PlanName -> String
                         LinkedHashMap::new,
-                        Collectors.toList()
-                ));
+                        Collectors.toList()));
 
         // 각 그룹을 ProjectByPlanGetResponse 로 매핑
         return groupedByPlan.entrySet().stream()
@@ -283,8 +348,10 @@ public class ProjectService {
                 .toList();
     }
 
+    // ToDo 아래 코드에서 TOP 5 뽑는 부분들은 `findTopNWithImageGroupByOrderByViewsDesc` 메서드로
+    // 대체할 예정
     @Transactional(readOnly = true)
-    public ProjectCategoryTopResponseWrapper getTopView(){
+    public ProjectCategoryTopResponseWrapper getTopView() {
         List<Project> projects = projectRepository.findTopViewedProjectsByCategory();
 
         // 전체 조회수 기준 Top 5 (카테고리 상관없이)
@@ -299,8 +366,7 @@ public class ProjectService {
 
         // 카테고리별 Top 5
         Map<Category, List<Project>> groupedByCategory = projects.stream()
-                .collect(Collectors.groupingBy(Project::getCategory
-                        ,LinkedHashMap::new,
+                .collect(Collectors.groupingBy(Project::getCategory, LinkedHashMap::new,
                         Collectors.toList()));
 
         List<ProjectCategoryTopViewResponse> categoryTopViews = groupedByCategory.entrySet().stream()
@@ -341,7 +407,7 @@ public class ProjectService {
     }
 
     public Long getSellerId(Long projectId) {
-        User user =  projectRepository.findSellerByProjectId(projectId);
+        User user = projectRepository.findSellerByProjectId(projectId);
         return user.getId();
     }
 

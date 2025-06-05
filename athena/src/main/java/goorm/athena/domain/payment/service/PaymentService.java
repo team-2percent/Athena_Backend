@@ -63,7 +63,6 @@ public class PaymentService {
         }
 
         Payment payment = Payment.create(order, user, response.tid(), order.getTotalPrice());
-        order.getProject().increasePrice(requestDto.totalAmount());
         paymentRepository.save(payment);
 
         return response;
@@ -89,6 +88,7 @@ public class PaymentService {
         List<OrderItem> orderItems = orderItemRepository.findByOrderId(payment.getOrder().getId());
         for (OrderItem item : orderItems) {
             item.getProduct().decreaseStock(item.getQuantity());
+            item.getOrder().getProject().increasePrice(item.getPrice());
         }
         return KakaoPayApproveResponse.ofSuccess(response);
     }

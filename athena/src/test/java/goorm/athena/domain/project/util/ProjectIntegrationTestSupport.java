@@ -1,16 +1,17 @@
-package goorm.athena.domain.project;
+package goorm.athena.domain.project.util;
 
 import goorm.athena.util.IntegrationServiceTestSupport;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
+import jakarta.transaction.Transactional;
 
 import goorm.athena.domain.project.repository.ProjectRepository;
 import goorm.athena.domain.project.service.ProjectService;
+import org.springframework.beans.factory.annotation.Autowired;
 
+@Transactional
 public abstract class ProjectIntegrationTestSupport extends IntegrationServiceTestSupport {
-  @Mock
+  @Autowired
   protected ProjectRepository projectRepository;
 
-  @InjectMocks
+  @Autowired
   protected ProjectService projectService;
 }

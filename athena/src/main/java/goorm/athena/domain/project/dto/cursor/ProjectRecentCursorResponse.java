@@ -9,8 +9,7 @@ public record ProjectRecentCursorResponse(
         List<ProjectRecentResponse> content,
         LocalDateTime nextCursorValue,
         Long nextProjectId,
-        Long total
-) {
+        Long total) implements ProjectCursorBaseResponse {
     public static ProjectRecentCursorResponse ofByCreatedAt(List<ProjectRecentResponse> content, Long total) {
         if (content.isEmpty()) {
             return new ProjectRecentCursorResponse(content, null, null, null);
