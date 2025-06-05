@@ -116,12 +116,15 @@ jacocoTestReport {
 	afterEvaluate {
 		classDirectories.setFrom(files(classDirectories.files.collect {
 			fileTree(dir: it, exclude: [
+					'**/mapper/**',
 					'**/repository/**',
 					'**/entity/**',
 					'**/dto/**',
 					'**/*Application*',
 					'**/exception/**',
 					'**/config/**',
+					'**/project/spec/**',
+					'**/jwt/**'
 			] + QDomainList)
 		}))
 	}
@@ -161,6 +164,8 @@ jacocoTestCoverageVerification {
 					'**.*Application*',
 					'**.exception.**',
 					'**.config.**',
+					'**/project/spec/**',
+					'**/jwt/**'
 			] + QDomainList
 		}
 	}

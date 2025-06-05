@@ -39,40 +39,43 @@ public class RefreshTokenService {
         if(refreshToken == null || refreshToken.isEmpty()){
             throw new CustomException(ErrorCode.REFRESHTOKEN_NOT_FOUND);
         }
+        else {
 
-        boolean isAccessTokenValid = jwtTokenizer.isValidAccessToken(accessToken);
-        boolean isRefreshTokenValid = jwtTokenizer.isValidRefreshToken(refreshToken);
+            boolean isAccessTokenValid = jwtTokenizer.isValidAccessToken(accessToken);
+            boolean isRefreshTokenValid = jwtTokenizer.isValidRefreshToken(refreshToken);
 
-        // 2. Access, Refresh 둘 다 유효한 경우 → Access 토큰 그대로 사용, Refresh도 그대로
-        if (isAccessTokenValid && isRefreshTokenValid) {
-            Claims claims = jwtTokenizer.parseAccessToken(accessToken);
-            Long userId = Long.parseLong(claims.getSubject());
+            // 2. Access, Refresh 둘 다 유효한 경우 → Access 토큰 그대로 사용, Refresh도 그대로
+            if (isAccessTokenValid && isRefreshTokenValid) {
+                Claims claims = jwtTokenizer.parseAccessToken(accessToken);
+                Long userId = Long.parseLong(claims.getSubject());
 
-            return RefreshTokenMapper.toRefreshTokenResponse(userId, accessToken, refreshToken);
+                return RefreshTokenMapper.toRefreshTokenResponse(userId, accessToken, refreshToken);
+            }
+
+
+            // 3. Access는 만료, Refresh는 유효 → Access만 재발급
+            else if (!isAccessTokenValid && isRefreshTokenValid) {
+                Claims claims = jwtTokenizer.parseRefreshToken(refreshToken);
+                Long userId = Long.valueOf(claims.getSubject());
+
+                User user = userService.getUser(userId);
+
+                String newAccessToken = jwtTokenizer.createAccessToken(user.getId(), user.getNickname(), user.getRole().name());
+
+                return RefreshTokenMapper.toRefreshTokenResponse(user.getId(), newAccessToken, refreshToken);
+            }
+
+
+            // 4. access는 유효, refresh는 만료 -> 로그아웃 상태로 변경
+            // ( 이전에 refreshToken이 true인 경우를 모두 검증하였기에 accessToken만 조건 설정
+            else if (isAccessTokenValid) {
+                deleteRefreshToken(response);
+                throw new CustomException(ErrorCode.REFRESHTOKEN_EXPIRED);
+            } else {
+                // 5. 둘 다 만료 → 로그인 필요
+                deleteRefreshToken(response);
+                throw new CustomException(ErrorCode.AUTH_TOKEN_EXPIRED);
+            }
         }
-
-
-        // 3. Access는 만료, Refresh는 유효 → Access만 재발급
-        if (!isAccessTokenValid && isRefreshTokenValid) {
-            Claims claims = jwtTokenizer.parseRefreshToken(refreshToken);
-            Long userId = Long.valueOf(claims.getSubject());
-
-            User user = userService.getUser(userId);
-
-            String newAccessToken = jwtTokenizer.createAccessToken(user.getId(), user.getNickname(), user.getRole().name());
-
-            return RefreshTokenMapper.toRefreshTokenResponse(user.getId(), newAccessToken, refreshToken);
-        }
-
-
-        // 4. access는 유효, refresh는 만료 -> 로그아웃 상태로 변경
-        if (isAccessTokenValid && !isRefreshTokenValid) {
-            deleteRefreshToken(response);
-            throw new CustomException(ErrorCode.REFRESHTOKEN_EXPIRED);
-        }
-
-        // 5. 둘 다 만료 → 로그인 필요
-        deleteRefreshToken(response);
-        throw new CustomException(ErrorCode.AUTH_TOKEN_EXPIRED);
     }
 }

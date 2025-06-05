@@ -34,19 +34,7 @@ public class DeliveryInfoService {
     public void addDeliveryInfo(Long userId, DeliveryInfoRequest request) {
         User user = userService.getUser(userId);
 
-        boolean isDefault;
-        try {
-            // 기본 배송지 존재 여부 확인
-            getPrimaryDeliveryInfo(userId);
-            isDefault = false;
-        } catch (CustomException e) {
-            if (e.getErrorCode() == ErrorCode.DELIVERY_NOT_FOUND) {
-                isDefault = true;
-            } else {
-                throw e;
-            }
-        }
-
+        boolean isDefault = !hasPrimaryDeliveryInfo(userId);
         DeliveryInfo info = DeliveryInfo.of(user, request, isDefault);
         deliveryInfoRepository.save(info);
     }
@@ -70,15 +58,6 @@ public class DeliveryInfoService {
         deliveryInfoRepository.saveAll(List.of(previousDeliveryInfo, newDeliveryInfo));
     }
 
-    @Transactional
-    public void updateDeliveryInfo(Long userId, Long id, DeliveryInfoUpdateRequest request) {
-        User user = userService.getUser(userId);
-        DeliveryInfo info = deliveryInfoRepository.findById(id).orElseThrow();
-        if (!info.getUser().getId().equals(user.getId())) {
-            throw new CustomException(ErrorCode.ACCESS_DENIED);
-        }
-        info.update(request.zipcode(), request.address(), request.detailAddress());
-    }
 
     @Transactional
     public void deleteDeliveryInfo(Long userId, Long id) {
@@ -90,10 +69,35 @@ public class DeliveryInfoService {
 
         // 기본 배송지면 삭제 제한
         if (info.isDefault()) {
-            throw new CustomException(ErrorCode.BASIC_ACCOUNT_NOT_DELETED);
+            throw new CustomException(ErrorCode.BASIC_DELIVERY_NOT_DELETED);
         }
 
         deliveryInfoRepository.delete(info);
+    }
+
+    public List<DeliveryInfoResponse> getMyDeliveryInfo(Long userId) {
+        return deliveryInfoRepository.findByUserId(userId).stream()
+                .map(DeliveryInfoResponse::from)
+                .collect(toList());
+    }
+
+    public DeliveryInfo getPrimaryDeliveryInfo(Long userId) {
+        return deliveryInfoRepository.findByUserIdAndIsDefaultTrue(userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.DELIVERY_NOT_FOUND));
+    }
+
+    public boolean hasPrimaryDeliveryInfo(Long userId) {
+        return deliveryInfoRepository.existsByUserIdAndIsDefaultTrue(userId);
+    }
+
+    /*
+    private void unsetPreviousDefault(User user) {
+        List<DeliveryInfo> infos = deliveryInfoRepository.findByUserId(user.getId());
+        for (DeliveryInfo info : infos) {
+            if (info.isDefault()) {
+                info.updateDefault(false);
+            }
+        }
     }
 
     @Transactional
@@ -118,24 +122,16 @@ public class DeliveryInfoService {
         newDefault.updateDefault(true);
     }
 
-    public List<DeliveryInfoResponse> getMyDeliveryInfo(Long userId) {
-        return deliveryInfoRepository.findByUserId(userId).stream()
-                .map(DeliveryInfoResponse::from)
-                .collect(Collectors.toList());
-    }
-
-    private void unsetPreviousDefault(User user) {
-        List<DeliveryInfo> infos = deliveryInfoRepository.findByUserId(user.getId());
-        for (DeliveryInfo info : infos) {
-            if (info.isDefault()) {
-                info.updateDefault(false);
-            }
+    @Transactional
+    public void updateDeliveryInfo(Long userId, Long id, DeliveryInfoUpdateRequest request) {
+        User user = userService.getUser(userId);
+        DeliveryInfo info = deliveryInfoRepository.findById(id).orElseThrow();
+        if (!info.getUser().getId().equals(user.getId())) {
+            throw new CustomException(ErrorCode.ACCESS_DENIED);
         }
+        info.update(request.zipcode(), request.address(), request.detailAddress());
     }
 
-    public DeliveryInfo getPrimaryDeliveryInfo(Long userId) {
-        return deliveryInfoRepository.findByUserIdAndIsDefaultTrue(userId)
-                .orElseThrow(() -> new CustomException(ErrorCode.DELIVERY_NOT_FOUND));
-    }
+     */
 
 }

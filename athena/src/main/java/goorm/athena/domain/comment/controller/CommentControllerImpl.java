@@ -26,7 +26,7 @@ public class CommentControllerImpl implements CommentController{
     @Override
     @PostMapping("/create")
     public ResponseEntity<CommentCreateResponse> createComment(@CheckLogin LoginUserRequest loginUserRequest,
-                                                               CommentCreateRequest commentCreateRequest){
+                                                               @RequestBody CommentCreateRequest commentCreateRequest){
         CommentCreateResponse response = commentService.createComment(commentCreateRequest.projectId(),
                 loginUserRequest.userId(),
                 commentCreateRequest.content());
