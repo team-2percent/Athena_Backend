@@ -120,7 +120,7 @@ public class ProjectQueryServiceTest extends ProjectIntegrationTestSupport {
     // when
     ProjectRecentCursorResponse result = (ProjectRecentCursorResponse) projectService.getProjectsWithCursor(
         ProjectQueryType.LATEST, Optional.empty(),
-        new ProjectQueryLatestRequest(LocalDateTime.now(), null, 10));
+        new ProjectQueryLatestRequest(LocalDateTime.now(), null, 20));
 
     // then
     assertThat(result.content().size()).isGreaterThanOrEqualTo(20);
