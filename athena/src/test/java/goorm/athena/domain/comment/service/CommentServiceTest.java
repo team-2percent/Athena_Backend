@@ -36,7 +36,7 @@ class CommentServiceTest extends CommentIntegrationSupport {
         User user = setupUser("123", "123", "123", imageGroup);
         Category category = setupCategory("음식");
         BankAccount bankAccount = setupBankAccount(user, "123" ,"123" ,"123", true);
-        PlatformPlan platformPlan = setupPlatformPlan(PlanName.BASIC, 10, 10, 10, "설명");
+        PlatformPlan platformPlan = platformPlanRepository.findById(1L).get();
         Project project = setupProject(user, category, imageGroup, bankAccount, platformPlan,
                 "프로젝2132132131트 제목", "설123213213명", 100000L, 10000L);
         Comment comment = setupComment(user, project, "123");
@@ -44,7 +44,6 @@ class CommentServiceTest extends CommentIntegrationSupport {
         userRepository.save(user);
         categoryRepository.save(category);
         bankAccountRepository.save(bankAccount);
-        platformPlanRepository.save(platformPlan);
         projectRepository.save(project);
         commentRepository.save(comment);
 
@@ -65,14 +64,13 @@ class CommentServiceTest extends CommentIntegrationSupport {
         User user = setupUser("123", "123", "123", imageGroup);
         Category category = setupCategory("음식");
         BankAccount bankAccount = setupBankAccount(user, "123" ,"123" ,"123", true);
-        PlatformPlan platformPlan = setupPlatformPlan(PlanName.BASIC, 10, 10, 10, "설명");
+        PlatformPlan platformPlan = platformPlanRepository.findById(1L).get();
         Project project = setupProject(user, category, imageGroup, bankAccount, platformPlan,
                 "프로젝2132132131트 제목", "설123213213명", 100000L, 10000L);
 
         userRepository.save(user);
         categoryRepository.save(category);
         bankAccountRepository.save(bankAccount);
-        platformPlanRepository.save(platformPlan);
         projectRepository.save(project);
 
         Optional<Project> project1 = projectRepository.findById(project.getId());
@@ -95,7 +93,7 @@ class CommentServiceTest extends CommentIntegrationSupport {
         User user2 = setupUser("123", "123", "124", imageGroup2);
         Category category = setupCategory("음식");
         BankAccount bankAccount = setupBankAccount(user, "123" ,"123" ,"123", true);
-        PlatformPlan platformPlan = setupPlatformPlan(PlanName.BASIC, 10, 10, 10, "설명");
+        PlatformPlan platformPlan = platformPlanRepository.findById(1L).get();
         Project project = setupProject(user, category, imageGroup, bankAccount, platformPlan,
                 "프로젝2132132131트 제목", "설123213213명", 100000L, 10000L);
         Comment comment = setupComment(user, project, "123");
@@ -104,7 +102,6 @@ class CommentServiceTest extends CommentIntegrationSupport {
         userRepository.saveAll(List.of(user, user2));
         categoryRepository.save(category);
         bankAccountRepository.save(bankAccount);
-        platformPlanRepository.save(platformPlan);
         projectRepository.save(project);
         commentRepository.saveAll(List.of(comment, comment1));
 
@@ -132,7 +129,7 @@ class CommentServiceTest extends CommentIntegrationSupport {
         User user2 = setupUser("123", "123", "124", imageGroup2);
         Category category = setupCategory("음식");
         BankAccount bankAccount = setupBankAccount(user, "123" ,"123" ,"123", true);
-        PlatformPlan platformPlan = setupPlatformPlan(PlanName.BASIC, 10, 10, 10, "설명");
+        PlatformPlan platformPlan = platformPlanRepository.findById(1L).get();
         Project project = setupProject(user, category, imageGroup, bankAccount, platformPlan,
                 "프로젝2132132131트 제목", "설123213213명", 100000L, 10000L);
         Comment comment = setupComment(user, project, "123");
@@ -141,7 +138,6 @@ class CommentServiceTest extends CommentIntegrationSupport {
         userRepository.saveAll(List.of(user, user2));
         categoryRepository.save(category);
         bankAccountRepository.save(bankAccount);
-        platformPlanRepository.save(platformPlan);
         projectRepository.save(project);
         commentRepository.saveAll(List.of(comment, comment1));
 

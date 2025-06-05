@@ -84,13 +84,11 @@ public class UserControllerImpl implements UserController {
     public ResponseEntity<Void> logout(@CheckLogin LoginUserRequest request,
             @CookieValue("refreshToken") String refreshToken,
                                        HttpServletResponse response) {
-        /*
         if (refreshToken == null || refreshToken.isEmpty()) {
             throw new CustomException(ErrorCode.REFRESHTOKEN_NOT_FOUND);
         }
-        */
 
-        // refreshTokenService.deleteRefreshToken(response);
+        refreshTokenService.deleteRefreshToken(response);
         fcmTokenService.deleteToken(request.userId());      // 특정 유저 FCM 토큰 삭제
 
         return ResponseEntity.ok().build();
