@@ -96,11 +96,8 @@ public class PaymentService {
         try {
             payment.approve(pgToken);
 
-            List<OrderItem> orderItems = orderItemRepository.findByOrderId(payment.getOrder().getId());
-            for (OrderItem item : orderItems) {
-                item.getProduct().decreaseStock(item.getQuantity());
-                item.getOrder().getProject().increasePrice(item.getPrice());
-            }
+            orderService.decreaseInventory(payment.getOrder().getId()); // 재고 감소
+            orderService.increaseProjectFunding(orderId); // 누적 가격 증가
 
             return response;
 
