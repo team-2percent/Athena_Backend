@@ -157,16 +157,18 @@ class UserServiceTest extends UserIntegrationTestSupport {
     @DisplayName("복수의 유저 정보들을 조회한다.")
     @Test
     void getUserIdAll_returnsAllUserIds() {
+
         ImageGroup imageGroup = setupImageGroup();
         User user1 = setupUser("123", passwordEncoder.encode("123"), "nick", imageGroup);
         User user2 = setupUser("124", passwordEncoder.encode("123"), "nick2", null);
+        int expectedSize = userRepository.findAll().size();
         userRepository.saveAll(List.of(user1, user2));
 
         // when
         List<Long> result = userService.getUserIdAll();
 
         // then
-        assertThat(result).hasSize(2);
+        assertThat(result).hasSize(expectedSize + 2);
     }
 
     @DisplayName("로그인 한 유저의 저장된 비밀번호와 입력된 비밀번호가 같다면 새 토큰을 발급한다.")

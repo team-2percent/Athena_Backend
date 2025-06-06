@@ -41,7 +41,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
-
+@Transactional
 class UserInfoControllerImplTest extends UserInfoIntegrationTestSupport{
 
     @DisplayName("로그인 한 유저의 소개문구를 리턴한다.")
@@ -344,13 +344,22 @@ class UserInfoControllerImplTest extends UserInfoIntegrationTestSupport{
 
         List<MyOrderScrollResponse.Item> orderItems = List.of(
                 new MyOrderScrollResponse.Item(
-                        1L, orderItem3.getProduct().getProject().getId(), orderItem3.getProduct().getId(), orderItem3.getProduct().getProject().getTitle(), orderItem3.getProduct().getProductName(), orderItem3.getProduct().getProject().getSeller().getNickname(), "",
+                        orderItem1.getId(), orderItem1.getProduct().getProject().getId(), orderItem1.getProduct().getId(), orderItem1.getProduct().getProject().getTitle(), orderItem1.getProduct().getProductName(), orderItem1.getProduct().getProject().getSeller().getNickname(), "",
                         nextCursor.minusDays(2), nextCursor.plusDays(10), 75L, true
                 ),
                 new MyOrderScrollResponse.Item(
-                        2L, orderItem4.getProduct().getProject().getId(), orderItem4.getProduct().getId(), orderItem3.getProduct().getProject().getTitle(), orderItem3.getProduct().getProductName(), orderItem3.getProduct().getProject().getSeller().getNickname(), "",
+                        orderItem2.getId(), orderItem2.getProduct().getProject().getId(), orderItem2.getProduct().getId(), orderItem2.getProduct().getProject().getTitle(), orderItem2.getProduct().getProductName(), orderItem2.getProduct().getProject().getSeller().getNickname(), "",
+                        nextCursor.minusDays(2), nextCursor.plusDays(10), 75L, true
+                ),
+                new MyOrderScrollResponse.Item(
+                        orderItem3.getId(), orderItem3.getProduct().getProject().getId(), orderItem3.getProduct().getId(), orderItem3.getProduct().getProject().getTitle(), orderItem3.getProduct().getProductName(), orderItem3.getProduct().getProject().getSeller().getNickname(), "",
+                        nextCursor.minusDays(1), nextCursor.plusDays(20), 88L, false
+                ),
+                new MyOrderScrollResponse.Item(
+                        orderItem4.getId(), orderItem4.getProduct().getProject().getId(), orderItem4.getProduct().getId(), orderItem4.getProduct().getProject().getTitle(), orderItem4.getProduct().getProductName(), orderItem4.getProduct().getProject().getSeller().getNickname(), "",
                         nextCursor.minusDays(1), nextCursor.plusDays(20), 88L, false
                 )
+
         );
 
         MyOrderScrollResponse expectedResponse = new MyOrderScrollResponse(
@@ -366,7 +375,7 @@ class UserInfoControllerImplTest extends UserInfoIntegrationTestSupport{
         // then
         assertEquals(200, response.getStatusCodeValue());
         assertEquals(expectedResponse.content().getLast().projectName(), response.getBody().content().getFirst().projectName());
-        assertEquals(expectedResponse.content().getLast().orderId(), response.getBody().content().getLast().orderId());
+        assertEquals(expectedResponse.content().getFirst().orderId(), response.getBody().content().getFirst().orderId());
     }
 
         /*

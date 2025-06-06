@@ -67,20 +67,6 @@ public abstract class RefreshTokenIntegrationTestSupport extends IntegrationServ
     @Autowired
     protected DeliveryInfoRepository deliveryInfoRepository;
 
-    @BeforeEach
-    void setUp() {
-        orderItemRepository.deleteAllInBatch();
-        orderRepository.deleteAllInBatch();
-        productRepository.deleteAllInBatch();
-        deliveryInfoRepository.deleteAllInBatch();
-        projectRepository.deleteAllInBatch();
-        platformPlanRepository.deleteAllInBatch();
-        bankAccountRepository.deleteAllInBatch();
-        categoryRepository.deleteAllInBatch();
-        userRepository.deleteAllInBatch();
-        imageGroupRepository.deleteAllInBatch();
-
-    }
     protected ImageGroup setupImageGroup() {
         return imageGroupService.createImageGroup(Type.PROJECT);
     }

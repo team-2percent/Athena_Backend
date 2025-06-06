@@ -12,6 +12,7 @@ import goorm.athena.domain.user.entity.User;
 import goorm.athena.global.exception.CustomException;
 import goorm.athena.global.exception.ErrorCode;
 import goorm.athena.global.jwt.util.LoginUserRequest;
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -28,6 +29,7 @@ import java.io.IOException;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
+@Transactional
 class UserControllerImplTest extends UserControllerIntegrationTestSupport{
     @DisplayName("로그인 한 사용자가 로그아웃을 성공했다면 쿠키에 저장된 리프레시 토큰을 삭제한다.")
     @Test
@@ -88,6 +90,7 @@ class UserControllerImplTest extends UserControllerIntegrationTestSupport{
         assertThat(exception.getMessage()).isEqualTo("RefreshToken을 찾지 못했습니다.");
     }
 
+    @Transactional
     @DisplayName("입력받은 정보로 사용자가 회원가입을 성공적으로 진행한다.")
     @Test
     void createUser() {
@@ -105,6 +108,7 @@ class UserControllerImplTest extends UserControllerIntegrationTestSupport{
         assertEquals("nickname", response.getBody().nickname());
     }
 
+    @Transactional
     @DisplayName("사용자가 로그인 정보와 DB에 저장된 정보와 같다면 성공적으로 로그인한다.")
     @Test
     void login_success() {

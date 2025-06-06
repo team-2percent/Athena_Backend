@@ -14,7 +14,6 @@ import goorm.athena.domain.user.dto.request.UserUpdateRequest;
 import goorm.athena.domain.user.entity.Role;
 import goorm.athena.domain.user.entity.User;
 import goorm.athena.global.jwt.util.LoginUserRequest;
-import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.ResponseEntity;
@@ -33,7 +32,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class CommentControllerImplTest extends CommentControllerIntegrationSupport {
 
-    @Transactional
     @DisplayName("로그인 한 사용자가 해당 프로젝트에 코멘트를 작성한다.")
     @Test
     void createComment() {
@@ -66,7 +64,6 @@ class CommentControllerImplTest extends CommentControllerIntegrationSupport {
         assertEquals(content, response.getBody().content()); // 결과 검증
     }
 
-    @Transactional
     @DisplayName("해당 프로젝트의 후기 목록들을 조회한다. ")
     @Test
     void getComment() throws IOException {

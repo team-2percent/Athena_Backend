@@ -16,6 +16,7 @@ import goorm.athena.domain.user.dto.response.MyOrderScrollResponse;
 import goorm.athena.domain.user.dto.response.MyProjectScrollRequest;
 import goorm.athena.domain.user.dto.response.MyProjectScrollResponse;
 import goorm.athena.domain.user.entity.User;
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -34,14 +35,13 @@ class MyInfoServiceTest extends MyInfoIntegrationTestSupport{
         User user = setupUser("test2@email.com", "1231231", "nickname2", imageGroup);
         Category category = setupCategory("음식");
         BankAccount bankAccount = setupBankAccount(user, "123" ,"123" ,"123", true);
-        PlatformPlan platformPlan = setupPlatformPlan(PlanName.BASIC, 10, 10, 10, "설명");
+        PlatformPlan platformPlan = platformPlanRepository.findById(1L).get();
         Project project = setupProject(user, category, imageGroup, bankAccount, platformPlan,
                 "프로젝2132132131트 제목", "설123213213명", 100000L, 10000L, "!23");
 
         userRepository.save(user);
         categoryRepository.save(category);
         bankAccountRepository.save(bankAccount);
-        platformPlanRepository.save(platformPlan);
         projectRepository.save(project);
 
         MyProjectScrollRequest request = new MyProjectScrollRequest(
@@ -56,6 +56,7 @@ class MyInfoServiceTest extends MyInfoIntegrationTestSupport{
         assertThat(result.content().get(0).title()).isEqualTo("프로젝2132132131트 제목");
     }
 
+    @Transactional
     @DisplayName("로그인 한 유저의 내가 구매한 상품들을 성공적으로 무한 페이징 형식으로 조회한다.")
     @Test
     void getMyOrders_Success() {
@@ -64,7 +65,7 @@ class MyInfoServiceTest extends MyInfoIntegrationTestSupport{
         User user = setupUser("test@email.com", "123123", "nickname", imageGroup);
         Category category = setupCategory("프로그래밍");
         BankAccount bankAccount = setupBankAccount(user, "1243" ,"1243" ,"1243", true);
-        PlatformPlan platformPlan = setupPlatformPlan(PlanName.PRO, 11, 11, 11, "설명1");
+        PlatformPlan platformPlan = platformPlanRepository.findById(1L).get();
         Project project = setupProject(user, category, imageGroup, bankAccount, platformPlan,
                 "프로젝213213211트 제목", "설12313213명", 1000000L, 100000L, "!23");
         DeliveryInfo deliveryInfo = setupDeliveryInfo(user, "12123123", "123123", "123213", true);
@@ -80,7 +81,6 @@ class MyInfoServiceTest extends MyInfoIntegrationTestSupport{
         userRepository.save(user);
         categoryRepository.save(category);
         bankAccountRepository.save(bankAccount);
-        platformPlanRepository.save(platformPlan);
         projectRepository.save(project);
         deliveryInfoRepository.save(deliveryInfo);
         productRepository.save(product);
