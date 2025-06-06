@@ -19,6 +19,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -76,7 +77,11 @@ public class KakaoPayService {
                     entity,
                     KakaoPayApproveResponse.class
             );
-            return response.getBody();
+
+            return Optional.ofNullable(response.getBody())
+                    .map(KakaoPayApproveResponse::ofSuccess)
+                    .orElseGet(KakaoPayApproveResponse::ofFailure);
+
         } catch (Exception e) {
             log.error("카카오페이 승인 실패", e);
             throw new CustomException(ErrorCode.KAKAO_PAY_APPROVE_FAILED);

@@ -79,21 +79,54 @@ public class PaymentService {
         PaymentApproveRequest requestDto = new PaymentApproveRequest(orderId, pgToken);
 
         KakaoPayApproveResponse response;
+
         try {
-            response = kakaoPayService
-                    .approveKakaoPayment(payment.getTid(), requestDto, user);
+            response = kakaoPayService.approveKakaoPayment(payment.getTid(), requestDto, user);
+        } catch (CustomException ce) {
+            log.warn("카카오페이 결제 승인 중 예외 발생: {}", ce.getMessage());
+            return KakaoPayApproveResponse.ofFailure();
+        };
+
+        if (response.tid() == null) {
+            log.warn("카카오 결제 승인 내부 응답값이 올바르지 않음");
+            return response;
+        }
+
+
+        try {
+            payment.approve(pgToken);
+
+            List<OrderItem> orderItems = orderItemRepository.findByOrderId(payment.getOrder().getId());
+            for (OrderItem item : orderItems) {
+                item.getProduct().decreaseStock(item.getQuantity());
+                item.getOrder().getProject().increasePrice(item.getPrice());
+            }
+
+            return response;
+
         } catch (Exception e) {
-            log.error(" 카카오 결제 승인 실패", e);
+            log.error("결제 승인 후 내부 처리 오류", e);
             return KakaoPayApproveResponse.ofFailure();
         }
 
-        payment.approve(pgToken);
 
-        List<OrderItem> orderItems = orderItemRepository.findByOrderId(payment.getOrder().getId());
-        for (OrderItem item : orderItems) {
-            item.getProduct().decreaseStock(item.getQuantity());
-            item.getOrder().getProject().increasePrice(item.getPrice());
-        }
-        return KakaoPayApproveResponse.ofSuccess(response);
+//        KakaoPayApproveResponse response;
+//        try {
+//            response = kakaoPayService
+//                    .approveKakaoPayment(payment.getTid(), requestDto, user);
+//        } catch (Exception e) {
+//            log.error(" 카카오 결제 승인 실패", e);
+//            return KakaoPayApproveResponse.ofFailure();
+//        }
+
+//        payment.approve(pgToken);
+//
+//        List<OrderItem> orderItems = orderItemRepository.findByOrderId(payment.getOrder().getId());
+//        for (OrderItem item : orderItems) {
+//            item.getProduct().decreaseStock(item.getQuantity());
+//            item.getOrder().getProject().increasePrice(item.getPrice());
+//        }
+//        return KakaoPayApproveResponse.ofSuccess(response);
+//    }
     }
 }
