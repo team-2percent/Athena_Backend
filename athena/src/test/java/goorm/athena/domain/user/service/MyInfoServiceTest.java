@@ -36,7 +36,7 @@ class MyInfoServiceTest extends MyInfoIntegrationTestSupport{
         BankAccount bankAccount = setupBankAccount(user, "123" ,"123" ,"123", true);
         PlatformPlan platformPlan = setupPlatformPlan(PlanName.BASIC, 10, 10, 10, "설명");
         Project project = setupProject(user, category, imageGroup, bankAccount, platformPlan,
-                "프로젝2132132131트 제목", "설123213213명", 100000L, 10000L);
+                "프로젝2132132131트 제목", "설123213213명", 100000L, 10000L, "!23");
 
         userRepository.save(user);
         categoryRepository.save(category);
@@ -66,7 +66,7 @@ class MyInfoServiceTest extends MyInfoIntegrationTestSupport{
         BankAccount bankAccount = setupBankAccount(user, "1243" ,"1243" ,"1243", true);
         PlatformPlan platformPlan = setupPlatformPlan(PlanName.PRO, 11, 11, 11, "설명1");
         Project project = setupProject(user, category, imageGroup, bankAccount, platformPlan,
-                "프로젝213213211트 제목", "설12313213명", 1000000L, 100000L);
+                "프로젝213213211트 제목", "설12313213명", 1000000L, 100000L, "!23");
         DeliveryInfo deliveryInfo = setupDeliveryInfo(user, "12123123", "123123", "123213", true);
         Product product = setupProduct(project, "123", "123", 12L, 12L);
         Order order = setupOrder(user, deliveryInfo, project, LocalDateTime.now().minusDays(1));

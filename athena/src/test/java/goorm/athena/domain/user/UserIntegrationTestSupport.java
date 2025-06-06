@@ -118,10 +118,10 @@ public abstract class UserIntegrationTestSupport extends IntegrationServiceTestS
 
   protected Project setupProject(User user, Category category, ImageGroup imageGroup,
                                  BankAccount bankAccount, PlatformPlan platformPlan,
-                                 String title, String description, Long goalAmount, Long totalAmount) {
+                                 String title, String description, Long goalAmount, Long totalAmount, String contentMarkdown) {
     Project project = TestEntityFactory.createProject(
             user, category, imageGroup, bankAccount, platformPlan,
-            title, description, goalAmount, totalAmount
+            title, description, goalAmount, totalAmount, contentMarkdown
     );
     return project;
   }
