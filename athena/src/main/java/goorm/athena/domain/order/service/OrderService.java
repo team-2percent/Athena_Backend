@@ -85,8 +85,14 @@ public class OrderService {
     public void decreaseInventory(Long orderId) {
         List<OrderItem> orderItems = orderItemRepository.findByOrderId(orderId);
         for (OrderItem item : orderItems) {
-            Product product = item.getProduct();
-            product.decreaseStock(item.getQuantity());
+            item.getProduct().decreaseStock(item.getQuantity());
+        }
+    }
+
+    public void increaseProjectFunding(Long orderId) {
+        List<OrderItem> orderItems = orderItemRepository.findByOrderId(orderId);
+        for (OrderItem item : orderItems) {
+            item.getOrder().getProject().increasePrice(item.getPrice());
         }
     }
 

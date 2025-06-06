@@ -31,11 +31,16 @@ public record KakaoPayApproveResponse(
         );
     }
 
-    public static KakaoPayApproveResponse ofFailure() {
+    public static KakaoPayApproveResponse ofFailure(String message) {
         return new KakaoPayApproveResponse(
                 null, null, null, null, null, null, null, 0, null,
-                "카카오 결제 승인에 실패했습니다.",
+                message,
                 "/payment/fail"
         );
     }
+
+    public static KakaoPayApproveResponse ofFailure() {
+        return ofFailure("카카오 결제 승인에 실패했습니다.");
+    }
+
 }

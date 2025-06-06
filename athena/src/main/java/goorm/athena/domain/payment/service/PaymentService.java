@@ -17,10 +17,12 @@ import goorm.athena.global.exception.CustomException;
 import goorm.athena.global.exception.ErrorCode;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -68,6 +70,7 @@ public class PaymentService {
         return response;
     }
 
+
     public KakaoPayApproveResponse approvePayment(String pgToken, Long orderId) {
         Payment payment = paymentRepository.findByOrderId(orderId)
                 .orElseThrow(() -> new CustomException(ErrorCode.PAYMENT_NOT_FOUND));
@@ -76,20 +79,51 @@ public class PaymentService {
         PaymentApproveRequest requestDto = new PaymentApproveRequest(orderId, pgToken);
 
         KakaoPayApproveResponse response;
+
         try {
-            response = kakaoPayService
-                    .approveKakaoPayment(payment.getTid(), requestDto, user);
+            response = kakaoPayService.approveKakaoPayment(payment.getTid(), requestDto, user);
+        } catch (CustomException ce) {
+            log.warn("카카오페이 결제 승인 중 예외 발생: {}", ce.getMessage());
+            return KakaoPayApproveResponse.ofFailure("카카오페이 연동 실패 발생");
+        };
+
+        if (response.tid() == null) {
+            log.warn("카카오 결제 승인 내부 응답값이 올바르지 않음");
+            return KakaoPayApproveResponse.ofFailure("카카오 결제 승인 내부 응답값이 올바르지 않음");
+        }
+
+
+        try {
+            payment.approve(pgToken);
+
+            orderService.decreaseInventory(payment.getOrder().getId()); // 재고 감소
+            orderService.increaseProjectFunding(orderId); // 누적 가격 증가
+
+            return response;
+
         } catch (Exception e) {
-            return KakaoPayApproveResponse.ofFailure();
+            log.error("결제 승인 후 내부 처리 오류", e);
+            return KakaoPayApproveResponse.ofFailure("걀제 승인 후 재고,누적 처리 오류");
         }
 
-        payment.approve(pgToken);
 
-        List<OrderItem> orderItems = orderItemRepository.findByOrderId(payment.getOrder().getId());
-        for (OrderItem item : orderItems) {
-            item.getProduct().decreaseStock(item.getQuantity());
-            item.getOrder().getProject().increasePrice(item.getPrice());
-        }
-        return KakaoPayApproveResponse.ofSuccess(response);
+//        KakaoPayApproveResponse response;
+//        try {
+//            response = kakaoPayService
+//                    .approveKakaoPayment(payment.getTid(), requestDto, user);
+//        } catch (Exception e) {
+//            log.error(" 카카오 결제 승인 실패", e);
+//            return KakaoPayApproveResponse.ofFailure();
+//        }
+
+//        payment.approve(pgToken);
+//
+//        List<OrderItem> orderItems = orderItemRepository.findByOrderId(payment.getOrder().getId());
+//        for (OrderItem item : orderItems) {
+//            item.getProduct().decreaseStock(item.getQuantity());
+//            item.getOrder().getProject().increasePrice(item.getPrice());
+//        }
+//        return KakaoPayApproveResponse.ofSuccess(response);
+//    }
     }
 }

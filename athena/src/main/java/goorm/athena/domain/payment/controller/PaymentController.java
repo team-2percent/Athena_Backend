@@ -39,7 +39,7 @@ public interface PaymentController {
     )
     @ApiResponse(responseCode = "200", description = "결제 승인 성공")
     @GetMapping("/approve/{orderId}")
-    ResponseEntity<KakaoPayApproveResponse> approvePayment(
+    ResponseEntity<String> approvePayment(
             @PathVariable Long orderId,
             @RequestParam("pg_token") String pgToken
     );

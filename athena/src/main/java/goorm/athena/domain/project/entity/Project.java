@@ -50,7 +50,6 @@ public class Project {
 
     // 설명 (요약)
     @NotBlank
-    @Size(min = 10, max = 100)
     @Column(length = 100)
     private String description;
 
