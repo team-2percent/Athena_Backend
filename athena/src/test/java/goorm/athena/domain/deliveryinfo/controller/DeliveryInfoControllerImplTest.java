@@ -8,6 +8,7 @@ import goorm.athena.domain.deliveryinfo.entity.DeliveryInfo;
 import goorm.athena.domain.user.entity.Role;
 import goorm.athena.domain.user.entity.User;
 import goorm.athena.global.jwt.util.LoginUserRequest;
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +20,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class DeliveryInfoControllerImplTest extends DeliveryControllerIntegrationTestSupport {
 
+    @Transactional
     @DisplayName("로그인 한 사용자가 자신의 배송 정보를 생성한다.")
     @Test
     void addDeliveryInfo() {
@@ -28,6 +30,7 @@ class DeliveryInfoControllerImplTest extends DeliveryControllerIntegrationTestSu
 
         LoginUserRequest loginUserRequest = new LoginUserRequest("123", user.getId(), Role.ROLE_USER);
         DeliveryInfoRequest request = new DeliveryInfoRequest("서울시 강남구", "01012345678", "홍길동");
+        int size = deliveryInfoRepository.findAll().size();
 
         // when
         ResponseEntity<Void> response = controller.addDeliveryInfo(loginUserRequest, request);
@@ -36,10 +39,11 @@ class DeliveryInfoControllerImplTest extends DeliveryControllerIntegrationTestSu
         assertEquals(200, response.getStatusCodeValue());
 
         List<DeliveryInfo> all = deliveryInfoRepository.findAll();
-        assertEquals(1, all.size());
-        assertEquals("서울시 강남구", all.get(0).getZipcode());
+        assertEquals(size+1, all.size());
+        assertEquals("서울시 강남구", all.getLast().getZipcode());
     }
 
+    @Transactional
     @DisplayName("유저의 기존에 저장된 배송 정보와 선택한 배송 정보의 상태를 변경한다.")
     @Test
     void changeDeliveryInfoState() {

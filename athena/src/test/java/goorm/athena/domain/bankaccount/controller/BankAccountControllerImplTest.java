@@ -18,10 +18,8 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@Transactional
 class BankAccountControllerImplTest extends BankAccountControllerIntegrationTestSupport {
 
-    @Transactional
     @DisplayName("로그인 한 사용자가 자신의 계좌 정보를 생성한다.")
     @Test
     void createBankAccount() {
@@ -62,12 +60,14 @@ class BankAccountControllerImplTest extends BankAccountControllerIntegrationTest
         userRepository.save(user);
         bankAccountRepository.saveAll(List.of(oldBankAccount, newBankAccount));
 
+        BankAccount oldPrimaryAccount = bankAccountService.getPrimaryAccount(user.getId());
+
         // when
-        ResponseEntity<Void> response = controller.changeAccountState(loginUserRequest, newBankAccount.getId());
+        controller.changeAccountState(loginUserRequest, newBankAccount.getId());
 
         // then
         assertThat(newBankAccount.isDefault()).isTrue();
-        assertThat(oldBankAccount.isDefault()).isFalse();
+        assertThat(oldPrimaryAccount.isDefault()).isFalse();
     }
 
     @Transactional
