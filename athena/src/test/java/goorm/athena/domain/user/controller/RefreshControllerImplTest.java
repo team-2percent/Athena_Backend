@@ -7,12 +7,12 @@ import goorm.athena.global.exception.CustomException;
 import goorm.athena.global.exception.ErrorCode;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.test.context.support.WithMockUser;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class RefreshControllerImplTest extends RefreshControllerIntegrationTestSupport{
 
@@ -34,7 +34,7 @@ class RefreshControllerImplTest extends RefreshControllerIntegrationTestSupport{
         RefreshTokenResponse tokenResponse = controller.requestRefresh(refreshToken, header, response).getBody();
 
         // then
-        assertEquals(200, response.getStatus());
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
         assertThat(tokenResponse).isNotNull();
         assertThat(tokenResponse.accessToken()).isNotEmpty();
         assertThat(tokenResponse.refreshToken()).isNotEmpty();
@@ -43,7 +43,7 @@ class RefreshControllerImplTest extends RefreshControllerIntegrationTestSupport{
         assertThat(jwtTokenizer.isValidRefreshToken(tokenResponse.refreshToken())).isTrue();
     }
 
-    @DisplayName("액세스 토큰을 갱신할 때 리프레시 토큰이 만료되면 AUTH_TOKEN_EXPIRED 에러를 리턴한다.")
+    @DisplayName("액세스 토큰을 갱신할 때 리프레시 토큰이 만료되면 REFRESHTOKEN_EXPIRED 에러를 리턴한다.")
     @WithMockUser(username = "user", roles = {"USER"})
     @Test
     void requestRefresh_FAILED() {
@@ -63,7 +63,7 @@ class RefreshControllerImplTest extends RefreshControllerIntegrationTestSupport{
         });
 
         // then
-        assertEquals(ErrorCode.REFRESHTOKEN_EXPIRED, exception.getErrorCode());
+        assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.REFRESHTOKEN_EXPIRED);
         assertThat(exception.getMessage()).isEqualTo("리프레시 토큰이 만료되었습니다");
     }
 }

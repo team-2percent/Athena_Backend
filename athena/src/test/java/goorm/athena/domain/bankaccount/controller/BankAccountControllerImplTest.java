@@ -11,6 +11,7 @@ import goorm.athena.global.jwt.util.LoginUserRequest;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
@@ -39,8 +40,8 @@ class BankAccountControllerImplTest extends BankAccountControllerIntegrationTest
         assertEquals(200, response.getStatusCodeValue());
 
         List<BankAccount> all = bankAccountRepository.findAll();
-        assertEquals(oldSize+1, all.size());
-        assertEquals("123", all.get(all.size()-1).getAccountHolder());
+        assertThat(oldSize+1).isEqualTo(all.size());
+        assertThat("123").isEqualTo(all.get(all.size()-1).getAccountHolder());
     }
 
     @Transactional
@@ -108,8 +109,8 @@ class BankAccountControllerImplTest extends BankAccountControllerIntegrationTest
         ResponseEntity<List<BankAccountGetResponse>> response = controller.getBankAccount(loginUserRequest);
 
         // then
-        assertEquals(200, response.getStatusCodeValue());
-        assertEquals(response.getBody().size(), 2);
-        assertEquals(response.getBody().get(1).accountHolder(), "124");
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody().size()).isEqualTo(2);
+        assertThat(response.getBody().get(1).accountHolder()).isEqualTo("124");
     }
 }

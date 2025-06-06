@@ -27,6 +27,7 @@ import goorm.athena.global.jwt.util.LoginUserRequest;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockMultipartFile;
 
@@ -61,7 +62,7 @@ class UserInfoControllerImplTest extends UserInfoIntegrationTestSupport{
         ResponseEntity<UserSummaryResponse> response = controller.getSummary(loginRequest);
 
         // then
-        assertEquals(200, response.getStatusCodeValue());
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody().sellerIntroduction()).isEqualTo(user.getSellerIntroduction());
         assertThat(response.getBody().linkUrl()).isEqualTo(user.getLinkUrl());
     }
@@ -132,7 +133,7 @@ class UserInfoControllerImplTest extends UserInfoIntegrationTestSupport{
         ResponseEntity<List<CommentGetResponse>> responses = controller.getComments(loginRequest);
 
         // then
-        assertEquals(200, responses.getStatusCodeValue());
+        assertThat(responses.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(responses.getBody().get(0).imageUrl()).isEqualTo(response1.imageUrl());
         assertThat(responses.getBody().get(1).content()).isEqualTo(response2.content());
     }
@@ -152,7 +153,7 @@ class UserInfoControllerImplTest extends UserInfoIntegrationTestSupport{
         ResponseEntity<Boolean> response = controller.checkPassword(loginRequest, passwordRequest);
 
         // then
-        assertEquals(200, response.getStatusCodeValue());
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isTrue();
     }
 
@@ -171,7 +172,7 @@ class UserInfoControllerImplTest extends UserInfoIntegrationTestSupport{
         ResponseEntity<Boolean> response = controller.checkPassword(loginRequest, passwordRequest);
 
         // then
-        assertEquals(200, response.getStatusCodeValue());
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isFalse();
     }
 
@@ -190,7 +191,7 @@ class UserInfoControllerImplTest extends UserInfoIntegrationTestSupport{
 
         User updatedUser = userRepository.findById(user.getId()).get();
         // then
-        assertEquals(204, response.getStatusCodeValue());
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
         assertThat(passwordEncoder.matches(updatePassword.newPassword(), updatedUser.getPassword())).isTrue();
     }
 
@@ -226,7 +227,7 @@ class UserInfoControllerImplTest extends UserInfoIntegrationTestSupport{
         ResponseEntity<Boolean> response = controller.checkUserId(request, lastUser.getId());
 
         // then
-        assertEquals(200, response.getStatusCodeValue());
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isTrue();
     }
 
@@ -242,11 +243,9 @@ class UserInfoControllerImplTest extends UserInfoIntegrationTestSupport{
         ResponseEntity<Boolean> response = controller.checkUserId(request, 1500L);
 
         // then
-        assertEquals(200, response.getStatusCodeValue());
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isFalse();
-
     }
-
 
     @Transactional
     @DisplayName("로그인 한 유저가 프로젝트를 등록했다면, 등록한 프로젝트들을 무한 페이징 형식으로 조회한다.")
@@ -295,9 +294,8 @@ class UserInfoControllerImplTest extends UserInfoIntegrationTestSupport{
         ResponseEntity<MyProjectScrollResponse> response =
                 controller.getMyProjects(loginRequest, nextCursor, nextProjectId, pageSize);
 
-        System.out.println(response + "가가");
         // then3
-        assertEquals(200, response.getStatusCodeValue());
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertEquals(expectedResponse.content().getLast().title(), response.getBody().content().getFirst().title());
         assertEquals(expectedResponse.content().getLast().projectId(), response.getBody().content().getFirst().projectId());
     }
@@ -373,9 +371,9 @@ class UserInfoControllerImplTest extends UserInfoIntegrationTestSupport{
                 controller.getMyOrders(loginRequest, nextCursor, nextOrderId, pageSize);
 
         // then
-        assertEquals(200, response.getStatusCodeValue());
-        assertEquals(expectedResponse.content().getLast().projectName(), response.getBody().content().getFirst().projectName());
-        assertEquals(expectedResponse.content().getFirst().orderId(), response.getBody().content().getFirst().orderId());
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(expectedResponse.content().getLast().projectName()).isEqualTo(response.getBody().content().getFirst().projectName());
+        assertThat(expectedResponse.content().getFirst().orderId()).isEqualTo(response.getBody().content().getFirst().orderId());
     }
 
         /*

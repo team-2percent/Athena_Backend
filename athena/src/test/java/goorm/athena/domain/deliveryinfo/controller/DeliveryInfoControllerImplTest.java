@@ -11,6 +11,7 @@ import goorm.athena.global.jwt.util.LoginUserRequest;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
@@ -39,8 +40,8 @@ class DeliveryInfoControllerImplTest extends DeliveryControllerIntegrationTestSu
         assertEquals(200, response.getStatusCodeValue());
 
         List<DeliveryInfo> all = deliveryInfoRepository.findAll();
-        assertEquals(size+1, all.size());
-        assertEquals("서울시 강남구", all.getLast().getZipcode());
+        assertThat(size+1).isEqualTo(all.size());
+        assertThat("서울시 강남구").isEqualTo(all.getLast().getZipcode());
     }
 
     @Transactional
@@ -63,7 +64,7 @@ class DeliveryInfoControllerImplTest extends DeliveryControllerIntegrationTestSu
         ResponseEntity<Void> response = controller.changeDeliveryInfoState(loginUserRequest, request);
 
         // then
-        assertEquals(204, response.getStatusCodeValue());
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
         assertEquals(deliveryInfo2.getId(), deliveryInfoService.getPrimaryDeliveryInfo(user.getId()).getId());
     }
 
@@ -84,7 +85,7 @@ class DeliveryInfoControllerImplTest extends DeliveryControllerIntegrationTestSu
         ResponseEntity<Void> response = controller.deleteDeliveryInfo(loginUserRequest, deliveryInfo2.getId());
 
         // then
-        assertEquals(204, response.getStatusCodeValue());
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
 
         boolean exists = deliveryInfoRepository.findById(deliveryInfo2.getId()).isPresent();
         assertThat(exists).isFalse();
@@ -107,8 +108,8 @@ class DeliveryInfoControllerImplTest extends DeliveryControllerIntegrationTestSu
         ResponseEntity<List<DeliveryInfoResponse>> response = controller.getDeliveryInfoList(loginUserRequest);
 
         // then
-        assertEquals(200, response.getStatusCodeValue());
-        assertEquals(response.getBody().size(), 2);
-        assertEquals(response.getBody().get(1).zipcode(), "!234");
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody().size()).isEqualTo(2);
+        assertThat(response.getBody().get(1).zipcode()).isEqualTo("!234");
     }
 }

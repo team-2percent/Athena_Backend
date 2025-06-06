@@ -101,11 +101,11 @@ class UserControllerImplTest extends UserControllerIntegrationTestSupport{
 
         int oldSize = userRepository.findAll().size();
         // then
-        assertEquals(200, response.getStatusCodeValue());
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertNotNull(response.getBody());
-        assertEquals(userRepository.findAll().size(), oldSize);
-        assertEquals("test@example.com", response.getBody().email());
-        assertEquals("nickname", response.getBody().nickname());
+        assertThat(userRepository.findAll().size()).isEqualTo(oldSize);
+        assertThat("test@example.com").isEqualTo(response.getBody().email());
+        assertThat("nickname").isEqualTo(response.getBody().nickname());
     }
 
     @Transactional
@@ -122,7 +122,7 @@ class UserControllerImplTest extends UserControllerIntegrationTestSupport{
         ResponseEntity<UserLoginResponse> response = controller.login(loginRequest, bindingResult, httpServletResponse);
 
         // then
-        assertEquals(200, response.getStatusCodeValue());
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertNotNull(response.getBody());
         assertThat(response.getBody().userId()).isEqualTo(user.getId());
 
@@ -147,7 +147,7 @@ class UserControllerImplTest extends UserControllerIntegrationTestSupport{
             controller.login(loginRequest, bindingResult, httpServletResponse);
         });
 
-        assertEquals(ErrorCode.VALIDATION_ERROR, exception.getErrorCode());
+        assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.VALIDATION_ERROR);
     }
 
     @DisplayName("로그인 한 유저가 의도에 맞게 수정 정보에 맞게 입력했다면 성공적으로 유저 수정을 진행한다.")
@@ -175,8 +175,8 @@ class UserControllerImplTest extends UserControllerIntegrationTestSupport{
 
         ResponseEntity<UserUpdateResponse> response = controller.updateUser(loginRequest, request, file);
 
-        assertEquals(200, response.getStatusCodeValue());
-        assertEquals(expected, response.getBody());
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(expected).isEqualTo(response.getBody());
     }
 
     @DisplayName("다른 유저의 정보를 user의 ID를 기준으로 조회한다.")
@@ -188,8 +188,8 @@ class UserControllerImplTest extends UserControllerIntegrationTestSupport{
 
         ResponseEntity<UserGetResponse> response = controller.getUserById(user.getId());
 
-        assertEquals(200, response.getStatusCodeValue());
-        assertEquals(user.getNickname(), response.getBody().nickname());
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(user.getNickname()).isEqualTo(response.getBody().nickname());
         assertThat(user.getEmail()).isEqualTo(response.getBody().email());
     }
 
@@ -204,7 +204,7 @@ class UserControllerImplTest extends UserControllerIntegrationTestSupport{
         ResponseEntity<Void> response = controller.deleteUser(user.getId());
 
         // then
-        assertEquals(204, response.getStatusCodeValue());
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
         assertThat(userRepository.findById(user.getId())).isEmpty();
     }
 
@@ -237,7 +237,7 @@ class UserControllerImplTest extends UserControllerIntegrationTestSupport{
         String expectImage = imageService.getImage(user.getImageGroup().getId());
 
         // then
-        assertEquals(200, response.getStatusCodeValue());
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(expectImage).isEqualTo(response.getBody().imageUrl());
     }
 
@@ -269,7 +269,7 @@ class UserControllerImplTest extends UserControllerIntegrationTestSupport{
         ResponseEntity<UserGetResponse> response = controller.getUserProfile(user.getId());
 
         // then
-        assertEquals(200, response.getStatusCodeValue());
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(user.getNickname()).isEqualTo(response.getBody().nickname());
         assertThat(expectImage).isEqualTo(response.getBody().imageUrl());
     }

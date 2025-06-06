@@ -16,6 +16,7 @@ import goorm.athena.domain.user.entity.User;
 import goorm.athena.global.jwt.util.LoginUserRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockMultipartFile;
 
@@ -28,11 +29,10 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 class CommentControllerImplTest extends CommentControllerIntegrationSupport {
 
-    @DisplayName("로그인 한 사용자가 해당 프로젝트에 코멘트를 작성한다.")
+    @DisplayName("로그인 한 사용자가 특정 프로젝트에 코멘트를 작성한다.")
     @Test
     void createComment() {
         // given
@@ -60,11 +60,11 @@ class CommentControllerImplTest extends CommentControllerIntegrationSupport {
         ResponseEntity<CommentCreateResponse> response = controller.createComment(loginUserRequest, request);
 
         // then
-        assertEquals(200, response.getStatusCodeValue());
-        assertEquals(content, response.getBody().content()); // 결과 검증
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(content).isEqualTo(response.getBody().content()); // 결과 검증
     }
 
-    @DisplayName("해당 프로젝트의 후기 목록들을 조회한다. ")
+    @DisplayName("특정 프로젝트 ID의 코멘트 목록들을 조회한다. ")
     @Test
     void getComment() throws IOException {
         ImageGroup userImageGroup = setupUserImageGroup();
@@ -122,8 +122,8 @@ class CommentControllerImplTest extends CommentControllerIntegrationSupport {
         ResponseEntity<List<CommentGetResponse>> responses = controller.getComment(project.getId());
 
         // then
-        assertEquals(200, responses.getStatusCodeValue());
-        assertEquals(expectedResponse.get(0).imageUrl(), responses.getBody().getFirst().imageUrl());
+        assertThat(responses.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(expectedResponse.get(0).imageUrl()).isEqualTo(responses.getBody().getFirst().imageUrl());
         assertThat(expectedResponse.get(1).content()).isEqualTo(responses.getBody().get(1).content());
     }
 }
