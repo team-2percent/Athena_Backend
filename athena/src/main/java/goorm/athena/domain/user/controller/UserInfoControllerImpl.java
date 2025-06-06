@@ -49,8 +49,9 @@ public class UserInfoControllerImpl implements UserInfoController {
 
     @Override
     @GetMapping("/comment")
-    public List<CommentGetResponse> getComments(@CheckLogin LoginUserRequest request){
-        return commentService.getCommentByUser(request.userId());
+    public ResponseEntity<List<CommentGetResponse>> getComments(@CheckLogin LoginUserRequest request){
+        List<CommentGetResponse> responses = commentService.getCommentByUser(request.userId());
+        return ResponseEntity.ok(responses);
     }
 
     @Override

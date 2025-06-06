@@ -4,8 +4,6 @@ import goorm.athena.domain.bankaccount.BankAccountIntegrationTestSupport;
 import goorm.athena.domain.bankaccount.dto.req.BankAccountCreateRequest;
 import goorm.athena.domain.bankaccount.dto.res.BankAccountGetResponse;
 import goorm.athena.domain.bankaccount.entity.BankAccount;
-import goorm.athena.domain.deliveryinfo.dto.res.DeliveryInfoResponse;
-import goorm.athena.domain.deliveryinfo.entity.DeliveryInfo;
 import goorm.athena.domain.imageGroup.entity.ImageGroup;
 import goorm.athena.domain.user.entity.User;
 import goorm.athena.global.exception.CustomException;
@@ -17,7 +15,6 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.*;
 
 class BankAccountServiceTest extends BankAccountIntegrationTestSupport {
 
