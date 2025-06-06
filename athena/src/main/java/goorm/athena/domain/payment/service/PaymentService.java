@@ -17,10 +17,12 @@ import goorm.athena.global.exception.CustomException;
 import goorm.athena.global.exception.ErrorCode;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -68,6 +70,7 @@ public class PaymentService {
         return response;
     }
 
+
     public KakaoPayApproveResponse approvePayment(String pgToken, Long orderId) {
         Payment payment = paymentRepository.findByOrderId(orderId)
                 .orElseThrow(() -> new CustomException(ErrorCode.PAYMENT_NOT_FOUND));
@@ -80,6 +83,7 @@ public class PaymentService {
             response = kakaoPayService
                     .approveKakaoPayment(payment.getTid(), requestDto, user);
         } catch (Exception e) {
+            log.error(" 카카오 결제 승인 실패", e);
             return KakaoPayApproveResponse.ofFailure();
         }
 
