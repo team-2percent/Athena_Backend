@@ -84,12 +84,12 @@ public class PaymentService {
             response = kakaoPayService.approveKakaoPayment(payment.getTid(), requestDto, user);
         } catch (CustomException ce) {
             log.warn("카카오페이 결제 승인 중 예외 발생: {}", ce.getMessage());
-            return KakaoPayApproveResponse.ofFailure();
+            return KakaoPayApproveResponse.ofFailure("카카오페이 연동 실패 발생");
         };
 
         if (response.tid() == null) {
             log.warn("카카오 결제 승인 내부 응답값이 올바르지 않음");
-            return response;
+            return KakaoPayApproveResponse.ofFailure("카카오 결제 승인 내부 응답값이 올바르지 않음");
         }
 
 
@@ -103,7 +103,7 @@ public class PaymentService {
 
         } catch (Exception e) {
             log.error("결제 승인 후 내부 처리 오류", e);
-            return KakaoPayApproveResponse.ofFailure();
+            return KakaoPayApproveResponse.ofFailure("걀제 승인 후 재고,누적 처리 오류");
         }
 
 
