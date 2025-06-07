@@ -76,8 +76,6 @@ public abstract class UserIntegrationTestSupport extends IntegrationServiceTestS
 
   @BeforeEach
   void setUp() {
-    userRepository.deleteAllInBatch();
-    imageGroupRepository.deleteAllInBatch();
     // 테스트에서 nasService로 내부 경로를 강제 주입하여 임시 디렉터리로 파일 I/O 수행함
     Field imagePathField = ReflectionUtils.findField(NasService.class, "imagePath");
     imagePathField.setAccessible(true);
@@ -118,10 +116,10 @@ public abstract class UserIntegrationTestSupport extends IntegrationServiceTestS
 
   protected Project setupProject(User user, Category category, ImageGroup imageGroup,
                                  BankAccount bankAccount, PlatformPlan platformPlan,
-                                 String title, String description, Long goalAmount, Long totalAmount) {
+                                 String title, String description, Long goalAmount, Long totalAmount, String contentMarkdown) {
     Project project = TestEntityFactory.createProject(
             user, category, imageGroup, bankAccount, platformPlan,
-            title, description, goalAmount, totalAmount
+            title, description, goalAmount, totalAmount, contentMarkdown
     );
     return project;
   }

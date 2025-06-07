@@ -38,7 +38,7 @@ class CommentServiceTest extends CommentIntegrationSupport {
         BankAccount bankAccount = setupBankAccount(user, "123" ,"123" ,"123", true);
         PlatformPlan platformPlan = platformPlanRepository.findById(1L).get();
         Project project = setupProject(user, category, imageGroup, bankAccount, platformPlan,
-                "프로젝2132132131트 제목", "설123213213명", 100000L, 10000L);
+                "프로젝2132132131트 제목", "설123213213명", 100000L, 10000L, "!23");
         Comment comment = setupComment(user, project, "123");
 
         userRepository.save(user);
@@ -66,7 +66,7 @@ class CommentServiceTest extends CommentIntegrationSupport {
         BankAccount bankAccount = setupBankAccount(user, "123" ,"123" ,"123", true);
         PlatformPlan platformPlan = platformPlanRepository.findById(1L).get();
         Project project = setupProject(user, category, imageGroup, bankAccount, platformPlan,
-                "프로젝2132132131트 제목", "설123213213명", 100000L, 10000L);
+                "프로젝2132132131트 제목", "설123213213명", 100000L, 10000L, "!23");
 
         userRepository.save(user);
         categoryRepository.save(category);
@@ -95,7 +95,7 @@ class CommentServiceTest extends CommentIntegrationSupport {
         BankAccount bankAccount = setupBankAccount(user, "123" ,"123" ,"123", true);
         PlatformPlan platformPlan = platformPlanRepository.findById(1L).get();
         Project project = setupProject(user, category, imageGroup, bankAccount, platformPlan,
-                "프로젝2132132131트 제목", "설123213213명", 100000L, 10000L);
+                "프로젝2132132131트 제목", "설123213213명", 100000L, 10000L, "!23");
         Comment comment = setupComment(user, project, "123");
         Comment comment1 = setupComment(user2, project, "12#");
 
@@ -131,7 +131,7 @@ class CommentServiceTest extends CommentIntegrationSupport {
         BankAccount bankAccount = setupBankAccount(user, "123" ,"123" ,"123", true);
         PlatformPlan platformPlan = platformPlanRepository.findById(1L).get();
         Project project = setupProject(user, category, imageGroup, bankAccount, platformPlan,
-                "프로젝2132132131트 제목", "설123213213명", 100000L, 10000L);
+                "프로젝2132132131트 제목", "설123213213명", 100000L, 10000L, "!23");
         Comment comment = setupComment(user, project, "123");
         Comment comment1 = setupComment(user2, project, "12#");
 

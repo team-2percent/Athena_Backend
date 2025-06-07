@@ -6,6 +6,7 @@ import goorm.athena.domain.user.dto.response.RefreshTokenResponse;
 import goorm.athena.domain.user.entity.User;
 import goorm.athena.global.exception.CustomException;
 import goorm.athena.global.exception.ErrorCode;
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -13,6 +14,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;
 
+@Transactional
 class RefreshTokenServiceTest extends RefreshTokenIntegrationTestSupport {
 
     @DisplayName("토큰을 재발급할 때 리프레시 토큰이 Null이라면 에러를 리턴한다.")

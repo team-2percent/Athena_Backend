@@ -2,18 +2,17 @@ package goorm.athena.domain.user.controller;
 
 import goorm.athena.domain.user.RefreshControllerIntegrationTestSupport;
 import goorm.athena.domain.user.dto.response.RefreshTokenResponse;
-import io.jsonwebtoken.JwtException;
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletResponse;
+import goorm.athena.domain.user.entity.User;
+import goorm.athena.global.exception.CustomException;
+import goorm.athena.global.exception.ErrorCode;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpStatus;
+import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.test.context.support.WithMockUser;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.BDDMockito.given;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertThrows;
 
 class RefreshControllerImplTest extends RefreshControllerIntegrationTestSupport{
 
@@ -22,46 +21,50 @@ class RefreshControllerImplTest extends RefreshControllerIntegrationTestSupport{
     @Test
     void requestRefresh_success() throws Exception {
         // given
-        String oldAccessToken = "oldAccessToken";
-        String refreshToken = "validRefreshToken";
-        String newAccessToken = "newAccessToken";
-        String newRefreshToken = "newRefreshToken";
+        User user = setupUser("test@email.com", "password123", "nickname",  null);
+        userRepository.save(user);
 
-        RefreshTokenResponse expectedResponse = new RefreshTokenResponse(1L, newAccessToken, newRefreshToken);
+        String accessToken = jwtTokenizer.createAccessToken(user.getId(), user.getNickname(), user.getRole().name());
+        String refreshToken = jwtTokenizer.createRefreshToken(user.getId(), user.getNickname(), user.getRole().name());
 
-        // stub
-        given(jwtTokenizer.extractBearerToken("Bearer " + oldAccessToken)).willReturn(oldAccessToken);
-        given(refreshTokenService.reissueToken(eq(oldAccessToken), eq(refreshToken), any(HttpServletResponse.class)))
-                .willReturn(expectedResponse);
+        String header = "Bearer " + accessToken;
+        MockHttpServletResponse response = new MockHttpServletResponse();
 
-        // when & then
-        mockMvc.perform(post("/api/refreshToken/ReissueRefresh")
-                        .cookie(new Cookie("refreshToken", refreshToken))
-                        .header("Authorization", "Bearer " + oldAccessToken))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.accessToken").value(newAccessToken))
-                .andExpect(jsonPath("$.refreshToken").value(newRefreshToken));
+        // when
+        RefreshTokenResponse tokenResponse = controller.requestRefresh(refreshToken, header, response).getBody();
+
+        // then
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
+        assertThat(tokenResponse).isNotNull();
+        assertThat(tokenResponse.accessToken()).isNotEmpty();
+        assertThat(tokenResponse.refreshToken()).isNotEmpty();
+
+        assertThat(jwtTokenizer.isValidAccessToken(tokenResponse.accessToken())).isTrue();
+        assertThat(jwtTokenizer.isValidRefreshToken(tokenResponse.refreshToken())).isTrue();
     }
 
-    @DisplayName("액세스 토큰을 갱신할 때 리프레시 토큰이 만료되면 AUTH_TOKEN_EXPIRED 에러를 리턴한다.")
+    @DisplayName("액세스 토큰을 갱신할 때 리프레시 토큰이 만료되면 REFRESHTOKEN_EXPIRED 에러를 리턴한다.")
     @WithMockUser(username = "user", roles = {"USER"})
     @Test
-    void requestRefresh_FAILED() throws Exception {
+    void requestRefresh_FAILED() {
         // given
-        String validAccessToken = "validAccessToken";
-        String oldRefreshToken = "OldRefreshToken";
+        User user = setupUser("test@email.com", "password123", "nickname",  null);
+        userRepository.save(user);
 
-        // stub
-        given(jwtTokenizer.extractBearerToken("Bearer " + validAccessToken)).willReturn(validAccessToken);
-        given(refreshTokenService.reissueToken(eq(validAccessToken), eq(oldRefreshToken), any(HttpServletResponse.class)))
-                .willThrow(new JwtException("토큰이 만료되었습니다."));
+        String accessToken = jwtTokenizer.createAccessToken(user.getId(), user.getNickname(), user.getRole().name());
+        String refreshToken = jwtTokenizer.createRefreshToken(user.getId(), user.getNickname(), user.getRole().name(), 1L);
 
-        // when // the
-        mockMvc.perform(post("/api/refreshToken/ReissueRefresh")
-                        .cookie(new Cookie("refreshToken", oldRefreshToken))
-                        .header("Authorization", "Bearer " + validAccessToken))
-                .andExpect(status().isUnauthorized())
-                .andExpect(jsonPath("$.message").value("토큰이 만료되었습니다."));
+        String header = "Bearer " + accessToken;
+        MockHttpServletResponse response = new MockHttpServletResponse();
+
+        // when
+        CustomException exception = assertThrows(CustomException.class, () -> {
+            controller.requestRefresh(refreshToken, header, response);
+        });
+
+        // then
+        assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.REFRESHTOKEN_EXPIRED);
+        assertThat(exception.getMessage()).isEqualTo("리프레시 토큰이 만료되었습니다");
     }
 }
 

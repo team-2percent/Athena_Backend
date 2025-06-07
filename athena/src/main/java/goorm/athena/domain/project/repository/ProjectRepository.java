@@ -59,7 +59,7 @@ public interface ProjectRepository extends JpaRepository<Project, Long>, JpaSpec
     @Query(value = """
             SELECT u.* 
             FROM project p
-            JOIN user u ON p.seller_id = u.id
+            JOIN `user` u ON p.seller_id = u.id
             WHERE p.id = :projectId
             """, nativeQuery = true)
     User findSellerByProjectId(@Param("projectId") Long projectId);

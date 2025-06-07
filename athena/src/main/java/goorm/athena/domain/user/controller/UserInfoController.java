@@ -76,7 +76,7 @@ public interface UserInfoController {
     @Operation(summary = "유저 작성 댓글 조회 API", description = "유저가 작성한 댓글들을 조회합니다.")
     @ApiResponse(responseCode = "200", description = "유저 작성 댓글 조회 성공")
     @GetMapping("/comment")
-    public List<CommentGetResponse> getComments(@Parameter(hidden = true) @CheckLogin LoginUserRequest request);
+    public ResponseEntity<List<CommentGetResponse>> getComments(@Parameter(hidden = true) @CheckLogin LoginUserRequest request);
 
     @Operation(summary = "유저 비밀번호 확인 API", description = "유저의 비밀번호를 확인합니다.")
     @ApiResponse(responseCode = "200", description = "유저 비밀번호 확인 성공")

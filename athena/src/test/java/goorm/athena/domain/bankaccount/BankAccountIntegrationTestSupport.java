@@ -32,11 +32,6 @@ public abstract class BankAccountIntegrationTestSupport extends IntegrationServi
         return imageGroupService.createImageGroup(Type.USER);
     }
 
-    @BeforeEach
-    void setUp() {
-        bankAccountRepository.deleteAllInBatch();
-        userRepository.deleteAllInBatch();
-    }
 
     protected User setupUser(String email, String password, String nickname, ImageGroup imageGroup) {
         User user = TestEntityFactory.createUser(email, password, nickname, imageGroup, Role.ROLE_USER);

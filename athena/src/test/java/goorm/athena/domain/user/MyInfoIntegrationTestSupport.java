@@ -27,7 +27,6 @@ import goorm.athena.domain.user.repository.UserRepository;
 import goorm.athena.domain.user.service.MyInfoService;
 import goorm.athena.util.IntegrationServiceTestSupport;
 import goorm.athena.util.TestEntityFactory;
-import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDateTime;
@@ -70,20 +69,6 @@ public abstract class MyInfoIntegrationTestSupport extends IntegrationServiceTes
     @Autowired
     protected DeliveryInfoRepository deliveryInfoRepository;
 
-    @BeforeEach
-    void setUp() {
-        orderItemRepository.deleteAllInBatch();
-        orderRepository.deleteAllInBatch();
-        productRepository.deleteAllInBatch();
-        deliveryInfoRepository.deleteAllInBatch();
-        projectRepository.deleteAllInBatch();
-        platformPlanRepository.deleteAllInBatch();
-        bankAccountRepository.deleteAllInBatch();
-        categoryRepository.deleteAllInBatch();
-        userRepository.deleteAllInBatch();
-        imageGroupRepository.deleteAllInBatch();
-    }
-
     protected ImageGroup setupImageGroup() {
         return imageGroupService.createImageGroup(Type.PROJECT);
     }
@@ -110,10 +95,10 @@ public abstract class MyInfoIntegrationTestSupport extends IntegrationServiceTes
 
     protected Project setupProject(User user, Category category, ImageGroup imageGroup,
                                  BankAccount bankAccount, PlatformPlan platformPlan,
-                                   String title, String description, Long goalAmount, Long totalAmount) {
+                                   String title, String description, Long goalAmount, Long totalAmount, String contentMarkdown) {
         Project project = TestEntityFactory.createProject(
                 user, category, imageGroup, bankAccount, platformPlan,
-                title, description, goalAmount, totalAmount
+                title, description, goalAmount, totalAmount, contentMarkdown
         );
         return project;
     }

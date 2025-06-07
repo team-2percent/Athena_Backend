@@ -59,7 +59,8 @@ public class TestEntityFactory {
 
     public static Project createProject(User user, Category category, ImageGroup imageGroup,
                                         BankAccount bankAccount, PlatformPlan platformPlan,
-                                        String title, String description, long goalAmount, long totalAmount) {
+                                        String title, String description, long goalAmount, long totalAmount,
+                                        String contentMarkDown) {
         return Project.builder()
                 .seller(user)
                 .category(category)
@@ -70,7 +71,7 @@ public class TestEntityFactory {
                 .description(description)
                 .goalAmount(goalAmount)
                 .totalAmount(totalAmount)
-                .contentMarkdown("기본 콘텐츠")
+                .contentMarkdown(contentMarkDown)
                 .startAt(LocalDateTime.now())
                 .endAt(LocalDateTime.now().plusDays(30))
                 .shippedAt(LocalDateTime.now().plusDays(35))
