@@ -78,6 +78,11 @@ firebase:
 ---
 
 spring:
+  sql:
+    init:
+      mode: always
+      data-locations: classpath:data.sql
+      schema-locations: classpath:schema.sql
   config:
     activate:
       on-profile: test
@@ -90,12 +95,17 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: update
     database-platform: org.hibernate.dialect.H2Dialect
     show-sql: true
     properties:
       hibernate:
         format_sql: true
+  defer-datasource-initialization: true
+  generate-ddl: true
+logging:
+  level:
+    org.springframework.jdbc.datasource.init: DEBUG
 
 ---
 

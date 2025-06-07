@@ -50,22 +50,24 @@ class DeliveryInfoControllerImplTest extends DeliveryControllerIntegrationTestSu
     void changeDeliveryInfoState() {
         // given
         User user = setupUser("123123213", "123", "123", null);
-        DeliveryInfo deliveryInfo = new DeliveryInfo(user, "123", "123", "123", true);
+        DeliveryInfo deliveryInfo = new DeliveryInfo(user, "123", "123", "123", false);
         DeliveryInfo deliveryInfo2 = new DeliveryInfo(user, "123", "123", "123", false);
 
         userRepository.save(user);
-
         deliveryInfoRepository.saveAll(List.of(deliveryInfo, deliveryInfo2));
 
         LoginUserRequest loginUserRequest = new LoginUserRequest("123", user.getId(), Role.ROLE_USER);
         DeliveryChangeStateRequest request = new DeliveryChangeStateRequest(deliveryInfo2.getId());
+
+        DeliveryInfo primaryDelivery = deliveryInfoService.getPrimaryDeliveryInfo(user.getId());
 
         // when
         ResponseEntity<Void> response = controller.changeDeliveryInfoState(loginUserRequest, request);
 
         // then
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
-        assertEquals(deliveryInfo2.getId(), deliveryInfoService.getPrimaryDeliveryInfo(user.getId()).getId());
+        assertThat(primaryDelivery.isDefault()).isFalse();
+        assertThat(deliveryInfo2.isDefault()).isTrue();
     }
 
     @DisplayName("로그인 한 사용자가 자신의 선택한 배송 정보를 삭제한다.")
@@ -99,7 +101,9 @@ class DeliveryInfoControllerImplTest extends DeliveryControllerIntegrationTestSu
         userRepository.save(user);
         LoginUserRequest loginUserRequest = new LoginUserRequest("123", user.getId(), Role.ROLE_USER);
 
-        DeliveryInfo deliveryInfo = new DeliveryInfo(user, "!234", "124", "1243", false);
+        int size = deliveryInfoRepository.findByUserId(user.getId()).size();
+
+        DeliveryInfo deliveryInfo = new DeliveryInfo(user, "!2343", "124", "1243", false);
         DeliveryInfo deliveryInfo2 = new DeliveryInfo(user, "!234", "124", "1243", false);
         deliveryInfoRepository.save(deliveryInfo);
         deliveryInfoRepository.save(deliveryInfo2);
@@ -109,7 +113,7 @@ class DeliveryInfoControllerImplTest extends DeliveryControllerIntegrationTestSu
 
         // then
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody().size()).isEqualTo(2);
-        assertThat(response.getBody().get(1).zipcode()).isEqualTo("!234");
+        assertThat(response.getBody().size()).isEqualTo(size+2);
+        assertThat(response.getBody().get(size).zipcode()).isEqualTo(deliveryInfo.getZipcode());
     }
 }

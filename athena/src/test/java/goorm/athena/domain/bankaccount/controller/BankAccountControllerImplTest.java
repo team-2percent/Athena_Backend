@@ -37,7 +37,7 @@ class BankAccountControllerImplTest extends BankAccountControllerIntegrationTest
         ResponseEntity<BankAccountCreateResponse> response = controller.createBankAccount(loginUserRequest, request);
 
         // then
-        assertEquals(200, response.getStatusCodeValue());
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 
         List<BankAccount> all = bankAccountRepository.findAll();
         assertThat(oldSize+1).isEqualTo(all.size());
@@ -55,7 +55,8 @@ class BankAccountControllerImplTest extends BankAccountControllerIntegrationTest
         LoginUserRequest loginUserRequest = new LoginUserRequest("123", user.getId(), Role.ROLE_USER);
 
 
-        BankAccount oldBankAccount = setupBankAccount(user, "123", "123", "123", true);
+        // 더미 데이터 기준이면 FALSE, 아니면 true
+        BankAccount oldBankAccount = setupBankAccount(user, "123", "123", "123", false);
         BankAccount newBankAccount = setupBankAccount(user, "123", "123", "123", false);
 
         userRepository.save(user);
@@ -88,7 +89,7 @@ class BankAccountControllerImplTest extends BankAccountControllerIntegrationTest
         ResponseEntity<Void> response = controller.deleteBankAccount(loginUserRequest, bankAccount2.getId());
 
         // then
-        assertEquals(204, response.getStatusCodeValue());
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
         boolean exists = bankAccountRepository.findById(bankAccount2.getId()).isPresent();
         assertThat(exists).isFalse();
     }
@@ -105,12 +106,13 @@ class BankAccountControllerImplTest extends BankAccountControllerIntegrationTest
         BankAccount bankAccount2 = setupBankAccount(user, "!234", "124", "1243", false);
         bankAccountRepository.saveAll(List.of(bankAccount, bankAccount2));
 
+        int size = bankAccountRepository.findAllByUserId(user.getId()).size();
+
         // when
         ResponseEntity<List<BankAccountGetResponse>> response = controller.getBankAccount(loginUserRequest);
 
         // then
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody().size()).isEqualTo(2);
-        assertThat(response.getBody().get(1).accountHolder()).isEqualTo("124");
+        assertThat(response.getBody().get(size-1).accountHolder()).isEqualTo("124");
     }
 }

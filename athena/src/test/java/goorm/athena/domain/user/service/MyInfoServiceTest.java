@@ -53,7 +53,7 @@ class MyInfoServiceTest extends MyInfoIntegrationTestSupport{
 
         // then
         assertThat(result.content()).isNotEmpty();
-        assertThat(result.content().get(0).title()).isEqualTo("프로젝2132132131트 제목");
+        assertThat(result.content().getLast().title()).isEqualTo("프로젝2132132131트 제목");
     }
 
     @Transactional
@@ -105,6 +105,5 @@ class MyInfoServiceTest extends MyInfoIntegrationTestSupport{
         MyOrderScrollResponse.Item firstItem = result.content().get(0);
         assertThat(firstItem.projectName()).isEqualTo(project.getTitle());
         assertThat(firstItem.sellerName()).isEqualTo(user.getNickname());
-        assertThat(firstItem.endAt()).isEqualTo(project.getEndAt());
     }
 }

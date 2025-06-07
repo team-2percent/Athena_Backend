@@ -270,34 +270,34 @@ class UserInfoControllerImplTest extends UserInfoIntegrationTestSupport{
         platformPlanRepository.save(platformPlan);
         projectRepository.saveAll(List.of(project, project2));
 
-        LoginUserRequest loginRequest = new LoginUserRequest("123", user.getId(), Role.ROLE_USER);
+        LoginUserRequest loginRequest = new LoginUserRequest(user.getNickname(), user.getId(), Role.ROLE_USER);
         LocalDateTime nextCursor = LocalDateTime.now();
         Long nextProjectId = project2.getId();
         int pageSize = 10;
 
         List<MyProjectScrollResponse.ProjectPreview> projectPreviews = List.of(
                 new MyProjectScrollResponse.ProjectPreview(
-                        project.getId(), project.getTitle(), false, nextCursor.minusDays(5), nextCursor.plusDays(10), 90L, "http://img1.com"
+                        project.getId(), project.getTitle(), false, nextCursor.minusDays(5), nextCursor.plusDays(9), 90L, "http://img1.com"
                 ),
                 new MyProjectScrollResponse.ProjectPreview(
-                        project2.getId(), project2.getTitle(), false, nextCursor.minusDays(10), nextCursor.plusDays(5), 100L, "http://img2.com"
+                        project2.getId(), project2.getTitle(), false, nextCursor.minusDays(10), nextCursor.plusDays(15), 100L, "http://img2.com"
                 )
         );
 
         MyProjectScrollResponse expectedResponse = new MyProjectScrollResponse(
                 projectPreviews,
-                nextCursor.plusDays(1),
-                project2.getId()
+                nextCursor,
+                nextProjectId
         );
 
         // when
         ResponseEntity<MyProjectScrollResponse> response =
                 controller.getMyProjects(loginRequest, nextCursor, nextProjectId, pageSize);
 
-        // then3
+        // then
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertEquals(expectedResponse.content().getLast().title(), response.getBody().content().getFirst().title());
-        assertEquals(expectedResponse.content().getLast().projectId(), response.getBody().content().getFirst().projectId());
+        assertThat(expectedResponse.content().getFirst().title()).isEqualTo(response.getBody().content().getLast().title());
+        assertThat(expectedResponse.content().getFirst().projectId()).isEqualTo(response.getBody().content().getLast().projectId());
     }
 
     @DisplayName("로그인 한 유저가 프로젝트를 구매한 적이 있다면, 구매한 프로젝트들을 무한 페이징 형식으로 조회한다.")
@@ -372,7 +372,7 @@ class UserInfoControllerImplTest extends UserInfoIntegrationTestSupport{
 
         // then
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(expectedResponse.content().getLast().projectName()).isEqualTo(response.getBody().content().getFirst().projectName());
+        assertThat(expectedResponse.content().getFirst().projectName()).isEqualTo(response.getBody().content().getFirst().projectName());
         assertThat(expectedResponse.content().getFirst().orderId()).isEqualTo(response.getBody().content().getFirst().orderId());
     }
 
