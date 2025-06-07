@@ -74,11 +74,6 @@ public abstract class CommentIntegrationSupport extends IntegrationServiceTestSu
         return bankAccount;
     }
 
-    protected PlatformPlan setupPlatformPlan(PlanName planName, int platformFeeRate, int pgFeeRate, int vatRate, String description) {
-        PlatformPlan plan = TestEntityFactory.createPlatformPlan(planName, platformFeeRate, pgFeeRate, vatRate, description);
-        return plan;
-    }
-
     protected Project setupProject(User user, Category category, ImageGroup imageGroup,
                                    BankAccount bankAccount, PlatformPlan platformPlan,
                                    String title, String description, Long goalAmount, Long totalAmount, String contentMarkdown) {
@@ -90,10 +85,6 @@ public abstract class CommentIntegrationSupport extends IntegrationServiceTestSu
     }
 
     protected Comment setupComment(User user, Project project, String content){
-        return Comment.builder()
-                .user(user)
-                .project(project)
-                .content(content)
-                .build();
+        return TestEntityFactory.createComment(user, project, content);
     }
 }
