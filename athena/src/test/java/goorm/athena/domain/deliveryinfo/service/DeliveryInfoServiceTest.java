@@ -1,5 +1,6 @@
 package goorm.athena.domain.deliveryinfo.service;
 
+import goorm.athena.domain.bankaccount.entity.BankAccount;
 import goorm.athena.domain.deliveryinfo.DeliveryIntegrationTestSupport;
 import goorm.athena.domain.deliveryinfo.dto.req.DeliveryInfoRequest;
 import goorm.athena.domain.deliveryinfo.dto.res.DeliveryInfoResponse;
@@ -62,6 +63,10 @@ class DeliveryInfoServiceTest extends DeliveryIntegrationTestSupport {
         ImageGroup imageGroup = setupImageGroup();
         User user = setupUser("123", "123", "123", imageGroup);
         userRepository.save(user);
+
+        DeliveryInfo userDelivery = deliveryInfoService.getPrimaryDeliveryInfo(user.getId());
+        userDelivery.unsetAsDefault();
+        deliveryInfoRepository.save(userDelivery);
         DeliveryInfoRequest request = new DeliveryInfoRequest("홍길동", "서울시", "010-1111-2222");
 
         int size = deliveryInfoRepository.findByUserId(user.getId()).size();
@@ -72,7 +77,8 @@ class DeliveryInfoServiceTest extends DeliveryIntegrationTestSupport {
         // then
         List<DeliveryInfo> infos = deliveryInfoRepository.findByUserId(user.getId());
         assertThat(infos).hasSize(size+1);
-        assertThat(infos.get(0).isDefault()).isTrue(); // 첫 배송지는 기본 배송지로 설정됨
+        assertThat(infos.getLast().isDefault()).isTrue(); // 첫 배송지는 기본 배송지로 설정됨
+        assertThat(userDelivery.isDefault()).isFalse();
     }
 
 

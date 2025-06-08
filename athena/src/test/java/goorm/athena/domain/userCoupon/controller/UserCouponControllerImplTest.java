@@ -77,6 +77,7 @@ class UserCouponControllerImplTest extends UserCouponControllerIntegrationSuppor
         // given
 
         // when
+        controller.schedulerExpiredUserCoupon();
 
         // then
     }

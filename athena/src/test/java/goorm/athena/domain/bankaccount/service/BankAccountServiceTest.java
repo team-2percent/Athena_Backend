@@ -11,6 +11,9 @@ import goorm.athena.global.exception.ErrorCode;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.platform.commons.util.ReflectionUtils;
+import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.List;
 
@@ -60,7 +63,11 @@ class BankAccountServiceTest extends BankAccountIntegrationTestSupport {
         // given
         ImageGroup imageGroup = setupImageGroup();
         User user = setupUser("123", "123", "123", imageGroup);
-        userRepository.save(user);
+        userRepository.save(user); // saveAndFlush도 OK
+
+        BankAccount userAccount = bankAccountService.getPrimaryAccount(user.getId());
+        userAccount.unsetAsDefault();
+        bankAccountRepository.save(userAccount);
         BankAccountCreateRequest request = new BankAccountCreateRequest("123", "123", "123");
 
         // when
@@ -68,7 +75,8 @@ class BankAccountServiceTest extends BankAccountIntegrationTestSupport {
 
         // then
         List<BankAccount> infos = bankAccountRepository.findAllByUserId(user.getId());
-        assertThat(infos.get(0).isDefault()).isTrue();
+        assertThat(infos.getLast().isDefault()).isTrue();
+        assertThat(userAccount.isDefault()).isFalse();
     }
 
     @DisplayName("기본 계좌 정보를 조회할 시 해당 정보가 존재하지 않을 경우 에러를 리턴한다.")
