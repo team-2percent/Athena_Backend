@@ -4,6 +4,8 @@ import goorm.athena.domain.bankaccount.entity.BankAccount;
 import goorm.athena.domain.category.entity.Category;
 import goorm.athena.domain.comment.dto.res.CommentGetResponse;
 import goorm.athena.domain.comment.entity.Comment;
+import goorm.athena.domain.coupon.entity.Coupon;
+import goorm.athena.domain.coupon.entity.CouponStatus;
 import goorm.athena.domain.deliveryinfo.entity.DeliveryInfo;
 import goorm.athena.domain.imageGroup.entity.ImageGroup;
 import goorm.athena.domain.order.entity.Order;
@@ -21,6 +23,9 @@ import goorm.athena.domain.user.dto.request.UserUpdateRequest;
 import goorm.athena.domain.user.dto.response.*;
 import goorm.athena.domain.user.entity.Role;
 import goorm.athena.domain.user.entity.User;
+import goorm.athena.domain.userCoupon.dto.cursor.UserCouponCursorResponse;
+import goorm.athena.domain.userCoupon.entity.Status;
+import goorm.athena.domain.userCoupon.entity.UserCoupon;
 import goorm.athena.global.exception.CustomException;
 import goorm.athena.global.exception.ErrorCode;
 import goorm.athena.global.jwt.util.LoginUserRequest;
@@ -376,40 +381,49 @@ class UserInfoControllerImplTest extends UserInfoIntegrationTestSupport{
         assertThat(expectedResponse.content().getFirst().orderId()).isEqualTo(response.getBody().content().getFirst().orderId());
     }
 
-        /*
+
     @DisplayName("로그인 한 유저가 쿠폰들을 발급받았다면, 발급받은 쿠폰들을 무한 페이징 형식으로 조회한다.")
     @Test
     void getUserCoupons_Success() {
         // given
-        LoginUserRequest request = new LoginUserRequest("123", 1L, Role.ROLE_USER);
+        User user = setupUser("123", "123", "123", null);
 
-        Long userId = 1L;
-        Long cursorId = null;
-        int size = 5;
+        Coupon coupon = setupCoupon("123", "123123123123", 10000, LocalDateTime.now().plusDays(10),
+                LocalDateTime.now().plusDays(30), LocalDateTime.now().plusDays(50), 1000, CouponStatus.PREVIOUS);
+        Coupon coupon2 = setupCoupon("1234", "1231231231234", 10000, LocalDateTime.now().plusDays(10),
+                LocalDateTime.now().plusDays(30), LocalDateTime.now().plusDays(50), 1000, CouponStatus.IN_PROGRESS);
+        Coupon coupon3 = setupCoupon("12345", "1231231231235", 10000, LocalDateTime.now().plusDays(10),
+                LocalDateTime.now().plusDays(30), LocalDateTime.now().plusDays(50), 1000, CouponStatus.IN_PROGRESS);
+        Coupon coupon4 = setupCoupon("12346", "1231231231236", 10000, LocalDateTime.now().plusDays(10),
+                LocalDateTime.now().plusDays(30), LocalDateTime.now().plusDays(50), 1000, CouponStatus.ENDED);
+        Coupon coupon5 = setupCoupon("12347", "1231231231237", 10000, LocalDateTime.now().plusDays(10),
+                LocalDateTime.now().plusDays(30), LocalDateTime.now().plusDays(50), 1000, CouponStatus.COMPLETED);
 
-        UserCouponGetResponse coupon1 = new UserCouponGetResponse(
-                1L, 101L, "10% 할인 쿠폰", "10% 할인됩니다", 1000, 10,
-                LocalDateTime.now().plusDays(7), Status.UNUSED
-        );
+        userRepository.save(user);
+        couponRepository.saveAll(List.of(coupon, coupon2, coupon3, coupon4, coupon5));
 
-        UserCouponGetResponse coupon2 = new UserCouponGetResponse(
-                2L, 102L, "5000원 할인 쿠폰", "500원 할인됩니다", 5000, 5,
-                LocalDateTime.now().plusDays(7), Status.USED
-        );
+        LoginUserRequest loginUserRequest = new LoginUserRequest(user.getNickname(), user.getId(), Role.ROLE_USER);
 
-        List<UserCouponGetResponse> couponList = List.of(coupon1, coupon2);
-        UserCouponCursorResponse expectedResponse = new UserCouponCursorResponse(couponList, 3L, 10L);
+        UserCoupon userCoupon1 = setupUserCoupon(user, coupon, Status.UNUSED);
+        UserCoupon userCoupon2 = setupUserCoupon(user, coupon2, Status.USED);
+        UserCoupon userCoupon3 = setupUserCoupon(user, coupon3, Status.EXPIRED);
+        UserCoupon userCoupon4 = setupUserCoupon(user, coupon4, Status.UNUSED);
+        UserCoupon userCoupon5 = setupUserCoupon(user, coupon5, Status.USED);
+
+        userCouponRepository.saveAll(List.of(userCoupon1, userCoupon2, userCoupon3, userCoupon4, userCoupon5));
 
         // when
-        when(userCouponService.getUserCoupons(userId, cursorId, size)).thenReturn(expectedResponse);
-        ResponseEntity<UserCouponCursorResponse> response = controller.getUserCoupons(request, cursorId, size);
+        ResponseEntity<UserCouponCursorResponse> response = controller.getUserCoupons(loginUserRequest, 2L, 5);
 
         // then
-        assertEquals(200, response.getStatusCodeValue());
-        assertEquals(expectedResponse, response.getBody());
-        verify(userCouponService).getUserCoupons(userId, cursorId, size);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody().total()).isEqualTo(5);
+        assertThat(response.getBody().content().getFirst().content()).isEqualTo(coupon3.getContent());
+        assertThat(response.getBody().content().getFirst().title()).isEqualTo(coupon3.getTitle());
+        assertThat(response.getBody().content().getLast().content()).isEqualTo(coupon5.getContent());
+        assertThat(response.getBody().content().getLast().content()).isEqualTo(coupon5.getContent());
     }
 
-     */
+
 }
 
