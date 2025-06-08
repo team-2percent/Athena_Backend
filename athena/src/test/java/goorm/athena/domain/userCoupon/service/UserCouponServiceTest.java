@@ -210,14 +210,14 @@ class UserCouponServiceTest extends UserCouponIntegrationSupport {
         userCouponRepository.saveAll(List.of(userCoupon, userCoupon2, userCoupon3, userCoupon4, userCoupon5, userCoupon6, userCoupon7));
 
         // when
-        UserCouponCursorResponse response = userCouponService.getUserCoupons(user.getId(), coupon2.getId(), 3);
+        UserCouponCursorResponse response = userCouponService.getUserCoupons(user.getId(), userCoupon2.getId(), 3);
 
         // then
         assertThat(response.total()).isEqualTo(7);
         assertThat(response.content().getFirst().content()).isEqualTo(coupon3.getContent());
-        assertThat(response.content().getFirst().id()).isEqualTo(coupon3.getId());
+        assertThat(response.content().getFirst().id()).isEqualTo(userCoupon3.getId());
         assertThat(response.content().getLast().content()).isEqualTo(coupon5.getContent());
-        assertThat(response.content().getLast().id()).isEqualTo(coupon5.getId());
+        assertThat(response.content().getLast().id()).isEqualTo(userCoupon5.getId());
 
     }
 

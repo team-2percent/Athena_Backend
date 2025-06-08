@@ -35,6 +35,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -252,7 +253,6 @@ class UserInfoControllerImplTest extends UserInfoIntegrationTestSupport{
         assertThat(response.getBody()).isFalse();
     }
 
-    @Transactional
     @DisplayName("로그인 한 유저가 프로젝트를 등록했다면, 등록한 프로젝트들을 무한 페이징 형식으로 조회한다.")
     @Test
     void getMyProjects() {
@@ -262,12 +262,15 @@ class UserInfoControllerImplTest extends UserInfoIntegrationTestSupport{
         ImageGroup projectImageGroup2 = setupProjectImageGroup();
         User user = setupUser("test2@email.com", "1231231", "nickname2", imageGroup);
         Category category = setupCategory("음식");
-        BankAccount bankAccount = setupBankAccount(user, "123" ,"123" ,"123", true);
+        BankAccount bankAccount = setupBankAccount(user, "123" ,"123" ,"123", false);
         PlatformPlan platformPlan = platformPlanRepository.findById(1L).get();
         Project project = setupProject(user, category, projectImageGroup, bankAccount, platformPlan,
                 "프로젝2132132131트 제목", "설123213213명", 100000L, 10000L, "!23");
         Project project2 = setupProject(user, category, projectImageGroup2, bankAccount, platformPlan,
                 "프로젝트 제목123123", "설명123213213", 100000L, 10000L, "!23");
+
+        ReflectionTestUtils.setField(project, "createdAt", LocalDateTime.of(2025, 10, 9, 0, 0));
+        ReflectionTestUtils.setField(project2, "createdAt", LocalDateTime.of(2025, 11, 9, 0, 0));
 
         userRepository.save(user);
         categoryRepository.save(category);
@@ -276,16 +279,17 @@ class UserInfoControllerImplTest extends UserInfoIntegrationTestSupport{
         projectRepository.saveAll(List.of(project, project2));
 
         LoginUserRequest loginRequest = new LoginUserRequest(user.getNickname(), user.getId(), Role.ROLE_USER);
-        LocalDateTime nextCursor = LocalDateTime.now();
-        Long nextProjectId = project2.getId();
+        LocalDateTime nextCursor = LocalDateTime.of(2026, 10, 7, 12, 0);
+        Long nextProjectId = null;
         int pageSize = 10;
+
 
         List<MyProjectScrollResponse.ProjectPreview> projectPreviews = List.of(
                 new MyProjectScrollResponse.ProjectPreview(
-                        project.getId(), project.getTitle(), false, nextCursor.minusDays(5), nextCursor.plusDays(9), 90L, "http://img1.com"
+                        project2.getId(), project2.getTitle(), false, nextCursor.minusDays(5), nextCursor.plusDays(15), 100L, "http://img2.com"
                 ),
                 new MyProjectScrollResponse.ProjectPreview(
-                        project2.getId(), project2.getTitle(), false, nextCursor.minusDays(10), nextCursor.plusDays(15), 100L, "http://img2.com"
+                        project.getId(), project.getTitle(), false, nextCursor.minusDays(10), nextCursor.plusDays(9), 90L, "http://img1.com"
                 )
         );
 
@@ -297,12 +301,20 @@ class UserInfoControllerImplTest extends UserInfoIntegrationTestSupport{
 
         // when
         ResponseEntity<MyProjectScrollResponse> response =
-                controller.getMyProjects(loginRequest, nextCursor, nextProjectId, pageSize);
+                controller.getMyProjects(loginRequest, nextCursor, null, pageSize);
 
         // then
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(expectedResponse.content().getFirst().title()).isEqualTo(response.getBody().content().getLast().title());
-        assertThat(expectedResponse.content().getFirst().projectId()).isEqualTo(response.getBody().content().getLast().projectId());
+        List<MyProjectScrollResponse.ProjectPreview> actualProjects = response.getBody().content();
+
+        // createdAt 내림차순이 맞는지 확인
+        assertThat(actualProjects)
+                .extracting(MyProjectScrollResponse.ProjectPreview::projectId)
+                .containsSequence(project2.getId(), project.getId());
+
+        assertThat(actualProjects)
+                .extracting(MyProjectScrollResponse.ProjectPreview::title)
+                .containsSequence(project2.getTitle(), project.getTitle());
     }
 
     @DisplayName("로그인 한 유저가 프로젝트를 구매한 적이 있다면, 구매한 프로젝트들을 무한 페이징 형식으로 조회한다.")
@@ -347,22 +359,21 @@ class UserInfoControllerImplTest extends UserInfoIntegrationTestSupport{
 
         List<MyOrderScrollResponse.Item> orderItems = List.of(
                 new MyOrderScrollResponse.Item(
-                        orderItem1.getId(), orderItem1.getProduct().getProject().getId(), orderItem1.getProduct().getId(), orderItem1.getProduct().getProject().getTitle(), orderItem1.getProduct().getProductName(), orderItem1.getProduct().getProject().getSeller().getNickname(), "",
-                        nextCursor.minusDays(2), nextCursor.plusDays(10), 75L, true
-                ),
-                new MyOrderScrollResponse.Item(
-                        orderItem2.getId(), orderItem2.getProduct().getProject().getId(), orderItem2.getProduct().getId(), orderItem2.getProduct().getProject().getTitle(), orderItem2.getProduct().getProductName(), orderItem2.getProduct().getProject().getSeller().getNickname(), "",
-                        nextCursor.minusDays(2), nextCursor.plusDays(10), 75L, true
+                        orderItem4.getId(), orderItem4.getProduct().getProject().getId(), orderItem4.getProduct().getId(), orderItem4.getProduct().getProject().getTitle(), orderItem4.getProduct().getProductName(), orderItem4.getProduct().getProject().getSeller().getNickname(), "",
+                        nextCursor.minusDays(1), nextCursor.plusDays(20), 88L, false
                 ),
                 new MyOrderScrollResponse.Item(
                         orderItem3.getId(), orderItem3.getProduct().getProject().getId(), orderItem3.getProduct().getId(), orderItem3.getProduct().getProject().getTitle(), orderItem3.getProduct().getProductName(), orderItem3.getProduct().getProject().getSeller().getNickname(), "",
                         nextCursor.minusDays(1), nextCursor.plusDays(20), 88L, false
                 ),
                 new MyOrderScrollResponse.Item(
-                        orderItem4.getId(), orderItem4.getProduct().getProject().getId(), orderItem4.getProduct().getId(), orderItem4.getProduct().getProject().getTitle(), orderItem4.getProduct().getProductName(), orderItem4.getProduct().getProject().getSeller().getNickname(), "",
-                        nextCursor.minusDays(1), nextCursor.plusDays(20), 88L, false
+                        orderItem2.getId(), orderItem2.getProduct().getProject().getId(), orderItem2.getProduct().getId(), orderItem2.getProduct().getProject().getTitle(), orderItem2.getProduct().getProductName(), orderItem2.getProduct().getProject().getSeller().getNickname(), "",
+                        nextCursor.minusDays(2), nextCursor.plusDays(10), 75L, true
+                ),
+                new MyOrderScrollResponse.Item(
+                        orderItem1.getId(), orderItem1.getProduct().getProject().getId(), orderItem1.getProduct().getId(), orderItem1.getProduct().getProject().getTitle(), orderItem1.getProduct().getProductName(), orderItem1.getProduct().getProject().getSeller().getNickname(), "",
+                        nextCursor.minusDays(2), nextCursor.plusDays(10), 75L, true
                 )
-
         );
 
         MyOrderScrollResponse expectedResponse = new MyOrderScrollResponse(
@@ -377,8 +388,8 @@ class UserInfoControllerImplTest extends UserInfoIntegrationTestSupport{
 
         // then
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(expectedResponse.content().getFirst().projectName()).isEqualTo(response.getBody().content().getFirst().projectName());
-        assertThat(expectedResponse.content().getFirst().orderId()).isEqualTo(response.getBody().content().getFirst().orderId());
+        assertThat(expectedResponse.content().getLast().projectName()).isEqualTo(response.getBody().content().getLast().projectName());
+        assertThat(expectedResponse.content().getLast().orderId()).isEqualTo(response.getBody().content().getFirst().orderId());
     }
 
 
@@ -390,14 +401,14 @@ class UserInfoControllerImplTest extends UserInfoIntegrationTestSupport{
 
         Coupon coupon = setupCoupon("123", "123123123123", 10000, LocalDateTime.now().plusDays(10),
                 LocalDateTime.now().plusDays(30), LocalDateTime.now().plusDays(50), 1000, CouponStatus.PREVIOUS);
-        Coupon coupon2 = setupCoupon("1234", "1231231231234", 10000, LocalDateTime.now().plusDays(10),
-                LocalDateTime.now().plusDays(30), LocalDateTime.now().plusDays(50), 1000, CouponStatus.IN_PROGRESS);
-        Coupon coupon3 = setupCoupon("12345", "1231231231235", 10000, LocalDateTime.now().plusDays(10),
-                LocalDateTime.now().plusDays(30), LocalDateTime.now().plusDays(50), 1000, CouponStatus.IN_PROGRESS);
-        Coupon coupon4 = setupCoupon("12346", "1231231231236", 10000, LocalDateTime.now().plusDays(10),
-                LocalDateTime.now().plusDays(30), LocalDateTime.now().plusDays(50), 1000, CouponStatus.ENDED);
-        Coupon coupon5 = setupCoupon("12347", "1231231231237", 10000, LocalDateTime.now().plusDays(10),
-                LocalDateTime.now().plusDays(30), LocalDateTime.now().plusDays(50), 1000, CouponStatus.COMPLETED);
+        Coupon coupon2 = setupCoupon("1234", "1231231231234", 10000, LocalDateTime.now().plusDays(11),
+                LocalDateTime.now().plusDays(31), LocalDateTime.now().plusDays(51), 1000, CouponStatus.IN_PROGRESS);
+        Coupon coupon3 = setupCoupon("12345", "1231231231235", 10000, LocalDateTime.now().plusDays(12),
+                LocalDateTime.now().plusDays(32), LocalDateTime.now().plusDays(52), 1000, CouponStatus.IN_PROGRESS);
+        Coupon coupon4 = setupCoupon("12346", "1231231231236", 10000, LocalDateTime.now().plusDays(13),
+                LocalDateTime.now().plusDays(33), LocalDateTime.now().plusDays(53), 1000, CouponStatus.ENDED);
+        Coupon coupon5 = setupCoupon("12347", "1231231231237", 10000, LocalDateTime.now().plusDays(14),
+                LocalDateTime.now().plusDays(34), LocalDateTime.now().plusDays(54), 1000, CouponStatus.COMPLETED);
 
         userRepository.save(user);
         couponRepository.saveAll(List.of(coupon, coupon2, coupon3, coupon4, coupon5));
@@ -413,13 +424,13 @@ class UserInfoControllerImplTest extends UserInfoIntegrationTestSupport{
         userCouponRepository.saveAll(List.of(userCoupon1, userCoupon2, userCoupon3, userCoupon4, userCoupon5));
 
         // when
-        ResponseEntity<UserCouponCursorResponse> response = controller.getUserCoupons(loginUserRequest, 2L, 5);
+        ResponseEntity<UserCouponCursorResponse> response = controller.getUserCoupons(loginUserRequest, null, 5);
 
         // then
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody().total()).isEqualTo(5);
-        assertThat(response.getBody().content().getFirst().content()).isEqualTo(coupon3.getContent());
-        assertThat(response.getBody().content().getFirst().title()).isEqualTo(coupon3.getTitle());
+        assertThat(response.getBody().content().getFirst().content()).isEqualTo(coupon.getContent());
+        assertThat(response.getBody().content().getFirst().title()).isEqualTo(coupon.getTitle());
         assertThat(response.getBody().content().getLast().content()).isEqualTo(coupon5.getContent());
         assertThat(response.getBody().content().getLast().content()).isEqualTo(coupon5.getContent());
     }

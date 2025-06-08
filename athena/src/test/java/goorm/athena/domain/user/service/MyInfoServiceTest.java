@@ -25,6 +25,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@Transactional
 class MyInfoServiceTest extends MyInfoIntegrationTestSupport{
 
     @DisplayName("로그인 한 유저의 내가 등록한 프로젝트들을 성공적으로 무한 페이징 형식으로 조회한다.")
@@ -53,7 +54,7 @@ class MyInfoServiceTest extends MyInfoIntegrationTestSupport{
 
         // then
         assertThat(result.content()).isNotEmpty();
-        assertThat(result.content().getLast().title()).isEqualTo("프로젝2132132131트 제목");
+        assertThat(result.content().getLast().title()).isEqualTo(project.getTitle());
     }
 
     @Transactional
