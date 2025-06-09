@@ -1,18 +1,16 @@
 package goorm.athena.domain.project.repository;
 
-import goorm.athena.domain.project.entity.ApprovalStatus;
 import goorm.athena.domain.project.entity.Project;
 import goorm.athena.domain.user.entity.User;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
-import org.springframework.data.jpa.repository.Query;
-
-import org.springframework.data.repository.query.Param;
-
 import java.time.LocalDateTime;
 import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import goorm.athena.domain.project.entity.ApprovalStatus;
+
+
 
 public interface ProjectRepository extends JpaRepository<Project, Long>, JpaSpecificationExecutor<Project> {
     @Query("SELECT p FROM Project p " +
@@ -52,7 +50,7 @@ public interface ProjectRepository extends JpaRepository<Project, Long>, JpaSpec
             JOIN platform_plan pp ON p.platform_plan_id = pp.id
             WHERE pp.name IN ('PRO', 'PREMIUM')
                 AND p.is_approved = 'APPROVED'
-            ORDER BY p.created_at DESC
+            ORDER BY p.created_at DESC limit 20
             """, nativeQuery = true)
     List<Project> findTop5ProjectsGroupedByPlatformPlan();
 
