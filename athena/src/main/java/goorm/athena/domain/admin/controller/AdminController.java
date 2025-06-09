@@ -50,6 +50,8 @@ public interface AdminController {
     ResponseEntity<ProjectSummaryResponse> getProjects(
             @Parameter(hidden = true) @CheckLogin LoginUserRequest loginUserRequest,
             @Parameter(description = "프로젝트 제목 검색어 (선택)") @RequestParam(required = false) String keyword,
+            @Parameter(description = "정렬 기준 필드 (예: createdAt, title, nickname)", example = "createdAt")
+            @RequestParam(value = "sortBy", defaultValue = "createdAt") String sortBy,
             @Parameter(description = "정렬 방향(desc 또는 asc)", example = "desc") @RequestParam(value = "direction", defaultValue = "desc") String direction,
             @Parameter(description = "페이지 번호 (0부터 시작)", example = "0") @RequestParam(value = "page", defaultValue = "0") int page
     );

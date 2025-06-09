@@ -19,9 +19,9 @@ public class AdminService {
     private final AdminQueryRepository adminProjectQueryService;
     private final SettlementService settlementService;
 
-    public ProjectSummaryResponse getProjectList(String keyword, String sortDirection, int page) {
+    public ProjectSummaryResponse getProjectList(String keyword, String sortBy, String sortDirection, int page) {
         Sort.Direction direction = Sort.Direction.fromOptionalString(sortDirection).orElse(Sort.Direction.DESC);
-        Sort sort = Sort.by(direction, "createdAt");
+        Sort sort = Sort.by(direction, sortBy != null ? sortBy : "createdAt");
         Pageable pageable = PageRequest.of(page, 10, sort);
 
         return adminProjectQueryService.findProjectList(keyword, pageable);

@@ -3,19 +3,20 @@ package goorm.athena.domain.admin.repository;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.CaseBuilder;
-import com.querydsl.core.types.dsl.Expressions;
-import com.querydsl.core.types.dsl.NumberExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import goorm.athena.domain.admin.dto.res.ProjectSummaryResponse;
 import goorm.athena.domain.project.entity.ApprovalStatus;
 import goorm.athena.domain.project.entity.QProject;
 import goorm.athena.domain.user.entity.QUser;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
+import com.querydsl.core.types.Order;
+import com.querydsl.core.types.OrderSpecifier;
+import com.querydsl.core.types.dsl.PathBuilder;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -34,12 +35,25 @@ public class AdminQueryRepository {
             where.and(project.title.containsIgnoreCase(keyword));
         }
 
+        // 정렬 조건 생성 (PENDING 우선 + 전달된 정렬 기준)
+        List<OrderSpecifier<?>> orderSpecifiers = new ArrayList<>();
+
         // PENDING 우선 정렬
-        NumberExpression<Integer> pendingPriority = Expressions.numberTemplate(
-                Integer.class,
-                "case when {0} = 'PENDING' then 0 else 1 end",
-                project.isApproved
+        orderSpecifiers.add(
+                new CaseBuilder()
+                        .when(project.isApproved.eq(ApprovalStatus.PENDING)).then(0)
+                        .otherwise(1)
+                        .asc()
         );
+
+        // pageable의 sort 조건 추가
+        for (Sort.Order order : pageable.getSort()) {
+            String property = order.getProperty();
+            Order direction = order.isAscending() ? Order.ASC : Order.DESC;
+
+            PathBuilder<?> pathBuilder = new PathBuilder<>(project.getType(), project.getMetadata());
+            orderSpecifiers.add(new OrderSpecifier(direction, pathBuilder.get(property)));
+        }
 
         List<ProjectSummaryResponse.Item> content = queryFactory
                 .select(Projections.constructor(
@@ -54,13 +68,7 @@ public class AdminQueryRepository {
                 .from(project)
                 .join(project.seller, user)
                 .where(where)
-                .orderBy(
-                        new CaseBuilder()
-                                .when(project.isApproved.eq(ApprovalStatus.PENDING)).then(0)
-                                .otherwise(1)
-                                .asc(),
-                        project.createdAt.desc()
-                )
+                .orderBy(orderSpecifiers.toArray(new OrderSpecifier[0]))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
