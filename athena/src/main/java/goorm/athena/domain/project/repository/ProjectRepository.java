@@ -50,7 +50,7 @@ public interface ProjectRepository extends JpaRepository<Project, Long>, JpaSpec
             JOIN platform_plan pp ON p.platform_plan_id = pp.id
             WHERE pp.name IN ('PRO', 'PREMIUM')
                 AND p.is_approved = 'APPROVED'
-            ORDER BY p.created_at DESC limit 20
+            ORDER BY p.created_at DESC LIMIT 20
             """, nativeQuery = true)
     List<Project> findTop5ProjectsGroupedByPlatformPlan();
 
