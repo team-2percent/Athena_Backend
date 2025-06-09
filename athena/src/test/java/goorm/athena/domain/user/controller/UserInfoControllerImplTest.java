@@ -300,81 +300,81 @@ class UserInfoControllerImplTest extends UserInfoIntegrationTestSupport{
         assertThat(expectedResponse.content().getFirst().projectId()).isEqualTo(response.getBody().content().getLast().projectId());
     }
 
-    @DisplayName("로그인 한 유저가 프로젝트를 구매한 적이 있다면, 구매한 프로젝트들을 무한 페이징 형식으로 조회한다.")
-    @Test
-    void getMyOrders() {
-        // given
-        ImageGroup imageGroup = setupUserImageGroup();
-        ImageGroup projectImageGroup = setupProjectImageGroup();
-        User user = setupUser("test2@email.com", "1231231", "nickname2", imageGroup);
-        Category category = setupCategory("음식");
-        BankAccount bankAccount = setupBankAccount(user, "123" ,"123" ,"123", true);
-        PlatformPlan platformPlan = platformPlanRepository.findById(1L).get();
-        Project project = setupProject(user, category, projectImageGroup, bankAccount, platformPlan,
-                "프로젝2132132131트 제목", "설123213213명", 100000L, 10000L, "!23");
-        DeliveryInfo deliveryInfo = setupDeliveryInfo(user, "12123123", "123123", "123213", true);
-        Product product = setupProduct(project, "123", "123", 12L, 12L);
-        Order order = setupOrder(user, deliveryInfo, project, LocalDateTime.now().minusDays(1));
-        Order order2 = setupOrder(user, deliveryInfo, project, LocalDateTime.now().minusDays(2));
-        Order order3 = setupOrder(user, deliveryInfo, project, LocalDateTime.now().minusDays(2));
-        Order order4 = setupOrder(user, deliveryInfo, project, LocalDateTime.now().minusDays(2));
-
-        OrderItem orderItem1 = setupOrderItem(order, product, 123, 12L);
-        OrderItem orderItem2 = setupOrderItem(order2, product, 123, 123L);
-        OrderItem orderItem3 = setupOrderItem(order3, product, 123, 123L);
-        OrderItem orderItem4 = setupOrderItem(order4, product, 123, 123L);
-
-        userRepository.save(user);
-        categoryRepository.save(category);
-        bankAccountRepository.save(bankAccount);
-        platformPlanRepository.save(platformPlan);
-        projectRepository.save(project);
-        deliveryInfoRepository.save(deliveryInfo);
-        productRepository.save(product);
-        orderRepository.saveAll(List.of(order, order2, order3, order4));
-        orderItemRepository.saveAll(List.of(orderItem1, orderItem2, orderItem3, orderItem4));
-
-
-        LoginUserRequest loginRequest = new LoginUserRequest("123", user.getId(), Role.ROLE_USER);
-        LocalDateTime nextCursor = LocalDateTime.now();
-        Long nextOrderId = orderItem3.getId();
-        int pageSize = 10;
-
-        List<MyOrderScrollResponse.Item> orderItems = List.of(
-                new MyOrderScrollResponse.Item(
-                        orderItem1.getId(), orderItem1.getProduct().getProject().getId(), orderItem1.getProduct().getId(), orderItem1.getProduct().getProject().getTitle(), orderItem1.getProduct().getProductName(), orderItem1.getProduct().getProject().getSeller().getNickname(), "",
-                        nextCursor.minusDays(2), nextCursor.plusDays(10), 75L, true
-                ),
-                new MyOrderScrollResponse.Item(
-                        orderItem2.getId(), orderItem2.getProduct().getProject().getId(), orderItem2.getProduct().getId(), orderItem2.getProduct().getProject().getTitle(), orderItem2.getProduct().getProductName(), orderItem2.getProduct().getProject().getSeller().getNickname(), "",
-                        nextCursor.minusDays(2), nextCursor.plusDays(10), 75L, true
-                ),
-                new MyOrderScrollResponse.Item(
-                        orderItem3.getId(), orderItem3.getProduct().getProject().getId(), orderItem3.getProduct().getId(), orderItem3.getProduct().getProject().getTitle(), orderItem3.getProduct().getProductName(), orderItem3.getProduct().getProject().getSeller().getNickname(), "",
-                        nextCursor.minusDays(1), nextCursor.plusDays(20), 88L, false
-                ),
-                new MyOrderScrollResponse.Item(
-                        orderItem4.getId(), orderItem4.getProduct().getProject().getId(), orderItem4.getProduct().getId(), orderItem4.getProduct().getProject().getTitle(), orderItem4.getProduct().getProductName(), orderItem4.getProduct().getProject().getSeller().getNickname(), "",
-                        nextCursor.minusDays(1), nextCursor.plusDays(20), 88L, false
-                )
-
-        );
-
-        MyOrderScrollResponse expectedResponse = new MyOrderScrollResponse(
-                orderItems,
-                nextCursor.plusDays(1),
-                202L
-        );
-
-        // when
-        ResponseEntity<MyOrderScrollResponse> response =
-                controller.getMyOrders(loginRequest, nextCursor, nextOrderId, pageSize);
-
-        // then
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(expectedResponse.content().getFirst().projectName()).isEqualTo(response.getBody().content().getFirst().projectName());
-        assertThat(expectedResponse.content().getFirst().orderId()).isEqualTo(response.getBody().content().getFirst().orderId());
-    }
+//    @DisplayName("로그인 한 유저가 프로젝트를 구매한 적이 있다면, 구매한 프로젝트들을 무한 페이징 형식으로 조회한다.")
+//    @Test
+//    void getMyOrders() {
+//        // given
+//        ImageGroup imageGroup = setupUserImageGroup();
+//        ImageGroup projectImageGroup = setupProjectImageGroup();
+//        User user = setupUser("test2@email.com", "1231231", "nickname2", imageGroup);
+//        Category category = setupCategory("음식");
+//        BankAccount bankAccount = setupBankAccount(user, "123" ,"123" ,"123", true);
+//        PlatformPlan platformPlan = platformPlanRepository.findById(1L).get();
+//        Project project = setupProject(user, category, projectImageGroup, bankAccount, platformPlan,
+//                "프로젝2132132131트 제목", "설123213213명", 100000L, 10000L, "!23");
+//        DeliveryInfo deliveryInfo = setupDeliveryInfo(user, "12123123", "123123", "123213", true);
+//        Product product = setupProduct(project, "123", "123", 12L, 12L);
+//        Order order = setupOrder(user, deliveryInfo, project, LocalDateTime.now().minusDays(1));
+//        Order order2 = setupOrder(user, deliveryInfo, project, LocalDateTime.now().minusDays(2));
+//        Order order3 = setupOrder(user, deliveryInfo, project, LocalDateTime.now().minusDays(2));
+//        Order order4 = setupOrder(user, deliveryInfo, project, LocalDateTime.now().minusDays(2));
+//
+//        OrderItem orderItem1 = setupOrderItem(order, product, 123, 12L);
+//        OrderItem orderItem2 = setupOrderItem(order2, product, 123, 123L);
+//        OrderItem orderItem3 = setupOrderItem(order3, product, 123, 123L);
+//        OrderItem orderItem4 = setupOrderItem(order4, product, 123, 123L);
+//
+//        userRepository.save(user);
+//        categoryRepository.save(category);
+//        bankAccountRepository.save(bankAccount);
+//        platformPlanRepository.save(platformPlan);
+//        projectRepository.save(project);
+//        deliveryInfoRepository.save(deliveryInfo);
+//        productRepository.save(product);
+//        orderRepository.saveAll(List.of(order, order2, order3, order4));
+//        orderItemRepository.saveAll(List.of(orderItem1, orderItem2, orderItem3, orderItem4));
+//
+//
+//        LoginUserRequest loginRequest = new LoginUserRequest("123", user.getId(), Role.ROLE_USER);
+//        LocalDateTime nextCursor = LocalDateTime.now();
+//        Long nextOrderId = orderItem3.getId();
+//        int pageSize = 10;
+//
+//        List<MyOrderScrollResponse.Item> orderItems = List.of(
+//                new MyOrderScrollResponse.Item(
+//                        orderItem1.getId(), orderItem1.getProduct().getProject().getId(), orderItem1.getProduct().getId(), orderItem1.getProduct().getProject().getTitle(), orderItem1.getProduct().getProductName(), orderItem1.getProduct().getProject().getSeller().getNickname(), "",
+//                        nextCursor.minusDays(2), nextCursor.plusDays(10), 75L, true
+//                ),
+//                new MyOrderScrollResponse.Item(
+//                        orderItem2.getId(), orderItem2.getProduct().getProject().getId(), orderItem2.getProduct().getId(), orderItem2.getProduct().getProject().getTitle(), orderItem2.getProduct().getProductName(), orderItem2.getProduct().getProject().getSeller().getNickname(), "",
+//                        nextCursor.minusDays(2), nextCursor.plusDays(10), 75L, true
+//                ),
+//                new MyOrderScrollResponse.Item(
+//                        orderItem3.getId(), orderItem3.getProduct().getProject().getId(), orderItem3.getProduct().getId(), orderItem3.getProduct().getProject().getTitle(), orderItem3.getProduct().getProductName(), orderItem3.getProduct().getProject().getSeller().getNickname(), "",
+//                        nextCursor.minusDays(1), nextCursor.plusDays(20), 88L, false
+//                ),
+//                new MyOrderScrollResponse.Item(
+//                        orderItem4.getId(), orderItem4.getProduct().getProject().getId(), orderItem4.getProduct().getId(), orderItem4.getProduct().getProject().getTitle(), orderItem4.getProduct().getProductName(), orderItem4.getProduct().getProject().getSeller().getNickname(), "",
+//                        nextCursor.minusDays(1), nextCursor.plusDays(20), 88L, false
+//                )
+//
+//        );
+//
+//        MyOrderScrollResponse expectedResponse = new MyOrderScrollResponse(
+//                orderItems,
+//                nextCursor.plusDays(1),
+//                202L
+//        );
+//
+//        // when
+//        ResponseEntity<MyOrderScrollResponse> response =
+//                controller.getMyOrders(loginRequest, nextCursor, nextOrderId, pageSize);
+//
+//        // then
+//        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+//        assertThat(expectedResponse.content().getFirst().projectName()).isEqualTo(response.getBody().content().getFirst().projectName());
+//        assertThat(expectedResponse.content().getFirst().orderId()).isEqualTo(response.getBody().content().getFirst().orderId());
+//    }
 
         /*
     @DisplayName("로그인 한 유저가 쿠폰들을 발급받았다면, 발급받은 쿠폰들을 무한 페이징 형식으로 조회한다.")

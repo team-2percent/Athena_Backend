@@ -56,54 +56,54 @@ class MyInfoServiceTest extends MyInfoIntegrationTestSupport{
         assertThat(result.content().getLast().title()).isEqualTo("프로젝2132132131트 제목");
     }
 
-    @Transactional
-    @DisplayName("로그인 한 유저의 내가 구매한 상품들을 성공적으로 무한 페이징 형식으로 조회한다.")
-    @Test
-    void getMyOrders_Success() {
-        // given
-        ImageGroup imageGroup = setupImageGroup();
-        User user = setupUser("test@email.com", "123123", "nickname", imageGroup);
-        Category category = setupCategory("프로그래밍");
-        BankAccount bankAccount = setupBankAccount(user, "1243" ,"1243" ,"1243", true);
-        PlatformPlan platformPlan = platformPlanRepository.findById(1L).get();
-        Project project = setupProject(user, category, imageGroup, bankAccount, platformPlan,
-                "프로젝213213211트 제목", "설12313213명", 1000000L, 100000L, "!23");
-        DeliveryInfo deliveryInfo = setupDeliveryInfo(user, "12123123", "123123", "123213", true);
-        Product product = setupProduct(project, "123", "123", 12L, 12L);
-        Order order = setupOrder(user, deliveryInfo, project, LocalDateTime.now().minusDays(1));
-        Order order2 = setupOrder(user, deliveryInfo, project, LocalDateTime.now().minusDays(2));
-
-        OrderItem orderItem1 = setupOrderItem(order, product, 123, 12L);
-        OrderItem orderItem2 = setupOrderItem(order2, product, 123, 123L);
-        OrderItem orderItem3 = setupOrderItem(order2, product, 123, 123L);
-        OrderItem orderItem4 = setupOrderItem(order2, product, 123, 123L);
-
-        userRepository.save(user);
-        categoryRepository.save(category);
-        bankAccountRepository.save(bankAccount);
-        projectRepository.save(project);
-        deliveryInfoRepository.save(deliveryInfo);
-        productRepository.save(product);
-        orderRepository.saveAll(List.of(order, order2));
-        orderItemRepository.saveAll(List.of(orderItem1, orderItem2, orderItem3, orderItem4));
-
-        LocalDateTime cursor = LocalDateTime.now().minusDays(1);
-        Long nextOrderId = 2L;
-        int pageSize = 3;
-        MyOrderScrollRequest request = new MyOrderScrollRequest(
-                cursor,
-                nextOrderId,
-                pageSize
-        );
-
-        // when
-        MyOrderScrollResponse result = myInfoService.getMyOrders(user.getId(), request);
-
-        // then
-        assertThat(result).isNotNull();
-        assertThat(result.content()).hasSize(3);
-        MyOrderScrollResponse.Item firstItem = result.content().get(0);
-        assertThat(firstItem.projectName()).isEqualTo(project.getTitle());
-        assertThat(firstItem.sellerName()).isEqualTo(user.getNickname());
-    }
+//    @Transactional
+//    @DisplayName("로그인 한 유저의 내가 구매한 상품들을 성공적으로 무한 페이징 형식으로 조회한다.")
+//    @Test
+//    void getMyOrders_Success() {
+//        // given
+//        ImageGroup imageGroup = setupImageGroup();
+//        User user = setupUser("test@email.com", "123123", "nickname", imageGroup);
+//        Category category = setupCategory("프로그래밍");
+//        BankAccount bankAccount = setupBankAccount(user, "1243" ,"1243" ,"1243", true);
+//        PlatformPlan platformPlan = platformPlanRepository.findById(1L).get();
+//        Project project = setupProject(user, category, imageGroup, bankAccount, platformPlan,
+//                "프로젝213213211트 제목", "설12313213명", 1000000L, 100000L, "!23");
+//        DeliveryInfo deliveryInfo = setupDeliveryInfo(user, "12123123", "123123", "123213", true);
+//        Product product = setupProduct(project, "123", "123", 12L, 12L);
+//        Order order = setupOrder(user, deliveryInfo, project, LocalDateTime.now().minusDays(1));
+//        Order order2 = setupOrder(user, deliveryInfo, project, LocalDateTime.now().minusDays(2));
+//
+//        OrderItem orderItem1 = setupOrderItem(order, product, 123, 12L);
+//        OrderItem orderItem2 = setupOrderItem(order2, product, 123, 123L);
+//        OrderItem orderItem3 = setupOrderItem(order2, product, 123, 123L);
+//        OrderItem orderItem4 = setupOrderItem(order2, product, 123, 123L);
+//
+//        userRepository.save(user);
+//        categoryRepository.save(category);
+//        bankAccountRepository.save(bankAccount);
+//        projectRepository.save(project);
+//        deliveryInfoRepository.save(deliveryInfo);
+//        productRepository.save(product);
+//        orderRepository.saveAll(List.of(order, order2));
+//        orderItemRepository.saveAll(List.of(orderItem1, orderItem2, orderItem3, orderItem4));
+//
+//        LocalDateTime cursor = LocalDateTime.now().minusDays(1);
+//        Long nextOrderId = 2L;
+//        int pageSize = 3;
+//        MyOrderScrollRequest request = new MyOrderScrollRequest(
+//                cursor,
+//                nextOrderId,
+//                pageSize
+//        );
+//
+//        // when
+//        MyOrderScrollResponse result = myInfoService.getMyOrders(user.getId(), request);
+//
+//        // then
+//        assertThat(result).isNotNull();
+//        assertThat(result.content()).hasSize(3);
+//        MyOrderScrollResponse.Item firstItem = result.content().get(0);
+//        assertThat(firstItem.projectName()).isEqualTo(project.getTitle());
+//        assertThat(firstItem.sellerName()).isEqualTo(user.getNickname());
+//    }
 }

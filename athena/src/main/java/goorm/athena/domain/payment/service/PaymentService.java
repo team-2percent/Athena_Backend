@@ -103,7 +103,7 @@ public class PaymentService {
 
         } catch (Exception e) {
             log.error("결제 승인 후 내부 처리 오류", e);
-            return KakaoPayApproveResponse.ofFailure("걀제 승인 후 재고,누적 처리 오류");
+            return KakaoPayApproveResponse.ofFailure("결제 승인 후 재고,누적 처리 오류");
         }
 
 
