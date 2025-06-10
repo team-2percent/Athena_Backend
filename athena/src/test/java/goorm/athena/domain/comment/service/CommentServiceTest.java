@@ -7,10 +7,8 @@ import goorm.athena.domain.comment.dto.res.CommentCreateResponse;
 import goorm.athena.domain.comment.dto.res.CommentGetResponse;
 import goorm.athena.domain.comment.entity.Comment;
 import goorm.athena.domain.imageGroup.entity.ImageGroup;
-import goorm.athena.domain.project.entity.PlanName;
 import goorm.athena.domain.project.entity.PlatformPlan;
 import goorm.athena.domain.project.entity.Project;
-import goorm.athena.domain.project.service.ProjectService;
 import goorm.athena.domain.user.entity.User;
 import goorm.athena.global.exception.CustomException;
 import goorm.athena.global.exception.ErrorCode;
@@ -50,7 +48,7 @@ class CommentServiceTest extends CommentIntegrationSupport {
         Optional<Project> project1 = projectRepository.findById(project.getId());
 
         // when & then
-        assertThatThrownBy(() -> commentService.createComment(project1.get().getId(), user.getId(), "123"))
+        assertThatThrownBy(() -> commentCommandService.createComment(project1.get().getId(), user.getId(), "123"))
                 .isInstanceOf(CustomException.class)
                 .hasMessageContaining(ErrorCode.ALREADY_COMMENTED.getErrorMessage());
 
@@ -76,7 +74,7 @@ class CommentServiceTest extends CommentIntegrationSupport {
         Optional<Project> project1 = projectRepository.findById(project.getId());
 
         // when
-        CommentCreateResponse response = commentService.createComment(project1.get().getId(), user.getId(), "123123");
+        CommentCreateResponse response = commentCommandService.createComment(project1.get().getId(), user.getId(), "123123");
 
         // then
         assertThat(response.userName()).isEqualTo(user.getNickname());
@@ -106,7 +104,7 @@ class CommentServiceTest extends CommentIntegrationSupport {
         commentRepository.saveAll(List.of(comment, comment1));
 
         // when
-        List<CommentGetResponse> response = commentService.getCommentByProject(project.getId());
+        List<CommentGetResponse> response = commentQueryService.getCommentByProject(project.getId());
         String expectedImageUrl = imageService.getImage(user.getImageGroup().getId());
 
         // then
@@ -142,7 +140,7 @@ class CommentServiceTest extends CommentIntegrationSupport {
         commentRepository.saveAll(List.of(comment, comment1));
 
         // when
-        List<CommentGetResponse> response = commentService.getCommentByUser(user.getId());
+        List<CommentGetResponse> response = commentQueryService.getCommentByUser(user.getId());
         String expectedImageUrl = imageService.getImage(user.getImageGroup().getId());
 
         // then

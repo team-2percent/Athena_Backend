@@ -1,7 +1,7 @@
 package goorm.athena.domain.user.controller;
 
 import goorm.athena.domain.comment.dto.res.CommentGetResponse;
-import goorm.athena.domain.comment.service.CommentService;
+import goorm.athena.domain.comment.service.CommentQueryService;
 import goorm.athena.domain.user.dto.request.UserPasswordRequest;
 import goorm.athena.domain.user.dto.request.UserUpdatePasswordRequest;
 import goorm.athena.domain.user.dto.response.UserSummaryResponse;
@@ -34,7 +34,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/api/my")
 public class UserInfoControllerImpl implements UserInfoController {
-    private final CommentService commentService;
+    private final CommentQueryService commentQueryService;
     private final MyInfoQueryService myInfoQueryService;
     private final UserQueryService userQueryService;
     private final UserCommandService userCommandService;
@@ -50,7 +50,7 @@ public class UserInfoControllerImpl implements UserInfoController {
     @Override
     @GetMapping("/comment")
     public ResponseEntity<List<CommentGetResponse>> getComments(@CheckLogin LoginUserRequest request){
-        List<CommentGetResponse> responses = commentService.getCommentByUser(request.userId());
+        List<CommentGetResponse> responses = commentQueryService.getCommentByUser(request.userId());
         return ResponseEntity.ok(responses);
     }
 

@@ -6,12 +6,12 @@ import goorm.athena.domain.category.entity.Category;
 import goorm.athena.domain.category.repository.CategoryRepository;
 import goorm.athena.domain.comment.entity.Comment;
 import goorm.athena.domain.comment.repository.CommentRepository;
-import goorm.athena.domain.comment.service.CommentService;
+import goorm.athena.domain.comment.service.CommentCommandService;
+import goorm.athena.domain.comment.service.CommentQueryService;
 import goorm.athena.domain.image.service.ImageService;
 import goorm.athena.domain.imageGroup.entity.ImageGroup;
 import goorm.athena.domain.imageGroup.entity.Type;
 import goorm.athena.domain.imageGroup.service.ImageGroupService;
-import goorm.athena.domain.project.entity.PlanName;
 import goorm.athena.domain.project.entity.PlatformPlan;
 import goorm.athena.domain.project.entity.Project;
 import goorm.athena.domain.project.repository.PlatformPlanRepository;
@@ -32,7 +32,10 @@ public abstract class CommentIntegrationSupport extends IntegrationServiceTestSu
     protected ImageGroupService imageGroupService;
 
     @Autowired
-    protected CommentService commentService;
+    protected CommentQueryService commentQueryService;
+
+    @Autowired
+    protected CommentCommandService commentCommandService;
 
     @Autowired
     protected UserRepository userRepository;

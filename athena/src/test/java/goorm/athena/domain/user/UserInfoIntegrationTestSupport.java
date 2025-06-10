@@ -6,7 +6,7 @@ import goorm.athena.domain.category.entity.Category;
 import goorm.athena.domain.category.repository.CategoryRepository;
 import goorm.athena.domain.comment.entity.Comment;
 import goorm.athena.domain.comment.repository.CommentRepository;
-import goorm.athena.domain.comment.service.CommentService;
+import goorm.athena.domain.comment.service.CommentQueryService;
 import goorm.athena.domain.coupon.entity.Coupon;
 import goorm.athena.domain.coupon.entity.CouponStatus;
 import goorm.athena.domain.coupon.repository.CouponRepository;
@@ -66,7 +66,7 @@ public abstract class UserInfoIntegrationTestSupport extends IntegrationControll
     protected UserCommandService userCommandService;
 
     @Autowired
-    protected CommentService commentService;
+    protected CommentQueryService commentQueryService;
 
     @Autowired
     protected MyInfoQueryService myInfoQueryService;
@@ -133,7 +133,7 @@ public abstract class UserInfoIntegrationTestSupport extends IntegrationControll
 
     @BeforeEach
     void setUp() {
-        controller = new UserInfoControllerImpl(commentService, myInfoQueryService, userQueryService, userCommandService, userCouponQueryService);
+        controller = new UserInfoControllerImpl(commentQueryService, myInfoQueryService, userQueryService, userCommandService, userCouponQueryService);
         Field imagePathField = ReflectionUtils.findField(NasService.class, "imagePath");
         imagePathField.setAccessible(true);
         ReflectionUtils.setField(imagePathField, nasService, tempDir.toAbsolutePath().toString());

@@ -7,7 +7,7 @@ import goorm.athena.domain.category.repository.CategoryRepository;
 import goorm.athena.domain.comment.controller.CommentControllerImpl;
 import goorm.athena.domain.comment.entity.Comment;
 import goorm.athena.domain.comment.repository.CommentRepository;
-import goorm.athena.domain.comment.service.CommentService;
+import goorm.athena.domain.comment.service.CommentQueryService;
 import goorm.athena.domain.image.repository.ImageRepository;
 import goorm.athena.domain.image.service.ImageService;
 import goorm.athena.domain.image.service.NasService;
@@ -77,7 +77,7 @@ public abstract class CommentControllerIntegrationSupport extends IntegrationCon
     protected CommentRepository commentRepository;
 
     @Autowired
-    protected CommentService commentService;
+    protected CommentQueryService commentQueryService;
 
     @Autowired
     protected ProjectService projectService;
