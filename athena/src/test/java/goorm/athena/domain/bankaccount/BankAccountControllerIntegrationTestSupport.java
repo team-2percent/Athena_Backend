@@ -12,7 +12,7 @@ import goorm.athena.domain.notification.service.FcmTokenService;
 import goorm.athena.domain.user.entity.Role;
 import goorm.athena.domain.user.entity.User;
 import goorm.athena.domain.user.repository.UserRepository;
-import goorm.athena.domain.user.service.UserService;
+import goorm.athena.domain.user.service.UserQueryService;
 import goorm.athena.domain.userCoupon.service.UserCouponQueryService;
 import goorm.athena.global.jwt.util.LoginUserRequest;
 import goorm.athena.util.IntegrationControllerTestSupport;
@@ -49,7 +49,7 @@ public abstract class BankAccountControllerIntegrationTestSupport extends Integr
     protected ImageService imageService;
 
     @Autowired
-    protected UserService userService;
+    protected UserQueryService userQueryService;
 
     @BeforeEach
     void setUp() {

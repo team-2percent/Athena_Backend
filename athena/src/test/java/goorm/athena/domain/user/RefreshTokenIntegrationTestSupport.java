@@ -15,12 +15,11 @@ import goorm.athena.domain.project.repository.ProjectRepository;
 import goorm.athena.domain.user.entity.Role;
 import goorm.athena.domain.user.entity.User;
 import goorm.athena.domain.user.repository.UserRepository;
-import goorm.athena.domain.user.service.RefreshTokenService;
+import goorm.athena.domain.user.service.RefreshTokenCommandService;
 import goorm.athena.global.jwt.util.JwtTokenizer;
 import goorm.athena.util.IntegrationServiceTestSupport;
 import goorm.athena.util.TestEntityFactory;
 import jakarta.servlet.http.HttpServletResponse;
-import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public abstract class RefreshTokenIntegrationTestSupport extends IntegrationServiceTestSupport {
@@ -32,7 +31,7 @@ public abstract class RefreshTokenIntegrationTestSupport extends IntegrationServ
     protected HttpServletResponse response;
 
     @Autowired
-    protected RefreshTokenService refreshTokenService;
+    protected RefreshTokenCommandService refreshTokenCommandService;
 
     @Autowired
     protected ProjectRepository projectRepository;

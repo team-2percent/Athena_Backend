@@ -230,7 +230,7 @@ class UserControllerImplTest extends UserControllerIntegrationTestSupport{
                 new ByteArrayInputStream(os.toByteArray())
         );
 
-        userService.updateUser(user.getId(), request, file);
+        userCommandService.updateUser(user.getId(), request, file);
 
         //when
         ResponseEntity<UserHeaderGetResponse> response = controller.getHeader(loginRequest);
@@ -261,7 +261,7 @@ class UserControllerImplTest extends UserControllerIntegrationTestSupport{
                 new ByteArrayInputStream(os.toByteArray())
         );
 
-        userService.updateUser(user.getId(), request, file);
+        userCommandService.updateUser(user.getId(), request, file);
 
         String expectImage = imageService.getImage(user.getImageGroup().getId());
 

@@ -13,6 +13,7 @@ import goorm.athena.domain.project.entity.Project;
 import goorm.athena.domain.user.dto.request.UserUpdateRequest;
 import goorm.athena.domain.user.entity.Role;
 import goorm.athena.domain.user.entity.User;
+import goorm.athena.domain.userCoupon.entity.QUserCoupon;
 import goorm.athena.global.jwt.util.LoginUserRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -99,7 +100,7 @@ class CommentControllerImplTest extends CommentControllerIntegrationSupport {
                 new ByteArrayInputStream(os.toByteArray())
         );
 
-        userService.updateUser(user.getId(), request, multipartFile);
+        userCommandService.updateUser(user.getId(), request, multipartFile);
 
         User updatedUser = userRepository.findById(user.getId()).get();
         User updatedUser2 = userRepository.findById(user2.getId()).get();

@@ -6,7 +6,6 @@ import goorm.athena.domain.comment.dto.res.CommentGetResponse;
 import goorm.athena.domain.comment.service.CommentService;
 import goorm.athena.domain.notification.service.FcmNotificationService;
 import goorm.athena.domain.project.service.ProjectService;
-import goorm.athena.domain.user.service.UserService;
 import goorm.athena.global.jwt.util.CheckLogin;
 import goorm.athena.global.jwt.util.LoginUserRequest;
 import lombok.RequiredArgsConstructor;

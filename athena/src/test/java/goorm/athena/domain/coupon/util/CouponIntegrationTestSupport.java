@@ -9,7 +9,7 @@ import goorm.athena.domain.imageGroup.entity.ImageGroup;
 import goorm.athena.domain.user.entity.Role;
 import goorm.athena.domain.user.entity.User;
 import goorm.athena.domain.user.repository.UserRepository;
-import goorm.athena.domain.user.service.UserService;
+import goorm.athena.domain.user.service.UserQueryService;
 import goorm.athena.domain.userCoupon.repository.UserCouponRepository;
 import goorm.athena.domain.userCoupon.service.UserCouponCommandService;
 import goorm.athena.domain.userCoupon.service.UserCouponQueryService;
@@ -33,7 +33,7 @@ public abstract class CouponIntegrationTestSupport extends IntegrationServiceTes
     protected CouponQueryService couponQueryService;
 
     @Autowired
-    protected UserService userService;
+    protected UserQueryService userQueryService;
 
     @Autowired
     protected UserRepository userRepository;

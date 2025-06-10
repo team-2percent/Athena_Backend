@@ -11,8 +11,9 @@ import goorm.athena.domain.user.controller.UserControllerImpl;
 import goorm.athena.domain.user.entity.Role;
 import goorm.athena.domain.user.entity.User;
 import goorm.athena.domain.user.repository.UserRepository;
-import goorm.athena.domain.user.service.RefreshTokenService;
-import goorm.athena.domain.user.service.UserService;
+import goorm.athena.domain.user.service.RefreshTokenCommandService;
+import goorm.athena.domain.user.service.UserCommandService;
+import goorm.athena.domain.user.service.UserQueryService;
 import goorm.athena.global.jwt.util.JwtTokenizer;
 import goorm.athena.util.IntegrationControllerTestSupport;
 import goorm.athena.util.TestEntityFactory;
@@ -31,7 +32,10 @@ public abstract class UserControllerIntegrationTestSupport extends IntegrationCo
     protected UserControllerImpl controller;
 
     @Autowired
-    protected UserService userService;
+    protected UserQueryService userQueryService;
+
+    @Autowired
+    protected UserCommandService userCommandService;
 
     @Autowired
     protected UserRepository userRepository;
@@ -46,7 +50,7 @@ public abstract class UserControllerIntegrationTestSupport extends IntegrationCo
     protected ImageService imageService;
 
     @Autowired
-    protected RefreshTokenService refreshTokenService;
+    protected RefreshTokenCommandService refreshTokenCommandService;
 
     @Autowired
     protected HttpServletResponse httpServletResponse;
@@ -67,7 +71,7 @@ public abstract class UserControllerIntegrationTestSupport extends IntegrationCo
 
     @BeforeEach
     void setUp() {
-        controller = new UserControllerImpl(userService, refreshTokenService, imageGroupService, fcmTokenService);
+        controller = new UserControllerImpl(userQueryService, userCommandService, refreshTokenCommandService, imageGroupService, fcmTokenService);
         Field imagePathField = ReflectionUtils.findField(NasService.class, "imagePath");
         imagePathField.setAccessible(true);
         ReflectionUtils.setField(imagePathField, nasService, tempDir.toAbsolutePath().toString());

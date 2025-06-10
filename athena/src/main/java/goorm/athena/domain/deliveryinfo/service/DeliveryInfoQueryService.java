@@ -3,7 +3,7 @@ package goorm.athena.domain.deliveryinfo.service;
 import goorm.athena.domain.deliveryinfo.dto.res.DeliveryInfoResponse;
 import goorm.athena.domain.deliveryinfo.entity.DeliveryInfo;
 import goorm.athena.domain.deliveryinfo.repository.DeliveryInfoRepository;
-import goorm.athena.domain.user.service.UserService;
+import goorm.athena.domain.user.service.UserQueryService;
 import goorm.athena.global.exception.CustomException;
 import goorm.athena.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +18,7 @@ import static java.util.stream.Collectors.toList;
 public class DeliveryInfoQueryService {
 
     private final DeliveryInfoRepository deliveryInfoRepository;
-    private final UserService userService;
+    private final UserQueryService userQueryService;
 
     public DeliveryInfo getById(Long id) {
         return deliveryInfoRepository.findById(id)

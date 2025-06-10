@@ -4,7 +4,7 @@ import goorm.athena.domain.deliveryinfo.dto.req.DeliveryInfoRequest;
 import goorm.athena.domain.deliveryinfo.entity.DeliveryInfo;
 import goorm.athena.domain.deliveryinfo.repository.DeliveryInfoRepository;
 import goorm.athena.domain.user.entity.User;
-import goorm.athena.domain.user.service.UserService;
+import goorm.athena.domain.user.service.UserQueryService;
 import goorm.athena.global.exception.CustomException;
 import goorm.athena.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -17,12 +17,12 @@ import java.util.List;
 @RequiredArgsConstructor
 public class DeliveryInfoCommandService {
     private final DeliveryInfoRepository deliveryInfoRepository;
-    private final UserService userService;
+    private final UserQueryService userQueryService;
     private final DeliveryInfoQueryService deliveryInfoQueryService;
 
     @Transactional
     public void addDeliveryInfo(Long userId, DeliveryInfoRequest request) {
-        User user = userService.getUser(userId);
+        User user = userQueryService.getUser(userId);
 
         boolean isDefault = !hasPrimaryDeliveryInfo(userId);
         DeliveryInfo info = DeliveryInfo.of(user, request, isDefault);

@@ -6,7 +6,7 @@ import goorm.athena.domain.bankaccount.entity.BankAccount;
 import goorm.athena.domain.bankaccount.mapper.BankAccountMapper;
 import goorm.athena.domain.bankaccount.repository.BankAccountRepository;
 import goorm.athena.domain.user.entity.User;
-import goorm.athena.domain.user.service.UserService;
+import goorm.athena.domain.user.service.UserQueryService;
 import goorm.athena.global.exception.CustomException;
 import goorm.athena.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -19,12 +19,12 @@ import java.util.List;
 @RequiredArgsConstructor
 public class BankAccountCommandService {
     private final BankAccountRepository bankAccountRepository;
-    private final UserService userService;
+    private final UserQueryService userQueryService;
     private final BankAccountQueryService bankAccountQueryService;
 
     @Transactional
     public BankAccountCreateResponse createBankAccount(Long userId, BankAccountCreateRequest request){
-        User user = userService.getUser(userId);
+        User user = userQueryService.getUser(userId);
 
         boolean isDefault = !hasPrimaryDeliveryInfo(userId);
         BankAccount bankAccount = BankAccountMapper.toEntity(user, request, isDefault);

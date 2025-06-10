@@ -7,7 +7,6 @@ import goorm.athena.domain.imageGroup.entity.ImageGroup;
 import goorm.athena.domain.order.entity.Order;
 import goorm.athena.domain.orderitem.entity.OrderItem;
 import goorm.athena.domain.product.entity.Product;
-import goorm.athena.domain.project.entity.PlanName;
 import goorm.athena.domain.project.entity.PlatformPlan;
 import goorm.athena.domain.project.entity.Project;
 import goorm.athena.domain.user.MyInfoIntegrationTestSupport;
@@ -50,7 +49,7 @@ class MyInfoServiceTest extends MyInfoIntegrationTestSupport{
         );
 
         // when
-        MyProjectScrollResponse result = myInfoService.getMyProjects(user.getId(), request);
+        MyProjectScrollResponse result = myInfoQueryService.getMyProjects(user.getId(), request);
 
         // then
         assertThat(result.content()).isNotEmpty();
@@ -98,7 +97,7 @@ class MyInfoServiceTest extends MyInfoIntegrationTestSupport{
         );
 
         // when
-        MyOrderScrollResponse result = myInfoService.getMyOrders(user.getId(), request);
+        MyOrderScrollResponse result = myInfoQueryService.getMyOrders(user.getId(), request);
 
         // then
         assertThat(result).isNotNull();

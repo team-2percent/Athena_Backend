@@ -25,7 +25,8 @@ import goorm.athena.domain.project.service.ProjectService;
 import goorm.athena.domain.user.entity.Role;
 import goorm.athena.domain.user.entity.User;
 import goorm.athena.domain.user.repository.UserRepository;
-import goorm.athena.domain.user.service.UserService;
+import goorm.athena.domain.user.service.UserCommandService;
+import goorm.athena.domain.user.service.UserQueryService;
 import goorm.athena.global.jwt.util.LoginUserRequest;
 import goorm.athena.util.IntegrationControllerTestSupport;
 import goorm.athena.util.TestEntityFactory;
@@ -88,7 +89,10 @@ public abstract class CommentControllerIntegrationSupport extends IntegrationCon
     protected ProductRepository productRepository;
 
     @Autowired
-    protected UserService userService;
+    protected UserQueryService userQueryService;
+
+    @Autowired
+    protected UserCommandService userCommandService;
 
     @BeforeEach
     protected void setUp() {

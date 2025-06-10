@@ -5,7 +5,7 @@ import goorm.athena.domain.bankaccount.entity.BankAccount;
 import goorm.athena.domain.bankaccount.mapper.BankAccountMapper;
 import goorm.athena.domain.bankaccount.repository.BankAccountRepository;
 import goorm.athena.domain.user.entity.User;
-import goorm.athena.domain.user.service.UserService;
+import goorm.athena.domain.user.service.UserQueryService;
 import goorm.athena.global.exception.CustomException;
 import goorm.athena.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -18,10 +18,10 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class BankAccountQueryService {
     private final BankAccountRepository bankAccountRepository;
-    private final UserService userService;
+    private final UserQueryService userQueryService;
 
     public List<BankAccountGetResponse> getBankAccounts(Long userId){
-        User user = userService.getUser(userId);
+        User user = userQueryService.getUser(userId);
         List<BankAccount> bankAccount = bankAccountRepository.findByUser(user);
         return bankAccountRepository.findByUser(user).stream()
                 .map(BankAccountMapper::toGetResponse)

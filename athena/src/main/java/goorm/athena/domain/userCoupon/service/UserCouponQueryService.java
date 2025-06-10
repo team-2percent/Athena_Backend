@@ -2,7 +2,7 @@ package goorm.athena.domain.userCoupon.service;
 
 import goorm.athena.domain.coupon.service.CouponQueryService;
 import goorm.athena.domain.user.entity.User;
-import goorm.athena.domain.user.service.UserService;
+import goorm.athena.domain.user.service.UserQueryService;
 import goorm.athena.domain.userCoupon.dto.cursor.UserCouponCursorResponse;
 import goorm.athena.domain.userCoupon.dto.res.UserCouponGetResponse;
 import goorm.athena.domain.userCoupon.mapper.UserCouponMapper;
@@ -20,13 +20,13 @@ import java.util.stream.Collectors;
 public class UserCouponQueryService {
     private final UserCouponRepository userCouponRepository;
     private final UserCouponCursorRepository userCouponCursorRepository;
-    private final UserService userService;
+    private final UserQueryService userQueryService;
     private final CouponQueryService couponQueryService;
 
 
     @Transactional(readOnly = true)
     public List<UserCouponGetResponse> getUserCoupon(Long userId){
-        User user = userService.getUser(userId);
+        User user = userQueryService.getUser(userId);
         return userCouponRepository.findByUser(user).stream()
                 .map(UserCouponMapper::toGetResponse)
                 .collect(Collectors.toList());

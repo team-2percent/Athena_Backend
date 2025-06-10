@@ -24,7 +24,7 @@ import goorm.athena.domain.project.repository.ProjectRepository;
 import goorm.athena.domain.user.entity.Role;
 import goorm.athena.domain.user.entity.User;
 import goorm.athena.domain.user.repository.UserRepository;
-import goorm.athena.domain.user.service.MyInfoService;
+import goorm.athena.domain.user.service.MyInfoQueryService;
 import goorm.athena.util.IntegrationServiceTestSupport;
 import goorm.athena.util.TestEntityFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +34,7 @@ import java.time.LocalDateTime;
 public abstract class MyInfoIntegrationTestSupport extends IntegrationServiceTestSupport {
 
     @Autowired
-    protected MyInfoService myInfoService;
+    protected MyInfoQueryService myInfoQueryService;
 
     @Autowired
     protected ProjectRepository projectRepository;

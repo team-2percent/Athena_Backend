@@ -4,7 +4,7 @@ import goorm.athena.domain.imageGroup.entity.ImageGroup;
 import goorm.athena.domain.user.entity.Role;
 import goorm.athena.domain.user.entity.User;
 import goorm.athena.domain.user.repository.UserRepository;
-import goorm.athena.domain.user.service.RefreshTokenService;
+import goorm.athena.domain.user.service.RefreshTokenCommandService;
 import goorm.athena.global.jwt.util.JwtTokenizer;
 import goorm.athena.util.IntegrationServiceTestSupport;
 import goorm.athena.util.TestEntityFactory;
@@ -24,7 +24,7 @@ public abstract class JwtTokenizerTestSupport extends IntegrationServiceTestSupp
     protected UserRepository userRepository;
 
     @Autowired
-    protected RefreshTokenService refreshTokenService;
+    protected RefreshTokenCommandService refreshTokenCommandService;
 
     @Autowired
     protected MockHttpServletResponse response;

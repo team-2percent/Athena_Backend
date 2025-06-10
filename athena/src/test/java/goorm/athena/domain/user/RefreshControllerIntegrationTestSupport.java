@@ -5,8 +5,8 @@ import goorm.athena.domain.user.controller.RefreshControllerImpl;
 import goorm.athena.domain.user.entity.Role;
 import goorm.athena.domain.user.entity.User;
 import goorm.athena.domain.user.repository.UserRepository;
-import goorm.athena.domain.user.service.RefreshTokenService;
-import goorm.athena.domain.user.service.UserService;
+import goorm.athena.domain.user.service.RefreshTokenCommandService;
+import goorm.athena.domain.user.service.UserQueryService;
 import goorm.athena.global.jwt.util.JwtTokenizer;
 import goorm.athena.global.jwt.util.LoginUserRequest;
 import goorm.athena.util.IntegrationControllerTestSupport;
@@ -20,10 +20,10 @@ public abstract class RefreshControllerIntegrationTestSupport extends Integratio
     protected LoginUserRequest loginUserRequest;
 
     @Autowired
-    protected RefreshTokenService refreshTokenService;
+    protected RefreshTokenCommandService refreshTokenCommandService;
 
     @Autowired
-    protected UserService userService;
+    protected UserQueryService userQueryService;
 
     @Autowired
     protected UserRepository userRepository;
@@ -33,7 +33,7 @@ public abstract class RefreshControllerIntegrationTestSupport extends Integratio
 
     @BeforeEach
     void setUp() {
-        controller = new RefreshControllerImpl(refreshTokenService,  jwtTokenizer);
+        controller = new RefreshControllerImpl(refreshTokenCommandService,  jwtTokenizer);
         loginUserRequest = new LoginUserRequest("123", 1L, Role.ROLE_USER);
     }
 

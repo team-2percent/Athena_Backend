@@ -8,8 +8,9 @@ import goorm.athena.domain.user.dto.request.UserCreateRequest;
 import goorm.athena.domain.user.dto.request.UserLoginRequest;
 import goorm.athena.domain.user.dto.request.UserUpdateRequest;
 import goorm.athena.domain.user.dto.response.*;
-import goorm.athena.domain.user.service.RefreshTokenService;
-import goorm.athena.domain.user.service.UserService;
+import goorm.athena.domain.user.service.RefreshTokenCommandService;
+import goorm.athena.domain.user.service.UserCommandService;
+import goorm.athena.domain.user.service.UserQueryService;
 import goorm.athena.global.exception.CustomException;
 import goorm.athena.global.exception.ErrorCode;
 import goorm.athena.global.jwt.util.CheckLogin;
@@ -27,8 +28,9 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping("/api/user")
 public class UserControllerImpl implements UserController {
 
-    private final UserService userService;
-    private final RefreshTokenService refreshTokenService;
+    private final UserQueryService userQueryService;
+    private final UserCommandService userCommandService;
+    private final RefreshTokenCommandService refreshTokenCommandService;
     private final ImageGroupService imageGroupService;
     private final FcmTokenService fcmTokenService;
 
@@ -37,7 +39,7 @@ public class UserControllerImpl implements UserController {
     public ResponseEntity<UserCreateResponse> createUser(@RequestBody UserCreateRequest request) {
         // User <-> ImageGroup 1:1 매핑되도록 생성
         ImageGroup userImageGroup = imageGroupService.createImageGroup(Type.USER);
-        UserCreateResponse response = userService.createUser(request, userImageGroup);
+        UserCreateResponse response = userCommandService.createUser(request, userImageGroup);
         return ResponseEntity.ok(response);
     }
 
@@ -49,21 +51,21 @@ public class UserControllerImpl implements UserController {
                                                          @RequestPart (value = "request") UserUpdateRequest request,
                                                          @RequestPart(value = "files", required = false) MultipartFile file){
 
-        UserUpdateResponse response = userService.updateUser(loginUserRequest.userId(), request, file);
+        UserUpdateResponse response = userCommandService.updateUser(loginUserRequest.userId(), request, file);
         return ResponseEntity.ok(response);
     }
 
     @Override
     @GetMapping("/{id}")
     public ResponseEntity<UserGetResponse> getUserById(@PathVariable Long id) {
-        UserGetResponse response = userService.getUserById(id);
+        UserGetResponse response = userQueryService.getUserById(id);
         return ResponseEntity.ok(response);
     }
 
     @Override
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
-        userService.deleteUser(id);
+        userCommandService.deleteUser(id);
         return ResponseEntity.noContent().build();
     }
 
@@ -74,7 +76,7 @@ public class UserControllerImpl implements UserController {
             throw new CustomException(ErrorCode.VALIDATION_ERROR);
         }
 
-        UserLoginResponse loginResponse = userService.validateUserCredentials(request, response);
+        UserLoginResponse loginResponse = userCommandService.validateUserCredentials(request, response);
 
         return ResponseEntity.ok(loginResponse);
     }
@@ -88,7 +90,7 @@ public class UserControllerImpl implements UserController {
             throw new CustomException(ErrorCode.REFRESHTOKEN_NOT_FOUND);
         }
 
-        refreshTokenService.deleteRefreshToken(response);
+        refreshTokenCommandService.deleteRefreshToken(response);
         fcmTokenService.deleteToken(request.userId());      // 특정 유저 FCM 토큰 삭제
 
         return ResponseEntity.ok().build();
@@ -98,7 +100,7 @@ public class UserControllerImpl implements UserController {
     @Override
     @GetMapping("/Header")
     public ResponseEntity<UserHeaderGetResponse> getHeader(@CheckLogin LoginUserRequest request){
-        UserHeaderGetResponse response = userService.getHeaderById(request.userId());
+        UserHeaderGetResponse response = userQueryService.getHeaderById(request.userId());
         return ResponseEntity.ok(response);
     }
 
@@ -106,7 +108,7 @@ public class UserControllerImpl implements UserController {
     @Override
     @GetMapping("/profile/{id}")
     public ResponseEntity<UserGetResponse> getUserProfile(@PathVariable Long id) {
-        UserGetResponse response = userService.getUserById(id);
+        UserGetResponse response = userQueryService.getUserById(id);
         return ResponseEntity.ok(response);
     }
 }

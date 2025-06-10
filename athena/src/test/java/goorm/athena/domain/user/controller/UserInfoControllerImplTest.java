@@ -62,7 +62,7 @@ class UserInfoControllerImplTest extends UserInfoIntegrationTestSupport{
         LoginUserRequest loginRequest = new LoginUserRequest("123", user.getId(), Role.ROLE_USER);
         UserUpdateRequest request = new UserUpdateRequest("newNickname", "newBio", "imageUrl");
 
-        userService.updateUser(user.getId(), request, null);
+        userCommandService.updateUser(user.getId(), request, null);
 
         // when
         ResponseEntity<UserSummaryResponse> response = controller.getSummary(loginRequest);

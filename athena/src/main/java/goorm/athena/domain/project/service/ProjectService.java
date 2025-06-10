@@ -32,7 +32,7 @@ import goorm.athena.domain.project.repository.query.ProjectSearchQueryRepository
 import goorm.athena.domain.user.dto.response.UserDetailResponse;
 import goorm.athena.domain.user.entity.User;
 import goorm.athena.domain.user.mapper.UserMapper;
-import goorm.athena.domain.user.service.UserService;
+import goorm.athena.domain.user.service.UserQueryService;
 import goorm.athena.global.exception.CustomException;
 import goorm.athena.global.exception.ErrorCode;
 import goorm.athena.domain.project.util.ProjectQueryType;
@@ -58,7 +58,7 @@ public class ProjectService {
     private final ProjectRepository projectRepository;
     private final ImageGroupService imageGroupService;
     private final ImageService imageService;
-    private final UserService userService;
+    private final UserQueryService userQueryService;
     private final CategoryService categoryService;
     private final ProductService productService;
     private final BankAccountQueryService bankAccountQueryService;
@@ -74,7 +74,7 @@ public class ProjectService {
     @Transactional
     public ProjectIdResponse createProject(ProjectCreateRequest request, List<MultipartFile> markdownFiles) {
         ImageGroup imageGroup = imageGroupService.getById(request.imageGroupId());
-        User seller = userService.getUser(request.sellerId());
+        User seller = userQueryService.getUser(request.sellerId());
         Category category = categoryService.getCategoryById(request.categoryId());
         BankAccount bankAccount = bankAccountQueryService.getAccount(request.sellerId(), request.bankAccountId());
         PlanName planName = PlanName.valueOf(request.platformPlan());

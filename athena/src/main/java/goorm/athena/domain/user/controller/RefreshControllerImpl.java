@@ -1,11 +1,8 @@
 package goorm.athena.domain.user.controller;
 
 import goorm.athena.domain.user.dto.response.RefreshTokenResponse;
-import goorm.athena.domain.user.service.RefreshTokenService;
-import goorm.athena.global.exception.CustomException;
-import goorm.athena.global.exception.ErrorCode;
+import goorm.athena.domain.user.service.RefreshTokenCommandService;
 import goorm.athena.global.jwt.util.JwtTokenizer;
-import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -15,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/refreshToken")
 public class RefreshControllerImpl implements RefreshController{
-    private final RefreshTokenService refreshTokenService;
+    private final RefreshTokenCommandService refreshTokenCommandService;
     private final JwtTokenizer jwtTokenizer;
 
     @Override
@@ -25,7 +22,7 @@ public class RefreshControllerImpl implements RefreshController{
                                                                HttpServletResponse response){
         String accessToken = jwtTokenizer.extractBearerToken(header);
 
-        RefreshTokenResponse refreshResponse = refreshTokenService.reissueToken(accessToken, refreshToken, response);
+        RefreshTokenResponse refreshResponse = refreshTokenCommandService.reissueToken(accessToken, refreshToken, response);
         return ResponseEntity.ok(refreshResponse);
     }
 }

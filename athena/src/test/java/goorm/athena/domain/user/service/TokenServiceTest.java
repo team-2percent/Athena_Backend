@@ -25,7 +25,7 @@ class TokenServiceTest extends TokenIntegrationTestSupport {
         ArgumentCaptor<String> cookieCaptor = ArgumentCaptor.forClass(String.class);
 
         // when
-        String actualRefreshToken = tokenService.issueToken(user, response);
+        String actualRefreshToken = tokenCommandService.issueToken(user, response);
 
         verify(response).addHeader(eq("Set-Cookie"), cookieCaptor.capture());
         String setCookieHeader = cookieCaptor.getValue();

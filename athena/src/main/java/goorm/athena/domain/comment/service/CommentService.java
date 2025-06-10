@@ -9,7 +9,7 @@ import goorm.athena.domain.image.service.ImageService;
 import goorm.athena.domain.project.entity.Project;
 import goorm.athena.domain.project.service.ProjectService;
 import goorm.athena.domain.user.entity.User;
-import goorm.athena.domain.user.service.UserService;
+import goorm.athena.domain.user.service.UserQueryService;
 import goorm.athena.global.exception.CustomException;
 import goorm.athena.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -22,13 +22,13 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CommentService {
     private final CommentRepository commentRepository;
-    private final UserService userService;
+    private final UserQueryService userQueryService;
     private final ProjectService projectService;
     private final ImageService imageService;
 
     @Transactional
     public CommentCreateResponse createComment(Long projectId, Long userId, String content) {
-        User user = userService.getUser(userId);
+        User user = userQueryService.getUser(userId);
         Project project = projectService.getById(projectId);
 
         boolean alreadyCommented = commentRepository.existsByUserAndProject(user, project);
@@ -59,7 +59,7 @@ public class CommentService {
 
     @Transactional(readOnly = true)
     public List<CommentGetResponse> getCommentByUser(Long userId){
-        User user = userService.getUser(userId);
+        User user = userQueryService.getUser(userId);
         List<Comment> results = commentRepository.findByUserWithProjectImage(user);
 
         return results.stream()

@@ -58,7 +58,7 @@ class JwtTokenizerTest extends JwtTokenizerTestSupport {
 
         // when
         CustomException exception = assertThrows(CustomException.class, () ->
-                refreshTokenService.reissueToken(accessToken, refreshToken, response)
+                refreshTokenCommandService.reissueToken(accessToken, refreshToken, response)
         );
 
         // then
@@ -85,7 +85,7 @@ class JwtTokenizerTest extends JwtTokenizerTestSupport {
 
         // when & then
         CustomException exception = assertThrows(CustomException.class, () ->
-                refreshTokenService.reissueToken(accessToken, tamperedToken, response)
+                refreshTokenCommandService.reissueToken(accessToken, tamperedToken, response)
         );
 
         // 예외 메시지나 코드 확인

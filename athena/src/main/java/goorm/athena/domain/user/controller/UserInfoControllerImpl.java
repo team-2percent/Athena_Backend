@@ -5,7 +5,8 @@ import goorm.athena.domain.comment.service.CommentService;
 import goorm.athena.domain.user.dto.request.UserPasswordRequest;
 import goorm.athena.domain.user.dto.request.UserUpdatePasswordRequest;
 import goorm.athena.domain.user.dto.response.UserSummaryResponse;
-import goorm.athena.domain.user.service.UserService;
+import goorm.athena.domain.user.service.UserCommandService;
+import goorm.athena.domain.user.service.UserQueryService;
 import goorm.athena.domain.userCoupon.dto.cursor.UserCouponCursorResponse;
 import goorm.athena.domain.userCoupon.service.UserCouponQueryService;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -17,7 +18,7 @@ import goorm.athena.domain.user.dto.response.MyOrderScrollRequest;
 import goorm.athena.domain.user.dto.response.MyOrderScrollResponse;
 import goorm.athena.domain.user.dto.response.MyProjectScrollRequest;
 import goorm.athena.domain.user.dto.response.MyProjectScrollResponse;
-import goorm.athena.domain.user.service.MyInfoService;
+import goorm.athena.domain.user.service.MyInfoQueryService;
 import goorm.athena.global.jwt.util.CheckLogin;
 import goorm.athena.global.jwt.util.LoginUserRequest;
 import lombok.RequiredArgsConstructor;
@@ -34,14 +35,15 @@ import java.util.List;
 @RequestMapping("/api/my")
 public class UserInfoControllerImpl implements UserInfoController {
     private final CommentService commentService;
-    private final MyInfoService myInfoService;
-    private final UserService userService;
+    private final MyInfoQueryService myInfoQueryService;
+    private final UserQueryService userQueryService;
+    private final UserCommandService userCommandService;
     private final UserCouponQueryService userCouponQueryService;
 
     @Override
     @GetMapping("/info")
     public ResponseEntity<UserSummaryResponse> getSummary(@CheckLogin LoginUserRequest request){
-        UserSummaryResponse response = userService.getUserSummary(request.userId());
+        UserSummaryResponse response = userQueryService.getUserSummary(request.userId());
         return ResponseEntity.ok(response);
     }
 
@@ -57,7 +59,7 @@ public class UserInfoControllerImpl implements UserInfoController {
     public ResponseEntity<Boolean> checkPassword(@CheckLogin LoginUserRequest request,
                                  @RequestBody @Valid UserPasswordRequest passwordRequest){
 
-        boolean response = userService.checkPassword(request.userId(), passwordRequest.password());
+        boolean response = userCommandService.checkPassword(request.userId(), passwordRequest.password());
         return ResponseEntity.ok(response);
     }
 
@@ -65,7 +67,7 @@ public class UserInfoControllerImpl implements UserInfoController {
     @PostMapping("/updatePassword")
     public ResponseEntity<Void> updatePassword(@CheckLogin LoginUserRequest request,
                                                  @RequestBody @Valid UserUpdatePasswordRequest updatePassword){
-        userService.updatePassword(request.userId(), updatePassword);
+        userCommandService.updatePassword(request.userId(), updatePassword);
 
         return ResponseEntity.noContent().build();
     }
@@ -96,7 +98,7 @@ public class UserInfoControllerImpl implements UserInfoController {
             @RequestParam(defaultValue = "10") int pageSize
     ) {
         MyProjectScrollRequest request = new MyProjectScrollRequest(nextCursorValue, nextProjectId, pageSize);
-        return ResponseEntity.ok(myInfoService.getMyProjects(loginUserRequest.userId(), request));
+        return ResponseEntity.ok(myInfoQueryService.getMyProjects(loginUserRequest.userId(), request));
     }
 
 
@@ -108,6 +110,6 @@ public class UserInfoControllerImpl implements UserInfoController {
             @RequestParam(defaultValue = "10") int pageSize
     ) {
         MyOrderScrollRequest request = new MyOrderScrollRequest(nextCursorValue, nextOrderId, pageSize);
-        return ResponseEntity.ok(myInfoService.getMyOrders(loginUserRequest.userId(), request));
+        return ResponseEntity.ok(myInfoQueryService.getMyOrders(loginUserRequest.userId(), request));
     }
 }

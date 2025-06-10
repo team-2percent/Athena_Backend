@@ -7,7 +7,7 @@ import goorm.athena.domain.imageGroup.entity.ImageGroup;
 import goorm.athena.domain.user.entity.Role;
 import goorm.athena.domain.user.entity.User;
 import goorm.athena.domain.user.repository.UserRepository;
-import goorm.athena.domain.user.service.UserService;
+import goorm.athena.domain.user.service.UserQueryService;
 import goorm.athena.domain.userCoupon.controller.UserCouponController;
 import goorm.athena.domain.userCoupon.entity.Status;
 import goorm.athena.domain.userCoupon.entity.UserCoupon;
@@ -33,7 +33,7 @@ public abstract class UserCouponControllerIntegrationSupport extends Integration
     protected CouponRepository couponRepository;
 
     @Autowired
-    protected UserService userService;
+    protected UserQueryService userQueryService;
 
     @Autowired
     protected UserRepository userRepository;
