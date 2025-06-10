@@ -8,12 +8,8 @@ import goorm.athena.domain.imageGroup.entity.ImageGroup;
 import goorm.athena.domain.user.entity.User;
 import goorm.athena.global.exception.CustomException;
 import goorm.athena.global.exception.ErrorCode;
-import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.platform.commons.util.ReflectionUtils;
-import org.springframework.test.context.jdbc.Sql;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.List;
 
@@ -33,7 +29,7 @@ class BankAccountServiceTest extends BankAccountIntegrationTestSupport {
         bankAccountRepository.save(bankAccount);
 
         // when & then
-        assertThatThrownBy(() -> bankAccountService.getBankAccount(100000L))
+        assertThatThrownBy(() -> bankAccountQueryService.getBankAccount(100000L))
                 .isInstanceOf(CustomException.class)
                 .hasMessageContaining(ErrorCode.BANK_ACCOUNT_NOT_FOUND.getErrorMessage());
     }
@@ -49,7 +45,7 @@ class BankAccountServiceTest extends BankAccountIntegrationTestSupport {
         bankAccountRepository.save(bankAccount);
 
         // when
-        BankAccount found = bankAccountService.getBankAccount(bankAccount.getId());
+        BankAccount found = bankAccountQueryService.getBankAccount(bankAccount.getId());
 
         // then
         assertThat(found.getId()).isEqualTo(bankAccount.getId());
@@ -65,13 +61,13 @@ class BankAccountServiceTest extends BankAccountIntegrationTestSupport {
         User user = setupUser("123", "123", "123", imageGroup);
         userRepository.save(user); // saveAndFlush도 OK
 
-        BankAccount userAccount = bankAccountService.getPrimaryAccount(user.getId());
+        BankAccount userAccount = bankAccountQueryService.getPrimaryAccount(user.getId());
         userAccount.unsetAsDefault();
         bankAccountRepository.save(userAccount);
         BankAccountCreateRequest request = new BankAccountCreateRequest("123", "123", "123");
 
         // when
-        bankAccountService.createBankAccount(user.getId(), request);
+        bankAccountCommandService.createBankAccount(user.getId(), request);
 
         // then
         List<BankAccount> infos = bankAccountRepository.findAllByUserId(user.getId());
@@ -90,7 +86,7 @@ class BankAccountServiceTest extends BankAccountIntegrationTestSupport {
         // 기본 계좌 정보 없음 상태
 
         // when & then
-        assertThatThrownBy(() -> bankAccountService.getPrimaryAccount(100000L))
+        assertThatThrownBy(() -> bankAccountQueryService.getPrimaryAccount(100000L))
                 .isInstanceOf(CustomException.class)
                 .hasMessageContaining(ErrorCode.BANK_ACCOUNT_NOT_FOUND.getErrorMessage());
     }
@@ -110,7 +106,7 @@ class BankAccountServiceTest extends BankAccountIntegrationTestSupport {
         int size = bankAccountRepository.findAllByUserId(user.getId()).size();
 
         // when
-        bankAccountService.createBankAccount(user.getId(), request);
+        bankAccountCommandService.createBankAccount(user.getId(), request);
 
         // then
         List<BankAccount> infos = bankAccountRepository.findAllByUserId(user.getId());
@@ -131,7 +127,7 @@ class BankAccountServiceTest extends BankAccountIntegrationTestSupport {
         bankAccountRepository.saveAll(List.of(oldBankAccount, newBankAccount));
 
         // when & then
-        assertThatThrownBy(() -> bankAccountService.changeAccountState(user.getId(), newBankAccount.getId()))
+        assertThatThrownBy(() -> bankAccountCommandService.changeAccountState(user.getId(), newBankAccount.getId()))
                 .isInstanceOf(CustomException.class)
                 .hasMessageContaining(ErrorCode.INACCURATE_BANK_ACCOUNT.getErrorMessage());
     }
@@ -143,13 +139,13 @@ class BankAccountServiceTest extends BankAccountIntegrationTestSupport {
         User user = setupUser("123", "123", "123", null);
         userRepository.save(user);
 
-        BankAccount primaryAccount = bankAccountService.getPrimaryAccount(user.getId());
+        BankAccount primaryAccount = bankAccountQueryService.getPrimaryAccount(user.getId());
 
      //   BankAccount bankAccount = setupBankAccount(user, "!23", "123", "123", true);
      //   bankAccountRepository.save(bankAccount);
 
         // when & then
-        assertThatThrownBy(() -> bankAccountService.changeAccountState(user.getId(), primaryAccount.getId()))
+        assertThatThrownBy(() -> bankAccountCommandService.changeAccountState(user.getId(), primaryAccount.getId()))
                 .isInstanceOf(CustomException.class)
                 .hasMessageContaining(ErrorCode.SAME_ACCOUNT_STATUS.getErrorMessage());
     }
@@ -165,10 +161,10 @@ class BankAccountServiceTest extends BankAccountIntegrationTestSupport {
         BankAccount newBankAccount = setupBankAccount(user, "!234", "1243", "1234", false);
         bankAccountRepository.saveAll(List.of(oldBankAccount, newBankAccount));
 
-        BankAccount primaryAccount = bankAccountService.getPrimaryAccount(user.getId());
+        BankAccount primaryAccount = bankAccountQueryService.getPrimaryAccount(user.getId());
 
         // when
-        bankAccountService.changeAccountState(user.getId(), newBankAccount.getId());
+        bankAccountCommandService.changeAccountState(user.getId(), newBankAccount.getId());
 
         BankAccount updatedOld = bankAccountRepository.findById(oldBankAccount.getId()).orElseThrow();
         BankAccount updatedNew = bankAccountRepository.findById(newBankAccount.getId()).orElseThrow();
@@ -188,7 +184,7 @@ class BankAccountServiceTest extends BankAccountIntegrationTestSupport {
         bankAccountRepository.save(bankAccount);
 
         // when & then
-        assertThatThrownBy(() -> bankAccountService.deleteBankAccount(99L, bankAccount.getId()))
+        assertThatThrownBy(() -> bankAccountCommandService.deleteBankAccount(99L, bankAccount.getId()))
                 .isInstanceOf(CustomException.class)
                 .hasMessageContaining(ErrorCode.INACCURATE_BANK_ACCOUNT.getErrorMessage());
     }
@@ -203,7 +199,7 @@ class BankAccountServiceTest extends BankAccountIntegrationTestSupport {
         bankAccountRepository.save(bankAccount);
 
         // when & then
-        assertThatThrownBy(() -> bankAccountService.deleteBankAccount(user.getId(), bankAccount.getId()))
+        assertThatThrownBy(() -> bankAccountCommandService.deleteBankAccount(user.getId(), bankAccount.getId()))
                 .isInstanceOf(CustomException.class)
                 .hasMessageContaining(ErrorCode.BASIC_ACCOUNT_NOT_DELETED.getErrorMessage());
     }
@@ -220,7 +216,7 @@ class BankAccountServiceTest extends BankAccountIntegrationTestSupport {
         bankAccountRepository.saveAll(List.of(bankAccount, bankAccount2));
 
         // when
-        bankAccountService.deleteBankAccount(user.getId(), bankAccount2.getId());
+        bankAccountCommandService.deleteBankAccount(user.getId(), bankAccount2.getId());
 
         // then
         boolean exists = bankAccountRepository.findById(bankAccount2.getId()).isPresent();
@@ -242,7 +238,7 @@ class BankAccountServiceTest extends BankAccountIntegrationTestSupport {
         int size = bankAccountRepository.findAllByUserId(user.getId()).size();
 
         // when
-        List<BankAccountGetResponse> responses = bankAccountService.getBankAccounts(user.getId());
+        List<BankAccountGetResponse> responses = bankAccountQueryService.getBankAccounts(user.getId());
 
         // then
         assertThat(responses).hasSize(size);
@@ -262,7 +258,7 @@ class BankAccountServiceTest extends BankAccountIntegrationTestSupport {
         bankAccountRepository.saveAll(List.of(bankAccount, bankAccount2));
 
         // when
-        BankAccount response = bankAccountService.getPrimaryAccount(user.getId());
+        BankAccount response = bankAccountQueryService.getPrimaryAccount(user.getId());
 
         // then
         assertThat(response.isDefault()).isTrue();
@@ -280,7 +276,7 @@ class BankAccountServiceTest extends BankAccountIntegrationTestSupport {
         bankAccountRepository.saveAll(List.of(bankAccount, bankAccount2));
 
         // when
-        assertThatThrownBy(() -> bankAccountService.getAccount(user.getId(), 99L))
+        assertThatThrownBy(() -> bankAccountQueryService.getAccount(user.getId(), 99L))
                 .isInstanceOf(CustomException.class)
                 .hasMessageContaining(ErrorCode.BANK_ACCOUNT_NOT_FOUND.getErrorMessage());
     }
@@ -297,7 +293,7 @@ class BankAccountServiceTest extends BankAccountIntegrationTestSupport {
         bankAccountRepository.saveAll(List.of(bankAccount, bankAccount2));
 
         // when
-        BankAccount response = bankAccountService.getAccount(user.getId(), bankAccount.getId());
+        BankAccount response = bankAccountQueryService.getAccount(user.getId(), bankAccount.getId());
 
         // then
         assertThat(response.getAccountNumber()).isEqualTo("!23");

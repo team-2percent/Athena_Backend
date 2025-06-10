@@ -1,6 +1,5 @@
 package goorm.athena.domain.deliveryinfo.service;
 
-import goorm.athena.domain.bankaccount.entity.BankAccount;
 import goorm.athena.domain.deliveryinfo.DeliveryIntegrationTestSupport;
 import goorm.athena.domain.deliveryinfo.dto.req.DeliveryInfoRequest;
 import goorm.athena.domain.deliveryinfo.dto.res.DeliveryInfoResponse;
@@ -11,13 +10,11 @@ import goorm.athena.global.exception.CustomException;
 import goorm.athena.global.exception.ErrorCode;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.*;
 
 class DeliveryInfoServiceTest extends DeliveryIntegrationTestSupport {
 
@@ -32,7 +29,7 @@ class DeliveryInfoServiceTest extends DeliveryIntegrationTestSupport {
         deliveryInfoRepository.save(deliveryInfo);
 
         // when & then
-        assertThatThrownBy(() -> deliveryInfoService.getById(100000L))
+        assertThatThrownBy(() -> deliveryInfoQueryService.getById(100000L))
                 .isInstanceOf(CustomException.class)
                 .hasMessageContaining(ErrorCode.DELIVERY_NOT_FOUND.getErrorMessage());
     }
@@ -48,7 +45,7 @@ class DeliveryInfoServiceTest extends DeliveryIntegrationTestSupport {
         deliveryInfoRepository.save(deliveryInfo);
 
         // when
-        DeliveryInfo found = deliveryInfoService.getById(deliveryInfo.getId());
+        DeliveryInfo found = deliveryInfoQueryService.getById(deliveryInfo.getId());
 
         // then
         assertThat(found.getId()).isEqualTo(deliveryInfo.getId());
@@ -64,7 +61,7 @@ class DeliveryInfoServiceTest extends DeliveryIntegrationTestSupport {
         User user = setupUser("123", "123", "123", imageGroup);
         userRepository.save(user);
 
-        DeliveryInfo userDelivery = deliveryInfoService.getPrimaryDeliveryInfo(user.getId());
+        DeliveryInfo userDelivery = deliveryInfoQueryService.getPrimaryDeliveryInfo(user.getId());
         userDelivery.unsetAsDefault();
         deliveryInfoRepository.save(userDelivery);
         DeliveryInfoRequest request = new DeliveryInfoRequest("홍길동", "서울시", "010-1111-2222");
@@ -72,7 +69,7 @@ class DeliveryInfoServiceTest extends DeliveryIntegrationTestSupport {
         int size = deliveryInfoRepository.findByUserId(user.getId()).size();
 
         // when
-        deliveryInfoService.addDeliveryInfo(user.getId(), request);
+        deliveryInfoCommandService.addDeliveryInfo(user.getId(), request);
 
         // then
         List<DeliveryInfo> infos = deliveryInfoRepository.findByUserId(user.getId());
@@ -93,7 +90,7 @@ class DeliveryInfoServiceTest extends DeliveryIntegrationTestSupport {
         // 기본 배송지 없음 상태
 
         // when & then
-        assertThatThrownBy(() -> deliveryInfoService.getPrimaryDeliveryInfo(100000L))
+        assertThatThrownBy(() -> deliveryInfoQueryService.getPrimaryDeliveryInfo(100000L))
                 .isInstanceOf(CustomException.class)
                 .hasMessageContaining(ErrorCode.DELIVERY_NOT_FOUND.getErrorMessage());
     }
@@ -112,7 +109,7 @@ class DeliveryInfoServiceTest extends DeliveryIntegrationTestSupport {
         int size = deliveryInfoRepository.findByUserId(user.getId()).size();
 
         // when
-        deliveryInfoService.addDeliveryInfo(user.getId(), request);
+        deliveryInfoCommandService.addDeliveryInfo(user.getId(), request);
 
         // then
         List<DeliveryInfo> response = deliveryInfoRepository.findByUserId(user.getId());
@@ -135,7 +132,7 @@ class DeliveryInfoServiceTest extends DeliveryIntegrationTestSupport {
         deliveryInfoRepository.saveAll(List.of(oldDeliveryInfo, newDeliveryInfo));
 
         // when & then
-        assertThatThrownBy(() -> deliveryInfoService.changeDeliveryState(user.getId(), newDeliveryInfo.getId()))
+        assertThatThrownBy(() -> deliveryInfoCommandService.changeDeliveryState(user.getId(), newDeliveryInfo.getId()))
                 .isInstanceOf(CustomException.class)
                 .hasMessageContaining(ErrorCode.DELIVERY_NOT_FOUND.getErrorMessage());
     }
@@ -148,13 +145,13 @@ class DeliveryInfoServiceTest extends DeliveryIntegrationTestSupport {
         User user = setupUser("123", "123", "123", imageGroup);
         userRepository.save(user);
 
-        DeliveryInfo deliveryInfo = deliveryInfoService.getPrimaryDeliveryInfo(user.getId());
+        DeliveryInfo deliveryInfo = deliveryInfoQueryService.getPrimaryDeliveryInfo(user.getId());
 
   //      DeliveryInfo deliveryInfo = new DeliveryInfo(user, "!23", "123", "123", false);
   //      deliveryInfoRepository.save(deliveryInfo);
 
         // when & then
-        assertThatThrownBy(() -> deliveryInfoService.changeDeliveryState(user.getId(), deliveryInfo.getId()))
+        assertThatThrownBy(() -> deliveryInfoCommandService.changeDeliveryState(user.getId(), deliveryInfo.getId()))
                 .isInstanceOf(CustomException.class)
                 .hasMessageContaining(ErrorCode.ALREADY_DEFAULT_DELIVERY.getErrorMessage());
     }
@@ -171,10 +168,10 @@ class DeliveryInfoServiceTest extends DeliveryIntegrationTestSupport {
         DeliveryInfo newDeliveryInfo = new DeliveryInfo(user, "!234", "1243", "1234", false);
         deliveryInfoRepository.saveAll(List.of(oldDeliveryInfo, newDeliveryInfo));
 
-        DeliveryInfo primaryDeliveryInfo = deliveryInfoService.getPrimaryDeliveryInfo(user.getId());
+        DeliveryInfo primaryDeliveryInfo = deliveryInfoQueryService.getPrimaryDeliveryInfo(user.getId());
 
         // when
-        deliveryInfoService.changeDeliveryState(user.getId(), newDeliveryInfo.getId());
+        deliveryInfoCommandService.changeDeliveryState(user.getId(), newDeliveryInfo.getId());
 
    //     DeliveryInfo updatedOld = deliveryInfoRepository.findById(oldDeliveryInfo.getId()).orElseThrow();
         DeliveryInfo updatedNew = deliveryInfoRepository.findById(newDeliveryInfo.getId()).orElseThrow();
@@ -195,7 +192,7 @@ class DeliveryInfoServiceTest extends DeliveryIntegrationTestSupport {
         deliveryInfoRepository.save(deliveryInfo);
 
         // when & then
-        assertThatThrownBy(() -> deliveryInfoService.deleteDeliveryInfo(99L, deliveryInfo.getId()))
+        assertThatThrownBy(() -> deliveryInfoCommandService.deleteDeliveryInfo(99L, deliveryInfo.getId()))
                 .isInstanceOf(CustomException.class)
                 .hasMessageContaining(ErrorCode.ACCESS_DENIED.getErrorMessage());
     }
@@ -211,7 +208,7 @@ class DeliveryInfoServiceTest extends DeliveryIntegrationTestSupport {
         deliveryInfoRepository.save(deliveryInfo);
 
         // when & then
-        assertThatThrownBy(() -> deliveryInfoService.deleteDeliveryInfo(user.getId(), deliveryInfo.getId()))
+        assertThatThrownBy(() -> deliveryInfoCommandService.deleteDeliveryInfo(user.getId(), deliveryInfo.getId()))
                 .isInstanceOf(CustomException.class)
                 .hasMessageContaining(ErrorCode.BASIC_DELIVERY_NOT_DELETED.getErrorMessage());
     }
@@ -228,7 +225,7 @@ class DeliveryInfoServiceTest extends DeliveryIntegrationTestSupport {
         deliveryInfoRepository.saveAll(List.of(deliveryInfo, deliveryInfo2));
 
         // when
-        deliveryInfoService.deleteDeliveryInfo(user.getId(), deliveryInfo2.getId());
+        deliveryInfoCommandService.deleteDeliveryInfo(user.getId(), deliveryInfo2.getId());
 
         // then
         boolean exists = deliveryInfoRepository.findById(deliveryInfo2.getId()).isPresent();
@@ -251,7 +248,7 @@ class DeliveryInfoServiceTest extends DeliveryIntegrationTestSupport {
 
 
         // when
-        List<DeliveryInfoResponse> responses = deliveryInfoService.getMyDeliveryInfo(user.getId());
+        List<DeliveryInfoResponse> responses = deliveryInfoQueryService.getMyDeliveryInfo(user.getId());
 
         // then
         assertThat(responses).hasSize(size+2);
@@ -272,7 +269,7 @@ class DeliveryInfoServiceTest extends DeliveryIntegrationTestSupport {
         deliveryInfoRepository.saveAll(List.of(oldDeliveryInfo, newDeliveryInfo));
 
         // when
-        DeliveryInfo response = deliveryInfoService.getPrimaryDeliveryInfo(user.getId());
+        DeliveryInfo response = deliveryInfoQueryService.getPrimaryDeliveryInfo(user.getId());
 
         // then
         assertThat(response.isDefault()).isTrue();
