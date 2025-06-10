@@ -10,7 +10,6 @@ import goorm.athena.domain.payment.dto.res.KakaoPayReadyResponse;
 import goorm.athena.domain.payment.entity.Payment;
 import goorm.athena.domain.payment.entity.Status;
 import goorm.athena.domain.payment.repository.PaymentRepository;
-import goorm.athena.domain.project.entity.Project;
 import goorm.athena.domain.user.entity.User;
 import goorm.athena.global.exception.CustomException;
 import goorm.athena.global.exception.ErrorCode;
@@ -19,13 +18,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
 @Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional
-public class PaymentCommendService {
+public class PaymentCommandService {
 
     private final KakaoPayService kakaoPayService;
     private final OrderCommendService orderCommendService;

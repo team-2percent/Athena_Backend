@@ -16,7 +16,7 @@ import static goorm.athena.domain.settlementhistory.mapper.SettlementHistoryMapp
 
 @Service
 @RequiredArgsConstructor
-public class SettlementHistoryService {
+public class SettlementHistoryCommandService {
 
     private final SettlementHistoryRepository settlementHistoryRepository;
 

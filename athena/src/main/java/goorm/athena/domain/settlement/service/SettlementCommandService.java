@@ -1,30 +1,21 @@
 package goorm.athena.domain.settlement.service;
 
-import goorm.athena.domain.admin.dto.res.ProductSettlementSummaryResponse;
-import goorm.athena.domain.admin.dto.res.SettlementDetailInfoResponse;
-import goorm.athena.domain.admin.dto.res.SettlementHistoryPageResponse;
 import goorm.athena.domain.bankaccount.entity.BankAccount;
 import goorm.athena.domain.bankaccount.service.BankAccountService;
 import goorm.athena.domain.order.entity.Order;
 import goorm.athena.domain.order.service.OrderCommendService;
-import goorm.athena.domain.payment.service.PaymentCommendService;
 import goorm.athena.domain.payment.service.PaymentQueryService;
 import goorm.athena.domain.project.entity.PlatformPlan;
 import goorm.athena.domain.project.entity.Project;
 import goorm.athena.domain.project.service.ProjectService;
-import goorm.athena.domain.settlement.dto.res.SettlementSummaryResponse;
 import goorm.athena.domain.settlement.entity.Settlement;
-import goorm.athena.domain.settlement.entity.Status;
 import goorm.athena.domain.settlement.mapper.SettlementMapper;
 import goorm.athena.domain.settlement.repository.SettlementQueryRepository;
 import goorm.athena.domain.settlement.repository.SettlementRepository;
 import goorm.athena.domain.settlementhistory.repository.SettlementHistoryQueryRepository;
-import goorm.athena.domain.settlementhistory.service.SettlementHistoryService;
+import goorm.athena.domain.settlementhistory.service.SettlementHistoryCommandService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,13 +28,13 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class SettlementService {
+public class SettlementCommandService {
 
     private final ProjectService projectService;
     private final OrderCommendService orderCommendService;
     private final SettlementRepository settlementRepository;
     private final BankAccountService bankAccountService;
-    private final SettlementHistoryService historyService;
+    private final SettlementHistoryCommandService historyService;
     private final PaymentQueryService paymentQueryService;
     private final SettlementQueryRepository settlementQueryRepository;
     private final SettlementHistoryQueryRepository settlementHistoryQueryRepository;
@@ -119,25 +110,4 @@ public class SettlementService {
         );
     }
 
-    public Page<SettlementSummaryResponse> getSettlements(Status status, Integer year, Integer month, Pageable pageable) {
-        return settlementQueryRepository.findPageByFilters(status, year, month, pageable);
-    }
-
-    public SettlementDetailInfoResponse getSettlementDetailInfo(Long settlementId) {
-        return settlementQueryRepository.findSettlementDetailInfo(settlementId);
-    }
-
-    public SettlementHistoryPageResponse getSettlementHistories(Long settlementId, int page) {
-        Pageable pageable = PageRequest.of(page, 10);
-        Page<SettlementHistoryPageResponse.SettlementHistoryItem> pageResult = settlementHistoryQueryRepository.findHistoriesBySettlementId(settlementId, pageable);
-
-        return new SettlementHistoryPageResponse(
-                pageResult.getContent(),
-                new SettlementHistoryPageResponse.PageInfo(pageResult.getNumber(), pageResult.getTotalPages())
-        );
-    }
-
-    public ProductSettlementSummaryResponse getProductSettlementInfo(Long settlementId) {
-        return settlementQueryRepository.findProductSettlementsWithSummary(settlementId);
-    }
 }
