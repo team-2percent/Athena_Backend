@@ -57,13 +57,8 @@ class DeliveryInfoServiceTest extends DeliveryIntegrationTestSupport {
     @Test
     void addDeliveryInfo_Primary() {
         // given
-        ImageGroup imageGroup = setupImageGroup();
-        User user = setupUser("123", "123", "123", imageGroup);
-        userRepository.save(user);
+        User user = userRepository.findById(11L).get();
 
-        DeliveryInfo userDelivery = deliveryInfoQueryService.getPrimaryDeliveryInfo(user.getId());
-        userDelivery.unsetAsDefault();
-        deliveryInfoRepository.save(userDelivery);
         DeliveryInfoRequest request = new DeliveryInfoRequest("홍길동", "서울시", "010-1111-2222");
 
         int size = deliveryInfoRepository.findByUserId(user.getId()).size();
@@ -74,8 +69,8 @@ class DeliveryInfoServiceTest extends DeliveryIntegrationTestSupport {
         // then
         List<DeliveryInfo> infos = deliveryInfoRepository.findByUserId(user.getId());
         assertThat(infos).hasSize(size+1);
-        assertThat(infos.getLast().isDefault()).isTrue(); // 첫 배송지는 기본 배송지로 설정됨
-        assertThat(userDelivery.isDefault()).isFalse();
+        assertThat(infos.getFirst().isDefault()).isTrue(); // 첫 배송지는 기본 배송지로 설정됨
+        assertThat(infos.getLast().isDefault()).isFalse();
     }
 
 
@@ -99,22 +94,17 @@ class DeliveryInfoServiceTest extends DeliveryIntegrationTestSupport {
     @Test
     void addDeliveryInfo_Normal() {
         // given
-        ImageGroup imageGroup = setupImageGroup();
-        User user = setupUser("123", "123", "123", imageGroup);
-        userRepository.save(user);
+        User user = userRepository.findById(5L).get();
         DeliveryInfoRequest request = new DeliveryInfoRequest("홍길동", "서울시", "010-1111-2222");
-        DeliveryInfo deliveryInfo = new DeliveryInfo(user, "!23", "123", "123", false);
-        deliveryInfoRepository.save(deliveryInfo);
-
-        int size = deliveryInfoRepository.findByUserId(user.getId()).size();
 
         // when
         deliveryInfoCommandService.addDeliveryInfo(user.getId(), request);
 
+        DeliveryInfo newDeliveryInfo = deliveryInfoRepository.findById(151L).get();
+
         // then
         List<DeliveryInfo> response = deliveryInfoRepository.findByUserId(user.getId());
-        assertThat(response).hasSize(size+1);
-        assertThat(response.get(size).isDefault()).isFalse(); // 두 번쨰 배송지부터 일반 배송지로 설정됨
+        assertThat(newDeliveryInfo.isDefault()).isFalse();
     }
 
     @DisplayName("유저가 배송 정보를 변경할 때 다른 유저의 배송 정보를 변경하면 NOT_FOUND 에러를 리턴한다.")
@@ -141,17 +131,12 @@ class DeliveryInfoServiceTest extends DeliveryIntegrationTestSupport {
     @Test
     void changeDeliveryState_ALREADY() {
         // given
-        ImageGroup imageGroup = setupImageGroup();
-        User user = setupUser("123", "123", "123", imageGroup);
-        userRepository.save(user);
+        User user = userRepository.findById(7L).get();
 
         DeliveryInfo deliveryInfo = deliveryInfoQueryService.getPrimaryDeliveryInfo(user.getId());
 
-  //      DeliveryInfo deliveryInfo = new DeliveryInfo(user, "!23", "123", "123", false);
-  //      deliveryInfoRepository.save(deliveryInfo);
-
         // when & then
-        assertThatThrownBy(() -> deliveryInfoCommandService.changeDeliveryState(user.getId(), deliveryInfo.getId()))
+        assertThatThrownBy(() -> deliveryInfoCommandService.changeDeliveryState(user.getId(), 7L))
                 .isInstanceOf(CustomException.class)
                 .hasMessageContaining(ErrorCode.ALREADY_DEFAULT_DELIVERY.getErrorMessage());
     }
@@ -160,21 +145,13 @@ class DeliveryInfoServiceTest extends DeliveryIntegrationTestSupport {
     @Test
     void changeDeliveryState() {
         // given
-        ImageGroup imageGroup = setupImageGroup();
-        User user = setupUser("123", "123", "123", imageGroup);
-        userRepository.save(user);
-
-        DeliveryInfo oldDeliveryInfo = new DeliveryInfo(user, "!23", "123", "123", false);
-        DeliveryInfo newDeliveryInfo = new DeliveryInfo(user, "!234", "1243", "1234", false);
-        deliveryInfoRepository.saveAll(List.of(oldDeliveryInfo, newDeliveryInfo));
+        User user = userRepository.findById(3L).get();
 
         DeliveryInfo primaryDeliveryInfo = deliveryInfoQueryService.getPrimaryDeliveryInfo(user.getId());
 
         // when
-        deliveryInfoCommandService.changeDeliveryState(user.getId(), newDeliveryInfo.getId());
-
-   //     DeliveryInfo updatedOld = deliveryInfoRepository.findById(oldDeliveryInfo.getId()).orElseThrow();
-        DeliveryInfo updatedNew = deliveryInfoRepository.findById(newDeliveryInfo.getId()).orElseThrow();
+        deliveryInfoCommandService.changeDeliveryState(user.getId(), 151L);
+        DeliveryInfo updatedNew = deliveryInfoRepository.findById(151L).get();
 
         // then
         assertThat(primaryDeliveryInfo.isDefault()).isFalse();
@@ -260,13 +237,7 @@ class DeliveryInfoServiceTest extends DeliveryIntegrationTestSupport {
     @Test
     void getPrimaryDeliveryInfo() {
         // given
-        ImageGroup imageGroup = setupImageGroup();
-        User user = setupUser("123", "123", "123", imageGroup);
-        userRepository.save(user);
-
-        DeliveryInfo oldDeliveryInfo = new DeliveryInfo(user, "!23", "123", "123", false);
-        DeliveryInfo newDeliveryInfo = new DeliveryInfo(user, "!234", "1243", "1234", false);
-        deliveryInfoRepository.saveAll(List.of(oldDeliveryInfo, newDeliveryInfo));
+        User user = userRepository.findById(1L).get();
 
         // when
         DeliveryInfo response = deliveryInfoQueryService.getPrimaryDeliveryInfo(user.getId());

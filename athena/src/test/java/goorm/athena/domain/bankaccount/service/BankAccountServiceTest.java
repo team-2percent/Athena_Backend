@@ -57,13 +57,8 @@ class BankAccountServiceTest extends BankAccountIntegrationTestSupport {
     @Test
     void createBankAccount_Primary() {
         // given
-        ImageGroup imageGroup = setupImageGroup();
-        User user = setupUser("123", "123", "123", imageGroup);
-        userRepository.save(user); // saveAndFlush도 OK
+        User user = userRepository.findById(2L).get();
 
-        BankAccount userAccount = bankAccountQueryService.getPrimaryAccount(user.getId());
-        userAccount.unsetAsDefault();
-        bankAccountRepository.save(userAccount);
         BankAccountCreateRequest request = new BankAccountCreateRequest("123", "123", "123");
 
         // when
@@ -72,7 +67,7 @@ class BankAccountServiceTest extends BankAccountIntegrationTestSupport {
         // then
         List<BankAccount> infos = bankAccountRepository.findAllByUserId(user.getId());
         assertThat(infos.getLast().isDefault()).isTrue();
-        assertThat(userAccount.isDefault()).isFalse();
+        assertThat(infos.getFirst().isDefault()).isFalse();
     }
 
     @DisplayName("기본 계좌 정보를 조회할 시 해당 정보가 존재하지 않을 경우 에러를 리턴한다.")
@@ -118,13 +113,10 @@ class BankAccountServiceTest extends BankAccountIntegrationTestSupport {
     @Test
     void changeBankAccountState_NotMyUser() {
         // given
-        User user = setupUser("123", "123", "123", null);
-        User user2 = setupUser("1234", "123", "123", null);
-        userRepository.saveAll(List.of(user, user2));
+        User user = userRepository.findById(1L).get();
+        User user2 = userRepository.findById(3L).get();
 
-        BankAccount oldBankAccount = setupBankAccount(user, "!23", "123", "123", false);
-        BankAccount newBankAccount = setupBankAccount(user2, "!234", "1243", "1234", false);
-        bankAccountRepository.saveAll(List.of(oldBankAccount, newBankAccount));
+        BankAccount newBankAccount = bankAccountRepository.findById(user2.getId()).get();
 
         // when & then
         assertThatThrownBy(() -> bankAccountCommandService.changeAccountState(user.getId(), newBankAccount.getId()))
@@ -136,13 +128,9 @@ class BankAccountServiceTest extends BankAccountIntegrationTestSupport {
     @Test
     void changeBankAccountState_ALREADY() {
         // given
-        User user = setupUser("123", "123", "123", null);
-        userRepository.save(user);
+        User user = userRepository.findById(1L).get();
 
         BankAccount primaryAccount = bankAccountQueryService.getPrimaryAccount(user.getId());
-
-     //   BankAccount bankAccount = setupBankAccount(user, "!23", "123", "123", true);
-     //   bankAccountRepository.save(bankAccount);
 
         // when & then
         assertThatThrownBy(() -> bankAccountCommandService.changeAccountState(user.getId(), primaryAccount.getId()))
@@ -154,23 +142,16 @@ class BankAccountServiceTest extends BankAccountIntegrationTestSupport {
     @Test
     void changeBankAccountState() {
         // given
-        User user = setupUser("123", "123", "123", null);
-        userRepository.save(user);
-
-        BankAccount oldBankAccount = setupBankAccount(user, "!23", "123", "123", false);
-        BankAccount newBankAccount = setupBankAccount(user, "!234", "1243", "1234", false);
-        bankAccountRepository.saveAll(List.of(oldBankAccount, newBankAccount));
-
-        BankAccount primaryAccount = bankAccountQueryService.getPrimaryAccount(user.getId());
+        User user = userRepository.findById(3L).get();
 
         // when
-        bankAccountCommandService.changeAccountState(user.getId(), newBankAccount.getId());
+        bankAccountCommandService.changeAccountState(user.getId(), 151L);
 
-        BankAccount updatedOld = bankAccountRepository.findById(oldBankAccount.getId()).orElseThrow();
-        BankAccount updatedNew = bankAccountRepository.findById(newBankAccount.getId()).orElseThrow();
+        BankAccount updatedOld = bankAccountRepository.findById(3L).get();
+        BankAccount updatedNew = bankAccountRepository.findById(151L).get();
 
         // then
-        assertThat(primaryAccount.isDefault()).isFalse();
+        assertThat(updatedOld.isDefault()).isFalse();
         assertThat(updatedNew.isDefault()).isTrue();
     }
 
@@ -250,8 +231,7 @@ class BankAccountServiceTest extends BankAccountIntegrationTestSupport {
     @Test
     void getPrimaryDeliveryInfo() {
         // given
-        User user = setupUser("123", "123", "123", null);
-        userRepository.save(user);
+        User user = userRepository.findById(1L).get();
 
         BankAccount bankAccount = setupBankAccount(user, "!23", "123", "123", false);
         BankAccount bankAccount2 = setupBankAccount(user, "!234", "124", "1243", false);

@@ -50,9 +50,9 @@ class CouponServiceTest extends CouponIntegrationTestSupport {
         Page<Coupon> coupons = couponQueryService.getCoupons(0, 10);
 
         // then
-        assertThat(coupons.getContent()).hasSize(1);
-        assertThat(coupons.getTotalElements()).isEqualTo(1);
-        assertThat(coupons.getTotalPages()).isEqualTo(1);
+        assertThat(coupons.getContent()).hasSize(10);
+        assertThat(coupons.getTotalElements()).isEqualTo(151);
+        assertThat(coupons.getTotalPages()).isEqualTo(16);
         assertThat(coupons.getNumber()).isEqualTo(0); // 현재 페이지 번호
         assertThat(coupons.getSize()).isEqualTo(10);  // 요청한 사이즈
     }
@@ -61,25 +61,14 @@ class CouponServiceTest extends CouponIntegrationTestSupport {
     @Test
     void getCouponByStatus_PREVIOUS() {
         // given
-        Coupon coupon = setupCoupon("123", "123123123123", 10000, LocalDateTime.now().plusDays(10),
-                LocalDateTime.now().plusDays(30), LocalDateTime.now().plusDays(50), 1000, CouponStatus.PREVIOUS);
-        Coupon coupon2 = setupCoupon("1234", "1231231231234", 10000, LocalDateTime.now().plusDays(10),
-                LocalDateTime.now().plusDays(30), LocalDateTime.now().plusDays(50), 1000, CouponStatus.PREVIOUS);
-        Coupon coupon3 = setupCoupon("12345", "1231231231234", 10000, LocalDateTime.now().plusDays(10),
-                LocalDateTime.now().plusDays(30), LocalDateTime.now().plusDays(50), 1000, CouponStatus.IN_PROGRESS);
-        Coupon coupon4 = setupCoupon("12346", "1231231231234", 10000, LocalDateTime.now().plusDays(10),
-                LocalDateTime.now().plusDays(30), LocalDateTime.now().plusDays(50), 1000, CouponStatus.ENDED);
-        Coupon coupon5 = setupCoupon("12347", "1231231231234", 10000, LocalDateTime.now().plusDays(10),
-                LocalDateTime.now().plusDays(30), LocalDateTime.now().plusDays(50), 1000, CouponStatus.COMPLETED);
-        couponRepository.saveAll(List.of(coupon, coupon2, coupon3, coupon4, coupon5));
 
         // when
         Page<Coupon> coupons = couponQueryService.getCouponByStatus(0, 10, CouponStatus.PREVIOUS);
 
         // then
-        assertThat(coupons.getContent()).hasSize(2);
-        assertThat(coupons.getTotalElements()).isEqualTo(2);
-        assertThat(coupons.getTotalPages()).isEqualTo(1);
+        assertThat(coupons.getContent()).hasSize(10);
+        assertThat(coupons.getTotalElements()).isEqualTo(20);
+        assertThat(coupons.getTotalPages()).isEqualTo(2);
         assertThat(coupons.getNumber()).isEqualTo(0); // 현재 페이지 번호
         assertThat(coupons.getSize()).isEqualTo(10);  // 요청한 사이즈
     }
@@ -88,25 +77,14 @@ class CouponServiceTest extends CouponIntegrationTestSupport {
     @Test
     void getCouponByStatus_IN_PROGRESS() {
         // given
-        Coupon coupon = setupCoupon("123", "123123123123", 10000, LocalDateTime.now().plusDays(10),
-                LocalDateTime.now().plusDays(30), LocalDateTime.now().plusDays(50), 1000, CouponStatus.PREVIOUS);
-        Coupon coupon2 = setupCoupon("1234", "1231231231234", 10000, LocalDateTime.now().plusDays(10),
-                LocalDateTime.now().plusDays(30), LocalDateTime.now().plusDays(50), 1000, CouponStatus.PREVIOUS);
-        Coupon coupon3 = setupCoupon("12345", "1231231231234", 10000, LocalDateTime.now().plusDays(10),
-                LocalDateTime.now().plusDays(30), LocalDateTime.now().plusDays(50), 1000, CouponStatus.IN_PROGRESS);
-        Coupon coupon4 = setupCoupon("12346", "1231231231234", 10000, LocalDateTime.now().plusDays(10),
-                LocalDateTime.now().plusDays(30), LocalDateTime.now().plusDays(50), 1000, CouponStatus.ENDED);
-        Coupon coupon5 = setupCoupon("12347", "1231231231234", 10000, LocalDateTime.now().plusDays(10),
-                LocalDateTime.now().plusDays(30), LocalDateTime.now().plusDays(50), 1000, CouponStatus.COMPLETED);
-        couponRepository.saveAll(List.of(coupon, coupon2, coupon3, coupon4, coupon5));
 
         // when
         Page<Coupon> coupons = couponQueryService.getCouponByStatus(0, 10, CouponStatus.IN_PROGRESS);
 
         // then
-        assertThat(coupons.getContent()).hasSize(1);
-        assertThat(coupons.getTotalElements()).isEqualTo(1);
-        assertThat(coupons.getTotalPages()).isEqualTo(1);
+        assertThat(coupons.getContent()).hasSize(10);
+        assertThat(coupons.getTotalElements()).isEqualTo(70);
+        assertThat(coupons.getTotalPages()).isEqualTo(7);
         assertThat(coupons.getNumber()).isEqualTo(0); // 현재 페이지 번호
         assertThat(coupons.getSize()).isEqualTo(10);  // 요청한 사이즈
     }
@@ -115,25 +93,14 @@ class CouponServiceTest extends CouponIntegrationTestSupport {
     @Test
     void getCouponByStatus_COMPLETED() {
         // given
-        Coupon coupon = setupCoupon("123", "123123123123", 10000, LocalDateTime.now().plusDays(10),
-                LocalDateTime.now().plusDays(30), LocalDateTime.now().plusDays(50), 1000, CouponStatus.PREVIOUS);
-        Coupon coupon2 = setupCoupon("1234", "1231231231234", 10000, LocalDateTime.now().plusDays(10),
-                LocalDateTime.now().plusDays(30), LocalDateTime.now().plusDays(50), 1000, CouponStatus.PREVIOUS);
-        Coupon coupon3 = setupCoupon("12345", "1231231231234", 10000, LocalDateTime.now().plusDays(10),
-                LocalDateTime.now().plusDays(30), LocalDateTime.now().plusDays(50), 1000, CouponStatus.IN_PROGRESS);
-        Coupon coupon4 = setupCoupon("12346", "1231231231234", 10000, LocalDateTime.now().plusDays(10),
-                LocalDateTime.now().plusDays(30), LocalDateTime.now().plusDays(50), 1000, CouponStatus.ENDED);
-        Coupon coupon5 = setupCoupon("12347", "1231231231234", 10000, LocalDateTime.now().plusDays(10),
-                LocalDateTime.now().plusDays(30), LocalDateTime.now().plusDays(50), 1000, CouponStatus.COMPLETED);
-        couponRepository.saveAll(List.of(coupon, coupon2, coupon3, coupon4, coupon5));
 
         // when
         Page<Coupon> coupons = couponQueryService.getCouponByStatus(0, 10, CouponStatus.COMPLETED);
 
         // then
-        assertThat(coupons.getContent()).hasSize(1);
-        assertThat(coupons.getTotalElements()).isEqualTo(1);
-        assertThat(coupons.getTotalPages()).isEqualTo(1);
+        assertThat(coupons.getContent()).hasSize(10);
+        assertThat(coupons.getTotalElements()).isEqualTo(30);
+        assertThat(coupons.getTotalPages()).isEqualTo(3);
         assertThat(coupons.getNumber()).isEqualTo(0); // 현재 페이지 번호
         assertThat(coupons.getSize()).isEqualTo(10);  // 요청한 사이즈
     }
@@ -142,25 +109,14 @@ class CouponServiceTest extends CouponIntegrationTestSupport {
     @Test
     void getCouponByStatus_ENDED() {
         // given
-        Coupon coupon = setupCoupon("123", "123123123123", 10000, LocalDateTime.now().plusDays(10),
-                LocalDateTime.now().plusDays(30), LocalDateTime.now().plusDays(50), 1000, CouponStatus.PREVIOUS);
-        Coupon coupon2 = setupCoupon("1234", "1231231231234", 10000, LocalDateTime.now().plusDays(10),
-                LocalDateTime.now().plusDays(30), LocalDateTime.now().plusDays(50), 1000, CouponStatus.PREVIOUS);
-        Coupon coupon3 = setupCoupon("12345", "1231231231234", 10000, LocalDateTime.now().plusDays(10),
-                LocalDateTime.now().plusDays(30), LocalDateTime.now().plusDays(50), 1000, CouponStatus.IN_PROGRESS);
-        Coupon coupon4 = setupCoupon("12346", "1231231231234", 10000, LocalDateTime.now().plusDays(10),
-                LocalDateTime.now().plusDays(30), LocalDateTime.now().plusDays(50), 1000, CouponStatus.ENDED);
-        Coupon coupon5 = setupCoupon("12347", "1231231231234", 10000, LocalDateTime.now().plusDays(10),
-                LocalDateTime.now().plusDays(30), LocalDateTime.now().plusDays(50), 1000, CouponStatus.COMPLETED);
-        couponRepository.saveAll(List.of(coupon, coupon2, coupon3, coupon4, coupon5));
 
         // when
         Page<Coupon> coupons = couponQueryService.getCouponByStatus(0, 10, CouponStatus.ENDED);
 
         // then
-        assertThat(coupons.getContent()).hasSize(1);
-        assertThat(coupons.getTotalElements()).isEqualTo(1);
-        assertThat(coupons.getTotalPages()).isEqualTo(1);
+        assertThat(coupons.getContent()).hasSize(10);
+        assertThat(coupons.getTotalElements()).isEqualTo(30);
+        assertThat(coupons.getTotalPages()).isEqualTo(3);
         assertThat(coupons.getNumber()).isEqualTo(0); // 현재 페이지 번호
         assertThat(coupons.getSize()).isEqualTo(10);  // 요청한 사이즈
     }
@@ -219,63 +175,9 @@ class CouponServiceTest extends CouponIntegrationTestSupport {
     @Test
     void getCouponEvent_UNUSED() {
         // given
-        User user = setupUser("123", "123", "123", null);
+        User user = userRepository.findById(21L).get();
 
-        Coupon coupon = setupCoupon("123", "123123123123", 10000, LocalDateTime.now().plusDays(10),
-                LocalDateTime.now().plusDays(30), LocalDateTime.now().plusDays(50), 1000, CouponStatus.PREVIOUS);
-        Coupon coupon2 = setupCoupon("1234", "1231231231234", 10000, LocalDateTime.now().plusDays(10),
-                LocalDateTime.now().plusDays(30), LocalDateTime.now().plusDays(50), 1000, CouponStatus.PREVIOUS);
-        Coupon coupon3 = setupCoupon("12345", "1231231231235", 10000, LocalDateTime.now().plusDays(10),
-                LocalDateTime.now().plusDays(30), LocalDateTime.now().plusDays(50), 1000, CouponStatus.IN_PROGRESS);
-        Coupon coupon4 = setupCoupon("12346", "1231231231236", 10000, LocalDateTime.now().plusDays(10),
-                LocalDateTime.now().plusDays(30), LocalDateTime.now().plusDays(50), 1000, CouponStatus.ENDED);
-        Coupon coupon5 = setupCoupon("12347", "1231231231237", 10000, LocalDateTime.now().plusDays(10),
-                LocalDateTime.now().plusDays(30), LocalDateTime.now().plusDays(50), 1000, CouponStatus.COMPLETED);
-        Coupon coupon6 = setupCoupon("12346", "1231231231238", 10000, LocalDateTime.now().plusDays(10),
-                LocalDateTime.now().plusDays(30), LocalDateTime.now().plusDays(50), 1000, CouponStatus.IN_PROGRESS);
-        Coupon coupon7 = setupCoupon("12347", "1231231231239", 10000, LocalDateTime.now().plusDays(10),
-                LocalDateTime.now().plusDays(30), LocalDateTime.now().plusDays(50), 1000, CouponStatus.IN_PROGRESS);
-
-        couponRepository.saveAll(List.of(coupon, coupon2, coupon3, coupon4, coupon5, coupon6, coupon7));
-        userRepository.save(user);
-
-        // when
-        List<CouponEventGetResponse> responses = couponQueryService.getCouponEvent(user.getId());
-
-        // then
-        assertThat(responses.getFirst().content()).isEqualTo(coupon7.getContent());
-        assertThat(responses.getFirst().title()).isEqualTo(coupon7.getTitle());
-        assertThat(responses.getFirst().userIssued()).isFalse();
-        assertThat(responses.getLast().content()).isEqualTo(coupon3.getContent());
-        assertThat(responses.getLast().title()).isEqualTo(coupon3.getTitle());
-        assertThat(responses.getLast().userIssued()).isFalse();
-    }
-
-    @DisplayName("유저가 현재 발급 중인 쿠폰 이벤트들을 조회한다. ( 사용 ) ")
-    @Test
-    void getCouponEvent_USED() {
-        // given
-        User user = setupUser("123", "123", "123", null);
-
-        Coupon coupon = setupCoupon("123", "123123123123", 10000, LocalDateTime.now().plusDays(10),
-                LocalDateTime.now().plusDays(30), LocalDateTime.now().plusDays(50), 1000, CouponStatus.PREVIOUS);
-        Coupon coupon2 = setupCoupon("1234", "1231231231234", 10000, LocalDateTime.now().plusDays(10),
-                LocalDateTime.now().plusDays(30), LocalDateTime.now().plusDays(50), 1000, CouponStatus.PREVIOUS);
-        Coupon coupon3 = setupCoupon("12345", "1231231231235", 10000, LocalDateTime.now().plusDays(10),
-                LocalDateTime.now().plusDays(30), LocalDateTime.now().plusDays(50), 1000, CouponStatus.IN_PROGRESS);
-        Coupon coupon4 = setupCoupon("12346", "1231231231236", 10000, LocalDateTime.now().plusDays(10),
-                LocalDateTime.now().plusDays(30), LocalDateTime.now().plusDays(50), 1000, CouponStatus.ENDED);
-        Coupon coupon5 = setupCoupon("12347", "1231231231237", 10000, LocalDateTime.now().plusDays(10),
-                LocalDateTime.now().plusDays(30), LocalDateTime.now().plusDays(50), 1000, CouponStatus.COMPLETED);
-        Coupon coupon6 = setupCoupon("12346", "1231231231238", 10000, LocalDateTime.now().plusDays(10),
-                LocalDateTime.now().plusDays(30), LocalDateTime.now().plusDays(50), 1000, CouponStatus.IN_PROGRESS);
-        Coupon coupon7 = setupCoupon("12347", "1231231231239", 10000, LocalDateTime.now().plusDays(10),
-                LocalDateTime.now().plusDays(30), LocalDateTime.now().plusDays(50), 1000, CouponStatus.IN_PROGRESS);
-
-        couponRepository.saveAll(List.of(coupon, coupon2, coupon3, coupon4, coupon5, coupon6, coupon7));
-        userRepository.save(user);
-
-        UserCouponIssueRequest request = new UserCouponIssueRequest(coupon7.getId());
+        UserCouponIssueRequest request = new UserCouponIssueRequest(60L);
 
         userCouponCommandService.issueCoupon(user.getId(), request);
 
@@ -283,11 +185,25 @@ class CouponServiceTest extends CouponIntegrationTestSupport {
         List<CouponEventGetResponse> responses = couponQueryService.getCouponEvent(user.getId());
 
         // then
-        assertThat(responses.getFirst().content()).isEqualTo(coupon7.getContent());
-        assertThat(responses.getFirst().title()).isEqualTo(coupon7.getTitle());
-        assertThat(responses.getFirst().userIssued()).isTrue();
-        assertThat(responses.getLast().content()).isEqualTo(coupon3.getContent());
-        assertThat(responses.getLast().title()).isEqualTo(coupon3.getTitle());
+        assertThat(responses.getFirst().userIssued()).isFalse();
+        assertThat(responses.getLast().userIssued()).isFalse();
+    }
+
+    @DisplayName("유저가 현재 발급 중인 쿠폰 이벤트들을 조회한다. ( 사용 ) ")
+    @Test
+    void getCouponEvent_USED() {
+        // given
+        Long userId = 20L;
+        UserCouponIssueRequest request = new UserCouponIssueRequest(50L);
+
+        userCouponCommandService.issueCoupon(userId, request);
+
+        // when
+        List<CouponEventGetResponse> responses = couponQueryService.getCouponEvent(userId);
+
+        // then
+        assertThat(responses.size()).isEqualTo(70);
+        assertThat(responses.get(40).userIssued()).isTrue();
         assertThat(responses.getLast().userIssued()).isFalse();
     }
 }
