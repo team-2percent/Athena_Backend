@@ -28,12 +28,8 @@ class UserCouponServiceTest extends UserCouponIntegrationSupport {
     @Test
     void issueCoupon_Success() {
         // given
-        User user = setupUser("123", "123", "123", null);
-        Coupon coupon = setupCoupon("123", "123123123123", 10000, LocalDateTime.now().plusDays(10),
-                LocalDateTime.now().plusDays(30), LocalDateTime.now().plusDays(50), 1000, CouponStatus.IN_PROGRESS);
-
-        userRepository.save(user);
-        couponRepository.save(coupon);
+        User user = userRepository.findById(71L).get();
+        Coupon coupon = couponRepository.findById(71L).get();
 
         UserCouponIssueRequest request = new UserCouponIssueRequest(coupon.getId());
 
@@ -51,16 +47,12 @@ class UserCouponServiceTest extends UserCouponIntegrationSupport {
     @Test
     void issueCoupon_NOT_INPROGRESS() {
         // given
-        User user = setupUser("123", "123", "123", null);
-        Coupon coupon = setupCoupon("123", "123123123123", 10000, LocalDateTime.now().plusDays(10),
-                LocalDateTime.now().plusDays(30), LocalDateTime.now().plusDays(50), 1000, CouponStatus.ENDED);
-
-        userRepository.save(user);
-        couponRepository.save(coupon);
+        User user = userRepository.findById(71L).get();
+        Coupon coupon = couponRepository.findById(131L).get();
 
         UserCouponIssueRequest request = new UserCouponIssueRequest(coupon.getId());
 
-        // when & thenn
+        // when & then
         assertThatThrownBy(() -> userCouponCommandService.issueCoupon(user.getId(), request))
                 .isInstanceOf(CustomException.class)
                 .hasMessageContaining(ErrorCode.INVALID_COUPON_STATUS.getErrorMessage());
@@ -70,18 +62,15 @@ class UserCouponServiceTest extends UserCouponIntegrationSupport {
     @Test
     void issueCoupon_ALREADY_ISSUED() {
         // given
-        User user = setupUser("123", "123", "123", null);
-        Coupon coupon = setupCoupon("123", "123123123123", 10000, LocalDateTime.now().plusDays(10),
-                LocalDateTime.now().plusDays(30), LocalDateTime.now().plusDays(50), 1000, CouponStatus.IN_PROGRESS);
+        User user = userRepository.findById(71L).get();
+        Coupon coupon = couponRepository.findById(73L).get();
 
-        userRepository.save(user);
-        couponRepository.save(coupon);
 
         UserCouponIssueRequest request = new UserCouponIssueRequest(coupon.getId());
 
         userCouponCommandService.issueCoupon(user.getId(), request);
 
-        // when & thenn
+        // when & then
         assertThatThrownBy(() -> userCouponCommandService.issueCoupon(user.getId(), request))
                 .isInstanceOf(CustomException.class)
                 .hasMessageContaining(ErrorCode.ALREADY_ISSUED_COUPON.getErrorMessage());
@@ -91,13 +80,10 @@ class UserCouponServiceTest extends UserCouponIntegrationSupport {
     @Test
     void useCoupon_Success() {
         // given
-        User user = setupUser("123", "123", "123", null);
-        Coupon coupon = setupCoupon("123", "123123123123", 10000, LocalDateTime.now().plusDays(10),
-                LocalDateTime.now().plusDays(30), LocalDateTime.now().plusDays(50), 1000, CouponStatus.IN_PROGRESS);
+        User user = userRepository.findById(71L).get();
+        Coupon coupon = couponRepository.findById(75L).get();
         UserCoupon userCoupon = setupUserCoupon(user, coupon, UNUSED);
 
-        userRepository.save(user);
-        couponRepository.save(coupon);
         userCouponRepository.save(userCoupon);
 
         // when
@@ -111,13 +97,10 @@ class UserCouponServiceTest extends UserCouponIntegrationSupport {
     @Test
     void useCoupon_INVALID_USE_COUPON() {
         // given
-        User user = setupUser("123", "123", "123", null);
-        Coupon coupon = setupCoupon("123", "123123123123", 10000, LocalDateTime.now().plusDays(10),
-                LocalDateTime.now().plusDays(30), LocalDateTime.now().plusDays(50), 1000, CouponStatus.IN_PROGRESS);
+        User user = userRepository.findById(71L).get();
+        Coupon coupon = couponRepository.findById(75L).get();
         UserCoupon userCoupon = setupUserCoupon(user, coupon, EXPIRED);
 
-        userRepository.save(user);
-        couponRepository.save(coupon);
         userCouponRepository.save(userCoupon);
 
         // when & then
@@ -130,14 +113,11 @@ class UserCouponServiceTest extends UserCouponIntegrationSupport {
     @Test
     void useCoupon_NOT_FOUND() {
         // given
-        User user = setupUser("123", "123", "123", null);
-        User user2 = setupUser("1234", "1234", "1234", null);
-        Coupon coupon = setupCoupon("123", "123123123123", 10000, LocalDateTime.now().plusDays(10),
-                LocalDateTime.now().plusDays(30), LocalDateTime.now().plusDays(50), 1000, CouponStatus.IN_PROGRESS);
-        UserCoupon userCoupon = setupUserCoupon(user, coupon, EXPIRED);
+        User user = userRepository.findById(71L).get();
+        User user2 = userRepository.findById(69L).get();
+        Coupon coupon = couponRepository.findById(57L).get();
+        UserCoupon userCoupon = setupUserCoupon(user, coupon, UNUSED);
 
-        userRepository.saveAll(List.of(user, user2));
-        couponRepository.save(coupon);
         userCouponRepository.save(userCoupon);
 
         // when & then
@@ -150,20 +130,15 @@ class UserCouponServiceTest extends UserCouponIntegrationSupport {
     @Test
     void getUserCoupon() {
         // given
-        User user = setupUser("123", "123", "123", null);
-        Coupon coupon = setupCoupon("123", "123123123123", 10000, LocalDateTime.now().plusDays(10),
-                LocalDateTime.now().plusDays(30), LocalDateTime.now().plusDays(50), 1000, CouponStatus.PREVIOUS);
-        Coupon coupon2 = setupCoupon("1234", "1231231231234", 10000, LocalDateTime.now().plusDays(10),
-                LocalDateTime.now().plusDays(30), LocalDateTime.now().plusDays(50), 1000, CouponStatus.PREVIOUS);
-        Coupon coupon3 = setupCoupon("12345", "1231231231235", 10000, LocalDateTime.now().plusDays(10),
-                LocalDateTime.now().plusDays(30), LocalDateTime.now().plusDays(50), 1000, CouponStatus.IN_PROGRESS);
+        User user = userRepository.findById(47L).get();
+        Coupon coupon = couponRepository.findById(21L).get();
+        Coupon coupon2 = couponRepository.findById(23L).get();
+        Coupon coupon3 = couponRepository.findById(25L).get();
 
         UserCoupon userCoupon = setupUserCoupon(user, coupon, EXPIRED);
         UserCoupon userCoupon2 = setupUserCoupon(user, coupon2, USED);
         UserCoupon userCoupon3 = setupUserCoupon(user, coupon3, UNUSED);
 
-        userRepository.save(user);
-        couponRepository.saveAll(List.of(coupon, coupon2, coupon3));
         userCouponRepository.saveAll(List.of(userCoupon, userCoupon2, userCoupon3));
 
         // when
@@ -180,21 +155,15 @@ class UserCouponServiceTest extends UserCouponIntegrationSupport {
     @Test
     void getUserCoupons() {
         // given
-        User user = setupUser("123", "123", "123", null);
-        Coupon coupon = setupCoupon("123", "123123123123", 10000, LocalDateTime.now().plusDays(10),
-                LocalDateTime.now().plusDays(30), LocalDateTime.now().plusDays(50), 1000, CouponStatus.PREVIOUS);
-        Coupon coupon2 = setupCoupon("1234", "1231231231234", 10000, LocalDateTime.now().plusDays(10),
-                LocalDateTime.now().plusDays(30), LocalDateTime.now().plusDays(50), 1000, CouponStatus.PREVIOUS);
-        Coupon coupon3 = setupCoupon("12345", "1231231231235", 10000, LocalDateTime.now().plusDays(10),
-                LocalDateTime.now().plusDays(30), LocalDateTime.now().plusDays(50), 1000, CouponStatus.IN_PROGRESS);
-        Coupon coupon4 = setupCoupon("12346", "1231231231236", 10000, LocalDateTime.now().plusDays(10),
-                LocalDateTime.now().plusDays(30), LocalDateTime.now().plusDays(50), 1000, CouponStatus.ENDED);
-        Coupon coupon5 = setupCoupon("12347", "1231231231237", 10000, LocalDateTime.now().plusDays(10),
-                LocalDateTime.now().plusDays(30), LocalDateTime.now().plusDays(50), 1000, CouponStatus.COMPLETED);
-        Coupon coupon6 = setupCoupon("12346", "1231231231238", 10000, LocalDateTime.now().plusDays(10),
-                LocalDateTime.now().plusDays(30), LocalDateTime.now().plusDays(50), 1000, CouponStatus.IN_PROGRESS);
-        Coupon coupon7 = setupCoupon("12347", "1231231231239", 10000, LocalDateTime.now().plusDays(10),
-                LocalDateTime.now().plusDays(30), LocalDateTime.now().plusDays(50), 1000, CouponStatus.IN_PROGRESS);
+        User user = userRepository.findById(33L).get();
+
+        Coupon coupon = couponRepository.findById(21L).get();
+        Coupon coupon2 = couponRepository.findById(23L).get();
+        Coupon coupon3 = couponRepository.findById(25L).get();
+        Coupon coupon4 = couponRepository.findById(27L).get();
+        Coupon coupon5 = couponRepository.findById(29L).get();
+        Coupon coupon6 = couponRepository.findById(31L).get();
+        Coupon coupon7 = couponRepository.findById(33L).get();
 
         UserCoupon userCoupon = setupUserCoupon(user, coupon, EXPIRED);
         UserCoupon userCoupon2 = setupUserCoupon(user, coupon2, USED);
@@ -204,8 +173,6 @@ class UserCouponServiceTest extends UserCouponIntegrationSupport {
         UserCoupon userCoupon6 = setupUserCoupon(user, coupon6, UNUSED);
         UserCoupon userCoupon7 = setupUserCoupon(user, coupon7, EXPIRED);
 
-        userRepository.save(user);
-        couponRepository.saveAll(List.of(coupon, coupon2, coupon3, coupon4, coupon5, coupon6, coupon7));
         userCouponRepository.saveAll(List.of(userCoupon, userCoupon2, userCoupon3, userCoupon4, userCoupon5, userCoupon6, userCoupon7));
 
         // when
@@ -224,9 +191,7 @@ class UserCouponServiceTest extends UserCouponIntegrationSupport {
     @Test
     void getCouponTitle() {
         // given
-        Coupon coupon = setupCoupon("123", "123123123123", 10000, LocalDateTime.now().plusDays(10),
-                LocalDateTime.now().plusDays(30), LocalDateTime.now().plusDays(50), 1000, CouponStatus.PREVIOUS);
-        couponRepository.save(coupon);
+        Coupon coupon = couponRepository.findById(21L).get();
 
         // when
         String response = userCouponQueryService.getCouponTitle(coupon.getId());

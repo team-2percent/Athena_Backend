@@ -7,7 +7,6 @@ import goorm.athena.domain.coupon.dto.res.CouponGetDetailResponse;
 import goorm.athena.domain.coupon.entity.Coupon;
 import goorm.athena.domain.coupon.entity.CouponStatus;
 import goorm.athena.domain.coupon.util.CouponIntegrationTestSupport;
-import goorm.athena.domain.user.entity.User;
 import goorm.athena.domain.userCoupon.dto.req.UserCouponIssueRequest;
 import goorm.athena.global.exception.CustomException;
 import goorm.athena.global.exception.ErrorCode;
@@ -42,17 +41,14 @@ class CouponServiceTest extends CouponIntegrationTestSupport {
     @Test
     void getCoupons() {
         // given
-        Coupon coupon = setupCoupon("123", "123123123123", 10000, LocalDateTime.now().plusDays(10),
-                LocalDateTime.now().plusDays(30), LocalDateTime.now().plusDays(50), 1000, CouponStatus.PREVIOUS);
-        couponRepository.save(coupon);
 
         // when
         Page<Coupon> coupons = couponQueryService.getCoupons(0, 10);
 
         // then
         assertThat(coupons.getContent()).hasSize(10);
-        assertThat(coupons.getTotalElements()).isEqualTo(151);
-        assertThat(coupons.getTotalPages()).isEqualTo(16);
+        assertThat(coupons.getTotalElements()).isEqualTo(150);
+        assertThat(coupons.getTotalPages()).isEqualTo(15);
         assertThat(coupons.getNumber()).isEqualTo(0); // 현재 페이지 번호
         assertThat(coupons.getSize()).isEqualTo(10);  // 요청한 사이즈
     }
@@ -125,9 +121,7 @@ class CouponServiceTest extends CouponIntegrationTestSupport {
     @Test
     void getCouponDetail() {
         // given
-        Coupon coupon = setupCoupon("123", "123123123123", 10000, LocalDateTime.now().plusDays(10),
-                LocalDateTime.now().plusDays(30), LocalDateTime.now().plusDays(50), 1000, CouponStatus.PREVIOUS);
-        couponRepository.save(coupon);
+        Coupon coupon = couponRepository.findById(50L).get();
 
         // when
         CouponGetDetailResponse response = couponQueryService.getCouponDetail(coupon.getId());
@@ -143,12 +137,10 @@ class CouponServiceTest extends CouponIntegrationTestSupport {
     @Test
     void getCoupon_SUCCESS() {
         // given
-        Coupon coupon = setupCoupon("123", "123123123123", 10000, LocalDateTime.now().plusDays(10),
-                LocalDateTime.now().plusDays(30), LocalDateTime.now().plusDays(50), 1000, CouponStatus.PREVIOUS);
-        couponRepository.save(coupon);
+        Coupon coupon = couponRepository.findById(50L).get();
 
         // when
-        Coupon response = couponQueryService.getCoupon(coupon.getId());
+        Coupon response = couponQueryService.getCoupon(50L);
 
         // then
         assertThat(response.getId()).isEqualTo(coupon.getId());
@@ -161,9 +153,6 @@ class CouponServiceTest extends CouponIntegrationTestSupport {
     @Test
     void getCoupon_Error() {
         // given
-        Coupon coupon = setupCoupon("123", "123123123123", 10000, LocalDateTime.now().plusDays(10),
-                LocalDateTime.now().plusDays(30), LocalDateTime.now().plusDays(50), 1000, CouponStatus.PREVIOUS);
-        couponRepository.save(coupon);
 
         // when & then
         assertThatThrownBy(() -> couponQueryService.getCoupon(1000000L))
@@ -175,16 +164,16 @@ class CouponServiceTest extends CouponIntegrationTestSupport {
     @Test
     void getCouponEvent_UNUSED() {
         // given
-        User user = userRepository.findById(21L).get();
+        Long userId = 20L;
+        UserCouponIssueRequest request = new UserCouponIssueRequest(50L);
 
-        UserCouponIssueRequest request = new UserCouponIssueRequest(60L);
-
-        userCouponCommandService.issueCoupon(user.getId(), request);
+        userCouponCommandService.issueCoupon(userId, request);
 
         // when
-        List<CouponEventGetResponse> responses = couponQueryService.getCouponEvent(user.getId());
+        List<CouponEventGetResponse> responses = couponQueryService.getCouponEvent(userId);
 
         // then
+        assertThat(responses.size()).isEqualTo(70);
         assertThat(responses.getFirst().userIssued()).isFalse();
         assertThat(responses.getLast().userIssued()).isFalse();
     }
