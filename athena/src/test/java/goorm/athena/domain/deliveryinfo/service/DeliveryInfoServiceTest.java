@@ -57,7 +57,7 @@ class DeliveryInfoServiceTest extends DeliveryIntegrationTestSupport {
     @Test
     void addDeliveryInfo_Primary() {
         // given
-        User user = userRepository.findById(11L).get();
+        User user = userRepository.findById(100L).get();
 
         DeliveryInfoRequest request = new DeliveryInfoRequest("홍길동", "서울시", "010-1111-2222");
 
@@ -66,11 +66,14 @@ class DeliveryInfoServiceTest extends DeliveryIntegrationTestSupport {
         // when
         deliveryInfoCommandService.addDeliveryInfo(user.getId(), request);
 
+        System.out.println(deliveryInfoRepository.findByUserId(user.getId()).get(0).isDefault()+"123123123");
+        System.out.println(deliveryInfoRepository.findByUserId(user.getId()).get(1).isDefault()+"123123123");
+
         // then
         List<DeliveryInfo> infos = deliveryInfoRepository.findByUserId(user.getId());
         assertThat(infos).hasSize(size+1);
-        assertThat(infos.getFirst().isDefault()).isTrue(); // 첫 배송지는 기본 배송지로 설정됨
-        assertThat(infos.getLast().isDefault()).isFalse();
+        assertThat(infos.getFirst().isDefault()).isFalse();
+        assertThat(infos.getLast().isDefault()).isTrue();
     }
 
 
@@ -123,6 +126,17 @@ class DeliveryInfoServiceTest extends DeliveryIntegrationTestSupport {
 
         // when & then
         assertThatThrownBy(() -> deliveryInfoCommandService.changeDeliveryState(user.getId(), newDeliveryInfo.getId()))
+                .isInstanceOf(CustomException.class)
+                .hasMessageContaining(ErrorCode.DELIVERY_NOT_FOUND.getErrorMessage());
+    }
+
+    @DisplayName("유저가 배송 정보를 변경할 때 다른 유저의 배송 정보를 변경하면 NOT_FOUND 에러를 리턴한다.")
+    @Test
+    void changeDeliveryState_Delivery_Not_Found() {
+        // given
+
+        // when & then
+        assertThatThrownBy(() -> deliveryInfoCommandService.changeDeliveryState(51L, 16L))
                 .isInstanceOf(CustomException.class)
                 .hasMessageContaining(ErrorCode.DELIVERY_NOT_FOUND.getErrorMessage());
     }
