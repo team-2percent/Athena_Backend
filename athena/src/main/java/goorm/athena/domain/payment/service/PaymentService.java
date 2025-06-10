@@ -1,8 +1,7 @@
 package goorm.athena.domain.payment.service;
 
 import goorm.athena.domain.order.entity.Order;
-import goorm.athena.domain.order.service.OrderService;
-import goorm.athena.domain.orderitem.entity.OrderItem;
+import goorm.athena.domain.order.service.OrderCommendService;
 import goorm.athena.domain.orderitem.repository.OrderItemRepository;
 import goorm.athena.domain.payment.dto.req.PaymentApproveRequest;
 import goorm.athena.domain.payment.dto.req.PaymentReadyRequest;
@@ -29,9 +28,9 @@ import java.util.List;
 public class PaymentService {
 
     private final KakaoPayService kakaoPayService;
-    private final OrderService orderService;
+    private final OrderCommendService orderCommendService;
     private final PaymentRepository paymentRepository;
-    private final OrderItemRepository orderItemRepository;
+
 
     public List<Order> getUnsettledOrdersByProjects(List<Project> projects) {
         return paymentRepository.findUnsettledOrdersByProjects(projects);
@@ -39,7 +38,7 @@ public class PaymentService {
 
     public KakaoPayReadyResponse readyPayment(Long orderId) {
 
-        Order order = orderService.getById(orderId);
+        Order order = orderCommendService.getById(orderId);
         User user = order.getUser();
 
         // 기존 Payment가 있는지 확인
@@ -96,8 +95,9 @@ public class PaymentService {
         try {
             payment.approve(pgToken);
 
-            orderService.decreaseInventory(payment.getOrder().getId()); // 재고 감소
-            orderService.increaseProjectFunding(orderId); // 누적 가격 증가
+//            orderCommendService.decreaseInventory(payment.getOrder().getId()); // 재고 감소
+//            orderCommendService.increaseProjectFunding(orderId); // 누적 가격 증가
+            orderCommendService.postPaymentProcess(orderId); // 재고 감소 ,누적 가격 증가
 
             return response;
 

@@ -6,7 +6,7 @@ import goorm.athena.domain.admin.dto.res.SettlementHistoryPageResponse;
 import goorm.athena.domain.bankaccount.entity.BankAccount;
 import goorm.athena.domain.bankaccount.service.BankAccountService;
 import goorm.athena.domain.order.entity.Order;
-import goorm.athena.domain.order.service.OrderService;
+import goorm.athena.domain.order.service.OrderCommendService;
 import goorm.athena.domain.payment.service.PaymentService;
 import goorm.athena.domain.project.entity.PlatformPlan;
 import goorm.athena.domain.project.entity.Project;
@@ -39,7 +39,7 @@ import java.util.stream.Collectors;
 public class SettlementService {
 
     private final ProjectService projectService;
-    private final OrderService orderService;
+    private final OrderCommendService orderCommendService;
     private final SettlementRepository settlementRepository;
     private final BankAccountService bankAccountService;
     private final SettlementHistoryService historyService;
@@ -83,7 +83,7 @@ public class SettlementService {
                     project.getId(), settlement.getTotalSales(), orders.size());
 
             orders.forEach(Order::markAsSettled);
-            orderService.saveAll(orders);
+            orderCommendService.saveAll(orders);
         }
     }
 

@@ -28,7 +28,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class OrderService {
+public class OrderCommendService {
 
     private final OrderRepository orderRepository;
     private final OrderItemRepository orderItemRepository;
@@ -82,19 +82,27 @@ public class OrderService {
         return OrderCreateResponse.from(order, orderItems);
     }
 
-    public void decreaseInventory(Long orderId) {
-        List<OrderItem> orderItems = orderItemRepository.findByOrderId(orderId);
-        for (OrderItem item : orderItems) {
-            item.getProduct().decreaseStock(item.getQuantity());
-        }
-    }
+//    public void decreaseInventory(Long orderId) {
+//        List<OrderItem> orderItems = orderItemRepository.findByOrderId(orderId);
+//        for (OrderItem item : orderItems) {
+//            item.getProduct().decreaseStock(item.getQuantity());
+//        }
+//    }
+//
+//    public void increaseProjectFunding(Long orderId) {
+//        List<OrderItem> orderItems = orderItemRepository.findByOrderId(orderId);
+//        for (OrderItem item : orderItems) {
+//            item.getOrder().getProject().increasePrice(item.getPrice());
+//        }
+//    }
 
-    public void increaseProjectFunding(Long orderId) {
-        List<OrderItem> orderItems = orderItemRepository.findByOrderId(orderId);
-        for (OrderItem item : orderItems) {
+    public void postPaymentProcess(Long orderId) {
+        for (OrderItem item : orderItemRepository.findByOrderId(orderId)) {
+            item.getProduct().decreaseStock(item.getQuantity());
             item.getOrder().getProject().increasePrice(item.getPrice());
         }
     }
+
 
     public Long getSeller(Long orderId){
         User user = orderRepository.findSellerByOrderId(orderId);
