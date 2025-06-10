@@ -2,7 +2,7 @@ package goorm.athena.domain.payment.service;
 
 import goorm.athena.domain.order.entity.Order;
 import goorm.athena.domain.order.service.OrderCommendService;
-import goorm.athena.domain.orderitem.repository.OrderItemRepository;
+import goorm.athena.domain.order.service.OrderQueryService;
 import goorm.athena.domain.payment.dto.req.PaymentApproveRequest;
 import goorm.athena.domain.payment.dto.req.PaymentReadyRequest;
 import goorm.athena.domain.payment.dto.res.KakaoPayApproveResponse;
@@ -25,20 +25,17 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Transactional
-public class PaymentService {
+public class PaymentCommendService {
 
     private final KakaoPayService kakaoPayService;
     private final OrderCommendService orderCommendService;
+    private final OrderQueryService orderQueryService;
     private final PaymentRepository paymentRepository;
 
 
-    public List<Order> getUnsettledOrdersByProjects(List<Project> projects) {
-        return paymentRepository.findUnsettledOrdersByProjects(projects);
-    }
-
     public KakaoPayReadyResponse readyPayment(Long orderId) {
 
-        Order order = orderCommendService.getById(orderId);
+        Order order = orderQueryService.getById(orderId);
         User user = order.getUser();
 
         // 기존 Payment가 있는지 확인

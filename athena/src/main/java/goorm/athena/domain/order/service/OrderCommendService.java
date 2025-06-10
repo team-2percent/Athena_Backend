@@ -37,10 +37,10 @@ public class OrderCommendService {
     private final ProductService productService;
     private final ProjectService projectService;
 
-    public Order getById(Long id) {
-        return orderRepository.findById(id)
-                .orElseThrow(() -> new CustomException(ErrorCode.ORDER_NOT_FOUND));
-    }
+//    public Order getById(Long id) {
+//        return orderRepository.findById(id)
+//                .orElseThrow(() -> new CustomException(ErrorCode.ORDER_NOT_FOUND));
+//    }
 
     public void saveAll(List<Order> orders) {
         orderRepository.saveAll(orders);
@@ -104,14 +104,14 @@ public class OrderCommendService {
     }
 
 
-    public Long getSeller(Long orderId){
-        User user = orderRepository.findSellerByOrderId(orderId);
-        return user.getId();
-    }
+//    public Long getSeller(Long orderId){
+//        User user = orderRepository.findSellerByOrderId(orderId);
+//        return user.getId();
+//    }
 
-    public Long getBuyer(Long orderId){
-        User user =  orderRepository.findBuyerByOrderId(orderId);
-        return user.getId();
-    }
+//    public Long getBuyer(Long orderId){
+//        User user =  orderRepository.findBuyerByOrderId(orderId);
+//        return user.getId();
+//    }
 
 }

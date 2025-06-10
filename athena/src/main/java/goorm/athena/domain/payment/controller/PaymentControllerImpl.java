@@ -1,12 +1,11 @@
 package goorm.athena.domain.payment.controller;
 
 import goorm.athena.domain.notification.service.FcmNotificationService;
-import goorm.athena.domain.order.service.OrderCommendService;
 import goorm.athena.domain.order.service.OrderQueryService;
 import goorm.athena.domain.payment.dto.HtmlTemplates;
 import goorm.athena.domain.payment.dto.res.KakaoPayApproveResponse;
 import goorm.athena.domain.payment.dto.res.KakaoPayReadyResponse;
-import goorm.athena.domain.payment.service.PaymentService;
+import goorm.athena.domain.payment.service.PaymentCommendService;
 import goorm.athena.domain.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -18,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/payment")
 public class PaymentControllerImpl implements PaymentController {
 
-    private final PaymentService paymentService;
+    private final PaymentCommendService paymentCommendService;
     private final OrderQueryService orderQueryService;
     private final FcmNotificationService fcmNotificationService;
     private final UserService userService;
@@ -27,7 +26,7 @@ public class PaymentControllerImpl implements PaymentController {
     public ResponseEntity<KakaoPayReadyResponse> readyPayment(
             @PathVariable Long orderId
     ) {
-        KakaoPayReadyResponse response = paymentService.readyPayment(orderId);
+        KakaoPayReadyResponse response = paymentCommendService.readyPayment(orderId);
 
         return ResponseEntity.ok(response);
     }
@@ -37,7 +36,7 @@ public class PaymentControllerImpl implements PaymentController {
             @PathVariable Long orderId,
             @RequestParam("pg_token") String pgToken
     ) {
-        KakaoPayApproveResponse response = paymentService.approvePayment(pgToken, orderId);
+        KakaoPayApproveResponse response = paymentCommendService.approvePayment(pgToken, orderId);
 
         if (response.tid() == null) {
             return buildHtmlResponse(400, HtmlTemplates.kakaoFailHtml());  // 실패 시 HTML
