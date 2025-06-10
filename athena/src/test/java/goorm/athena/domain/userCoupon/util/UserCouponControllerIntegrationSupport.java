@@ -12,7 +12,7 @@ import goorm.athena.domain.userCoupon.controller.UserCouponController;
 import goorm.athena.domain.userCoupon.entity.Status;
 import goorm.athena.domain.userCoupon.entity.UserCoupon;
 import goorm.athena.domain.userCoupon.repository.UserCouponRepository;
-import goorm.athena.domain.userCoupon.service.UserCouponService;
+import goorm.athena.domain.userCoupon.service.UserCouponQueryService;
 import goorm.athena.util.IntegrationControllerTestSupport;
 import goorm.athena.util.TestEntityFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +24,7 @@ public abstract class UserCouponControllerIntegrationSupport extends Integration
     protected UserCouponController controller;
 
     @Autowired
-    protected UserCouponService userCouponService;
+    protected UserCouponQueryService userCouponQueryService;
 
     @Autowired
     protected UserCouponRepository userCouponRepository;

@@ -3,8 +3,7 @@ package goorm.athena.domain.userCoupon.util;
 import goorm.athena.domain.coupon.entity.Coupon;
 import goorm.athena.domain.coupon.entity.CouponStatus;
 import goorm.athena.domain.coupon.repository.CouponRepository;
-import goorm.athena.domain.coupon.service.CouponService;
-import goorm.athena.domain.coupon.util.CouponIntegrationTestSupport;
+import goorm.athena.domain.coupon.service.CouponQueryService;
 import goorm.athena.domain.imageGroup.entity.ImageGroup;
 import goorm.athena.domain.user.entity.Role;
 import goorm.athena.domain.user.entity.User;
@@ -14,7 +13,8 @@ import goorm.athena.domain.userCoupon.entity.Status;
 import goorm.athena.domain.userCoupon.entity.UserCoupon;
 import goorm.athena.domain.userCoupon.repository.UserCouponCursorRepository;
 import goorm.athena.domain.userCoupon.repository.UserCouponRepository;
-import goorm.athena.domain.userCoupon.service.UserCouponService;
+import goorm.athena.domain.userCoupon.service.UserCouponCommandService;
+import goorm.athena.domain.userCoupon.service.UserCouponQueryService;
 import goorm.athena.util.IntegrationServiceTestSupport;
 import goorm.athena.util.TestEntityFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +23,10 @@ import java.time.LocalDateTime;
 
 public abstract class UserCouponIntegrationSupport extends IntegrationServiceTestSupport {
     @Autowired
-    protected UserCouponService userCouponService;
+    protected UserCouponQueryService userCouponQueryService;
+
+    @Autowired
+    protected UserCouponCommandService userCouponCommandService;
 
     @Autowired
     protected UserCouponRepository userCouponRepository;
@@ -35,7 +38,7 @@ public abstract class UserCouponIntegrationSupport extends IntegrationServiceTes
     protected UserService userService;
 
     @Autowired
-    protected CouponService couponService;
+    protected CouponQueryService couponQueryService;
 
     @Autowired
     protected CouponRepository couponRepository;

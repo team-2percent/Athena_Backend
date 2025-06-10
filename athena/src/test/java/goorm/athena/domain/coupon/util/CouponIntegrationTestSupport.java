@@ -1,18 +1,18 @@
 package goorm.athena.domain.coupon.util;
 
-import goorm.athena.domain.comment.entity.Comment;
 import goorm.athena.domain.coupon.entity.Coupon;
 import goorm.athena.domain.coupon.entity.CouponStatus;
 import goorm.athena.domain.coupon.repository.CouponRepository;
-import goorm.athena.domain.coupon.service.CouponService;
+import goorm.athena.domain.coupon.service.CouponCommandService;
+import goorm.athena.domain.coupon.service.CouponQueryService;
 import goorm.athena.domain.imageGroup.entity.ImageGroup;
-import goorm.athena.domain.project.entity.Project;
 import goorm.athena.domain.user.entity.Role;
 import goorm.athena.domain.user.entity.User;
 import goorm.athena.domain.user.repository.UserRepository;
 import goorm.athena.domain.user.service.UserService;
 import goorm.athena.domain.userCoupon.repository.UserCouponRepository;
-import goorm.athena.domain.userCoupon.service.UserCouponService;
+import goorm.athena.domain.userCoupon.service.UserCouponCommandService;
+import goorm.athena.domain.userCoupon.service.UserCouponQueryService;
 import goorm.athena.util.IntegrationServiceTestSupport;
 import goorm.athena.util.TestEntityFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +24,13 @@ public abstract class CouponIntegrationTestSupport extends IntegrationServiceTes
     protected CouponRepository couponRepository;
 
     @Autowired
-    protected CouponService couponService;
+    protected CouponCommandService couponCommandService;
+
+    @Autowired
+    protected UserCouponCommandService userCouponCommandService;
+
+    @Autowired
+    protected CouponQueryService couponQueryService;
 
     @Autowired
     protected UserService userService;
@@ -36,7 +42,7 @@ public abstract class CouponIntegrationTestSupport extends IntegrationServiceTes
     protected UserCouponRepository userCouponRepository;
 
     @Autowired
-    protected UserCouponService userCouponService;
+    protected UserCouponQueryService userCouponQueryService;
 
     protected User setupUser(String email, String password, String nickname, ImageGroup imageGroup) {
         User user = TestEntityFactory.createUser(email, password, nickname, imageGroup, Role.ROLE_USER);

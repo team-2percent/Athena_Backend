@@ -39,7 +39,7 @@ import goorm.athena.domain.userCoupon.entity.Status;
 import goorm.athena.domain.userCoupon.entity.UserCoupon;
 import goorm.athena.domain.userCoupon.repository.UserCouponCursorRepository;
 import goorm.athena.domain.userCoupon.repository.UserCouponRepository;
-import goorm.athena.domain.userCoupon.service.UserCouponService;
+import goorm.athena.domain.userCoupon.service.UserCouponQueryService;
 import goorm.athena.util.IntegrationControllerTestSupport;
 import goorm.athena.util.TestEntityFactory;
 import org.junit.jupiter.api.BeforeEach;
@@ -68,7 +68,7 @@ public abstract class UserInfoIntegrationTestSupport extends IntegrationControll
     protected MyInfoService myInfoService;
 
     @Autowired
-    protected UserCouponService userCouponService;
+    protected UserCouponQueryService userCouponQueryService;
 
     @Autowired
     protected ImageGroupService imageGroupService;
@@ -129,7 +129,7 @@ public abstract class UserInfoIntegrationTestSupport extends IntegrationControll
 
     @BeforeEach
     void setUp() {
-        controller = new UserInfoControllerImpl(commentService, myInfoService, userService, userCouponService);
+        controller = new UserInfoControllerImpl(commentService, myInfoService, userService, userCouponQueryService);
         Field imagePathField = ReflectionUtils.findField(NasService.class, "imagePath");
         imagePathField.setAccessible(true);
         ReflectionUtils.setField(imagePathField, nasService, tempDir.toAbsolutePath().toString());
