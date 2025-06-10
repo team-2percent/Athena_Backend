@@ -1,6 +1,6 @@
 package goorm.athena.domain.order.service;
 
-import goorm.athena.domain.deliveryinfo.service.DeliveryInfoService;
+import goorm.athena.domain.deliveryinfo.service.DeliveryInfoQueryService;
 import goorm.athena.domain.order.dto.req.OrderCreateRequest;
 import goorm.athena.domain.order.dto.req.OrderItemRequest;
 import goorm.athena.domain.order.dto.res.OrderCreateResponse;
@@ -33,7 +33,7 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final OrderItemRepository orderItemRepository;
     private final UserService userService;
-    private final DeliveryInfoService deliveryInfoService;
+    private final DeliveryInfoQueryService deliveryInfoQueryService;
     private final ProductService productService;
     private final ProjectService projectService;
 
@@ -50,7 +50,7 @@ public class OrderService {
     public OrderCreateResponse createOrder(Long userId, OrderCreateRequest request) {
 
         User user = userService.getUser(userId);
-        DeliveryInfo delivery = deliveryInfoService.getById(request.deliveryInfoId());
+        DeliveryInfo delivery = deliveryInfoQueryService.getById(request.deliveryInfoId());
         Project project = projectService.getById(request.projectId());
 
         Order order = Order.create(user, delivery, project, LocalDateTime.now());

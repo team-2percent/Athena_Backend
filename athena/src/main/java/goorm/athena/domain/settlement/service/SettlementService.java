@@ -4,7 +4,7 @@ import goorm.athena.domain.admin.dto.res.ProductSettlementSummaryResponse;
 import goorm.athena.domain.admin.dto.res.SettlementDetailInfoResponse;
 import goorm.athena.domain.admin.dto.res.SettlementHistoryPageResponse;
 import goorm.athena.domain.bankaccount.entity.BankAccount;
-import goorm.athena.domain.bankaccount.service.BankAccountService;
+import goorm.athena.domain.bankaccount.service.BankAccountQueryService;
 import goorm.athena.domain.order.entity.Order;
 import goorm.athena.domain.order.service.OrderService;
 import goorm.athena.domain.payment.service.PaymentService;
@@ -41,7 +41,7 @@ public class SettlementService {
     private final ProjectService projectService;
     private final OrderService orderService;
     private final SettlementRepository settlementRepository;
-    private final BankAccountService bankAccountService;
+    private final BankAccountQueryService bankAccountQueryService;
     private final SettlementHistoryService historyService;
     private final PaymentService paymentService;
     private final SettlementQueryRepository settlementQueryRepository;
@@ -104,7 +104,7 @@ public class SettlementService {
         long payOutAmount = totalSales - platformFeeTotal - pgFeeTotal - vatTotal;
 
         // 3. 판매자 계좌 정보 가져오기
-        BankAccount bankAccount = bankAccountService.getPrimaryAccount(project.getSeller().getId());
+        BankAccount bankAccount = bankAccountQueryService.getPrimaryAccount(project.getSeller().getId());
 
         return SettlementMapper.toEntity(
                 project,

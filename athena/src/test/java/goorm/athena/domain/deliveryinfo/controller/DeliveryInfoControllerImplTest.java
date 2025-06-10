@@ -59,7 +59,7 @@ class DeliveryInfoControllerImplTest extends DeliveryControllerIntegrationTestSu
         LoginUserRequest loginUserRequest = new LoginUserRequest("123", user.getId(), Role.ROLE_USER);
         DeliveryChangeStateRequest request = new DeliveryChangeStateRequest(deliveryInfo2.getId());
 
-        DeliveryInfo primaryDelivery = deliveryInfoService.getPrimaryDeliveryInfo(user.getId());
+        DeliveryInfo primaryDelivery = deliveryInfoQueryService.getPrimaryDeliveryInfo(user.getId());
 
         // when
         ResponseEntity<Void> response = controller.changeDeliveryInfoState(loginUserRequest, request);

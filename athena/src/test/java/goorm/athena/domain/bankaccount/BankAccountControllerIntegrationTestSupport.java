@@ -3,7 +3,8 @@ package goorm.athena.domain.bankaccount;
 import goorm.athena.domain.bankaccount.controller.BankAccountControllerImpl;
 import goorm.athena.domain.bankaccount.entity.BankAccount;
 import goorm.athena.domain.bankaccount.repository.BankAccountRepository;
-import goorm.athena.domain.bankaccount.service.BankAccountService;
+import goorm.athena.domain.bankaccount.service.BankAccountCommandService;
+import goorm.athena.domain.bankaccount.service.BankAccountQueryService;
 import goorm.athena.domain.image.service.ImageService;
 import goorm.athena.domain.imageGroup.entity.ImageGroup;
 import goorm.athena.domain.imageGroup.service.ImageGroupService;
@@ -24,7 +25,10 @@ public abstract class BankAccountControllerIntegrationTestSupport extends Integr
     protected LoginUserRequest loginUserRequest;
 
     @Autowired
-    protected BankAccountService bankAccountService;
+    protected BankAccountCommandService bankAccountCommandService;
+
+    @Autowired
+    protected BankAccountQueryService bankAccountQueryService;
 
     @Autowired
     protected BankAccountRepository bankAccountRepository;
@@ -49,7 +53,7 @@ public abstract class BankAccountControllerIntegrationTestSupport extends Integr
 
     @BeforeEach
     void setUp() {
-        controller = new BankAccountControllerImpl(bankAccountService);
+        controller = new BankAccountControllerImpl(bankAccountQueryService, bankAccountCommandService);
         loginUserRequest = new LoginUserRequest("123", 1L, Role.ROLE_USER);
     }
 

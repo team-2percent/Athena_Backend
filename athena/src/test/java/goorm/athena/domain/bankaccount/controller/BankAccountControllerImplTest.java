@@ -62,7 +62,7 @@ class BankAccountControllerImplTest extends BankAccountControllerIntegrationTest
         userRepository.save(user);
         bankAccountRepository.saveAll(List.of(oldBankAccount, newBankAccount));
 
-        BankAccount oldPrimaryAccount = bankAccountService.getPrimaryAccount(user.getId());
+        BankAccount oldPrimaryAccount = bankAccountQueryService.getPrimaryAccount(user.getId());
 
         // when
         controller.changeAccountState(loginUserRequest, newBankAccount.getId());

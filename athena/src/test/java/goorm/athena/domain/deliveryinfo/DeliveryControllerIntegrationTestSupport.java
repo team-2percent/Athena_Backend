@@ -2,7 +2,8 @@ package goorm.athena.domain.deliveryinfo;
 
 import goorm.athena.domain.deliveryinfo.controller.DeliveryInfoControllerImpl;
 import goorm.athena.domain.deliveryinfo.repository.DeliveryInfoRepository;
-import goorm.athena.domain.deliveryinfo.service.DeliveryInfoService;
+import goorm.athena.domain.deliveryinfo.service.DeliveryInfoCommandService;
+import goorm.athena.domain.deliveryinfo.service.DeliveryInfoQueryService;
 import goorm.athena.domain.imageGroup.entity.ImageGroup;
 import goorm.athena.domain.imageGroup.service.ImageGroupService;
 import goorm.athena.domain.user.entity.Role;
@@ -19,7 +20,10 @@ public abstract class DeliveryControllerIntegrationTestSupport extends Integrati
     protected LoginUserRequest loginUserRequest;
 
     @Autowired
-    protected DeliveryInfoService deliveryInfoService;
+    protected DeliveryInfoCommandService deliveryInfoCommandService;
+
+    @Autowired
+    protected DeliveryInfoQueryService deliveryInfoQueryService;
 
     @Autowired
     protected DeliveryInfoRepository deliveryInfoRepository;
@@ -32,7 +36,7 @@ public abstract class DeliveryControllerIntegrationTestSupport extends Integrati
 
     @BeforeEach
     void setUp() {
-        controller = new DeliveryInfoControllerImpl(deliveryInfoService);
+        controller = new DeliveryInfoControllerImpl(deliveryInfoQueryService, deliveryInfoCommandService);
         loginUserRequest = new LoginUserRequest("123", 1L, Role.ROLE_USER);
     }
 

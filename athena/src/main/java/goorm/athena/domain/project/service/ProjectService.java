@@ -1,7 +1,7 @@
 package goorm.athena.domain.project.service;
 
 import goorm.athena.domain.bankaccount.entity.BankAccount;
-import goorm.athena.domain.bankaccount.service.BankAccountService;
+import goorm.athena.domain.bankaccount.service.BankAccountQueryService;
 import goorm.athena.domain.category.entity.Category;
 import goorm.athena.domain.category.service.CategoryService;
 import goorm.athena.domain.image.entity.Image;
@@ -10,7 +10,6 @@ import goorm.athena.domain.imageGroup.entity.ImageGroup;
 import goorm.athena.domain.imageGroup.service.ImageGroupService;
 import goorm.athena.domain.product.dto.req.ProductRequest;
 import goorm.athena.domain.product.dto.res.ProductResponse;
-import goorm.athena.domain.product.entity.Product;
 import goorm.athena.domain.product.service.ProductService;
 import goorm.athena.domain.project.dto.cursor.*;
 import goorm.athena.domain.project.dto.req.ProjectCreateRequest;
@@ -62,7 +61,7 @@ public class ProjectService {
     private final UserService userService;
     private final CategoryService categoryService;
     private final ProductService productService;
-    private final BankAccountService bankAccountService;
+    private final BankAccountQueryService bankAccountQueryService;
     private final ProjectQueryRepository projectQueryRepository;
     private final ProjectFilterQueryRepository projectFilterQueryRepository;
     private final ProjectSearchQueryRepository projectSearchQueryRepository;
@@ -77,7 +76,7 @@ public class ProjectService {
         ImageGroup imageGroup = imageGroupService.getById(request.imageGroupId());
         User seller = userService.getUser(request.sellerId());
         Category category = categoryService.getCategoryById(request.categoryId());
-        BankAccount bankAccount = bankAccountService.getAccount(request.sellerId(), request.bankAccountId());
+        BankAccount bankAccount = bankAccountQueryService.getAccount(request.sellerId(), request.bankAccountId());
         PlanName planName = PlanName.valueOf(request.platformPlan());
         PlatformPlan platformPlan = platformPlanRepository.findByName(planName);
 
@@ -152,7 +151,7 @@ public class ProjectService {
             List<MultipartFile> markdownFiles) {
         Project project = getById(projectId);
         Category category = categoryService.getCategoryById(request.categoryId());
-        BankAccount bankAccount = bankAccountService.getPrimaryAccount(request.bankAccountId());
+        BankAccount bankAccount = bankAccountQueryService.getPrimaryAccount(request.bankAccountId());
 
         // 마크다운 이미지, 대표 이미지 PUT 작업을 위해서 이미지 미리 전체 삭제
         imageService.deleteImages(project.getImageGroup());
