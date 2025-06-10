@@ -36,10 +36,7 @@ public class SettlementCommandService {
     private final BankAccountService bankAccountService;
     private final SettlementHistoryCommandService historyService;
     private final PaymentQueryService paymentQueryService;
-    private final SettlementQueryRepository settlementQueryRepository;
-    private final SettlementHistoryQueryRepository settlementHistoryQueryRepository;
-
-    private static final double PLATFORM_FEE_RATE = 0.10;
+    private final SettlementMapper settlementMapper;
 
     @Transactional
     public void executeMonthlySettlement(LocalDate settleDate) {
@@ -98,7 +95,7 @@ public class SettlementCommandService {
         // 3. 판매자 계좌 정보 가져오기
         BankAccount bankAccount = bankAccountService.getPrimaryAccount(project.getSeller().getId());
 
-        return SettlementMapper.toEntity(
+        return settlementMapper.toEntity(
                 project,
                 bankAccount,
                 totalCount,
