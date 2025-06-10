@@ -394,7 +394,7 @@ class UserServiceTest extends UserIntegrationTestSupport {
         userRepository.save(user);
 
         // when & then
-        assertThatThrownBy(() -> userQueryService.getUserSummary(99L))
+        assertThatThrownBy(() -> userQueryService.getUserSummary(2000000L))
                 .isInstanceOf(CustomException.class)
                 .hasMessageContaining(ErrorCode.USER_NOT_FOUND.getErrorMessage());
     }
@@ -428,7 +428,7 @@ class UserServiceTest extends UserIntegrationTestSupport {
         MultipartFile file = null;
 
         // when & then
-        assertThatThrownBy(() -> userCommandService.updateUser(2L, request, file))
+        assertThatThrownBy(() -> userCommandService.updateUser(170L, request, file))
                 .isInstanceOf(CustomException.class)
                 .hasMessageContaining(ErrorCode.USER_NOT_FOUND.getErrorMessage());
     }
