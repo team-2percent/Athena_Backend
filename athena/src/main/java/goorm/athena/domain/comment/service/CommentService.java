@@ -5,9 +5,9 @@ import goorm.athena.domain.comment.dto.res.CommentGetResponse;
 import goorm.athena.domain.comment.entity.Comment;
 import goorm.athena.domain.comment.mapper.CommentMapper;
 import goorm.athena.domain.comment.repository.CommentRepository;
-import goorm.athena.domain.image.service.ImageService;
+import goorm.athena.domain.image.service.ImageQueryService;
 import goorm.athena.domain.project.entity.Project;
-import goorm.athena.domain.project.service.ProjectService;
+import goorm.athena.domain.project.service.ProjectQueryService;
 import goorm.athena.domain.user.entity.User;
 import goorm.athena.domain.user.service.UserService;
 import goorm.athena.global.exception.CustomException;
@@ -23,13 +23,13 @@ import java.util.List;
 public class CommentService {
     private final CommentRepository commentRepository;
     private final UserService userService;
-    private final ProjectService projectService;
-    private final ImageService imageService;
+    private final ProjectQueryService projectQueryService;
+    private final ImageQueryService imageQueryService;
 
     @Transactional
     public CommentCreateResponse createComment(Long projectId, Long userId, String content) {
         User user = userService.getUser(userId);
-        Project project = projectService.getById(projectId);
+        Project project = projectQueryService.getById(projectId);
 
         boolean alreadyCommented = commentRepository.existsByUserAndProject(user, project);
         if(alreadyCommented){
@@ -45,13 +45,13 @@ public class CommentService {
 
     @Transactional(readOnly = true)
     public List<CommentGetResponse> getCommentByProject(Long projectId){
-        Project project = projectService.getById(projectId);
+        Project project = projectQueryService.getById(projectId);
         // 쿼리 결과를 Object[] 형태로 받아옴 (Comment, 이미지 URL)
         List<Comment> results = commentRepository.findByProjectWithUserProfileImage(project);
 
         return results.stream()
                 .map(comment -> {
-                    String imageUrl = imageService.getImage(comment.getUser().getImageGroup().getId());
+                    String imageUrl = imageQueryService.getImage(comment.getUser().getImageGroup().getId());
                     return CommentMapper.toGetResponse(comment, imageUrl);
                 })
                 .toList();
@@ -64,7 +64,7 @@ public class CommentService {
 
         return results.stream()
                 .map(comment -> {
-                    String imageUrl = imageService.getImage(comment.getProject().getImageGroup().getId());
+                    String imageUrl = imageQueryService.getImage(comment.getProject().getImageGroup().getId());
                     return CommentMapper.toGetResponse(comment, imageUrl);
                 })
                 .toList();

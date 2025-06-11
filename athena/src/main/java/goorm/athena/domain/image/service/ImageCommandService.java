@@ -9,21 +9,18 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Transactional
 @RequiredArgsConstructor
 @Service
-public class ImageService {
+public class ImageCommandService {
     private final ImageRepository imageRepository;
     private final NasService nasService;
+    private final ImageQueryService imageQueryService;
 
-    /**
-     * [이미지 저장]
-     */
     // 다중 이미지 업로드
     @Transactional
     public void uploadImages(List<MultipartFile> files, ImageGroup imageGroup) {
@@ -51,7 +48,7 @@ public class ImageService {
         }
         imageRepository.saveAll(markdownImages);
 
-        return getImageUrls(markdownImages);
+        return imageQueryService.getImageUrls(markdownImages);
     }
 
     // 이미지 전체 삭제
@@ -62,47 +59,5 @@ public class ImageService {
             nasService.deleteImageFiles(image.getFileName()); // 이미지 삭제 (NAS)
         }
         imageRepository.deleteAll(images); // 이미지 삭제 (DB)
-    }
-
-    /**
-     * [GET method]
-     */
-    // 썸네일 이미지 불러오기
-    public String getImage(Long imageGroupId) {
-        return imageRepository.findFirstImageByImageGroupId(imageGroupId)
-                .map(image -> getFullUrl(image.getOriginalUrl()))
-                .orElse("");
-    }
-
-    // 프로젝트 이미지 불러오기
-    // (마크다운 이미지는 제외한다.)
-    public List<Image> getProjectImages(Long imageGroupId) {
-        return imageRepository.findProjectImagesByImageGroupId(imageGroupId);
-    }
-
-    // 이미지 url 리스트 불러오기
-    public List<String> getImageUrls(List<Image> images) {
-        List<String> imageUrls = new ArrayList<>();
-        for (Image image : images) {
-            String fullUrl = getFullUrl(image.getOriginalUrl());
-            imageUrls.add(fullUrl);
-        }
-        return imageUrls;
-    }
-
-    /*
-     * Path로 이미지 Full URL 조립
-     */
-    public String getFullUrl(String path) {
-        if(path != null) {
-            ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-            String domain = attributes.getRequest().getServerName();
-            String scheme = "localhost".equals(domain) ? "http" : "https";
-            int port = attributes.getRequest().getServerPort();
-            boolean isDefaultPort = port == 80 || port == 443;
-            return scheme + "://" + domain + (isDefaultPort ? "" : ":" + port) + path;
-        } else {
-            return "";
-        }
     }
 }

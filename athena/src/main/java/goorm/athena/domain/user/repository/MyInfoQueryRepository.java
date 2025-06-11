@@ -10,10 +10,9 @@ import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import goorm.athena.domain.comment.entity.QComment;
 import goorm.athena.domain.image.entity.QImage;
-import goorm.athena.domain.image.service.ImageService;
+import goorm.athena.domain.image.service.ImageQueryService;
 import goorm.athena.domain.imageGroup.entity.QImageGroup;
 import goorm.athena.domain.order.entity.QOrder;
-import goorm.athena.domain.order.entity.Status;
 import goorm.athena.domain.orderitem.entity.QOrderItem;
 import goorm.athena.domain.product.entity.QProduct;
 import goorm.athena.domain.project.entity.QProject;
@@ -23,7 +22,6 @@ import goorm.athena.domain.user.dto.response.MyProjectScrollResponse;
 import goorm.athena.domain.user.entity.QUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
-import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -34,7 +32,7 @@ import java.util.List;
 public class MyInfoQueryRepository {
 
     private final JPAQueryFactory queryFactory;
-    private final ImageService imageService;
+    private final ImageQueryService imageQueryService;
 
     public MyProjectScrollResponse findMyProjectsByCursor(
             Long userId,
@@ -156,7 +154,7 @@ public class MyInfoQueryRepository {
                 .map(row -> {
                     Long rate = row.get(9, Long.class);
                     boolean hasCommented = Boolean.TRUE.equals(row.get(10, Boolean.class));
-                    String processedImageUrl = imageService.getFullUrl(row.get(image.originalUrl));
+                    String processedImageUrl = imageQueryService.getFullUrl(row.get(image.originalUrl));
 
 
                     return new MyOrderScrollResponse.Item(

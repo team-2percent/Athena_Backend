@@ -1,6 +1,7 @@
 package goorm.athena.domain.user.service;
 
-import goorm.athena.domain.image.service.ImageService;
+import goorm.athena.domain.image.service.ImageCommandService;
+import goorm.athena.domain.image.service.ImageQueryService;
 import goorm.athena.domain.imageGroup.entity.ImageGroup;
 import goorm.athena.domain.user.dto.request.UserCreateRequest;
 import goorm.athena.domain.user.dto.request.UserLoginRequest;
@@ -30,7 +31,8 @@ public class UserService {
     private final TokenService tokenService;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenizer jwtTokenizer;
-    private final ImageService imageService;
+    private final ImageCommandService imageCommandService;
+    private final ImageQueryService imageQueryService;
 
     @Transactional
     public UserCreateResponse createUser(UserCreateRequest request, ImageGroup imageGroup) {
@@ -59,7 +61,7 @@ public class UserService {
 
         // 프로필 이미지가 들어오는 경우에만 등록
         if(file != null && !file.isEmpty()){
-            imageService.uploadImages(List.of(file), updateUser.getImageGroup());
+            imageCommandService.uploadImages(List.of(file), updateUser.getImageGroup());
         }
 
         User savedUser = userRepository.save(updateUser);
@@ -79,7 +81,7 @@ public class UserService {
 
         String imageUrl = "";
         if(user.getImageGroup() != null){
-            imageUrl = imageService.getImage(user.getImageGroup().getId());
+            imageUrl = imageQueryService.getImage(user.getImageGroup().getId());
         }
         return UserMapper.toHeaderGetResponse(user, imageUrl);
     }
@@ -90,7 +92,7 @@ public class UserService {
         User user = getUser(userId);
         String imageUrl = null;
         if(user.getImageGroup() != null && user.getImageGroup().getId() != null) {
-            imageUrl = imageService.getImage(user.getImageGroup().getId());
+            imageUrl = imageQueryService.getImage(user.getImageGroup().getId());
         }
 
         return UserMapper.toGetResponse(user, imageUrl);

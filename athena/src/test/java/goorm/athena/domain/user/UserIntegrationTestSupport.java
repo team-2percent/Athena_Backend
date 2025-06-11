@@ -4,12 +4,12 @@ import goorm.athena.domain.bankaccount.entity.BankAccount;
 import goorm.athena.domain.category.entity.Category;
 import goorm.athena.domain.deliveryinfo.entity.DeliveryInfo;
 import goorm.athena.domain.image.repository.ImageRepository;
-import goorm.athena.domain.image.service.ImageService;
+import goorm.athena.domain.image.service.ImageQueryService;
 import goorm.athena.domain.image.service.NasService;
 import goorm.athena.domain.imageGroup.entity.ImageGroup;
 import goorm.athena.domain.imageGroup.entity.Type;
 import goorm.athena.domain.imageGroup.repository.ImageGroupRepository;
-import goorm.athena.domain.imageGroup.service.ImageGroupService;
+import goorm.athena.domain.imageGroup.service.ImageGroupCommandService;
 import goorm.athena.domain.order.entity.Order;
 import goorm.athena.domain.orderitem.entity.OrderItem;
 import goorm.athena.domain.product.entity.Product;
@@ -44,7 +44,7 @@ public abstract class UserIntegrationTestSupport extends IntegrationServiceTestS
   protected UserRepository userRepository;
 
   @Autowired
-  protected ImageService imageService;
+  protected ImageQueryService imageQueryService;
 
   @Autowired
   protected JwtTokenizer jwtTokenizer;
@@ -69,7 +69,7 @@ public abstract class UserIntegrationTestSupport extends IntegrationServiceTestS
   protected HttpServletResponse httpServletResponse;
 
   @Autowired
-  protected ImageGroupService imageGroupService;
+  protected ImageGroupCommandService imageGroupCommandService;
 
   @Autowired
   protected UserService userService;
@@ -91,7 +91,7 @@ public abstract class UserIntegrationTestSupport extends IntegrationServiceTestS
   }
 
   protected ImageGroup setupImageGroup() {
-    return imageGroupService.createImageGroup(Type.USER);
+    return imageGroupCommandService.createImageGroup(Type.USER);
   }
 
   protected User setupUser(String email, String password, String nickname, ImageGroup imageGroup) {

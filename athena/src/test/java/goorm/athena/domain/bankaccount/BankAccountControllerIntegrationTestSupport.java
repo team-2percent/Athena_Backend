@@ -2,17 +2,11 @@ package goorm.athena.domain.bankaccount;
 
 import goorm.athena.domain.bankaccount.controller.BankAccountControllerImpl;
 import goorm.athena.domain.bankaccount.entity.BankAccount;
-import goorm.athena.domain.bankaccount.repository.BankAccountRepository;
 import goorm.athena.domain.bankaccount.service.BankAccountService;
-import goorm.athena.domain.image.service.ImageService;
 import goorm.athena.domain.imageGroup.entity.ImageGroup;
-import goorm.athena.domain.imageGroup.service.ImageGroupService;
-import goorm.athena.domain.notification.service.FcmTokenService;
 import goorm.athena.domain.user.entity.Role;
 import goorm.athena.domain.user.entity.User;
 import goorm.athena.domain.user.repository.UserRepository;
-import goorm.athena.domain.user.service.UserService;
-import goorm.athena.domain.userCoupon.service.UserCouponService;
 import goorm.athena.global.jwt.util.LoginUserRequest;
 import goorm.athena.util.IntegrationControllerTestSupport;
 import goorm.athena.util.TestEntityFactory;
@@ -27,25 +21,8 @@ public abstract class BankAccountControllerIntegrationTestSupport extends Integr
     protected BankAccountService bankAccountService;
 
     @Autowired
-    protected BankAccountRepository bankAccountRepository;
-
-    @Autowired
     protected UserRepository userRepository;
 
-    @Autowired
-    protected ImageGroupService imageGroupService;
-
-    @Autowired
-    protected UserCouponService userCouponService;
-
-    @Autowired
-    protected FcmTokenService fcmTokenService;
-
-    @Autowired
-    protected ImageService imageService;
-
-    @Autowired
-    protected UserService userService;
 
     @BeforeEach
     void setUp() {

@@ -7,10 +7,8 @@ import goorm.athena.domain.comment.dto.res.CommentCreateResponse;
 import goorm.athena.domain.comment.dto.res.CommentGetResponse;
 import goorm.athena.domain.comment.entity.Comment;
 import goorm.athena.domain.imageGroup.entity.ImageGroup;
-import goorm.athena.domain.project.entity.PlanName;
 import goorm.athena.domain.project.entity.PlatformPlan;
 import goorm.athena.domain.project.entity.Project;
-import goorm.athena.domain.project.service.ProjectService;
 import goorm.athena.domain.user.entity.User;
 import goorm.athena.global.exception.CustomException;
 import goorm.athena.global.exception.ErrorCode;
@@ -107,7 +105,7 @@ class CommentServiceTest extends CommentIntegrationSupport {
 
         // when
         List<CommentGetResponse> response = commentService.getCommentByProject(project.getId());
-        String expectedImageUrl = imageService.getImage(user.getImageGroup().getId());
+        String expectedImageUrl = imageQueryService.getImage(user.getImageGroup().getId());
 
         // then
         assertThat(response).hasSize(2);
@@ -143,7 +141,7 @@ class CommentServiceTest extends CommentIntegrationSupport {
 
         // when
         List<CommentGetResponse> response = commentService.getCommentByUser(user.getId());
-        String expectedImageUrl = imageService.getImage(user.getImageGroup().getId());
+        String expectedImageUrl = imageQueryService.getImage(user.getImageGroup().getId());
 
         // then
         assertThat(response).hasSize(1);
