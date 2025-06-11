@@ -9,19 +9,17 @@ import goorm.athena.domain.comment.entity.Comment;
 import goorm.athena.domain.comment.repository.CommentRepository;
 import goorm.athena.domain.comment.service.CommentService;
 import goorm.athena.domain.image.repository.ImageRepository;
-import goorm.athena.domain.image.service.ImageService;
+import goorm.athena.domain.image.service.ImageQueryService;
 import goorm.athena.domain.image.service.NasService;
 import goorm.athena.domain.imageGroup.entity.ImageGroup;
 import goorm.athena.domain.imageGroup.entity.Type;
-import goorm.athena.domain.imageGroup.repository.ImageGroupRepository;
-import goorm.athena.domain.imageGroup.service.ImageGroupService;
+import goorm.athena.domain.imageGroup.service.ImageGroupCommandService;
 import goorm.athena.domain.product.entity.Product;
 import goorm.athena.domain.product.repository.ProductRepository;
 import goorm.athena.domain.project.entity.PlatformPlan;
 import goorm.athena.domain.project.entity.Project;
 import goorm.athena.domain.project.repository.PlatformPlanRepository;
 import goorm.athena.domain.project.repository.ProjectRepository;
-import goorm.athena.domain.project.service.ProjectService;
 import goorm.athena.domain.user.entity.Role;
 import goorm.athena.domain.user.entity.User;
 import goorm.athena.domain.user.repository.UserRepository;
@@ -46,13 +44,10 @@ public abstract class CommentControllerIntegrationSupport extends IntegrationCon
     protected UserRepository userRepository;
 
     @Autowired
-    protected ImageGroupService imageGroupService;
+    protected ImageGroupCommandService imageGroupCommandService;
 
     @Autowired
-    protected ImageGroupRepository imageGroupRepository;
-
-    @Autowired
-    protected ImageService imageService;
+    protected ImageQueryService imageQueryService;
 
     @Autowired
     protected NasService nasService;
@@ -79,9 +74,6 @@ public abstract class CommentControllerIntegrationSupport extends IntegrationCon
     protected CommentService commentService;
 
     @Autowired
-    protected ProjectService projectService;
-
-    @Autowired
     protected ImageRepository imageRepository;
 
     @Autowired
@@ -105,11 +97,11 @@ public abstract class CommentControllerIntegrationSupport extends IntegrationCon
     }
 
     protected ImageGroup setupUserImageGroup() {
-        return imageGroupService.createImageGroup(Type.USER);
+        return imageGroupCommandService.createImageGroup(Type.USER);
     }
 
     protected ImageGroup setupProjectImageGroup() {
-        return imageGroupService.createImageGroup(Type.PROJECT);
+        return imageGroupCommandService.createImageGroup(Type.PROJECT);
     }
 
     protected Category setupCategory(String categoryName) {

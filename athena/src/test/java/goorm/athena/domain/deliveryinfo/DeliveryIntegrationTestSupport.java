@@ -4,7 +4,7 @@ import goorm.athena.domain.deliveryinfo.repository.DeliveryInfoRepository;
 import goorm.athena.domain.deliveryinfo.service.DeliveryInfoService;
 import goorm.athena.domain.imageGroup.entity.ImageGroup;
 import goorm.athena.domain.imageGroup.entity.Type;
-import goorm.athena.domain.imageGroup.service.ImageGroupService;
+import goorm.athena.domain.imageGroup.service.ImageGroupCommandService;
 import goorm.athena.domain.user.entity.Role;
 import goorm.athena.domain.user.entity.User;
 import goorm.athena.domain.user.repository.UserRepository;
@@ -18,7 +18,7 @@ public abstract class DeliveryIntegrationTestSupport extends IntegrationServiceT
     protected UserRepository userRepository;
 
     @Autowired
-    protected ImageGroupService imageGroupService;
+    protected ImageGroupCommandService imageGroupCommandService;
 
     @Autowired
     protected DeliveryInfoRepository deliveryInfoRepository;
@@ -27,7 +27,7 @@ public abstract class DeliveryIntegrationTestSupport extends IntegrationServiceT
     protected DeliveryInfoService deliveryInfoService;
 
     protected ImageGroup setupImageGroup() {
-        return imageGroupService.createImageGroup(Type.USER);
+        return imageGroupCommandService.createImageGroup(Type.USER);
     }
 
     protected User setupUser(String email, String password, String nickname, ImageGroup imageGroup) {

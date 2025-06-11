@@ -7,10 +7,12 @@ import goorm.athena.global.exception.CustomException;
 import goorm.athena.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+@Transactional
 @RequiredArgsConstructor
 @Service
-public class ImageGroupService {
+public class ImageGroupCommandService {
     private final ImageGroupRepository imageGroupRepository;
 
     // 이미지 그룹 생성 (엔터티)
@@ -22,11 +24,5 @@ public class ImageGroupService {
     // 이미지 그룹 삭제
     public void deleteImageGroup(ImageGroup imageGroup) {
         imageGroupRepository.delete(imageGroup);
-    }
-
-    // Get Image group
-    public ImageGroup getById(Long id) {
-        return imageGroupRepository.findById(id)
-                .orElseThrow(() -> new CustomException(ErrorCode.IMAGE_GROUP_NOT_FOUND));
     }
 }

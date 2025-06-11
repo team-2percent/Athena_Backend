@@ -5,13 +5,12 @@ import goorm.athena.domain.bankaccount.repository.BankAccountRepository;
 import goorm.athena.domain.bankaccount.service.BankAccountService;
 import goorm.athena.domain.imageGroup.entity.ImageGroup;
 import goorm.athena.domain.imageGroup.entity.Type;
-import goorm.athena.domain.imageGroup.service.ImageGroupService;
+import goorm.athena.domain.imageGroup.service.ImageGroupCommandService;
 import goorm.athena.domain.user.entity.Role;
 import goorm.athena.domain.user.entity.User;
 import goorm.athena.domain.user.repository.UserRepository;
 import goorm.athena.util.IntegrationServiceTestSupport;
 import goorm.athena.util.TestEntityFactory;
-import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public abstract class BankAccountIntegrationTestSupport extends IntegrationServiceTestSupport {
@@ -20,7 +19,7 @@ public abstract class BankAccountIntegrationTestSupport extends IntegrationServi
     protected UserRepository userRepository;
 
     @Autowired
-    protected ImageGroupService imageGroupService;
+    protected ImageGroupCommandService imageGroupCommandService;
 
     @Autowired
     protected BankAccountRepository bankAccountRepository;
@@ -29,7 +28,7 @@ public abstract class BankAccountIntegrationTestSupport extends IntegrationServi
     protected BankAccountService bankAccountService;
 
     protected ImageGroup setupImageGroup() {
-        return imageGroupService.createImageGroup(Type.USER);
+        return imageGroupCommandService.createImageGroup(Type.USER);
     }
 
 
