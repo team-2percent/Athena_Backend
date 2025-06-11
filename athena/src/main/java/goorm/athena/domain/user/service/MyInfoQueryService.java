@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class MyInfoService {
+public class MyInfoQueryService {
 
     private final MyInfoQueryRepository myInfoQueryRepository;
     private final MyProjectScrollResponseMapper myProjectScrollResponseMapper;

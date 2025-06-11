@@ -19,7 +19,8 @@ import goorm.athena.domain.project.entity.Project;
 import goorm.athena.domain.user.entity.Role;
 import goorm.athena.domain.user.entity.User;
 import goorm.athena.domain.user.repository.UserRepository;
-import goorm.athena.domain.user.service.UserService;
+import goorm.athena.domain.user.service.UserCommandService;
+import goorm.athena.domain.user.service.UserQueryService;
 import goorm.athena.global.jwt.util.JwtTokenizer;
 import goorm.athena.util.IntegrationServiceTestSupport;
 
@@ -72,7 +73,10 @@ public abstract class UserIntegrationTestSupport extends IntegrationServiceTestS
   protected ImageGroupService imageGroupService;
 
   @Autowired
-  protected UserService userService;
+  protected UserQueryService userQueryService;
+
+  @Autowired
+  protected UserCommandService userCommandService;
 
   @BeforeEach
   void setUp() {

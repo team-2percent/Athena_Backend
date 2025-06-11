@@ -6,7 +6,7 @@ import goorm.athena.domain.payment.dto.HtmlTemplates;
 import goorm.athena.domain.payment.dto.res.KakaoPayApproveResponse;
 import goorm.athena.domain.payment.dto.res.KakaoPayReadyResponse;
 import goorm.athena.domain.payment.service.PaymentCommandService;
-import goorm.athena.domain.user.service.UserService;
+import goorm.athena.domain.user.service.UserQueryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +20,7 @@ public class PaymentControllerImpl implements PaymentController {
     private final PaymentCommandService paymentCommandService;
     private final OrderQueryService orderQueryService;
     private final FcmNotificationService fcmNotificationService;
-    private final UserService userService;
+    private final UserQueryService userQueryService;
 
     @PostMapping("/ready/{orderId}")
     public ResponseEntity<KakaoPayReadyResponse> readyPayment(
@@ -44,7 +44,7 @@ public class PaymentControllerImpl implements PaymentController {
 
         Long sellerId = orderQueryService.getSeller(orderId);
         Long buyerId = orderQueryService.getBuyer(orderId);
-        String buyerName = userService.getUser(buyerId).getNickname();
+        String buyerName = userQueryService.getUser(buyerId).getNickname();
         fcmNotificationService.notifyPurchase(buyerId, sellerId, buyerName);
 
         return buildHtmlResponse(200, HtmlTemplates.kakaoSuccessHtml());

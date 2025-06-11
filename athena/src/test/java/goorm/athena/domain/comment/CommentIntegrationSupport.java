@@ -6,12 +6,12 @@ import goorm.athena.domain.category.entity.Category;
 import goorm.athena.domain.category.repository.CategoryRepository;
 import goorm.athena.domain.comment.entity.Comment;
 import goorm.athena.domain.comment.repository.CommentRepository;
-import goorm.athena.domain.comment.service.CommentService;
+import goorm.athena.domain.comment.service.CommentCommandService;
+import goorm.athena.domain.comment.service.CommentQueryService;
 import goorm.athena.domain.image.service.ImageService;
 import goorm.athena.domain.imageGroup.entity.ImageGroup;
 import goorm.athena.domain.imageGroup.entity.Type;
 import goorm.athena.domain.imageGroup.service.ImageGroupService;
-import goorm.athena.domain.project.entity.PlanName;
 import goorm.athena.domain.project.entity.PlatformPlan;
 import goorm.athena.domain.project.entity.Project;
 import goorm.athena.domain.project.repository.PlatformPlanRepository;
@@ -32,7 +32,10 @@ public abstract class CommentIntegrationSupport extends IntegrationServiceTestSu
     protected ImageGroupService imageGroupService;
 
     @Autowired
-    protected CommentService commentService;
+    protected CommentQueryService commentQueryService;
+
+    @Autowired
+    protected CommentCommandService commentCommandService;
 
     @Autowired
     protected UserRepository userRepository;
@@ -74,11 +77,6 @@ public abstract class CommentIntegrationSupport extends IntegrationServiceTestSu
         return bankAccount;
     }
 
-    protected PlatformPlan setupPlatformPlan(PlanName planName, int platformFeeRate, int pgFeeRate, int vatRate, String description) {
-        PlatformPlan plan = TestEntityFactory.createPlatformPlan(planName, platformFeeRate, pgFeeRate, vatRate, description);
-        return plan;
-    }
-
     protected Project setupProject(User user, Category category, ImageGroup imageGroup,
                                    BankAccount bankAccount, PlatformPlan platformPlan,
                                    String title, String description, Long goalAmount, Long totalAmount, String contentMarkdown) {
@@ -90,10 +88,6 @@ public abstract class CommentIntegrationSupport extends IntegrationServiceTestSu
     }
 
     protected Comment setupComment(User user, Project project, String content){
-        return Comment.builder()
-                .user(user)
-                .project(project)
-                .content(content)
-                .build();
+        return TestEntityFactory.createComment(user, project, content);
     }
 }

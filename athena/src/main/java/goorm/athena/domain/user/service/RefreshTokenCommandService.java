@@ -15,8 +15,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-public class RefreshTokenService {
-    private final UserService userService;
+public class RefreshTokenCommandService {
+    private final UserQueryService userQueryService;
     private final JwtTokenizer jwtTokenizer;
 
     @Transactional
@@ -58,7 +58,7 @@ public class RefreshTokenService {
                 Claims claims = jwtTokenizer.parseRefreshToken(refreshToken);
                 Long userId = Long.valueOf(claims.getSubject());
 
-                User user = userService.getUser(userId);
+                User user = userQueryService.getUser(userId);
 
                 String newAccessToken = jwtTokenizer.createAccessToken(user.getId(), user.getNickname(), user.getRole().name());
 

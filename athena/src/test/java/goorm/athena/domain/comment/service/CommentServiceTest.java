@@ -7,10 +7,8 @@ import goorm.athena.domain.comment.dto.res.CommentCreateResponse;
 import goorm.athena.domain.comment.dto.res.CommentGetResponse;
 import goorm.athena.domain.comment.entity.Comment;
 import goorm.athena.domain.imageGroup.entity.ImageGroup;
-import goorm.athena.domain.project.entity.PlanName;
 import goorm.athena.domain.project.entity.PlatformPlan;
 import goorm.athena.domain.project.entity.Project;
-import goorm.athena.domain.project.service.ProjectService;
 import goorm.athena.domain.user.entity.User;
 import goorm.athena.global.exception.CustomException;
 import goorm.athena.global.exception.ErrorCode;
@@ -21,8 +19,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.*;
 
 
 @Transactional
@@ -32,25 +29,16 @@ class CommentServiceTest extends CommentIntegrationSupport {
     @Test
     void createComment_Error() {
         // given
-        ImageGroup imageGroup = setupImageGroup();
-        User user = setupUser("123", "123", "123", imageGroup);
-        Category category = setupCategory("음식");
-        BankAccount bankAccount = setupBankAccount(user, "123" ,"123" ,"123", true);
-        PlatformPlan platformPlan = platformPlanRepository.findById(1L).get();
-        Project project = setupProject(user, category, imageGroup, bankAccount, platformPlan,
-                "프로젝2132132131트 제목", "설123213213명", 100000L, 10000L, "!23");
+        User user = userRepository.findById(16L).get();
+        Project project = projectRepository.findById(16L).get();
         Comment comment = setupComment(user, project, "123");
 
-        userRepository.save(user);
-        categoryRepository.save(category);
-        bankAccountRepository.save(bankAccount);
-        projectRepository.save(project);
         commentRepository.save(comment);
 
         Optional<Project> project1 = projectRepository.findById(project.getId());
 
         // when & then
-        assertThatThrownBy(() -> commentService.createComment(project1.get().getId(), user.getId(), "123"))
+        assertThatThrownBy(() -> commentCommandService.createComment(project1.get().getId(), user.getId(), "123"))
                 .isInstanceOf(CustomException.class)
                 .hasMessageContaining(ErrorCode.ALREADY_COMMENTED.getErrorMessage());
 
@@ -60,23 +48,11 @@ class CommentServiceTest extends CommentIntegrationSupport {
     @Test
     void createComment() {
         // given
-        ImageGroup imageGroup = setupImageGroup();
-        User user = setupUser("123", "123", "123", imageGroup);
-        Category category = setupCategory("음식");
-        BankAccount bankAccount = setupBankAccount(user, "123" ,"123" ,"123", true);
-        PlatformPlan platformPlan = platformPlanRepository.findById(1L).get();
-        Project project = setupProject(user, category, imageGroup, bankAccount, platformPlan,
-                "프로젝2132132131트 제목", "설123213213명", 100000L, 10000L, "!23");
-
-        userRepository.save(user);
-        categoryRepository.save(category);
-        bankAccountRepository.save(bankAccount);
-        projectRepository.save(project);
-
-        Optional<Project> project1 = projectRepository.findById(project.getId());
+        User user = userRepository.findById(17L).get();
+        Project project = projectRepository.findById(17L).get();
 
         // when
-        CommentCreateResponse response = commentService.createComment(project1.get().getId(), user.getId(), "123123");
+        CommentCreateResponse response = commentCommandService.createComment(project.getId(), user.getId(), "123123");
 
         // then
         assertThat(response.userName()).isEqualTo(user.getNickname());
@@ -87,26 +63,17 @@ class CommentServiceTest extends CommentIntegrationSupport {
     @Test
     void getCommentByProject() {
         // given
-        ImageGroup imageGroup = setupImageGroup();
-        ImageGroup imageGroup2 = setupImageGroup();
-        User user = setupUser("123", "123", "123", imageGroup);
-        User user2 = setupUser("123", "123", "124", imageGroup2);
-        Category category = setupCategory("음식");
-        BankAccount bankAccount = setupBankAccount(user, "123" ,"123" ,"123", true);
-        PlatformPlan platformPlan = platformPlanRepository.findById(1L).get();
-        Project project = setupProject(user, category, imageGroup, bankAccount, platformPlan,
-                "프로젝2132132131트 제목", "설123213213명", 100000L, 10000L, "!23");
+        User user = userRepository.findById(18L).get();
+        User user2 = userRepository.findById(19L).get();
+        Project project = projectRepository.findById(18L).get();
+
         Comment comment = setupComment(user, project, "123");
         Comment comment1 = setupComment(user2, project, "12#");
 
-        userRepository.saveAll(List.of(user, user2));
-        categoryRepository.save(category);
-        bankAccountRepository.save(bankAccount);
-        projectRepository.save(project);
         commentRepository.saveAll(List.of(comment, comment1));
 
         // when
-        List<CommentGetResponse> response = commentService.getCommentByProject(project.getId());
+        List<CommentGetResponse> response = commentQueryService.getCommentByProject(project.getId());
         String expectedImageUrl = imageService.getImage(user.getImageGroup().getId());
 
         // then
@@ -123,26 +90,16 @@ class CommentServiceTest extends CommentIntegrationSupport {
     @Test
     void getCommentByUser() {
         // given
-        ImageGroup imageGroup = setupImageGroup();
-        ImageGroup imageGroup2 = setupImageGroup();
-        User user = setupUser("123", "123", "123", imageGroup);
-        User user2 = setupUser("123", "123", "124", imageGroup2);
-        Category category = setupCategory("음식");
-        BankAccount bankAccount = setupBankAccount(user, "123" ,"123" ,"123", true);
-        PlatformPlan platformPlan = platformPlanRepository.findById(1L).get();
-        Project project = setupProject(user, category, imageGroup, bankAccount, platformPlan,
-                "프로젝2132132131트 제목", "설123213213명", 100000L, 10000L, "!23");
+        User user = userRepository.findById(20L).get();
+        User user2 = userRepository.findById(21L).get();
+        Project project = projectRepository.findById(19L).get();
         Comment comment = setupComment(user, project, "123");
         Comment comment1 = setupComment(user2, project, "12#");
 
-        userRepository.saveAll(List.of(user, user2));
-        categoryRepository.save(category);
-        bankAccountRepository.save(bankAccount);
-        projectRepository.save(project);
         commentRepository.saveAll(List.of(comment, comment1));
 
         // when
-        List<CommentGetResponse> response = commentService.getCommentByUser(user.getId());
+        List<CommentGetResponse> response = commentQueryService.getCommentByUser(user.getId());
         String expectedImageUrl = imageService.getImage(user.getImageGroup().getId());
 
         // then

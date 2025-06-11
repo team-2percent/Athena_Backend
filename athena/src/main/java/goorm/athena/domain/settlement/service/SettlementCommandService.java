@@ -1,14 +1,19 @@
 package goorm.athena.domain.settlement.service;
 
+import goorm.athena.domain.admin.dto.res.ProductSettlementSummaryResponse;
+import goorm.athena.domain.admin.dto.res.SettlementDetailInfoResponse;
+import goorm.athena.domain.admin.dto.res.SettlementHistoryPageResponse;
 import goorm.athena.domain.bankaccount.entity.BankAccount;
-import goorm.athena.domain.bankaccount.service.BankAccountService;
+import goorm.athena.domain.bankaccount.service.BankAccountQueryService;
 import goorm.athena.domain.order.entity.Order;
 import goorm.athena.domain.order.service.OrderCommendService;
 import goorm.athena.domain.payment.service.PaymentQueryService;
 import goorm.athena.domain.project.entity.PlatformPlan;
 import goorm.athena.domain.project.entity.Project;
 import goorm.athena.domain.project.service.ProjectService;
+import goorm.athena.domain.settlement.dto.res.SettlementSummaryResponse;
 import goorm.athena.domain.settlement.entity.Settlement;
+import goorm.athena.domain.settlement.entity.Status;
 import goorm.athena.domain.settlement.mapper.SettlementMapper;
 import goorm.athena.domain.settlement.repository.SettlementQueryRepository;
 import goorm.athena.domain.settlement.repository.SettlementRepository;
@@ -16,6 +21,9 @@ import goorm.athena.domain.settlementhistory.repository.SettlementHistoryQueryRe
 import goorm.athena.domain.settlementhistory.service.SettlementHistoryCommandService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,10 +41,14 @@ public class SettlementCommandService {
     private final ProjectService projectService;
     private final OrderCommendService orderCommendService;
     private final SettlementRepository settlementRepository;
-    private final BankAccountService bankAccountService;
+    private final BankAccountQueryService bankAccountQueryService;
     private final SettlementHistoryCommandService historyService;
     private final PaymentQueryService paymentQueryService;
+    private final SettlementQueryRepository settlementQueryRepository;
+    private final SettlementHistoryQueryRepository settlementHistoryQueryRepository;
     private final SettlementMapper settlementMapper;
+
+    private static final double PLATFORM_FEE_RATE = 0.10;
 
     @Transactional
     public void executeMonthlySettlement(LocalDate settleDate) {
@@ -93,7 +105,7 @@ public class SettlementCommandService {
         long payOutAmount = totalSales - platformFeeTotal - pgFeeTotal - vatTotal;
 
         // 3. 판매자 계좌 정보 가져오기
-        BankAccount bankAccount = bankAccountService.getPrimaryAccount(project.getSeller().getId());
+        BankAccount bankAccount = bankAccountQueryService.getPrimaryAccount(project.getSeller().getId());
 
         return settlementMapper.toEntity(
                 project,
@@ -106,5 +118,5 @@ public class SettlementCommandService {
                 payOutAmount
         );
     }
-
+    
 }

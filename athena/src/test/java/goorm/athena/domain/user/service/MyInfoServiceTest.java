@@ -7,7 +7,6 @@ import goorm.athena.domain.imageGroup.entity.ImageGroup;
 import goorm.athena.domain.order.entity.Order;
 import goorm.athena.domain.orderitem.entity.OrderItem;
 import goorm.athena.domain.product.entity.Product;
-import goorm.athena.domain.project.entity.PlanName;
 import goorm.athena.domain.project.entity.PlatformPlan;
 import goorm.athena.domain.project.entity.Project;
 import goorm.athena.domain.user.MyInfoIntegrationTestSupport;
@@ -25,6 +24,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@Transactional
 class MyInfoServiceTest extends MyInfoIntegrationTestSupport{
 
     @DisplayName("로그인 한 유저의 내가 등록한 프로젝트들을 성공적으로 무한 페이징 형식으로 조회한다.")
@@ -49,11 +49,11 @@ class MyInfoServiceTest extends MyInfoIntegrationTestSupport{
         );
 
         // when
-        MyProjectScrollResponse result = myInfoService.getMyProjects(user.getId(), request);
+        MyProjectScrollResponse result = myInfoQueryService.getMyProjects(user.getId(), request);
 
         // then
         assertThat(result.content()).isNotEmpty();
-        assertThat(result.content().getLast().title()).isEqualTo("프로젝2132132131트 제목");
+        assertThat(result.content().getLast().title()).isEqualTo(project.getTitle());
     }
 
     @Transactional
@@ -97,7 +97,7 @@ class MyInfoServiceTest extends MyInfoIntegrationTestSupport{
         );
 
         // when
-        MyOrderScrollResponse result = myInfoService.getMyOrders(user.getId(), request);
+        MyOrderScrollResponse result = myInfoQueryService.getMyOrders(user.getId(), request);
 
         // then
         assertThat(result).isNotNull();

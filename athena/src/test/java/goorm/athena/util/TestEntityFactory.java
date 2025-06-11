@@ -2,6 +2,10 @@ package goorm.athena.util;
 
 import goorm.athena.domain.bankaccount.entity.BankAccount;
 import goorm.athena.domain.category.entity.Category;
+import goorm.athena.domain.comment.entity.Comment;
+import goorm.athena.domain.coupon.dto.req.CouponCreateRequest;
+import goorm.athena.domain.coupon.entity.Coupon;
+import goorm.athena.domain.coupon.entity.CouponStatus;
 import goorm.athena.domain.deliveryinfo.entity.DeliveryInfo;
 import goorm.athena.domain.imageGroup.entity.ImageGroup;
 import goorm.athena.domain.order.entity.Order;
@@ -12,6 +16,8 @@ import goorm.athena.domain.project.entity.PlatformPlan;
 import goorm.athena.domain.project.entity.Project;
 import goorm.athena.domain.user.entity.Role;
 import goorm.athena.domain.user.entity.User;
+import goorm.athena.domain.userCoupon.entity.Status;
+import goorm.athena.domain.userCoupon.entity.UserCoupon;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDateTime;
@@ -109,5 +115,37 @@ public class TestEntityFactory {
 
     public static Order createOrder(User user, DeliveryInfo delivery, Project project, LocalDateTime orderedAt) {
         return Order.create(user, delivery, project, orderedAt);
+    }
+
+    public static Comment createComment(User user, Project project, String content){
+        return Comment.builder()
+                .user(user)
+                .project(project)
+                .content(content)
+                .build();
+    }
+
+    public static Coupon createCoupon(String title, String content, int price, LocalDateTime startAt,
+                                      LocalDateTime endAt, LocalDateTime expiresAt, int stock, CouponStatus couponStatus){
+        CouponCreateRequest request = new CouponCreateRequest(title, content, price, startAt, endAt, expiresAt, stock);
+
+        Coupon coupon =  Coupon.builder()
+                .request(request)
+                .build();
+
+        // Coupon 리플렉터로 상태 필요시 직접 주입
+        ReflectionTestUtils.setField(coupon, "couponStatus", couponStatus);
+        return coupon;
+    }
+
+    public static UserCoupon createUserCoupon(User user, Coupon coupon, Status status) {
+        UserCoupon userCoupon = UserCoupon.builder()
+                .user(user)
+                .coupon(coupon)
+                .build();
+
+        // UserCoupon 리플렉터로 상태 필요시 직접 주입
+        ReflectionTestUtils.setField(userCoupon, "status", status);
+        return userCoupon;
     }
 }

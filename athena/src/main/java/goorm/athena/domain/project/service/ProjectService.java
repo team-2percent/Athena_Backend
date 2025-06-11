@@ -1,7 +1,7 @@
 package goorm.athena.domain.project.service;
 
 import goorm.athena.domain.bankaccount.entity.BankAccount;
-import goorm.athena.domain.bankaccount.service.BankAccountService;
+import goorm.athena.domain.bankaccount.service.BankAccountQueryService;
 import goorm.athena.domain.category.entity.Category;
 import goorm.athena.domain.category.service.CategoryService;
 import goorm.athena.domain.image.entity.Image;
@@ -32,7 +32,7 @@ import goorm.athena.domain.project.repository.query.ProjectSearchQueryRepository
 import goorm.athena.domain.user.dto.response.UserDetailResponse;
 import goorm.athena.domain.user.entity.User;
 import goorm.athena.domain.user.mapper.UserMapper;
-import goorm.athena.domain.user.service.UserService;
+import goorm.athena.domain.user.service.UserQueryService;
 import goorm.athena.global.exception.CustomException;
 import goorm.athena.global.exception.ErrorCode;
 import goorm.athena.domain.project.util.ProjectQueryType;
@@ -58,10 +58,10 @@ public class ProjectService {
     private final ProjectRepository projectRepository;
     private final ImageGroupService imageGroupService;
     private final ImageService imageService;
-    private final UserService userService;
+    private final UserQueryService userQueryService;
     private final CategoryService categoryService;
     private final ProductService productService;
-    private final BankAccountService bankAccountService;
+    private final BankAccountQueryService bankAccountQueryService;
     private final ProjectQueryRepository projectQueryRepository;
     private final ProjectFilterQueryRepository projectFilterQueryRepository;
     private final ProjectSearchQueryRepository projectSearchQueryRepository;
@@ -74,9 +74,9 @@ public class ProjectService {
     @Transactional
     public ProjectIdResponse createProject(ProjectCreateRequest request, List<MultipartFile> markdownFiles) {
         ImageGroup imageGroup = imageGroupService.getById(request.imageGroupId());
-        User seller = userService.getUser(request.sellerId());
+        User seller = userQueryService.getUser(request.sellerId());
         Category category = categoryService.getCategoryById(request.categoryId());
-        BankAccount bankAccount = bankAccountService.getAccount(request.sellerId(), request.bankAccountId());
+        BankAccount bankAccount = bankAccountQueryService.getAccount(request.sellerId(), request.bankAccountId());
         PlanName planName = PlanName.valueOf(request.platformPlan());
         PlatformPlan platformPlan = platformPlanRepository.findByName(planName);
 
@@ -151,7 +151,7 @@ public class ProjectService {
             List<MultipartFile> markdownFiles) {
         Project project = getById(projectId);
         Category category = categoryService.getCategoryById(request.categoryId());
-        BankAccount bankAccount = bankAccountService.getPrimaryAccount(request.bankAccountId());
+        BankAccount bankAccount = bankAccountQueryService.getPrimaryAccount(request.bankAccountId());
 
         // 마크다운 이미지, 대표 이미지 PUT 작업을 위해서 이미지 미리 전체 삭제
         imageService.deleteImages(project.getImageGroup());
