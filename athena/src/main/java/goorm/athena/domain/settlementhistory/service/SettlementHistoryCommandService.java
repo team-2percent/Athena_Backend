@@ -13,9 +13,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+
 @Service
 @RequiredArgsConstructor
-public class SettlementHistoryService {
+public class SettlementHistoryCommandService {
 
     private final SettlementHistoryRepository settlementHistoryRepository;
     private final SettlementHistoryMapper settlementHistoryMapper;

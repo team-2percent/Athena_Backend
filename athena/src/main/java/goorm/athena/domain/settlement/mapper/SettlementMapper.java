@@ -6,7 +6,6 @@ import goorm.athena.domain.settlement.entity.Settlement;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-
 @Mapper(componentModel = "spring")
 public interface SettlementMapper {
 
