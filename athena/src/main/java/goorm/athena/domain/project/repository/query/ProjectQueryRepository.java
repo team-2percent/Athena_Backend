@@ -5,14 +5,13 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import goorm.athena.domain.image.entity.QImage;
-import goorm.athena.domain.image.service.ImageService;
+import goorm.athena.domain.image.service.ImageQueryService;
 import goorm.athena.domain.imageGroup.entity.QImageGroup;
 import goorm.athena.domain.project.dto.cursor.*;
 import goorm.athena.domain.project.dto.req.ProjectCursorRequest;
 import goorm.athena.domain.project.dto.res.ProjectRecentResponse;
 import goorm.athena.domain.project.entity.ApprovalStatus;
 import goorm.athena.domain.project.entity.QProject;
-import goorm.athena.domain.project.entity.Status;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
@@ -24,7 +23,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ProjectQueryRepository {
     private final JPAQueryFactory queryFactory;
-    private final ImageService imageService;
+    private final ImageQueryService imageQueryService;
 
     // 최신 프로젝트 조회 (커서 기반 페이징)
     public ProjectRecentCursorResponse getProjectsByNew(ProjectCursorRequest<LocalDateTime> request) {
@@ -77,7 +76,7 @@ public class ProjectQueryRepository {
                 .map(dto -> new ProjectRecentResponse(
                         dto.id(),
                         StringUtils.hasText(dto.imageUrl())
-                                ? imageService.getFullUrl(dto.imageUrl().trim())
+                                ? imageQueryService.getFullUrl(dto.imageUrl().trim())
                                 : null,
                         dto.sellerName(),
                         dto.title(),

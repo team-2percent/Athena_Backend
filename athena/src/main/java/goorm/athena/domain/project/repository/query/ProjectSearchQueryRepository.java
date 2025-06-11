@@ -6,7 +6,7 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import goorm.athena.domain.image.entity.QImage;
-import goorm.athena.domain.image.service.ImageService;
+import goorm.athena.domain.image.service.ImageQueryService;
 import goorm.athena.domain.imageGroup.entity.QImageGroup;
 import goorm.athena.domain.project.dto.cursor.ProjectSearchCursorResponse;
 import goorm.athena.domain.project.dto.req.ProjectCursorRequest;
@@ -27,7 +27,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ProjectSearchQueryRepository {
     private final JPAQueryFactory queryFactory;
-    private final ImageService imageService;
+    private final ImageQueryService imageQueryService;
 
 
     // 검색 기반 페이지 조회
@@ -86,7 +86,7 @@ public class ProjectSearchQueryRepository {
                 .map(dto -> new ProjectSearchResponse(
                         dto.id(),
                         StringUtils.hasText(dto.imageUrl())
-                                ? imageService.getFullUrl(dto.imageUrl().trim())
+                                ? imageQueryService.getFullUrl(dto.imageUrl().trim())
                                 : null,
                         dto.sellerName(),
                         dto.title(),
