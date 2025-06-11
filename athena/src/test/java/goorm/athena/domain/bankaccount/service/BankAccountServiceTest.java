@@ -21,11 +21,7 @@ class BankAccountServiceTest extends BankAccountIntegrationTestSupport {
     @Test
     void getBankAccountById_Error() {
         // given
-        ImageGroup imageGroup = setupImageGroup();
-        User user = setupUser("123", "123", "123", imageGroup);
-        userRepository.save(user);
-        BankAccount bankAccount = setupBankAccount(user, "123", "123", "123", true);
-        bankAccountRepository.save(bankAccount);
+        User user = userRepository.findById(12L).get();
 
         // when & then
         assertThatThrownBy(() -> bankAccountQueryService.getBankAccount(100000L))
@@ -37,19 +33,14 @@ class BankAccountServiceTest extends BankAccountIntegrationTestSupport {
     @Test
     void getBankAccountById() {
         // given
-        ImageGroup imageGroup = setupImageGroup();
-        User user = setupUser("123", "123", "123", imageGroup);
-        userRepository.save(user);
-        BankAccount bankAccount = setupBankAccount(user, "123", "123", "123", true);
-        bankAccountRepository.save(bankAccount);
+        User user = userRepository.findById(13L).get();
 
         // when
-        BankAccount found = bankAccountQueryService.getBankAccount(bankAccount.getId());
+        BankAccount bankAccount = bankAccountQueryService.getPrimaryAccount(user.getId());
 
         // then
-        assertThat(found.getId()).isEqualTo(bankAccount.getId());
-        assertThat(found.getUser().getId()).isEqualTo(user.getId());
-        assertThat(found.getAccountHolder()).isEqualTo("123");
+        assertThat(bankAccount.getId()).isEqualTo(13L);
+        assertThat(bankAccount.getUser().getId()).isEqualTo(user.getId());
     }
 
     @DisplayName("유저가 자신의 계좌 정보를 입력해 저장한다.")
@@ -73,11 +64,7 @@ class BankAccountServiceTest extends BankAccountIntegrationTestSupport {
     @Test
     void getPrimaryDeliveryInfo_ThrowsDeliveryNotFound() {
         // given
-        ImageGroup imageGroup = setupImageGroup();
-        User user = setupUser("user_no_bankAccount", "abc", "abc", imageGroup);
-        userRepository.save(user);
-
-        // 기본 계좌 정보 없음 상태
+        User user = userRepository.findById(2L).get();
 
         // when & then
         assertThatThrownBy(() -> bankAccountQueryService.getPrimaryAccount(100000L))
@@ -89,23 +76,16 @@ class BankAccountServiceTest extends BankAccountIntegrationTestSupport {
     @Test
     void createBankAccount_Normal() {
         // given
-        ImageGroup imageGroup = setupImageGroup();
-        User user = setupUser("123", "123", "123", imageGroup);
-        userRepository.save(user);
-        BankAccount bankAccount = setupBankAccount(user, "124", "124", "124", true);
-        bankAccountRepository.save(bankAccount);
-
+        User user = userRepository.findById(8L).get();
         BankAccountCreateRequest request = new BankAccountCreateRequest("123", "123", "123");
-
-        int size = bankAccountRepository.findAllByUserId(user.getId()).size();
 
         // when
         bankAccountCommandService.createBankAccount(user.getId(), request);
 
         // then
         List<BankAccount> infos = bankAccountRepository.findAllByUserId(user.getId());
-        assertThat(infos).hasSize(size+1);
-        assertThat(infos.get(size).isDefault()).isFalse();
+        assertThat(infos.getLast().isDefault()).isTrue();
+        assertThat(infos.getFirst().isDefault()).isFalse();
     }
 
     @DisplayName("유저가 계좌 정보 상태를 변경할 때 다른 유저의 계좌 정보를 변경하면 에러를 리턴한다.")
@@ -158,13 +138,10 @@ class BankAccountServiceTest extends BankAccountIntegrationTestSupport {
     @Test
     void deleteBankAccountInfo_NotMyUser() {
         // given
-        User user = setupUser("123", "123", "123", null);
-        userRepository.save(user);
-        BankAccount bankAccount = setupBankAccount(user, "!23", "123", "123", true);
-        bankAccountRepository.save(bankAccount);
+        User user = userRepository.findById(16L).get();
 
         // when & then
-        assertThatThrownBy(() -> bankAccountCommandService.deleteBankAccount(99L, bankAccount.getId()))
+        assertThatThrownBy(() -> bankAccountCommandService.deleteBankAccount(user.getId(), 1L))
                 .isInstanceOf(CustomException.class)
                 .hasMessageContaining(ErrorCode.INACCURATE_BANK_ACCOUNT.getErrorMessage());
     }
@@ -173,10 +150,8 @@ class BankAccountServiceTest extends BankAccountIntegrationTestSupport {
     @Test
     void deleteBankAccountInfo_Primary() {
         // given
-        User user = setupUser("123", "123", "123", null);
-        userRepository.save(user);
-        BankAccount bankAccount = setupBankAccount(user, "!23", "123", "123", true);
-        bankAccountRepository.save(bankAccount);
+        User user = userRepository.findById(16L).get();
+        BankAccount bankAccount = bankAccountQueryService.getPrimaryAccount(user.getId());
 
         // when & then
         assertThatThrownBy(() -> bankAccountCommandService.deleteBankAccount(user.getId(), bankAccount.getId()))
@@ -207,9 +182,7 @@ class BankAccountServiceTest extends BankAccountIntegrationTestSupport {
     @Test
     void getMyDeliveryInfo() {
         // given
-        ImageGroup imageGroup = setupImageGroup();
-        User user = setupUser("123", "123", "123", imageGroup);
-        userRepository.save(user);
+        User user = userRepository.findById(3L).get();
 
         BankAccount bankAccount = setupBankAccount(user, "!23", "123", "123", false);
         BankAccount bankAccount2 = setupBankAccount(user, "!234", "124", "1243", false);

@@ -22,11 +22,7 @@ class DeliveryInfoServiceTest extends DeliveryIntegrationTestSupport {
     @Test
     void getById_Error() {
         // given
-        ImageGroup imageGroup = setupImageGroup();
-        User user = setupUser("123", "123", "123", imageGroup);
-        userRepository.save(user);
-        DeliveryInfo deliveryInfo = new DeliveryInfo(user, "!23", "123", "123", true);
-        deliveryInfoRepository.save(deliveryInfo);
+        User user = userRepository.findById(12L).get();
 
         // when & then
         assertThatThrownBy(() -> deliveryInfoQueryService.getById(100000L))
@@ -38,17 +34,13 @@ class DeliveryInfoServiceTest extends DeliveryIntegrationTestSupport {
     @Test
     void getById() {
         // given
-        ImageGroup imageGroup = setupImageGroup();
-        User user = setupUser("123", "123", "123", imageGroup);
-        userRepository.save(user);
-        DeliveryInfo deliveryInfo = new DeliveryInfo(user, "!23", "123", "123", true);
-        deliveryInfoRepository.save(deliveryInfo);
+        User user = userRepository.findById(12L).get();
 
         // when
-        DeliveryInfo found = deliveryInfoQueryService.getById(deliveryInfo.getId());
+        DeliveryInfo found = deliveryInfoQueryService.getById(12L);
 
         // then
-        assertThat(found.getId()).isEqualTo(deliveryInfo.getId());
+        assertThat(found.getId()).isEqualTo(12L);
         assertThat(found.getUser().getId()).isEqualTo(user.getId());
     }
 
@@ -57,8 +49,7 @@ class DeliveryInfoServiceTest extends DeliveryIntegrationTestSupport {
     @Test
     void addDeliveryInfo_Primary() {
         // given
-        User user = setupUser("123", "123", "123", null);
-        userRepository.save(user);
+        User user = userRepository.findById(12L).get();
 
         DeliveryInfoRequest request = new DeliveryInfoRequest("홍길동", "서울시", "010-1111-2222");
 
@@ -78,9 +69,7 @@ class DeliveryInfoServiceTest extends DeliveryIntegrationTestSupport {
     @Test
     void getPrimaryDeliveryInfo_ThrowsDeliveryNotFound() {
         // given
-        ImageGroup imageGroup = setupImageGroup();
-        User user = setupUser("user_no_delivery", "abc", "abc", imageGroup);
-        userRepository.save(user);
+        User user = userRepository.findById(12L).get();
 
         // 기본 배송지 없음 상태
 
@@ -168,14 +157,10 @@ class DeliveryInfoServiceTest extends DeliveryIntegrationTestSupport {
     @Test
     void deleteDeliveryInfo_NotMyUser() {
         // given
-        ImageGroup imageGroup = setupImageGroup();
-        User user = setupUser("123", "123", "123", imageGroup);
-        userRepository.save(user);
-        DeliveryInfo deliveryInfo = new DeliveryInfo(user, "!23", "123", "123", true);
-        deliveryInfoRepository.save(deliveryInfo);
+        User user = userRepository.findById(12L).get();
 
         // when & then
-        assertThatThrownBy(() -> deliveryInfoCommandService.deleteDeliveryInfo(99L, deliveryInfo.getId()))
+        assertThatThrownBy(() -> deliveryInfoCommandService.deleteDeliveryInfo(user.getId(), 26L))
                 .isInstanceOf(CustomException.class)
                 .hasMessageContaining(ErrorCode.ACCESS_DENIED.getErrorMessage());
     }
@@ -184,14 +169,10 @@ class DeliveryInfoServiceTest extends DeliveryIntegrationTestSupport {
     @Test
     void deleteDeliveryInfo_Primary() {
         // given
-        ImageGroup imageGroup = setupImageGroup();
-        User user = setupUser("123", "123", "123", imageGroup);
-        userRepository.save(user);
-        DeliveryInfo deliveryInfo = new DeliveryInfo(user, "!23", "123", "123", true);
-        deliveryInfoRepository.save(deliveryInfo);
+        User user = userRepository.findById(13L).get();
 
         // when & then
-        assertThatThrownBy(() -> deliveryInfoCommandService.deleteDeliveryInfo(user.getId(), deliveryInfo.getId()))
+        assertThatThrownBy(() -> deliveryInfoCommandService.deleteDeliveryInfo(user.getId(), 13L))
                 .isInstanceOf(CustomException.class)
                 .hasMessageContaining(ErrorCode.BASIC_DELIVERY_NOT_DELETED.getErrorMessage());
     }
@@ -200,10 +181,8 @@ class DeliveryInfoServiceTest extends DeliveryIntegrationTestSupport {
     @Test
     void deleteDeliveryInfo_Normal() {
         // given
-        ImageGroup imageGroup = setupImageGroup();
-        User user = setupUser("123", "123", "123", imageGroup);
-        userRepository.save(user);
-        DeliveryInfo deliveryInfo = new DeliveryInfo(user, "!23", "123", "123", true);
+        User user = userRepository.findById(13L).get();
+        DeliveryInfo deliveryInfo = new DeliveryInfo(user, "!23", "123", "123", false);
         DeliveryInfo deliveryInfo2 = new DeliveryInfo(user, "!234", "124", "1243", false);
         deliveryInfoRepository.saveAll(List.of(deliveryInfo, deliveryInfo2));
 
@@ -219,24 +198,19 @@ class DeliveryInfoServiceTest extends DeliveryIntegrationTestSupport {
     @Test
     void getMyDeliveryInfo() {
         // given
-        ImageGroup imageGroup = setupImageGroup();
-        User user = setupUser("123", "123", "123", imageGroup);
-        userRepository.save(user);
-
-        int size = deliveryInfoRepository.findByUserId(user.getId()).size();
+        User user = userRepository.findById(14L).get();
 
         DeliveryInfo oldDeliveryInfo = new DeliveryInfo(user, "!23", "123", "123", false);
         DeliveryInfo newDeliveryInfo = new DeliveryInfo(user, "!234", "1243", "1234", false);
         deliveryInfoRepository.saveAll(List.of(oldDeliveryInfo, newDeliveryInfo));
 
-
         // when
         List<DeliveryInfoResponse> responses = deliveryInfoQueryService.getMyDeliveryInfo(user.getId());
 
         // then
-        assertThat(responses).hasSize(size+2);
-        assertThat(responses.get(size).zipcode()).isEqualTo("!23");
-        assertThat(responses.get(size+1).zipcode()).isEqualTo("!234");
+        assertThat(responses).hasSize(3);
+        assertThat(responses.get(1).zipcode()).isEqualTo("!23");
+        assertThat(responses.get(2).zipcode()).isEqualTo("!234");
     }
 
     @DisplayName("유저가 자신이 등록한 기본 배송 정보를 조회한다.")
