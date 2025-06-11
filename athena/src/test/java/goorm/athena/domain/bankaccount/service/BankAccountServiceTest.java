@@ -232,7 +232,7 @@ class BankAccountServiceTest extends BankAccountIntegrationTestSupport {
                 .hasMessageContaining(ErrorCode.BANK_ACCOUNT_NOT_FOUND.getErrorMessage());
     }
 
-    @DisplayName("로그인 한 25번 유저가 자신이 등록했던 특정 계좌 정보를 리턴한다.")
+    @DisplayName("로그인 한 25번 유저가 조회하는 계좌 정보가 자신이 등록한 계좌라면, 특정 계좌의 정보를 리턴한다.")
     @Test
     void getAccount(){
         // given
