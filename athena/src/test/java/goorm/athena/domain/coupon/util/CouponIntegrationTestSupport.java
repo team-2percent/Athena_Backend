@@ -33,24 +33,10 @@ public abstract class CouponIntegrationTestSupport extends IntegrationServiceTes
     protected CouponQueryService couponQueryService;
 
     @Autowired
-    protected UserQueryService userQueryService;
-
-    @Autowired
     protected UserRepository userRepository;
-
-    @Autowired
-    protected UserCouponRepository userCouponRepository;
-
-    @Autowired
-    protected UserCouponQueryService userCouponQueryService;
 
     protected User setupUser(String email, String password, String nickname, ImageGroup imageGroup) {
         User user = TestEntityFactory.createUser(email, password, nickname, imageGroup, Role.ROLE_USER);
         return user;
-    }
-
-    protected Coupon setupCoupon(String title, String content, int price, LocalDateTime startAt,
-                                 LocalDateTime endAt, LocalDateTime expiresAt, int stock, CouponStatus couponStatus){
-        return TestEntityFactory.createCoupon(title, content, price, startAt, endAt, expiresAt, stock, couponStatus);
     }
 }

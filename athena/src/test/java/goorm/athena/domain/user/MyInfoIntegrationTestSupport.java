@@ -8,7 +8,6 @@ import goorm.athena.domain.deliveryinfo.entity.DeliveryInfo;
 import goorm.athena.domain.deliveryinfo.repository.DeliveryInfoRepository;
 import goorm.athena.domain.imageGroup.entity.ImageGroup;
 import goorm.athena.domain.imageGroup.entity.Type;
-import goorm.athena.domain.imageGroup.repository.ImageGroupRepository;
 import goorm.athena.domain.imageGroup.service.ImageGroupService;
 import goorm.athena.domain.order.entity.Order;
 import goorm.athena.domain.order.repository.OrderRepository;
@@ -16,7 +15,6 @@ import goorm.athena.domain.orderitem.entity.OrderItem;
 import goorm.athena.domain.orderitem.repository.OrderItemRepository;
 import goorm.athena.domain.product.entity.Product;
 import goorm.athena.domain.product.repository.ProductRepository;
-import goorm.athena.domain.project.entity.PlanName;
 import goorm.athena.domain.project.entity.PlatformPlan;
 import goorm.athena.domain.project.entity.Project;
 import goorm.athena.domain.project.repository.PlatformPlanRepository;
@@ -47,9 +45,6 @@ public abstract class MyInfoIntegrationTestSupport extends IntegrationServiceTes
 
     @Autowired
     protected ImageGroupService imageGroupService;
-
-    @Autowired
-    protected ImageGroupRepository imageGroupRepository;
 
     @Autowired
     protected BankAccountRepository bankAccountRepository;
@@ -86,11 +81,6 @@ public abstract class MyInfoIntegrationTestSupport extends IntegrationServiceTes
     protected BankAccount setupBankAccount(User user, String accountNumber, String accountHolder, String bankName, boolean isDefault) {
         BankAccount bankAccount = TestEntityFactory.createBankAccount(user, accountNumber, accountHolder, bankName, isDefault);
         return bankAccount;
-    }
-
-    protected PlatformPlan setupPlatformPlan(PlanName planName, int platformFeeRate, int pgFeeRate, int vatRate, String description) {
-        PlatformPlan plan = TestEntityFactory.createPlatformPlan(planName, platformFeeRate, pgFeeRate, vatRate, description);
-        return plan;
     }
 
     protected Project setupProject(User user, Category category, ImageGroup imageGroup,

@@ -5,7 +5,6 @@ import goorm.athena.domain.image.service.ImageService;
 import goorm.athena.domain.image.service.NasService;
 import goorm.athena.domain.imageGroup.entity.ImageGroup;
 import goorm.athena.domain.imageGroup.entity.Type;
-import goorm.athena.domain.imageGroup.repository.ImageGroupRepository;
 import goorm.athena.domain.imageGroup.service.ImageGroupService;
 import goorm.athena.domain.user.entity.Role;
 import goorm.athena.domain.user.entity.User;
@@ -49,10 +48,6 @@ public abstract class UserIntegrationTestSupport extends IntegrationServiceTestS
 
   @TempDir
   Path tempDir;
-
-
-  @Autowired
-  protected ImageGroupRepository imageGroupRepository;
 
   @Autowired
   protected PasswordEncoder passwordEncoder;
