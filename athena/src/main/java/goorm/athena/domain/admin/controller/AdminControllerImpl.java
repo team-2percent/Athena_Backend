@@ -14,7 +14,6 @@ import goorm.athena.domain.project.dto.res.ProjectDetailResponse;
 import goorm.athena.domain.project.service.ProjectCommandService;
 import goorm.athena.domain.project.service.ProjectQueryService;
 import goorm.athena.domain.settlement.entity.Status;
-import goorm.athena.domain.settlement.service.SettlementCommandService;
 import goorm.athena.domain.settlement.service.SettlementQueryService;
 import goorm.athena.global.jwt.util.CheckLogin;
 import goorm.athena.global.jwt.util.LoginUserRequest;
@@ -31,9 +30,8 @@ public class AdminControllerImpl implements AdminController {
 
     private final ProjectQueryService projectQueryService;
     private final ProjectCommandService projectCommandService;
-    private final AdminService adminService;
+    private final AdminQueryService adminQueryService;
     private final AdminRoleCheckService adminRoleCheckService;
-    private final SettlementCommandService settlementCommandService;
     private final SettlementQueryService settlementQueryService;
     private final CouponQueryService couponQueryService;
 

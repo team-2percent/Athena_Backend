@@ -1,7 +1,6 @@
 package goorm.athena.domain.user.service;
 
 import goorm.athena.domain.image.service.ImageCommandService;
-import goorm.athena.domain.image.service.ImageQueryService;
 import goorm.athena.domain.imageGroup.entity.ImageGroup;
 import goorm.athena.domain.user.dto.request.UserCreateRequest;
 import goorm.athena.domain.user.dto.request.UserLoginRequest;
@@ -29,7 +28,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserCommandService {
     private final UserRepository userRepository;
-    private final ImageService imageQueryService;
+    private final ImageCommandService imageCommandService;
     private final PasswordEncoder passwordEncoder;
     private final TokenCommandService tokenCommandService;
     private final JwtTokenizer jwtTokenizer;
