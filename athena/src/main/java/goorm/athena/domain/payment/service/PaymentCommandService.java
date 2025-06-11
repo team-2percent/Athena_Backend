@@ -91,7 +91,7 @@ public class PaymentCommandService {
 
 //            orderCommendService.decreaseInventory(payment.getOrder().getId()); // 재고 감소
 //            orderCommendService.increaseProjectFunding(orderId); // 누적 가격 증가
-            orderCommendService.postPaymentProcess(orderId); // 재고 감소 ,누적 가격 증가
+            orderCommendService.postPaymentProcess(orderId); //상품 재고 감소 ,주문 금액 만큼 프로젝트 누적 가격 증가
 
             return response;
 
