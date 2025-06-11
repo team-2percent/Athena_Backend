@@ -6,8 +6,6 @@ import goorm.athena.domain.payment.dto.HtmlTemplates;
 import goorm.athena.domain.payment.dto.res.KakaoPayApproveResponse;
 import goorm.athena.domain.payment.dto.res.KakaoPayReadyResponse;
 import goorm.athena.domain.payment.service.PaymentService;
-import goorm.athena.domain.project.service.ProjectService;
-import goorm.athena.domain.user.entity.User;
 import goorm.athena.domain.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;

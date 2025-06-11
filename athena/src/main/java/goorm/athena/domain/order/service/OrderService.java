@@ -8,9 +8,9 @@ import goorm.athena.domain.order.repository.OrderRepository;
 import goorm.athena.domain.orderitem.entity.OrderItem;
 import goorm.athena.domain.orderitem.repository.OrderItemRepository;
 import goorm.athena.domain.product.entity.Product;
-import goorm.athena.domain.product.service.ProductService;
+import goorm.athena.domain.product.service.ProductQueryService;
 import goorm.athena.domain.project.entity.Project;
-import goorm.athena.domain.project.service.ProjectService;
+import goorm.athena.domain.project.service.ProjectQueryService;
 import goorm.athena.domain.user.entity.User;
 import goorm.athena.domain.order.entity.Order;
 import goorm.athena.domain.deliveryinfo.entity.DeliveryInfo;
@@ -34,8 +34,8 @@ public class OrderService {
     private final OrderItemRepository orderItemRepository;
     private final UserService userService;
     private final DeliveryInfoService deliveryInfoService;
-    private final ProductService productService;
-    private final ProjectService projectService;
+    private final ProductQueryService productQueryService;
+    private final ProjectQueryService projectQueryService;
 
     public Order getById(Long id) {
         return orderRepository.findById(id)
@@ -51,7 +51,7 @@ public class OrderService {
 
         User user = userService.getUser(userId);
         DeliveryInfo delivery = deliveryInfoService.getById(request.deliveryInfoId());
-        Project project = projectService.getById(request.projectId());
+        Project project = projectQueryService.getById(request.projectId());
 
         Order order = Order.create(user, delivery, project, LocalDateTime.now());
 
@@ -61,7 +61,7 @@ public class OrderService {
         Long totalPrice = 0L;
 
         for (OrderItemRequest item : request.orderItems()) {
-            Product product = productService.getById(item.productId());
+            Product product = productQueryService.getById(item.productId());
             // 재고 여부 검사
             if (product.getStock() < item.quantity()) {
                 throw new CustomException(ErrorCode.INSUFFICIENT_INVENTORY);
