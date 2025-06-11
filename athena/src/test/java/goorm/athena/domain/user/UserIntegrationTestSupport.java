@@ -34,8 +34,12 @@ import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ResourceLoader;
+import org.springframework.jdbc.datasource.init.ScriptUtils;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.util.ReflectionUtils;
+
+import javax.sql.DataSource;
 import java.lang.reflect.Field;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
@@ -78,12 +82,22 @@ public abstract class UserIntegrationTestSupport extends IntegrationServiceTestS
   @Autowired
   protected UserCommandService userCommandService;
 
+
+  @Autowired protected DataSource dataSource;
+  @Autowired protected ResourceLoader resourceLoader;
+
   @BeforeEach
-  void setUp() {
-    // 테스트에서 nasService로 내부 경로를 강제 주입하여 임시 디렉터리로 파일 I/O 수행함
+  void setUp() throws Exception {
+    // 1. NAS 경로 설정
     Field imagePathField = ReflectionUtils.findField(NasService.class, "imagePath");
     imagePathField.setAccessible(true);
     ReflectionUtils.setField(imagePathField, nasService, tempDir.toAbsolutePath().toString());
+
+    // 2. SQL 스크립트 실행 (예: user-test-data.sql)
+    ScriptUtils.executeSqlScript(
+            dataSource.getConnection(),
+            resourceLoader.getResource("classpath:/data.sql")
+    );
   }
 
   protected static Validator validator;
