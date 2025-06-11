@@ -16,11 +16,10 @@ import static org.assertj.core.api.Assertions.*;
 
 class BankAccountServiceTest extends BankAccountIntegrationTestSupport {
 
-    @DisplayName("유저가 존재하지 않는 계좌 정보를 조회하면 에러를 리턴한다.")
+    @DisplayName("존재하지 않는 계좌 정보를 조회하면, 'BANK_ACCOUNT_NOT_FOUND' 에러를 리턴한다.")
     @Test
     void getBankAccountById_Error() {
         // given
-        User user = userRepository.findById(12L).get();
 
         // when & then
         assertThatThrownBy(() -> bankAccountQueryService.getBankAccount(100000L))
@@ -28,7 +27,7 @@ class BankAccountServiceTest extends BankAccountIntegrationTestSupport {
                 .hasMessageContaining(ErrorCode.BANK_ACCOUNT_NOT_FOUND.getErrorMessage());
     }
 
-    @DisplayName("유저가 계좌 정보를 저장했다면 계좌 정보의 ID로 해당 정보를 조회한다.")
+    @DisplayName("13번 유저가 기본 계좌 정보를 저장했다면 기본 계좌 정보의 주인이 13번 유저가 맞는지 검증한다.")
     @Test
     void getBankAccountById() {
         // given
@@ -42,7 +41,7 @@ class BankAccountServiceTest extends BankAccountIntegrationTestSupport {
         assertThat(bankAccount.getUser().getId()).isEqualTo(user.getId());
     }
 
-    @DisplayName("유저가 자신의 계좌 정보를 입력해 저장한다.")
+    @DisplayName("8번 유저가 기본 계좌가 없는 상태에서 계좌를 생성했다면 신규 생성 계좌가 기본 계좌인지 검증한다.")
     @Test
     void createBankAccount_Primary() {
         // given
@@ -59,7 +58,7 @@ class BankAccountServiceTest extends BankAccountIntegrationTestSupport {
         assertThat(infos.getFirst().isDefault()).isFalse();
     }
 
-    @DisplayName("기본 계좌 정보를 조회할 시 해당 정보가 존재하지 않을 경우 에러를 리턴한다.")
+    @DisplayName("2번 유저의 ID로 기본 계좌 정보를 조회할 시 유저 ID로 저장된 기본 계좌가 존재하지 않으면 'BANK_ACCOUNT_NOT_FOUND' 에러를 리턴한다.")
     @Test
     void getPrimaryDeliveryInfo_ThrowsDeliveryNotFound() {
         // given
@@ -71,7 +70,7 @@ class BankAccountServiceTest extends BankAccountIntegrationTestSupport {
                 .hasMessageContaining(ErrorCode.BANK_ACCOUNT_NOT_FOUND.getErrorMessage());
     }
 
-    @DisplayName("유저가 이미 기존 계좌 정보를 저장했었다면 현재 계좌 정보는 일반 계좌 정보로 저장한다.")
+    @DisplayName("27번 유저가 이미 기존 계좌를 저장했었다면 현재 생성한 계좌는 일반 계좌로 저장한다.")
     @Test
     void createBankAccount_Normal() {
         // given
@@ -87,7 +86,7 @@ class BankAccountServiceTest extends BankAccountIntegrationTestSupport {
         assertThat(infos.getFirst().isDefault()).isTrue();
     }
 
-    @DisplayName("유저가 계좌 정보 상태를 변경할 때 다른 유저의 계좌 정보를 변경하면 에러를 리턴한다.")
+    @DisplayName("유저가 계좌 정보 상태를 변경할 때 다른 유저의 계좌 정보를 변경하면 'INACCURATE_BANK_ACCOUNT' 에러를 리턴한다.")
     @Test
     void changeBankAccountState_NotMyUser() {
         // given
@@ -102,13 +101,13 @@ class BankAccountServiceTest extends BankAccountIntegrationTestSupport {
                 .hasMessageContaining(ErrorCode.INACCURATE_BANK_ACCOUNT.getErrorMessage());
     }
 
-    @DisplayName("유저가 기본 계좌를 기본 계좌 상태로 변경하려 하면 에러를 리턴한다.")
+    @DisplayName("로그인 한 1번 유저가 자신의 기본 계좌를 다시 기본 계좌 상태로 변경하려 하면 SAME_ACCOUNT_STATUS 에러를 리턴한다.")
     @Test
     void changeBankAccountState_ALREADY() {
         // given
         User user = userRepository.findById(1L).get();
 
-        BankAccount pri maryAccount = bankAccountQueryService.getPrimaryAccount(user.getId());
+        BankAccount primaryAccount = bankAccountQueryService.getPrimaryAccount(user.getId());
 
         // when & then
         assertThatThrownBy(() -> bankAccountCommandService.changeAccountState(user.getId(), primaryAccount.getId()))
@@ -116,7 +115,8 @@ class BankAccountServiceTest extends BankAccountIntegrationTestSupport {
                 .hasMessageContaining(ErrorCode.SAME_ACCOUNT_STATUS.getErrorMessage());
     }
 
-    @DisplayName("현재의 계좌 정보를 기본 계좌 정보로 변경하고, 이전 계좌 정보는 일반 계좌 정보로 변경한다.")
+    @DisplayName("3번 유저가 기본 계좌, 일반 계좌를 보유 중일 때 기본 계좌를 변경할려고 하면" +
+            "변경할 일반 계좌를 기본 계좌로 변경하고, 이전 기본 계좌는 일반 계좌로 변경한다.")
     @Test
     void changeBankAccountState() {
         // given
@@ -133,7 +133,7 @@ class BankAccountServiceTest extends BankAccountIntegrationTestSupport {
         assertThat(updatedNew.isDefault()).isTrue();
     }
 
-    @DisplayName("유저가 다른 사람의 계좌 정보를 삭제하고자 하면 접근 거부 에러를 리턴한다.")
+    @DisplayName("로그인 한 16번 유저가 다른 사람의 계좌 정보를 삭제하고자 하면 'INACCURATE_BANK_ACCOUNT' 에러를 리턴한다.")
     @Test
     void deleteBankAccountInfo_NotMyUser() {
         // given
@@ -145,7 +145,7 @@ class BankAccountServiceTest extends BankAccountIntegrationTestSupport {
                 .hasMessageContaining(ErrorCode.INACCURATE_BANK_ACCOUNT.getErrorMessage());
     }
 
-    @DisplayName("유저가 자신의 기본 계좌 정보를 삭제하고자 하면 접근 거부 에러를 리턴한다.")
+    @DisplayName("로그인 한 16번 유저가 자신의 기본 계좌 정보를 삭제하고자 하면 'BASIC_ACCOUNT_NOT_DELETED' 부 에러를 리턴한다.")
     @Test
     void deleteBankAccountInfo_Primary() {
         // given
@@ -158,11 +158,11 @@ class BankAccountServiceTest extends BankAccountIntegrationTestSupport {
                 .hasMessageContaining(ErrorCode.BASIC_ACCOUNT_NOT_DELETED.getErrorMessage());
     }
 
-    @DisplayName("유저가 등록했던 자신의 일반 계좌 정보 중 하나를 삭제한다.")
+    @DisplayName("30번 유저가 기본, 일반 계좌를 생성한 후 선택한 일반 계좌를 삭제한다.")
     @Test
     void deleteBankAccountInfo_Normal() {
         // given
-        User user = setupUser("123", "123", "123", null);
+        User user = userRepository.findById(30L).get();
         userRepository.save(user);
 
         BankAccount bankAccount = setupBankAccount(user, "!23", "123", "123", true);
@@ -177,7 +177,7 @@ class BankAccountServiceTest extends BankAccountIntegrationTestSupport {
         assertThat(exists).isFalse();
     }
 
-    @DisplayName("유저가 자신이 등록한 계좌 정보들을 조회한다.")
+    @DisplayName("로그인 한 3번 유저가 일반 계좌 두 개를 생성하고 자신의 계좌를 조회하면, 생성한 계좌를 포함한 등록한 모든 계좌 정보들을 조회한다.")
     @Test
     void getMyDeliveryInfo() {
         // given
@@ -196,9 +196,10 @@ class BankAccountServiceTest extends BankAccountIntegrationTestSupport {
         assertThat(responses).hasSize(size);
         assertThat(responses.get(size-2).bankAccount()).isEqualTo("!23");
         assertThat(responses.get(size-1).bankAccount()).isEqualTo("!234");
+        assertThat(responses.get(size-3).bankAccount()).isEqualTo("0000000025");
     }
 
-    @DisplayName("유저가 자신이 등록한 기본 계좌 정보를 조회한다.")
+    @DisplayName("로그인 한 1번 유저가 일반 계좌를 두 개 생성하고 기본 계좌를 조회하면, 등록한 기본 계좌만 조회한다.")
     @Test
     void getPrimaryDeliveryInfo() {
         // given
@@ -215,7 +216,7 @@ class BankAccountServiceTest extends BankAccountIntegrationTestSupport {
         assertThat(response.isDefault()).isTrue();
     }
 
-    @DisplayName("로그인 한 유저가 없는 계좌 정보를 조회하면 에러를 리턴한다.")
+    @DisplayName("로그인 한 25번 유저가 없는 계좌를 조회하면 BANK_ACCOUNT_NOT_FOUND 에러를 리턴한다.")
     @Test
     void getAccount_Error(){
         // given
@@ -231,7 +232,7 @@ class BankAccountServiceTest extends BankAccountIntegrationTestSupport {
                 .hasMessageContaining(ErrorCode.BANK_ACCOUNT_NOT_FOUND.getErrorMessage());
     }
 
-    @DisplayName("로그인 한 유저의 특정 계좌 정보를 리턴한다.")
+    @DisplayName("로그인 한 25번 유저가 자신이 등록했던 특정 계좌 정보를 리턴한다.")
     @Test
     void getAccount(){
         // given
