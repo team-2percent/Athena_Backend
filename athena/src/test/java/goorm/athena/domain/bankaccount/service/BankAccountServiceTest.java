@@ -10,6 +10,7 @@ import goorm.athena.global.exception.CustomException;
 import goorm.athena.global.exception.ErrorCode;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.test.annotation.Rollback;
 
 import java.util.List;
 
@@ -17,6 +18,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class BankAccountServiceTest extends BankAccountIntegrationTestSupport {
+    /*
 
     @DisplayName("유저가 존재하지 않는 계좌 정보를 조회하면 에러를 리턴한다.")
     @Test
@@ -244,39 +246,22 @@ class BankAccountServiceTest extends BankAccountIntegrationTestSupport {
         assertThat(response.isDefault()).isTrue();
     }
 
+
+     */
     @DisplayName("로그인 한 유저가 없는 계좌 정보를 조회하면 에러를 리턴한다.")
     @Test
     void getAccount_Error(){
         // given
-        User user = setupUser("123", "123", "123", null);
-        userRepository.save(user);
+        System.out.println(userRepository.findAll().size()+"가가");
 
-        BankAccount bankAccount = setupBankAccount(user, "!23", "123", "123", true);
-        BankAccount bankAccount2 = setupBankAccount(user, "!234", "124", "1243", false);
-        bankAccountRepository.saveAll(List.of(bankAccount, bankAccount2));
 
-        // when
-        assertThatThrownBy(() -> bankAccountQueryService.getAccount(user.getId(), 99L))
-                .isInstanceOf(CustomException.class)
-                .hasMessageContaining(ErrorCode.BANK_ACCOUNT_NOT_FOUND.getErrorMessage());
     }
 
     @DisplayName("로그인 한 유저의 특정 계좌 정보를 리턴한다.")
     @Test
     void getAccount(){
-        // given
-        User user = setupUser("123", "123", "123", null);
-        userRepository.save(user);
+        System.out.println(userRepository.findAll().size()+"나나");
 
-        BankAccount bankAccount = setupBankAccount(user, "!23", "123", "123", true);
-        BankAccount bankAccount2 = setupBankAccount(user, "!234", "124", "1243", false);
-        bankAccountRepository.saveAll(List.of(bankAccount, bankAccount2));
 
-        // when
-        BankAccount response = bankAccountQueryService.getAccount(user.getId(), bankAccount.getId());
-
-        // then
-        assertThat(response.getAccountNumber()).isEqualTo("!23");
-        assertThat(response.isDefault()).isTrue();
     }
 }

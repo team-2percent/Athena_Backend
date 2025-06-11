@@ -190,7 +190,7 @@ CREATE TABLE settlement_history (
     PRIMARY KEY (id)
 );
 
-CREATE TABLE `user` (
+CREATE TABLE "user" (
     id BIGINT NOT NULL AUTO_INCREMENT,
     image_group_id BIGINT,
     email VARCHAR(50) NOT NULL,

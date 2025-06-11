@@ -521,8 +521,7 @@ class UserServiceTest extends UserIntegrationTestSupport {
     @Test
     void updatePassword_비밀번호_틀렸을_때_예외_발생() {
         // given
-        User user = setupUser("123", passwordEncoder.encode("123"), "nick", null);
-        userRepository.save(user);
+        User user = userRepository.findById(30L).get();
         UserUpdatePasswordRequest request = new UserUpdatePasswordRequest("wrongOldPassword", "newPassword");
 
         // when
