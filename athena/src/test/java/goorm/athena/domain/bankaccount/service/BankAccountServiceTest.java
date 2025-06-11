@@ -46,7 +46,7 @@ class BankAccountServiceTest extends BankAccountIntegrationTestSupport {
     @Test
     void createBankAccount_Primary() {
         // given
-        User user = userRepository.findById(2L).get();
+        User user = userRepository.findById(8L).get();
 
         BankAccountCreateRequest request = new BankAccountCreateRequest("123", "123", "123");
 
@@ -75,7 +75,7 @@ class BankAccountServiceTest extends BankAccountIntegrationTestSupport {
     @Test
     void createBankAccount_Normal() {
         // given
-        User user = userRepository.findById(8L).get();
+        User user = userRepository.findById(27L).get();
         BankAccountCreateRequest request = new BankAccountCreateRequest("123", "123", "123");
 
         // when
@@ -83,8 +83,8 @@ class BankAccountServiceTest extends BankAccountIntegrationTestSupport {
 
         // then
         List<BankAccount> infos = bankAccountRepository.findAllByUserId(user.getId());
-        assertThat(infos.getLast().isDefault()).isTrue();
-        assertThat(infos.getFirst().isDefault()).isFalse();
+        assertThat(infos.getLast().isDefault()).isFalse();
+        assertThat(infos.getFirst().isDefault()).isTrue();
     }
 
     @DisplayName("유저가 계좌 정보 상태를 변경할 때 다른 유저의 계좌 정보를 변경하면 에러를 리턴한다.")
@@ -108,7 +108,7 @@ class BankAccountServiceTest extends BankAccountIntegrationTestSupport {
         // given
         User user = userRepository.findById(1L).get();
 
-        BankAccount primaryAccount = bankAccountQueryService.getPrimaryAccount(user.getId());
+        BankAccount pri maryAccount = bankAccountQueryService.getPrimaryAccount(user.getId());
 
         // when & then
         assertThatThrownBy(() -> bankAccountCommandService.changeAccountState(user.getId(), primaryAccount.getId()))

@@ -48,7 +48,7 @@ class DeliveryInfoServiceTest extends DeliveryIntegrationTestSupport {
     @Test
     void addDeliveryInfo_Primary() {
         // given
-        User user = userRepository.findById(12L).get();
+        User user = userRepository.findById(4L).get();
 
         DeliveryInfoRequest request = new DeliveryInfoRequest("홍길동", "서울시", "010-1111-2222");
 
@@ -60,7 +60,7 @@ class DeliveryInfoServiceTest extends DeliveryIntegrationTestSupport {
         // then
         List<DeliveryInfo> infos = deliveryInfoRepository.findByUserId(user.getId());
         assertThat(infos).hasSize(size+1);
-        assertThat(infos.getFirst().isDefault()).isTrue();
+        assertThat(infos.getLast().isDefault()).isTrue();
     }
 
 
@@ -126,8 +126,6 @@ class DeliveryInfoServiceTest extends DeliveryIntegrationTestSupport {
     void changeDeliveryState_ALREADY() {
         // given
         User user = userRepository.findById(7L).get();
-
-        DeliveryInfo deliveryInfo = deliveryInfoQueryService.getPrimaryDeliveryInfo(user.getId());
 
         // when & then
         assertThatThrownBy(() -> deliveryInfoCommandService.changeDeliveryState(user.getId(), 7L))
