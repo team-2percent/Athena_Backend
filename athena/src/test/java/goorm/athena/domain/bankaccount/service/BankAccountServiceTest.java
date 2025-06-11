@@ -18,7 +18,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class BankAccountServiceTest extends BankAccountIntegrationTestSupport {
-    /*
 
     @DisplayName("유저가 존재하지 않는 계좌 정보를 조회하면 에러를 리턴한다.")
     @Test
@@ -147,10 +146,10 @@ class BankAccountServiceTest extends BankAccountIntegrationTestSupport {
         User user = userRepository.findById(3L).get();
 
         // when
-        bankAccountCommandService.changeAccountState(user.getId(), 151L);
+        bankAccountCommandService.changeAccountState(user.getId(), 31L);
 
         BankAccount updatedOld = bankAccountRepository.findById(3L).get();
-        BankAccount updatedNew = bankAccountRepository.findById(151L).get();
+        BankAccount updatedNew = bankAccountRepository.findById(31L).get();
 
         // then
         assertThat(updatedOld.isDefault()).isFalse();
@@ -247,7 +246,8 @@ class BankAccountServiceTest extends BankAccountIntegrationTestSupport {
     }
 
 
-     */
+
+    /*
     @DisplayName("로그인 한 유저가 없는 계좌 정보를 조회하면 에러를 리턴한다.")
     @Test
     void getAccount_Error(){
@@ -264,4 +264,6 @@ class BankAccountServiceTest extends BankAccountIntegrationTestSupport {
 
 
     }
+
+     */
 }

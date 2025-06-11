@@ -86,20 +86,6 @@ public abstract class UserIntegrationTestSupport extends IntegrationServiceTestS
   @Autowired protected DataSource dataSource;
   @Autowired protected ResourceLoader resourceLoader;
 
-  @BeforeEach
-  void setUp() throws Exception {
-    // 1. NAS 경로 설정
-    Field imagePathField = ReflectionUtils.findField(NasService.class, "imagePath");
-    imagePathField.setAccessible(true);
-    ReflectionUtils.setField(imagePathField, nasService, tempDir.toAbsolutePath().toString());
-
-    // 2. SQL 스크립트 실행 (예: user-test-data.sql)
-    ScriptUtils.executeSqlScript(
-            dataSource.getConnection(),
-            resourceLoader.getResource("classpath:/data.sql")
-    );
-  }
-
   protected static Validator validator;
 
   @BeforeAll
