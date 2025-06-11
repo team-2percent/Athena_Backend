@@ -57,7 +57,7 @@ class DeliveryInfoServiceTest extends DeliveryIntegrationTestSupport {
     @Test
     void addDeliveryInfo_Primary() {
         // given
-        User user = userRepository.findById(100L).get();
+        User user = userRepository.findById(26L).get();
 
         DeliveryInfoRequest request = new DeliveryInfoRequest("홍길동", "서울시", "010-1111-2222");
 
@@ -66,14 +66,11 @@ class DeliveryInfoServiceTest extends DeliveryIntegrationTestSupport {
         // when
         deliveryInfoCommandService.addDeliveryInfo(user.getId(), request);
 
-        System.out.println(deliveryInfoRepository.findByUserId(user.getId()).get(0).isDefault()+"123123123");
-        System.out.println(deliveryInfoRepository.findByUserId(user.getId()).get(1).isDefault()+"123123123");
-
         // then
         List<DeliveryInfo> infos = deliveryInfoRepository.findByUserId(user.getId());
         assertThat(infos).hasSize(size+1);
-        assertThat(infos.getFirst().isDefault()).isFalse();
-        assertThat(infos.getLast().isDefault()).isTrue();
+        assertThat(infos.getLast().isDefault()).isFalse();
+        assertThat(infos.getFirst().isDefault()).isTrue();
     }
 
 
@@ -103,7 +100,7 @@ class DeliveryInfoServiceTest extends DeliveryIntegrationTestSupport {
         // when
         deliveryInfoCommandService.addDeliveryInfo(user.getId(), request);
 
-        DeliveryInfo newDeliveryInfo = deliveryInfoRepository.findById(151L).get();
+        DeliveryInfo newDeliveryInfo = deliveryInfoRepository.findById(32L).get();
 
         // then
         List<DeliveryInfo> response = deliveryInfoRepository.findByUserId(user.getId());
@@ -164,8 +161,8 @@ class DeliveryInfoServiceTest extends DeliveryIntegrationTestSupport {
         DeliveryInfo primaryDeliveryInfo = deliveryInfoQueryService.getPrimaryDeliveryInfo(user.getId());
 
         // when
-        deliveryInfoCommandService.changeDeliveryState(user.getId(), 151L);
-        DeliveryInfo updatedNew = deliveryInfoRepository.findById(151L).get();
+        deliveryInfoCommandService.changeDeliveryState(user.getId(), 31L);
+        DeliveryInfo updatedNew = deliveryInfoRepository.findById(31L).get();
 
         // then
         assertThat(primaryDeliveryInfo.isDefault()).isFalse();

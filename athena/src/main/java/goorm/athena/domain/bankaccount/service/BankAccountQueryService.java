@@ -19,12 +19,13 @@ import java.util.stream.Collectors;
 public class BankAccountQueryService {
     private final BankAccountRepository bankAccountRepository;
     private final UserQueryService userQueryService;
+    private final BankAccountMapper bankAccountMapper;
 
     public List<BankAccountGetResponse> getBankAccounts(Long userId){
         User user = userQueryService.getUser(userId);
         List<BankAccount> bankAccount = bankAccountRepository.findByUser(user);
         return bankAccountRepository.findByUser(user).stream()
-                .map(BankAccountMapper::toGetResponse)
+                .map(bankAccountMapper::toGetResponse)
                 .collect(Collectors.toList());
     }
 

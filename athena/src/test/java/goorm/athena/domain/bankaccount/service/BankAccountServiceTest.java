@@ -10,12 +10,10 @@ import goorm.athena.global.exception.CustomException;
 import goorm.athena.global.exception.ErrorCode;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.test.annotation.Rollback;
 
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.*;
 
 class BankAccountServiceTest extends BankAccountIntegrationTestSupport {
 
