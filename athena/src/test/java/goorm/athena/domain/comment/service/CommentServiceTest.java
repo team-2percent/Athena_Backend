@@ -48,7 +48,7 @@ class CommentServiceTest extends CommentIntegrationSupport {
     @Test
     void createComment() {
         // given
-        User user = userRepository.findById(17L).get();
+        User user = userRepository.findById(20L).get();
         Project project = projectRepository.findById(17L).get();
 
         // when

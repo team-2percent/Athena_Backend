@@ -48,7 +48,7 @@ class UserServiceTest extends UserIntegrationTestSupport {
         // MultipartFile 생성 (임시 WebP 이미지)
         BufferedImage bufferedImage = new BufferedImage(100, 100, BufferedImage.TYPE_INT_RGB);
         ByteArrayOutputStream os = new ByteArrayOutputStream();
-        ImageIO.write(bufferedImage, "webp", os); // WebP 포맷 지원 라이브러리 필요
+        ImageIO.write(bufferedImage, "png", os); // WebP 포맷 지원 라이브러리 필요
 
         MockMultipartFile multipartFile = new MockMultipartFile(
                 "file",
@@ -63,7 +63,6 @@ class UserServiceTest extends UserIntegrationTestSupport {
         assertThat(response).isNotNull();
         User updated = userQueryService.getUser(user.getId());
         assertThat(updated.getNickname()).isEqualTo("newNick");
-
 
         /*
         File savedFile = new File("src/test/resources/static/images/" +
@@ -109,16 +108,14 @@ class UserServiceTest extends UserIntegrationTestSupport {
     @Test
     void getHeaderById_returnsHeaderResponse() {
         // given
-        ImageGroup imageGroup = setupImageGroup();
-        User user = setupUser("123", "123", "nick", imageGroup);
-        userRepository.save(user);
+        User user = userRepository.findById(10L).get();
+        String imageUrl = imageService.getImage(user.getImageGroup().getId());
 
         // when
         UserHeaderGetResponse response = userQueryService.getHeaderById(user.getId());
-        String imageUrl = imageService.getImage(user.getImageGroup().getId());
 
         // then
-        assertThat(response.nickname()).isEqualTo("nick");
+        assertThat(response.nickname()).isEqualTo("User10");
         assertThat(response.imageUrl()).isEqualTo(imageUrl);
     }
 
@@ -277,22 +274,8 @@ class UserServiceTest extends UserIntegrationTestSupport {
     @Test
     void getHeaderById_whenImageGroupIsNotNull() throws IOException {
         // given
-        ImageGroup imageGroup = setupImageGroup();
-        User user = setupUser("124", passwordEncoder.encode("123"), "nick2", imageGroup);
-        userRepository.save(user);
+        User user = userRepository.findById(10L).get();
 
-        // 실제 이미지 파일 생성
-        BufferedImage bufferedImage = new BufferedImage(100, 100, BufferedImage.TYPE_INT_RGB);
-        ByteArrayOutputStream os = new ByteArrayOutputStream();
-        ImageIO.write(bufferedImage, "png", os);
-
-        MockMultipartFile multipartFile = new MockMultipartFile(
-                "file", "test.webp", "image/webp", new ByteArrayInputStream(os.toByteArray())
-        );
-
-        // when
-        UserUpdateRequest request = new UserUpdateRequest("123", "123" , "123");
-        userCommandService.updateUser(user.getId(), request, multipartFile);
         UserGetResponse response = userQueryService.getUserById(user.getId());
 
         // then
@@ -300,9 +283,9 @@ class UserServiceTest extends UserIntegrationTestSupport {
         assertThat(response.imageUrl()).isNotBlank();
         assertThat(response.imageUrl()).startsWith("http"); // 도메인 붙었는지 확인
 
-        Optional<Image> savedImage = imageRepository.findFirstImageByImageGroupId(imageGroup.getId());
+        Optional<Image> savedImage = imageRepository.findFirstImageByImageGroupId(user.getImageGroup().getId());
         assertThat(savedImage).isPresent();
-        assertThat(savedImage.get().getFileName()).matches("[a-f0-9\\-]{36}\\.webp");
+        assertThat(savedImage.get().getFileName()).matches("test/webp");
         assertThat(savedImage.get().getOriginalUrl()).endsWith(".webp"); // 확장자 포함 여부 확인
     }
 

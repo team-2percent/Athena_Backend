@@ -21,6 +21,7 @@ public class UserQueryService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final ImageService imageService;
+    private final UserMapper userMapper;
 
     @Transactional(readOnly = true)
     public User getUser(Long userId) {
@@ -36,7 +37,7 @@ public class UserQueryService {
         if(user.getImageGroup() != null){
             imageUrl = imageService.getImage(user.getImageGroup().getId());
         }
-        return UserMapper.toHeaderGetResponse(user, imageUrl);
+        return userMapper.toHeaderGetResponse(user, imageUrl);
     }
 
     // 내 정보 조회 임시 로직
@@ -48,7 +49,7 @@ public class UserQueryService {
             imageUrl = imageService.getImage(user.getImageGroup().getId());
         }
 
-        return UserMapper.toGetResponse(user, imageUrl);
+        return userMapper.toGetResponse(user, imageUrl);
     }
 
     public List<Long> getUserIdAll() {
@@ -59,6 +60,6 @@ public class UserQueryService {
 
     public UserSummaryResponse getUserSummary(Long userId){
         User user = getUser(userId);
-        return UserMapper.toSummaryResponse(user);
+        return userMapper.toSummaryResponse(user);
     }
 }

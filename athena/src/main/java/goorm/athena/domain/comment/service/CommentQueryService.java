@@ -22,6 +22,7 @@ public class CommentQueryService {
     private final UserQueryService userQueryService;
     private final ProjectService projectService;
     private final ImageService imageService;
+    private final CommentMapper commentMapper;
 
     @Transactional(readOnly = true)
     public List<CommentGetResponse> getCommentByProject(Long projectId){
@@ -32,7 +33,7 @@ public class CommentQueryService {
         return results.stream()
                 .map(comment -> {
                     String imageUrl = imageService.getImage(comment.getUser().getImageGroup().getId());
-                    return CommentMapper.toGetResponse(comment, imageUrl);
+                    return commentMapper.toGetResponse(comment, imageUrl);
                 })
                 .toList();
     }
@@ -45,7 +46,7 @@ public class CommentQueryService {
         return results.stream()
                 .map(comment -> {
                     String imageUrl = imageService.getImage(comment.getProject().getImageGroup().getId());
-                    return CommentMapper.toGetResponse(comment, imageUrl);
+                    return commentMapper.toGetResponse(comment, imageUrl);
                 })
                 .toList();
     }

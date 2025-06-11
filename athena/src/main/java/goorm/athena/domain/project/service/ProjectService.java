@@ -67,6 +67,7 @@ public class ProjectService {
     private final ProjectSearchQueryRepository projectSearchQueryRepository;
     private final MarkdownParser markdownParser;
     private final PlatformPlanRepository platformPlanRepository;
+    private final UserMapper userMapper;
 
     /**
      * [프로젝트 등록 Method]
@@ -218,7 +219,7 @@ public class ProjectService {
         List<Image> images = imageService.getProjectImages(project.getImageGroup().getId()); // 마크다운 이미지 제외 가져오기
         List<String> imageUrls = imageService.getImageUrls(images);
 
-        UserDetailResponse userDetailResponse = UserMapper.toDetailResponse(project.getSeller());
+        UserDetailResponse userDetailResponse = userMapper.toDetailResponse(project.getSeller());
         List<ProductResponse> productResponses = productService.getAllProducts(project);
 
         return ProjectMapper.toDetailDto(project, category, imageUrls, userDetailResponse, productResponses);
