@@ -314,7 +314,7 @@ INSERT INTO product (id, project_id, name, description, price, stock) VALUES
 (123, 30, '상품123', '상품123 설명입니다.', 41000, 100),
 (124, 30, '상품124', '상품124 설명입니다.', 59000, 100);
 
-ALTER TABLE product ALTER COLUMN id RESTART WITH 31;
+ALTER TABLE product ALTER COLUMN id RESTART WITH 125;
 
 INSERT INTO coupon (id, title, content, price, start_at, end_at, expires_at, stock, coupon_status) VALUES
 (1, '할인쿠폰001', '신규 가입자 전용 쿠폰입니다.', 3000, '2025-06-01', '2025-06-15', '2025-06-16', 300, 'PREVIOUS'),
@@ -469,3 +469,44 @@ INSERT INTO coupon (id, title, content, price, start_at, end_at, expires_at, sto
 (150, '2,600원 할인 쿠폰', '종료된 이벤트: 로그인 연속 출석 이벤트 쿠폰입니다.', 2600, '2024-03-27', '2024-03-31', '2024-04-01', 0, 'ENDED');
 
 ALTER TABLE coupon ALTER COLUMN id RESTART WITH 151;
+
+INSERT INTO orders (id, user_id, project_id, delivery_info_id, quantity, total_price, status, is_settled, ordered_at) VALUES
+(1, 1, 1, 1, 3, 130000, 'ORDERED', false, '2025-06-01T10:00:00'),
+(2, 1, 1, 1, 2, 30000, 'ORDERED', false, '2025-06-02T12:00:00'),
+(3, 2, 2, 2, 4, 252000, 'ORDERED', false, '2025-06-03T14:00:00'),
+(4, 3, 2, 3, 1, 90000, 'ORDERED', false, '2025-06-04T09:30:00'),
+(5, 3, 3, 3, 2, 36000, 'ORDERED', false, '2025-06-05T09:00:00'),
+(6, 4, 2, 2, 1, 40000, 'ORDERED', false, '2025-06-06T13:20:00'),
+(7, 4, 4, 1, 3, 69000, 'ORDERED', false, '2025-06-07T08:00:00'),
+(8, 5, 4, 4, 2, 106000, 'ORDERED', false, '2025-06-07T09:45:00'),
+(9, 5, 5, 1, 1, 53000, 'ORDERED', false, '2025-06-08T11:15:00'),
+(10, 2, 5, 2, 2, 114000, 'ORDERED', false, '2025-06-08T14:30:00');
+
+
+ALTER TABLE orders ALTER COLUMN id RESTART WITH 11;
+
+INSERT INTO order_item (id, order_id, product_id, quantity, price) VALUES
+-- Order 1 (project_id=1): 상품1(1개, 72000), 상품2(2개, 2*29000)
+(1, 1, 1, 1, 72000),
+(2, 1, 2, 2, 58000),
+-- Order 2 (project_id=1): 상품3(2개, 2*15000)
+(3, 2, 3, 2, 30000),
+-- Order 3 (project_id=2): 상품6(2개, 2*90000), 상품7(2개, 2*36000)
+(4, 3, 6, 2, 180000),
+(5, 3, 7, 2, 72000),
+-- Order 4 (project_id=2): 상품6(1개, 90000)
+(6, 4, 6, 1, 90000),
+-- Order 5 (project_id=3): 상품11(2개, 2*18000)
+(7, 5, 11, 2, 36000),
+-- Order 6 (project_id=2): 상품8(1개, 40000)
+(8, 6, 8, 1, 40000),
+-- Order 7 (project_id=4): 상품14(3개, 3*23000)
+(9, 7, 14, 3, 69000),
+-- Order 8 (project_id=4): 상품15(2개, 2*53000)
+(10, 8, 15, 2, 106000),
+-- Order 9 (project_id=5): 상품19(1개, 53000)
+(11, 9, 19, 1, 53000),
+-- Order 10 (project_id=5): 상품19(2개, 2*53000)
+(12, 10, 19, 2, 106000);
+
+ALTER TABLE order_item ALTER COLUMN id RESTART WITH 13;

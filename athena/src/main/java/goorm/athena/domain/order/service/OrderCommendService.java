@@ -42,9 +42,9 @@ public class OrderCommendService {
 //                .orElseThrow(() -> new CustomException(ErrorCode.ORDER_NOT_FOUND));
 //    }
 
-    public void saveAll(List<Order> orders) {
-        orderRepository.saveAll(orders);
-    }
+//    public void saveAll(List<Order> orders) {
+//        orderRepository.saveAll(orders);
+//    }
 
     @Transactional
     public OrderCreateResponse createOrder(Long userId, OrderCreateRequest request) {
