@@ -3,7 +3,8 @@ package goorm.athena.domain.comment.controller;
 import goorm.athena.domain.comment.dto.req.CommentCreateRequest;
 import goorm.athena.domain.comment.dto.res.CommentCreateResponse;
 import goorm.athena.domain.comment.dto.res.CommentGetResponse;
-import goorm.athena.domain.comment.service.CommentService;
+import goorm.athena.domain.comment.service.CommentCommandService;
+import goorm.athena.domain.comment.service.CommentQueryService;
 import goorm.athena.domain.notification.service.FcmNotificationService;
 import goorm.athena.domain.project.service.ProjectQueryService;
 import goorm.athena.global.jwt.util.CheckLogin;
@@ -18,15 +19,16 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/comment")
 public class CommentControllerImpl implements CommentController{
-    private final CommentService commentService;
     private final ProjectQueryService projectQueryService;
+    private final CommentQueryService commentQueryService;
+    private final CommentCommandService commentCommandService;
     private final FcmNotificationService fcmNotificationService;
 
     @Override
     @PostMapping("/create")
     public ResponseEntity<CommentCreateResponse> createComment(@CheckLogin LoginUserRequest loginUserRequest,
                                                                @RequestBody CommentCreateRequest commentCreateRequest){
-        CommentCreateResponse response = commentService.createComment(commentCreateRequest.projectId(),
+        CommentCreateResponse response = commentCommandService.createComment(commentCreateRequest.projectId(),
                 loginUserRequest.userId(),
                 commentCreateRequest.content());
 
@@ -39,7 +41,7 @@ public class CommentControllerImpl implements CommentController{
     @Override
     @GetMapping("/{projectId}")
     public ResponseEntity<List<CommentGetResponse>> getComment(@PathVariable Long projectId){
-        List<CommentGetResponse> response = commentService.getCommentByProject(projectId);
+        List<CommentGetResponse> response = commentQueryService.getCommentByProject(projectId);
         return ResponseEntity.ok(response);
     }
 }

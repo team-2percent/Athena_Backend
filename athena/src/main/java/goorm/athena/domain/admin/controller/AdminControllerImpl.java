@@ -2,19 +2,20 @@ package goorm.athena.domain.admin.controller;
 
 import goorm.athena.domain.admin.dto.res.*;
 import goorm.athena.domain.admin.service.AdminRoleCheckService;
-import goorm.athena.domain.admin.service.AdminService;
+import goorm.athena.domain.admin.service.AdminQueryService;
 import goorm.athena.domain.coupon.dto.res.CouponGetDetailResponse;
 import goorm.athena.domain.coupon.dto.res.CouponGetResponse;
 import goorm.athena.domain.coupon.entity.Coupon;
 import goorm.athena.domain.coupon.entity.CouponStatus;
 import goorm.athena.domain.coupon.mapper.CouponMapper;
-import goorm.athena.domain.coupon.service.CouponService;
+import goorm.athena.domain.coupon.service.CouponQueryService;
 import goorm.athena.domain.project.dto.req.ProjectApprovalRequest;
 import goorm.athena.domain.project.dto.res.ProjectDetailResponse;
 import goorm.athena.domain.project.service.ProjectCommandService;
 import goorm.athena.domain.project.service.ProjectQueryService;
 import goorm.athena.domain.settlement.entity.Status;
-import goorm.athena.domain.settlement.service.SettlementService;
+import goorm.athena.domain.settlement.service.SettlementCommandService;
+import goorm.athena.domain.settlement.service.SettlementQueryService;
 import goorm.athena.global.jwt.util.CheckLogin;
 import goorm.athena.global.jwt.util.LoginUserRequest;
 import lombok.RequiredArgsConstructor;
@@ -32,8 +33,9 @@ public class AdminControllerImpl implements AdminController {
     private final ProjectCommandService projectCommandService;
     private final AdminService adminService;
     private final AdminRoleCheckService adminRoleCheckService;
-    private final SettlementService settlementService;
-    private final CouponService couponService;
+    private final SettlementCommandService settlementCommandService;
+    private final SettlementQueryService settlementQueryService;
+    private final CouponQueryService couponQueryService;
 
 
     // 프로젝트 승인/반려
@@ -59,7 +61,7 @@ public class AdminControllerImpl implements AdminController {
             @RequestParam(value = "page", defaultValue = "0") int page
     ) {
         adminRoleCheckService.checkAdmin(loginUserRequest);
-        ProjectSummaryResponse response = adminService.getProjectList(keyword, sortBy, direction, page);
+        ProjectSummaryResponse response = adminQueryService.getProjectList(keyword, sortBy, direction, page);
         return ResponseEntity.ok(response);
     }
 
@@ -78,7 +80,7 @@ public class AdminControllerImpl implements AdminController {
             @RequestParam(defaultValue = "0") int page
     ) {
         adminRoleCheckService.checkAdmin(loginUserRequest);
-        SettlementSummaryPageResponse response = adminService.getSettlementList(status, year, month, page);
+        SettlementSummaryPageResponse response = adminQueryService.getSettlementList(status, year, month, page);
         return ResponseEntity.ok(response);
     }
 
@@ -88,7 +90,7 @@ public class AdminControllerImpl implements AdminController {
             @CheckLogin LoginUserRequest loginUserRequest
     ) {
         adminRoleCheckService.checkAdmin(loginUserRequest);
-        return ResponseEntity.ok(settlementService.getSettlementDetailInfo(settlementId));
+        return ResponseEntity.ok(settlementQueryService.getSettlementDetailInfo(settlementId));
     }
 
     @GetMapping("/settlement/{settlementId}/history")
@@ -98,14 +100,14 @@ public class AdminControllerImpl implements AdminController {
             @CheckLogin LoginUserRequest loginUserRequest
     ) {
         adminRoleCheckService.checkAdmin(loginUserRequest);
-        return ResponseEntity.ok(settlementService.getSettlementHistories(settlementId, page));
+        return ResponseEntity.ok(settlementQueryService.getSettlementHistories(settlementId, page));
     }
 
     @GetMapping("/settlement/{settlementId}/product-summary")
     public ResponseEntity<ProductSettlementSummaryResponse> getProductSettlementInfo(
             @PathVariable Long settlementId
     ) {
-        ProductSettlementSummaryResponse result = settlementService.getProductSettlementInfo(settlementId);
+        ProductSettlementSummaryResponse result = settlementQueryService.getProductSettlementInfo(settlementId);
         return ResponseEntity.ok(result);
     }
 
@@ -115,7 +117,7 @@ public class AdminControllerImpl implements AdminController {
             @CheckLogin LoginUserRequest request,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size){
-        Page<Coupon> coupons = couponService.getCoupons(page, size);
+        Page<Coupon> coupons = couponQueryService.getCoupons(page, size);
         Page<CouponGetResponse> response = coupons.map(CouponMapper::toGetResponse);
 
         return ResponseEntity.ok(response);
@@ -128,7 +130,7 @@ public class AdminControllerImpl implements AdminController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam CouponStatus status){
-        Page<Coupon> coupons = couponService.getCouponByStatus(page, size, status);
+        Page<Coupon> coupons = couponQueryService.getCouponByStatus(page, size, status);
         Page<CouponGetResponse> response = coupons.map(CouponMapper::toGetResponse);
 
         return ResponseEntity.ok(response);
@@ -139,7 +141,7 @@ public class AdminControllerImpl implements AdminController {
     public ResponseEntity<CouponGetDetailResponse> getCouponDetail(
             @CheckLogin LoginUserRequest request,
             @PathVariable Long couponId) {
-        CouponGetDetailResponse response = couponService.getCouponDetail(couponId);
+        CouponGetDetailResponse response = couponQueryService.getCouponDetail(couponId);
         return ResponseEntity.ok(response);
     }
 

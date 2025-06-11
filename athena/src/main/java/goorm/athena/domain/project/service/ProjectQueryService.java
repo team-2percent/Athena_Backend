@@ -45,10 +45,6 @@ public class ProjectQueryService {
     private final ProjectFilterQueryRepository projectFilterQueryRepository;
     private final ProjectSearchQueryRepository projectSearchQueryRepository;
 
-    /**
-     * [GET API 관련 Method]
-     */
-
     // 상세 페이지 조회
     public ProjectDetailResponse getProjectDetail(Long projectId) {
         Project project = getById(projectId);

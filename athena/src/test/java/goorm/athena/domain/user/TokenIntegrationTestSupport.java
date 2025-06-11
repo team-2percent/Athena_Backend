@@ -5,7 +5,7 @@ import goorm.athena.domain.imageGroup.entity.Type;
 import goorm.athena.domain.imageGroup.service.ImageGroupCommandService;
 import goorm.athena.domain.user.entity.Role;
 import goorm.athena.domain.user.entity.User;
-import goorm.athena.domain.user.service.TokenService;
+import goorm.athena.domain.user.service.TokenCommandService;
 import goorm.athena.util.IntegrationServiceTestSupport;
 import goorm.athena.util.TestEntityFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 public abstract class TokenIntegrationTestSupport extends IntegrationServiceTestSupport {
 
     @Autowired
-    protected TokenService tokenService;
+    protected TokenCommandService tokenCommandService;
 
     @Autowired
     protected ImageGroupCommandService imageGroupCommandService;

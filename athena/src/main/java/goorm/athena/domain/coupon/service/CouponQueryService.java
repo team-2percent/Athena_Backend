@@ -1,7 +1,5 @@
 package goorm.athena.domain.coupon.service;
 
-import goorm.athena.domain.coupon.dto.req.CouponCreateRequest;
-import goorm.athena.domain.coupon.dto.res.CouponCreateResponse;
 import goorm.athena.domain.coupon.dto.res.CouponEventGetResponse;
 import goorm.athena.domain.coupon.dto.res.CouponGetDetailResponse;
 import goorm.athena.domain.coupon.entity.Coupon;
@@ -24,18 +22,9 @@ import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
-public class CouponService {
+public class CouponQueryService {
     private final CouponRepository couponRepository;
     private final UserCouponRepository userCouponRepository;
-
-    @Transactional
-    public CouponCreateResponse createCoupon(CouponCreateRequest request){
-        Coupon coupon = Coupon.create(request);
-
-        couponRepository.save(coupon);
-
-        return CouponMapper.toCreateResponse(coupon);
-    }
 
     @Transactional(readOnly = true)
     public Page<Coupon> getCoupons(int page, int size){

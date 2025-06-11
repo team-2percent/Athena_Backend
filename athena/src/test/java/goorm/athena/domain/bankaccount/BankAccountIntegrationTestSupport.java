@@ -2,7 +2,8 @@ package goorm.athena.domain.bankaccount;
 
 import goorm.athena.domain.bankaccount.entity.BankAccount;
 import goorm.athena.domain.bankaccount.repository.BankAccountRepository;
-import goorm.athena.domain.bankaccount.service.BankAccountService;
+import goorm.athena.domain.bankaccount.service.BankAccountCommandService;
+import goorm.athena.domain.bankaccount.service.BankAccountQueryService;
 import goorm.athena.domain.imageGroup.entity.ImageGroup;
 import goorm.athena.domain.imageGroup.entity.Type;
 import goorm.athena.domain.imageGroup.service.ImageGroupCommandService;
@@ -11,7 +12,16 @@ import goorm.athena.domain.user.entity.User;
 import goorm.athena.domain.user.repository.UserRepository;
 import goorm.athena.util.IntegrationServiceTestSupport;
 import goorm.athena.util.TestEntityFactory;
+import org.junit.After;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ResourceLoader;
+import org.springframework.jdbc.datasource.init.ScriptUtils;
+
+import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.SQLException;
 
 public abstract class BankAccountIntegrationTestSupport extends IntegrationServiceTestSupport {
 
@@ -25,12 +35,18 @@ public abstract class BankAccountIntegrationTestSupport extends IntegrationServi
     protected BankAccountRepository bankAccountRepository;
 
     @Autowired
-    protected BankAccountService bankAccountService;
+    protected BankAccountQueryService bankAccountQueryService;
+
+    @Autowired
+    protected BankAccountCommandService bankAccountCommandService;
+
+
+    @Autowired
+    protected ImageGroupRepository imageGroupRepository;
 
     protected ImageGroup setupImageGroup() {
         return imageGroupCommandService.createImageGroup(Type.USER);
     }
-
 
     protected User setupUser(String email, String password, String nickname, ImageGroup imageGroup) {
         User user = TestEntityFactory.createUser(email, password, nickname, imageGroup, Role.ROLE_USER);

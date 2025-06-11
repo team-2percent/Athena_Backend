@@ -1,7 +1,8 @@
 package goorm.athena.domain.deliveryinfo;
 
 import goorm.athena.domain.deliveryinfo.repository.DeliveryInfoRepository;
-import goorm.athena.domain.deliveryinfo.service.DeliveryInfoService;
+import goorm.athena.domain.deliveryinfo.service.DeliveryInfoCommandService;
+import goorm.athena.domain.deliveryinfo.service.DeliveryInfoQueryService;
 import goorm.athena.domain.imageGroup.entity.ImageGroup;
 import goorm.athena.domain.imageGroup.entity.Type;
 import goorm.athena.domain.imageGroup.service.ImageGroupCommandService;
@@ -24,7 +25,10 @@ public abstract class DeliveryIntegrationTestSupport extends IntegrationServiceT
     protected DeliveryInfoRepository deliveryInfoRepository;
 
     @Autowired
-    protected DeliveryInfoService deliveryInfoService;
+    protected DeliveryInfoQueryService deliveryInfoQueryService;
+
+    @Autowired
+    protected DeliveryInfoCommandService deliveryInfoCommandService;
 
     protected ImageGroup setupImageGroup() {
         return imageGroupCommandService.createImageGroup(Type.USER);

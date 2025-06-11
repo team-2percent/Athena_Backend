@@ -1,8 +1,5 @@
 package goorm.athena.global.jwt.filter;
 
-import goorm.athena.domain.user.service.RefreshTokenService;
-import goorm.athena.global.exception.CustomException;
-import goorm.athena.global.exception.ErrorCode;
 import goorm.athena.global.jwt.token.JwtAuthenticationToken;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;

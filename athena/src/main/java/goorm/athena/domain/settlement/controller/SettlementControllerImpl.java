@@ -1,9 +1,6 @@
 package goorm.athena.domain.settlement.controller;
 
-import goorm.athena.domain.settlement.service.SettlementService;
-import goorm.athena.global.jwt.util.CheckLogin;
-import goorm.athena.global.jwt.util.LoginUserRequest;
-import io.swagger.v3.oas.annotations.Parameter;
+import goorm.athena.domain.settlement.service.SettlementCommandService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +16,7 @@ import java.time.LocalDate;
 @RequestMapping("/api/settlement")
 public class SettlementControllerImpl implements SettlementController{
 
-    private final SettlementService settlementService;
+    private final SettlementCommandService settlementCommandService;
 
     @PostMapping("/execute")
     public ResponseEntity<String> executeMonthlySettlement(
@@ -27,7 +24,7 @@ public class SettlementControllerImpl implements SettlementController{
     ) {
         LocalDate firstDayOfThisMonth = date.withDayOfMonth(1);
 
-        settlementService.executeMonthlySettlement(firstDayOfThisMonth);
+        settlementCommandService.executeMonthlySettlement(firstDayOfThisMonth);
 
         return ResponseEntity.ok(" 정산 실행 완료 (기준일: " + firstDayOfThisMonth + ")");
     }

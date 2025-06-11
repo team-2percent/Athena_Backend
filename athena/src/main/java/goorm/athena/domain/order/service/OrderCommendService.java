@@ -1,6 +1,6 @@
 package goorm.athena.domain.order.service;
 
-import goorm.athena.domain.deliveryinfo.service.DeliveryInfoService;
+import goorm.athena.domain.deliveryinfo.service.DeliveryInfoQueryService;
 import goorm.athena.domain.order.dto.req.OrderCreateRequest;
 import goorm.athena.domain.order.dto.req.OrderItemRequest;
 import goorm.athena.domain.order.dto.res.OrderCreateResponse;
@@ -15,7 +15,7 @@ import goorm.athena.domain.user.entity.User;
 import goorm.athena.domain.order.entity.Order;
 import goorm.athena.domain.deliveryinfo.entity.DeliveryInfo;
 
-import goorm.athena.domain.user.service.UserService;
+import goorm.athena.domain.user.service.UserQueryService;
 import goorm.athena.global.exception.CustomException;
 import goorm.athena.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -28,19 +28,19 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class OrderService {
+public class OrderCommendService {
 
     private final OrderRepository orderRepository;
     private final OrderItemRepository orderItemRepository;
-    private final UserService userService;
-    private final DeliveryInfoService deliveryInfoService;
     private final ProductQueryService productQueryService;
     private final ProjectQueryService projectQueryService;
+    private final UserQueryService userQueryService;
+    private final DeliveryInfoQueryService deliveryInfoQueryService;
 
-    public Order getById(Long id) {
-        return orderRepository.findById(id)
-                .orElseThrow(() -> new CustomException(ErrorCode.ORDER_NOT_FOUND));
-    }
+//    public Order getById(Long id) {
+//        return orderRepository.findById(id)
+//                .orElseThrow(() -> new CustomException(ErrorCode.ORDER_NOT_FOUND));
+//    }
 
     public void saveAll(List<Order> orders) {
         orderRepository.saveAll(orders);
@@ -49,8 +49,8 @@ public class OrderService {
     @Transactional
     public OrderCreateResponse createOrder(Long userId, OrderCreateRequest request) {
 
-        User user = userService.getUser(userId);
-        DeliveryInfo delivery = deliveryInfoService.getById(request.deliveryInfoId());
+        User user = userQueryService.getUser(userId);
+        DeliveryInfo delivery = deliveryInfoQueryService.getById(request.deliveryInfoId());
         Project project = projectQueryService.getById(request.projectId());
 
         Order order = Order.create(user, delivery, project, LocalDateTime.now());
@@ -82,28 +82,36 @@ public class OrderService {
         return OrderCreateResponse.from(order, orderItems);
     }
 
-    public void decreaseInventory(Long orderId) {
-        List<OrderItem> orderItems = orderItemRepository.findByOrderId(orderId);
-        for (OrderItem item : orderItems) {
-            item.getProduct().decreaseStock(item.getQuantity());
-        }
-    }
+//    public void decreaseInventory(Long orderId) {
+//        List<OrderItem> orderItems = orderItemRepository.findByOrderId(orderId);
+//        for (OrderItem item : orderItems) {
+//            item.getProduct().decreaseStock(item.getQuantity());
+//        }
+//    }
+//
+//    public void increaseProjectFunding(Long orderId) {
+//        List<OrderItem> orderItems = orderItemRepository.findByOrderId(orderId);
+//        for (OrderItem item : orderItems) {
+//            item.getOrder().getProject().increasePrice(item.getPrice());
+//        }
+//    }
 
-    public void increaseProjectFunding(Long orderId) {
-        List<OrderItem> orderItems = orderItemRepository.findByOrderId(orderId);
-        for (OrderItem item : orderItems) {
+    public void postPaymentProcess(Long orderId) {
+        for (OrderItem item : orderItemRepository.findByOrderId(orderId)) {
+            item.getProduct().decreaseStock(item.getQuantity());
             item.getOrder().getProject().increasePrice(item.getPrice());
         }
     }
 
-    public Long getSeller(Long orderId){
-        User user = orderRepository.findSellerByOrderId(orderId);
-        return user.getId();
-    }
 
-    public Long getBuyer(Long orderId){
-        User user =  orderRepository.findBuyerByOrderId(orderId);
-        return user.getId();
-    }
+//    public Long getSeller(Long orderId){
+//        User user = orderRepository.findSellerByOrderId(orderId);
+//        return user.getId();
+//    }
+
+//    public Long getBuyer(Long orderId){
+//        User user =  orderRepository.findBuyerByOrderId(orderId);
+//        return user.getId();
+//    }
 
 }

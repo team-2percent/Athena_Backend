@@ -5,6 +5,7 @@ import goorm.athena.domain.project.entity.PlatformPlan;
 import goorm.athena.domain.project.entity.Project;
 import goorm.athena.domain.settlement.entity.Settlement;
 import goorm.athena.domain.settlementhistory.entity.SettlementHistory;
+import goorm.athena.domain.settlementhistory.mapper.SettlementHistoryMapper;
 import goorm.athena.domain.settlementhistory.repository.SettlementHistoryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -12,15 +13,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-import static goorm.athena.domain.settlementhistory.mapper.SettlementHistoryMapper.toEntity;
 
 @Service
 @RequiredArgsConstructor
-public class SettlementHistoryService {
+public class SettlementHistoryCommandService {
 
     private final SettlementHistoryRepository settlementHistoryRepository;
+    private final SettlementHistoryMapper settlementHistoryMapper;
 
-    private static final double PLATFORM_FEE_RATE = 0.10;
 
     // 정산 데이터의 총 판매금액과 총수수료의 정보와 정산기록의 각 데이터의 수수료와 총금액의 합산이 안맞을 수가 있다.
     @Transactional
@@ -42,7 +42,7 @@ public class SettlementHistoryService {
                     long vat = Math.round(platformFee * vatRate);               // VAT는 플랫폼 수수료에만 적용
                     long amount = totalPrice - platformFee - pgFee - vat;       // 최종 정산금액
 
-                    return toEntity(settlement, order, totalPrice, platformFee, pgFee, vat, amount);
+                    return settlementHistoryMapper.toEntity(settlement, order, totalPrice, platformFee, pgFee, vat, amount);
                 })
                 .toList();
 

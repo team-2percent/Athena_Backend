@@ -57,11 +57,11 @@ class UserServiceTest extends UserIntegrationTestSupport {
                 new ByteArrayInputStream(os.toByteArray())
         );
 
-        UserUpdateResponse response = userService.updateUser(user.getId(), request, multipartFile);
+        UserUpdateResponse response = userCommandService.updateUser(user.getId(), request, multipartFile);
 
         // then
         assertThat(response).isNotNull();
-        User updated = userService.getUser(user.getId());
+        User updated = userQueryService.getUser(user.getId());
         assertThat(updated.getNickname()).isEqualTo("newNick");
 
 
@@ -82,11 +82,11 @@ class UserServiceTest extends UserIntegrationTestSupport {
 
         UserUpdateRequest request = new UserUpdateRequest("newNick", "소개글", "https://link.com");
 
-        UserUpdateResponse response = userService.updateUser(user.getId(), request, null);
+        UserUpdateResponse response = userCommandService.updateUser(user.getId(), request, null);
 
         // then
         assertThat(response).isNotNull();
-        User updated = userService.getUser(user.getId());
+        User updated = userQueryService.getUser(user.getId());
         assertThat(updated.getNickname()).isEqualTo("newNick");
     }
 
@@ -99,7 +99,7 @@ class UserServiceTest extends UserIntegrationTestSupport {
         userRepository.save(user);
 
         // when
-        UserGetResponse response = userService.getUserById(user.getId());
+        UserGetResponse response = userQueryService.getUserById(user.getId());
 
         // then
         assertThat(response.nickname()).isEqualTo("nick");
@@ -114,7 +114,7 @@ class UserServiceTest extends UserIntegrationTestSupport {
         userRepository.save(user);
 
         // when
-        UserHeaderGetResponse response = userService.getHeaderById(user.getId());
+        UserHeaderGetResponse response = userQueryService.getHeaderById(user.getId());
         String imageUrl = imageQueryService.getImage(user.getImageGroup().getId());
 
         // then
@@ -130,7 +130,7 @@ class UserServiceTest extends UserIntegrationTestSupport {
         userRepository.save(user);
 
         // when
-        userService.deleteUser(user.getId());
+        userCommandService.deleteUser(user.getId());
 
         // then
         boolean exists = userRepository.findById(user.getId()).isPresent();
@@ -148,7 +148,7 @@ class UserServiceTest extends UserIntegrationTestSupport {
         String encPw = "123";
 
         // when
-        boolean result = userService.checkPassword(user.getId(), encPw);
+        boolean result = userCommandService.checkPassword(user.getId(), encPw);
 
         // then
         assertThat(result).isTrue();
@@ -165,7 +165,7 @@ class UserServiceTest extends UserIntegrationTestSupport {
         userRepository.saveAll(List.of(user1, user2));
 
         // when
-        List<Long> result = userService.getUserIdAll();
+        List<Long> result = userQueryService.getUserIdAll();
 
         // then
         assertThat(result).hasSize(expectedSize + 2);
@@ -180,7 +180,7 @@ class UserServiceTest extends UserIntegrationTestSupport {
         userRepository.save(user);
 
         // when
-        UserLoginResponse response = userService.validateUserCredentials(request, httpServletResponse);
+        UserLoginResponse response = userCommandService.validateUserCredentials(request, httpServletResponse);
         String accessToken = jwtTokenizer.createAccessToken(user.getId(), user.getNickname(), user.getRole().name());
         String refreshToken = jwtTokenizer.createRefreshToken(user.getId(), user.getNickname(), user.getRole().name());
 
@@ -203,7 +203,7 @@ class UserServiceTest extends UserIntegrationTestSupport {
         UserUpdatePasswordRequest req = new UserUpdatePasswordRequest(oldPw, newPw);
 
         // when
-        userService.updatePassword(user.getId(), req);
+        userCommandService.updatePassword(user.getId(), req);
 
         // then
         User updatedUser = userRepository.findById(user.getId()).orElseThrow();
@@ -220,7 +220,7 @@ class UserServiceTest extends UserIntegrationTestSupport {
         user.update("nick", "소개", "https://example.com");
 
         // when
-        UserSummaryResponse response = userService.getUserSummary(user.getId());
+        UserSummaryResponse response = userQueryService.getUserSummary(user.getId());
 
         // then
         assertThat(response.linkUrl()).isEqualTo("https://example.com");
@@ -245,8 +245,8 @@ class UserServiceTest extends UserIntegrationTestSupport {
 
         // when
         UserUpdateRequest request = new UserUpdateRequest("123", "123" , "123");
-        userService.updateUser(user.getId(), request, multipartFile);
-        UserGetResponse response = userService.getUserById(user.getId());
+        userCommandService.updateUser(user.getId(), request, multipartFile);
+        UserGetResponse response = userQueryService.getUserById(user.getId());
 
         // then
         assertThat(response).isNotNull();
@@ -267,7 +267,7 @@ class UserServiceTest extends UserIntegrationTestSupport {
         userRepository.save(user);
 
         // when
-        UserHeaderGetResponse response = userService.getHeaderById(user.getId());
+        UserHeaderGetResponse response = userQueryService.getHeaderById(user.getId());
 
         // then
         assertThat(response.imageUrl()).isEmpty();
@@ -292,8 +292,8 @@ class UserServiceTest extends UserIntegrationTestSupport {
 
         // when
         UserUpdateRequest request = new UserUpdateRequest("123", "123" , "123");
-        userService.updateUser(user.getId(), request, multipartFile);
-        UserGetResponse response = userService.getUserById(user.getId());
+        userCommandService.updateUser(user.getId(), request, multipartFile);
+        UserGetResponse response = userQueryService.getUserById(user.getId());
 
         // then
         assertThat(response).isNotNull();
@@ -314,7 +314,7 @@ class UserServiceTest extends UserIntegrationTestSupport {
         userRepository.save(user);
 
         // when
-        UserGetResponse response = userService.getUserById(user.getId());
+        UserGetResponse response = userQueryService.getUserById(user.getId());
 
         // then
         assertThat(response.imageUrl()).isNull();
@@ -339,8 +339,8 @@ class UserServiceTest extends UserIntegrationTestSupport {
 
         // when
         UserUpdateRequest request = new UserUpdateRequest("123", "123" , "123");
-        userService.updateUser(user.getId(), request, multipartFile);
-        UserGetResponse response = userService.getUserById(user.getId());
+        userCommandService.updateUser(user.getId(), request, multipartFile);
+        UserGetResponse response = userQueryService.getUserById(user.getId());
 
         // then
         assertThat(response).isNotNull();
@@ -364,7 +364,7 @@ class UserServiceTest extends UserIntegrationTestSupport {
         userRepository.save(user);
 
         // when
-        UserGetResponse response = userService.getUserById(user.getId());
+        UserGetResponse response = userQueryService.getUserById(user.getId());
 
         // then
         assertThat(response.imageUrl()).isNull(); // 혹은 비어있음
@@ -378,7 +378,7 @@ class UserServiceTest extends UserIntegrationTestSupport {
         ImageGroup imageGroup = new ImageGroup();
 
         // when
-        UserCreateResponse response = userService.createUser(request, imageGroup);
+        UserCreateResponse response = userCommandService.createUser(request, imageGroup);
 
         // then
         assertEquals(request.email(), response.email());
@@ -394,7 +394,7 @@ class UserServiceTest extends UserIntegrationTestSupport {
         userRepository.save(user);
 
         // when & then
-        assertThatThrownBy(() -> userService.getUserSummary(99L))
+        assertThatThrownBy(() -> userQueryService.getUserSummary(2000000L))
                 .isInstanceOf(CustomException.class)
                 .hasMessageContaining(ErrorCode.USER_NOT_FOUND.getErrorMessage());
     }
@@ -413,7 +413,7 @@ class UserServiceTest extends UserIntegrationTestSupport {
         UserCreateRequest request = new UserCreateRequest("123", "password", "nickname");
 
         // then
-        assertThatThrownBy(() -> userService.createUser(request, imageGroup))
+        assertThatThrownBy(() -> userCommandService.createUser(request, imageGroup))
                 .isInstanceOf(CustomException.class)
                 .hasMessageContaining(ErrorCode.ALREADY_EXIST_USER.getErrorMessage());
     }
@@ -428,7 +428,7 @@ class UserServiceTest extends UserIntegrationTestSupport {
         MultipartFile file = null;
 
         // when & then
-        assertThatThrownBy(() -> userService.updateUser(2L, request, file))
+        assertThatThrownBy(() -> userCommandService.updateUser(170L, request, file))
                 .isInstanceOf(CustomException.class)
                 .hasMessageContaining(ErrorCode.USER_NOT_FOUND.getErrorMessage());
     }
@@ -442,7 +442,7 @@ class UserServiceTest extends UserIntegrationTestSupport {
         String rawPw = "wrongPw";
 
         // when
-        boolean result = userService.checkPassword(user.getId(), rawPw);
+        boolean result = userCommandService.checkPassword(user.getId(), rawPw);
 
         // then
         assertThat(result).isFalse();
@@ -458,7 +458,7 @@ class UserServiceTest extends UserIntegrationTestSupport {
         UserUpdateRequest request = new UserUpdateRequest("newNick", "newIntro", "newUrl");
 
         // when
-        UserUpdateResponse response = userService.updateUser(user.getId(), request, null);
+        UserUpdateResponse response = userCommandService.updateUser(user.getId(), request, null);
 
         // then
         assertThat(response).isNotNull();
@@ -482,7 +482,7 @@ class UserServiceTest extends UserIntegrationTestSupport {
 
         // when
         RuntimeException exception = assertThrows(CustomException.class, () -> {
-            userService.updateUser(user.getId(), request, multipartFile);
+            userCommandService.updateUser(user.getId(), request, multipartFile);
         });
 
         // then
@@ -510,7 +510,7 @@ class UserServiceTest extends UserIntegrationTestSupport {
 
         // when
         RuntimeException exception = assertThrows(CustomException.class, () -> {
-            userService.updateUser(user.getId(), request, multipartFile);
+            userCommandService.updateUser(user.getId(), request, multipartFile);
         });
 
         // then
@@ -521,13 +521,12 @@ class UserServiceTest extends UserIntegrationTestSupport {
     @Test
     void updatePassword_비밀번호_틀렸을_때_예외_발생() {
         // given
-        User user = setupUser("123", passwordEncoder.encode("123"), "nick", null);
-        userRepository.save(user);
+        User user = userRepository.findById(30L).get();
         UserUpdatePasswordRequest request = new UserUpdatePasswordRequest("wrongOldPassword", "newPassword");
 
         // when
         CustomException exception = assertThrows(CustomException.class, () -> {
-            userService.updatePassword(user.getId(), request);
+            userCommandService.updatePassword(user.getId(), request);
         });
 
         // then

@@ -19,7 +19,8 @@ import goorm.athena.domain.project.entity.Project;
 import goorm.athena.domain.user.entity.Role;
 import goorm.athena.domain.user.entity.User;
 import goorm.athena.domain.user.repository.UserRepository;
-import goorm.athena.domain.user.service.UserService;
+import goorm.athena.domain.user.service.UserCommandService;
+import goorm.athena.domain.user.service.UserQueryService;
 import goorm.athena.global.jwt.util.JwtTokenizer;
 import goorm.athena.util.IntegrationServiceTestSupport;
 
@@ -33,8 +34,12 @@ import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ResourceLoader;
+import org.springframework.jdbc.datasource.init.ScriptUtils;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.util.ReflectionUtils;
+
+import javax.sql.DataSource;
 import java.lang.reflect.Field;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
@@ -72,15 +77,14 @@ public abstract class UserIntegrationTestSupport extends IntegrationServiceTestS
   protected ImageGroupCommandService imageGroupCommandService;
 
   @Autowired
-  protected UserService userService;
+  protected UserQueryService userQueryService;
 
-  @BeforeEach
-  void setUp() {
-    // 테스트에서 nasService로 내부 경로를 강제 주입하여 임시 디렉터리로 파일 I/O 수행함
-    Field imagePathField = ReflectionUtils.findField(NasService.class, "imagePath");
-    imagePathField.setAccessible(true);
-    ReflectionUtils.setField(imagePathField, nasService, tempDir.toAbsolutePath().toString());
-  }
+  @Autowired
+  protected UserCommandService userCommandService;
+
+
+  @Autowired protected DataSource dataSource;
+  @Autowired protected ResourceLoader resourceLoader;
 
   protected static Validator validator;
 

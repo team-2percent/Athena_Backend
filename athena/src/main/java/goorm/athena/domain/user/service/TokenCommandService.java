@@ -12,7 +12,7 @@ import java.time.Duration;
 
 @Service
 @RequiredArgsConstructor
-public class TokenService {
+public class TokenCommandService {
     private final JwtTokenizer jwtTokenizer;
 
     // 토큰 발급, 재발급 공통 로직
