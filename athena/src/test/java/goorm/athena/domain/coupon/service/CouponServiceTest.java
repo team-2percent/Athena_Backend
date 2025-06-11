@@ -47,8 +47,8 @@ class CouponServiceTest extends CouponIntegrationTestSupport {
 
         // then
         assertThat(coupons.getContent()).hasSize(10);
-        assertThat(coupons.getTotalElements()).isEqualTo(150);
-        assertThat(coupons.getTotalPages()).isEqualTo(15);
+        assertThat(coupons.getTotalElements()).isEqualTo(30);
+        assertThat(coupons.getTotalPages()).isEqualTo(3);
         assertThat(coupons.getNumber()).isEqualTo(0); // 현재 페이지 번호
         assertThat(coupons.getSize()).isEqualTo(10);  // 요청한 사이즈
     }
@@ -63,8 +63,8 @@ class CouponServiceTest extends CouponIntegrationTestSupport {
 
         // then
         assertThat(coupons.getContent()).hasSize(10);
-        assertThat(coupons.getTotalElements()).isEqualTo(20);
-        assertThat(coupons.getTotalPages()).isEqualTo(2);
+        assertThat(coupons.getTotalElements()).isEqualTo(10);
+        assertThat(coupons.getTotalPages()).isEqualTo(1);
         assertThat(coupons.getNumber()).isEqualTo(0); // 현재 페이지 번호
         assertThat(coupons.getSize()).isEqualTo(10);  // 요청한 사이즈
     }
@@ -79,8 +79,8 @@ class CouponServiceTest extends CouponIntegrationTestSupport {
 
         // then
         assertThat(coupons.getContent()).hasSize(10);
-        assertThat(coupons.getTotalElements()).isEqualTo(70);
-        assertThat(coupons.getTotalPages()).isEqualTo(7);
+        assertThat(coupons.getTotalElements()).isEqualTo(10);
+        assertThat(coupons.getTotalPages()).isEqualTo(1);
         assertThat(coupons.getNumber()).isEqualTo(0); // 현재 페이지 번호
         assertThat(coupons.getSize()).isEqualTo(10);  // 요청한 사이즈
     }
@@ -94,9 +94,9 @@ class CouponServiceTest extends CouponIntegrationTestSupport {
         Page<Coupon> coupons = couponQueryService.getCouponByStatus(0, 10, CouponStatus.COMPLETED);
 
         // then
-        assertThat(coupons.getContent()).hasSize(10);
-        assertThat(coupons.getTotalElements()).isEqualTo(30);
-        assertThat(coupons.getTotalPages()).isEqualTo(3);
+        assertThat(coupons.getContent()).hasSize(5);
+        assertThat(coupons.getTotalElements()).isEqualTo(5);
+        assertThat(coupons.getTotalPages()).isEqualTo(1);
         assertThat(coupons.getNumber()).isEqualTo(0); // 현재 페이지 번호
         assertThat(coupons.getSize()).isEqualTo(10);  // 요청한 사이즈
     }
@@ -110,9 +110,9 @@ class CouponServiceTest extends CouponIntegrationTestSupport {
         Page<Coupon> coupons = couponQueryService.getCouponByStatus(0, 10, CouponStatus.ENDED);
 
         // then
-        assertThat(coupons.getContent()).hasSize(10);
-        assertThat(coupons.getTotalElements()).isEqualTo(30);
-        assertThat(coupons.getTotalPages()).isEqualTo(3);
+        assertThat(coupons.getContent()).hasSize(5);
+        assertThat(coupons.getTotalElements()).isEqualTo(5);
+        assertThat(coupons.getTotalPages()).isEqualTo(1);
         assertThat(coupons.getNumber()).isEqualTo(0); // 현재 페이지 번호
         assertThat(coupons.getSize()).isEqualTo(10);  // 요청한 사이즈
     }
@@ -121,7 +121,7 @@ class CouponServiceTest extends CouponIntegrationTestSupport {
     @Test
     void getCouponDetail() {
         // given
-        Coupon coupon = couponRepository.findById(50L).get();
+        Coupon coupon = couponRepository.findById(25L).get();
 
         // when
         CouponGetDetailResponse response = couponQueryService.getCouponDetail(coupon.getId());
@@ -137,10 +137,10 @@ class CouponServiceTest extends CouponIntegrationTestSupport {
     @Test
     void getCoupon_SUCCESS() {
         // given
-        Coupon coupon = couponRepository.findById(50L).get();
+        Coupon coupon = couponRepository.findById(25L).get();
 
         // when
-        Coupon response = couponQueryService.getCoupon(50L);
+        Coupon response = couponQueryService.getCoupon(25L);
 
         // then
         assertThat(response.getId()).isEqualTo(coupon.getId());
@@ -165,7 +165,7 @@ class CouponServiceTest extends CouponIntegrationTestSupport {
     void getCouponEvent_UNUSED() {
         // given
         Long userId = 20L;
-        UserCouponIssueRequest request = new UserCouponIssueRequest(50L);
+        UserCouponIssueRequest request = new UserCouponIssueRequest(19L);
 
         userCouponCommandService.issueCoupon(userId, request);
 
@@ -173,7 +173,7 @@ class CouponServiceTest extends CouponIntegrationTestSupport {
         List<CouponEventGetResponse> responses = couponQueryService.getCouponEvent(userId);
 
         // then
-        assertThat(responses.size()).isEqualTo(70);
+        assertThat(responses.size()).isEqualTo(10);
         assertThat(responses.getFirst().userIssued()).isFalse();
         assertThat(responses.getLast().userIssued()).isFalse();
     }
@@ -183,7 +183,7 @@ class CouponServiceTest extends CouponIntegrationTestSupport {
     void getCouponEvent_USED() {
         // given
         Long userId = 20L;
-        UserCouponIssueRequest request = new UserCouponIssueRequest(50L);
+        UserCouponIssueRequest request = new UserCouponIssueRequest(16L);
 
         userCouponCommandService.issueCoupon(userId, request);
 
@@ -191,8 +191,8 @@ class CouponServiceTest extends CouponIntegrationTestSupport {
         List<CouponEventGetResponse> responses = couponQueryService.getCouponEvent(userId);
 
         // then
-        assertThat(responses.size()).isEqualTo(70);
-        assertThat(responses.get(40).userIssued()).isTrue();
+        assertThat(responses.size()).isEqualTo(10);
+        assertThat(responses.get(4).userIssued()).isTrue();
         assertThat(responses.getLast().userIssued()).isFalse();
     }
 }

@@ -8,6 +8,7 @@ import goorm.athena.domain.userCoupon.dto.cursor.UserCouponCursorResponse;
 import goorm.athena.domain.userCoupon.dto.res.UserCouponGetResponse;
 import goorm.athena.domain.userCoupon.entity.QUserCoupon;
 import goorm.athena.domain.userCoupon.entity.UserCoupon;
+import goorm.athena.domain.userCoupon.mapper.UserCouponMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -17,6 +18,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserCouponCursorRepository {
     private final JPAQueryFactory queryFactory;
+    private final UserCouponMapper userCouponMapper;
 
     public UserCouponCursorResponse getUserCouponByCursor(Long userId, Long cursorId, int size){
         QUserCoupon userCoupon = QUserCoupon.userCoupon;
@@ -54,7 +56,7 @@ public class UserCouponCursorRepository {
 
         Long nextCursor = content.isEmpty() ? null : content.get(content.size() - 1).id();
 
-        return UserCouponCursorResponse.of(content, nextCursor, total);
+        return userCouponMapper.toGetCursorResponse(content, nextCursor, total);
     }
 
 }

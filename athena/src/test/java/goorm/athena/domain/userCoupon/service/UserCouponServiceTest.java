@@ -28,8 +28,8 @@ class UserCouponServiceTest extends UserCouponIntegrationSupport {
     @Test
     void issueCoupon_Success() {
         // given
-        User user = userRepository.findById(71L).get();
-        Coupon coupon = couponRepository.findById(71L).get();
+        User user = userRepository.findById(25L).get();
+        Coupon coupon = couponRepository.findById(11L).get();
 
         UserCouponIssueRequest request = new UserCouponIssueRequest(coupon.getId());
 
@@ -47,8 +47,8 @@ class UserCouponServiceTest extends UserCouponIntegrationSupport {
     @Test
     void issueCoupon_NOT_INPROGRESS() {
         // given
-        User user = userRepository.findById(71L).get();
-        Coupon coupon = couponRepository.findById(131L).get();
+        User user = userRepository.findById(25L).get();
+        Coupon coupon = couponRepository.findById(7L).get();
 
         UserCouponIssueRequest request = new UserCouponIssueRequest(coupon.getId());
 
@@ -62,8 +62,8 @@ class UserCouponServiceTest extends UserCouponIntegrationSupport {
     @Test
     void issueCoupon_ALREADY_ISSUED() {
         // given
-        User user = userRepository.findById(71L).get();
-        Coupon coupon = couponRepository.findById(73L).get();
+        User user = userRepository.findById(25L).get();
+        Coupon coupon = couponRepository.findById(11L).get();
 
 
         UserCouponIssueRequest request = new UserCouponIssueRequest(coupon.getId());
@@ -80,8 +80,8 @@ class UserCouponServiceTest extends UserCouponIntegrationSupport {
     @Test
     void useCoupon_Success() {
         // given
-        User user = userRepository.findById(71L).get();
-        Coupon coupon = couponRepository.findById(75L).get();
+        User user = userRepository.findById(25L).get();
+        Coupon coupon = couponRepository.findById(11L).get();
         UserCoupon userCoupon = setupUserCoupon(user, coupon, UNUSED);
 
         userCouponRepository.save(userCoupon);
@@ -97,8 +97,8 @@ class UserCouponServiceTest extends UserCouponIntegrationSupport {
     @Test
     void useCoupon_INVALID_USE_COUPON() {
         // given
-        User user = userRepository.findById(71L).get();
-        Coupon coupon = couponRepository.findById(75L).get();
+        User user = userRepository.findById(25L).get();
+        Coupon coupon = couponRepository.findById(11L).get();
         UserCoupon userCoupon = setupUserCoupon(user, coupon, EXPIRED);
 
         userCouponRepository.save(userCoupon);
@@ -113,9 +113,9 @@ class UserCouponServiceTest extends UserCouponIntegrationSupport {
     @Test
     void useCoupon_NOT_FOUND() {
         // given
-        User user = userRepository.findById(71L).get();
-        User user2 = userRepository.findById(69L).get();
-        Coupon coupon = couponRepository.findById(57L).get();
+        User user = userRepository.findById(25L).get();
+        User user2 = userRepository.findById(26L).get();
+        Coupon coupon = couponRepository.findById(11L).get();
         UserCoupon userCoupon = setupUserCoupon(user, coupon, UNUSED);
 
         userCouponRepository.save(userCoupon);
@@ -130,10 +130,10 @@ class UserCouponServiceTest extends UserCouponIntegrationSupport {
     @Test
     void getUserCoupon() {
         // given
-        User user = userRepository.findById(47L).get();
-        Coupon coupon = couponRepository.findById(21L).get();
-        Coupon coupon2 = couponRepository.findById(23L).get();
-        Coupon coupon3 = couponRepository.findById(25L).get();
+        User user = userRepository.findById(24L).get();
+        Coupon coupon = couponRepository.findById(12L).get();
+        Coupon coupon2 = couponRepository.findById(13L).get();
+        Coupon coupon3 = couponRepository.findById(14L).get();
 
         UserCoupon userCoupon = setupUserCoupon(user, coupon, EXPIRED);
         UserCoupon userCoupon2 = setupUserCoupon(user, coupon2, USED);
@@ -155,15 +155,15 @@ class UserCouponServiceTest extends UserCouponIntegrationSupport {
     @Test
     void getUserCoupons() {
         // given
-        User user = userRepository.findById(33L).get();
+        User user = userRepository.findById(25L).get();
 
-        Coupon coupon = couponRepository.findById(21L).get();
-        Coupon coupon2 = couponRepository.findById(23L).get();
-        Coupon coupon3 = couponRepository.findById(25L).get();
-        Coupon coupon4 = couponRepository.findById(27L).get();
-        Coupon coupon5 = couponRepository.findById(29L).get();
-        Coupon coupon6 = couponRepository.findById(31L).get();
-        Coupon coupon7 = couponRepository.findById(33L).get();
+        Coupon coupon = couponRepository.findById(11L).get();
+        Coupon coupon2 = couponRepository.findById(12L).get();
+        Coupon coupon3 = couponRepository.findById(13L).get();
+        Coupon coupon4 = couponRepository.findById(14L).get();
+        Coupon coupon5 = couponRepository.findById(15L).get();
+        Coupon coupon6 = couponRepository.findById(16L).get();
+        Coupon coupon7 = couponRepository.findById(17L).get();
 
         UserCoupon userCoupon = setupUserCoupon(user, coupon, EXPIRED);
         UserCoupon userCoupon2 = setupUserCoupon(user, coupon2, USED);

@@ -34,6 +34,7 @@ public class AdminControllerImpl implements AdminController {
     private final SettlementCommandService settlementCommandService;
     private final SettlementQueryService settlementQueryService;
     private final CouponQueryService couponQueryService;
+    private final CouponMapper couponMapper;
 
 
     // 프로젝트 승인/반려
@@ -116,7 +117,7 @@ public class AdminControllerImpl implements AdminController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size){
         Page<Coupon> coupons = couponQueryService.getCoupons(page, size);
-        Page<CouponGetResponse> response = coupons.map(CouponMapper::toGetResponse);
+        Page<CouponGetResponse> response = coupons.map(couponMapper::toGetResponse);
 
         return ResponseEntity.ok(response);
     }
@@ -129,7 +130,7 @@ public class AdminControllerImpl implements AdminController {
             @RequestParam(defaultValue = "10") int size,
             @RequestParam CouponStatus status){
         Page<Coupon> coupons = couponQueryService.getCouponByStatus(page, size, status);
-        Page<CouponGetResponse> response = coupons.map(CouponMapper::toGetResponse);
+        Page<CouponGetResponse> response = coupons.map(couponMapper::toGetResponse);
 
         return ResponseEntity.ok(response);
     }

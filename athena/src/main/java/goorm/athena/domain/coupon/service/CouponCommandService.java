@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class CouponCommandService {
     private final CouponRepository couponRepository;
+    private final CouponMapper couponMapper;
 
     @Transactional
     public CouponCreateResponse createCoupon(CouponCreateRequest request){
@@ -21,6 +22,6 @@ public class CouponCommandService {
 
         couponRepository.save(coupon);
 
-        return CouponMapper.toCreateResponse(coupon);
+        return couponMapper.toCreateResponse(coupon);
     }
 }

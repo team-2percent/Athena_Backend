@@ -22,13 +22,14 @@ public class UserCouponQueryService {
     private final UserCouponCursorRepository userCouponCursorRepository;
     private final UserQueryService userQueryService;
     private final CouponQueryService couponQueryService;
+    private final UserCouponMapper userCouponMapper;
 
 
     @Transactional(readOnly = true)
     public List<UserCouponGetResponse> getUserCoupon(Long userId){
         User user = userQueryService.getUser(userId);
         return userCouponRepository.findByUser(user).stream()
-                .map(UserCouponMapper::toGetResponse)
+                .map(userCouponMapper::toGetResponse)
                 .collect(Collectors.toList());
     }
 

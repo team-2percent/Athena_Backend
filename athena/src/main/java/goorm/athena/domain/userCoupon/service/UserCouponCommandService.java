@@ -23,6 +23,7 @@ public class UserCouponCommandService {
     private final UserQueryService userQueryService;
     private final CouponQueryService couponQueryService;
     private final UserCouponRepository userCouponRepository;
+    private final UserCouponMapper userCouponMapper;
 
     @Transactional
     public UserCouponIssueResponse issueCoupon(Long userId, UserCouponIssueRequest request){
@@ -44,7 +45,7 @@ public class UserCouponCommandService {
         UserCoupon userCoupon = UserCoupon.create(user, coupon);
         userCouponRepository.save(userCoupon);
 
-        return UserCouponMapper.toCreateResponse(userCoupon);
+        return userCouponMapper.toCreateResponse(userCoupon);
     }
 
     // 쿠폰 사용시 해당 로직을 사용하면 됩니다 ( 로그인 한 사용자의 Id와 사용할 유저의 쿠폰 ID를 받습니다.)

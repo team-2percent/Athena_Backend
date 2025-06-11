@@ -22,6 +22,7 @@ import goorm.athena.domain.user.repository.UserRepository;
 import goorm.athena.domain.user.service.UserCommandService;
 import goorm.athena.domain.user.service.UserQueryService;
 import goorm.athena.global.jwt.util.JwtTokenizer;
+import goorm.athena.global.jwt.util.LoginUserRequest;
 import goorm.athena.util.IntegrationServiceTestSupport;
 
 import goorm.athena.util.TestEntityFactory;
@@ -82,11 +83,15 @@ public abstract class UserIntegrationTestSupport extends IntegrationServiceTestS
   @Autowired
   protected UserCommandService userCommandService;
 
-
-  @Autowired protected DataSource dataSource;
-  @Autowired protected ResourceLoader resourceLoader;
-
   protected static Validator validator;
+
+  @BeforeEach
+  protected void setUp() {
+    // 테스트에서 nasService로 내부 경로를 강제 주입하여 임시 디렉터리로 파일 I/O 수행함
+    Field imagePathField = ReflectionUtils.findField(NasService.class, "imagePath");
+    imagePathField.setAccessible(true);
+    ReflectionUtils.setField(imagePathField, nasService, tempDir.toAbsolutePath().toString());
+  }
 
   @BeforeAll
   static void setupValidator() {
@@ -101,56 +106,6 @@ public abstract class UserIntegrationTestSupport extends IntegrationServiceTestS
   protected User setupUser(String email, String password, String nickname, ImageGroup imageGroup) {
     User user = TestEntityFactory.createUser(email, password, nickname, imageGroup, Role.ROLE_USER);
     return user;
-  }
-
-  protected Category setupCategory(String categoryName) {
-    Category category = TestEntityFactory.createCategory(categoryName);
-    return category;
-  }
-
-  protected BankAccount setupBankAccount(User user, String accountNumber, String accountHolder, String bankName, boolean isDefault) {
-    BankAccount bankAccount = TestEntityFactory.createBankAccount(user, accountNumber, accountHolder, bankName, isDefault);
-    return bankAccount;
-  }
-
-  protected PlatformPlan setupPlatformPlan(PlanName planName, int platformFeeRate, int pgFeeRate, int vatRate, String description) {
-    PlatformPlan plan = TestEntityFactory.createPlatformPlan(planName, platformFeeRate, pgFeeRate, vatRate, description);
-    return plan;
-  }
-
-  protected Project setupProject(User user, Category category, ImageGroup imageGroup,
-                                 BankAccount bankAccount, PlatformPlan platformPlan,
-                                 String title, String description, Long goalAmount, Long totalAmount, String contentMarkdown) {
-    Project project = TestEntityFactory.createProject(
-            user, category, imageGroup, bankAccount, platformPlan,
-            title, description, goalAmount, totalAmount, contentMarkdown
-    );
-    return project;
-  }
-
-  protected Product setupProduct(Project project, String name, String description, Long price, Long stock){
-    Product product = TestEntityFactory.createProduct(
-            project, name, description, price, stock);
-
-    return product;
-  }
-
-  protected DeliveryInfo setupDeliveryInfo(User user, String zipcode, String address, String detailAddress, boolean isDefault){
-    DeliveryInfo deliveryInfo = TestEntityFactory.createDeliveryInfo(user, zipcode, address, detailAddress, isDefault);
-
-    return deliveryInfo;
-  }
-
-  protected OrderItem setupOrderItem(Order order, Product product, int quantity, Long price){
-    OrderItem orderItem = TestEntityFactory.createOrderItem(order, product, quantity, price);
-
-    return orderItem;
-  }
-
-  protected Order setupOrder(User user, DeliveryInfo delivery, Project project, LocalDateTime orderedAt){
-    Order order = TestEntityFactory.createOrder(user, delivery, project, orderedAt);
-
-    return order;
   }
 
 }

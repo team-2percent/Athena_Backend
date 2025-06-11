@@ -25,6 +25,7 @@ import java.util.Set;
 public class CouponQueryService {
     private final CouponRepository couponRepository;
     private final UserCouponRepository userCouponRepository;
+    private final CouponMapper couponMapper;
 
     @Transactional(readOnly = true)
     public Page<Coupon> getCoupons(int page, int size){
@@ -41,7 +42,7 @@ public class CouponQueryService {
     @Transactional(readOnly = true)
     public CouponGetDetailResponse getCouponDetail(Long couponId){
         Coupon coupon = getCoupon(couponId);
-        return CouponMapper.toGetDetailResponse(coupon);
+        return couponMapper.toGetDetailResponse(coupon);
     }
 
     @Transactional(readOnly = true)
@@ -64,7 +65,7 @@ public class CouponQueryService {
         return couponEventList.stream()
                 .map(event -> {
                     boolean alreadyIssued = alreadyIssuedCouponIds.contains(event.getId());
-                    return CouponMapper.toGetEventResponse(event, alreadyIssued);
+                    return couponMapper.toGetEventResponse(event, alreadyIssued);
                 })
                 .toList();
 
