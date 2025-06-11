@@ -8,7 +8,7 @@ import goorm.athena.domain.coupon.dto.res.CouponGetResponse;
 import goorm.athena.domain.coupon.entity.Coupon;
 import goorm.athena.domain.coupon.entity.CouponStatus;
 import goorm.athena.domain.coupon.mapper.CouponMapper;
-import goorm.athena.domain.coupon.service.CouponService;
+import goorm.athena.domain.coupon.service.CouponQueryService;
 import goorm.athena.domain.project.dto.req.ProjectApprovalRequest;
 import goorm.athena.domain.project.dto.res.ProjectDetailResponse;
 import goorm.athena.domain.project.service.ProjectService;
@@ -31,7 +31,7 @@ public class AdminControllerImpl implements AdminController {
     private final AdminService adminService;
     private final AdminRoleCheckService adminRoleCheckService;
     private final SettlementService settlementService;
-    private final CouponService couponService;
+    private final CouponQueryService couponQueryService;
 
 
     // 프로젝트 승인/반려
@@ -113,7 +113,7 @@ public class AdminControllerImpl implements AdminController {
             @CheckLogin LoginUserRequest request,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size){
-        Page<Coupon> coupons = couponService.getCoupons(page, size);
+        Page<Coupon> coupons = couponQueryService.getCoupons(page, size);
         Page<CouponGetResponse> response = coupons.map(CouponMapper::toGetResponse);
 
         return ResponseEntity.ok(response);
@@ -126,7 +126,7 @@ public class AdminControllerImpl implements AdminController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam CouponStatus status){
-        Page<Coupon> coupons = couponService.getCouponByStatus(page, size, status);
+        Page<Coupon> coupons = couponQueryService.getCouponByStatus(page, size, status);
         Page<CouponGetResponse> response = coupons.map(CouponMapper::toGetResponse);
 
         return ResponseEntity.ok(response);
@@ -137,7 +137,7 @@ public class AdminControllerImpl implements AdminController {
     public ResponseEntity<CouponGetDetailResponse> getCouponDetail(
             @CheckLogin LoginUserRequest request,
             @PathVariable Long couponId) {
-        CouponGetDetailResponse response = couponService.getCouponDetail(couponId);
+        CouponGetDetailResponse response = couponQueryService.getCouponDetail(couponId);
         return ResponseEntity.ok(response);
     }
 

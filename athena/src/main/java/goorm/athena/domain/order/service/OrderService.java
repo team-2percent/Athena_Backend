@@ -1,6 +1,6 @@
 package goorm.athena.domain.order.service;
 
-import goorm.athena.domain.deliveryinfo.service.DeliveryInfoService;
+import goorm.athena.domain.deliveryinfo.service.DeliveryInfoQueryService;
 import goorm.athena.domain.order.dto.req.OrderCreateRequest;
 import goorm.athena.domain.order.dto.req.OrderItemRequest;
 import goorm.athena.domain.order.dto.res.OrderCreateResponse;
@@ -15,7 +15,7 @@ import goorm.athena.domain.user.entity.User;
 import goorm.athena.domain.order.entity.Order;
 import goorm.athena.domain.deliveryinfo.entity.DeliveryInfo;
 
-import goorm.athena.domain.user.service.UserService;
+import goorm.athena.domain.user.service.UserQueryService;
 import goorm.athena.global.exception.CustomException;
 import goorm.athena.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -32,8 +32,8 @@ public class OrderService {
 
     private final OrderRepository orderRepository;
     private final OrderItemRepository orderItemRepository;
-    private final UserService userService;
-    private final DeliveryInfoService deliveryInfoService;
+    private final UserQueryService userQueryService;
+    private final DeliveryInfoQueryService deliveryInfoQueryService;
     private final ProductService productService;
     private final ProjectService projectService;
 
@@ -49,8 +49,8 @@ public class OrderService {
     @Transactional
     public OrderCreateResponse createOrder(Long userId, OrderCreateRequest request) {
 
-        User user = userService.getUser(userId);
-        DeliveryInfo delivery = deliveryInfoService.getById(request.deliveryInfoId());
+        User user = userQueryService.getUser(userId);
+        DeliveryInfo delivery = deliveryInfoQueryService.getById(request.deliveryInfoId());
         Project project = projectService.getById(request.projectId());
 
         Order order = Order.create(user, delivery, project, LocalDateTime.now());

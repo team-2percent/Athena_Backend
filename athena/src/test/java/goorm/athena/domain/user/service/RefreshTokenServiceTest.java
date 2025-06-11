@@ -25,7 +25,7 @@ class RefreshTokenServiceTest extends RefreshTokenIntegrationTestSupport {
         String refreshToken = null;
 
         // when & then
-        assertThatThrownBy(() -> refreshTokenService.reissueToken(accessToken, refreshToken, response))
+        assertThatThrownBy(() -> refreshTokenCommandService.reissueToken(accessToken, refreshToken, response))
                 .isInstanceOf(CustomException.class)
                 .hasMessageContaining(ErrorCode.REFRESHTOKEN_NOT_FOUND.getErrorMessage());
     }
@@ -39,7 +39,7 @@ class RefreshTokenServiceTest extends RefreshTokenIntegrationTestSupport {
 
         // when & then
         CustomException exception = assertThrows(CustomException.class, () ->
-                refreshTokenService.reissueToken(accessToken, refreshToken, response)
+                refreshTokenCommandService.reissueToken(accessToken, refreshToken, response)
         );
 
         assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.REFRESHTOKEN_NOT_FOUND);
@@ -60,7 +60,7 @@ class RefreshTokenServiceTest extends RefreshTokenIntegrationTestSupport {
                 user.getId(), user.getNickname(), user.getRole().name(), 24 * 60 * 60 * 1000L);
 
         // when
-        RefreshTokenResponse actualResponse = refreshTokenService.reissueToken(accessToken, refreshToken, response);
+        RefreshTokenResponse actualResponse = refreshTokenCommandService.reissueToken(accessToken, refreshToken, response);
 
         // then
         assertThat(actualResponse.accessToken()).isEqualTo(accessToken);
@@ -82,7 +82,7 @@ class RefreshTokenServiceTest extends RefreshTokenIntegrationTestSupport {
         String refreshToken = jwtTokenizer.createRefreshToken(
                 user.getId(), user.getNickname(), user.getRole().name(), 24 * 60 * 60 * 1000L);
         // when
-        RefreshTokenResponse actualResponse = refreshTokenService.reissueToken(accessToken, refreshToken, response);
+        RefreshTokenResponse actualResponse = refreshTokenCommandService.reissueToken(accessToken, refreshToken, response);
 
         // then
         assertThat(actualResponse.accessToken()).isNotEqualTo(accessToken);
@@ -105,7 +105,7 @@ class RefreshTokenServiceTest extends RefreshTokenIntegrationTestSupport {
 
         // when
         CustomException exception = assertThrows(CustomException.class, () ->
-                refreshTokenService.reissueToken(accessToken, refreshToken, response)
+                refreshTokenCommandService.reissueToken(accessToken, refreshToken, response)
         );
 
         // then
@@ -133,7 +133,7 @@ class RefreshTokenServiceTest extends RefreshTokenIntegrationTestSupport {
 
         // when
         CustomException exception = assertThrows(CustomException.class, () ->
-                refreshTokenService.reissueToken(accessToken, refreshToken, response)
+                refreshTokenCommandService.reissueToken(accessToken, refreshToken, response)
         );
 
         // then
