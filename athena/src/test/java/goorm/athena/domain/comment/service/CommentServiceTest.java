@@ -1,13 +1,9 @@
 package goorm.athena.domain.comment.service;
 
-import goorm.athena.domain.bankaccount.entity.BankAccount;
-import goorm.athena.domain.category.entity.Category;
 import goorm.athena.domain.comment.CommentIntegrationSupport;
 import goorm.athena.domain.comment.dto.res.CommentCreateResponse;
 import goorm.athena.domain.comment.dto.res.CommentGetResponse;
 import goorm.athena.domain.comment.entity.Comment;
-import goorm.athena.domain.imageGroup.entity.ImageGroup;
-import goorm.athena.domain.project.entity.PlatformPlan;
 import goorm.athena.domain.project.entity.Project;
 import goorm.athena.domain.user.entity.User;
 import goorm.athena.global.exception.CustomException;
@@ -20,7 +16,6 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
-
 
 @Transactional
 class CommentServiceTest extends CommentIntegrationSupport {

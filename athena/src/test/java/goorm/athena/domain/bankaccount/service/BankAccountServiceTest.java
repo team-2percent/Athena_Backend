@@ -4,7 +4,6 @@ import goorm.athena.domain.bankaccount.BankAccountIntegrationTestSupport;
 import goorm.athena.domain.bankaccount.dto.req.BankAccountCreateRequest;
 import goorm.athena.domain.bankaccount.dto.res.BankAccountGetResponse;
 import goorm.athena.domain.bankaccount.entity.BankAccount;
-import goorm.athena.domain.imageGroup.entity.ImageGroup;
 import goorm.athena.domain.user.entity.User;
 import goorm.athena.global.exception.CustomException;
 import goorm.athena.global.exception.ErrorCode;

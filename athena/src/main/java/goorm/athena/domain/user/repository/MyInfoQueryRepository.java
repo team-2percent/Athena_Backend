@@ -13,7 +13,6 @@ import goorm.athena.domain.image.entity.QImage;
 import goorm.athena.domain.image.service.ImageService;
 import goorm.athena.domain.imageGroup.entity.QImageGroup;
 import goorm.athena.domain.order.entity.QOrder;
-import goorm.athena.domain.order.entity.Status;
 import goorm.athena.domain.orderitem.entity.QOrderItem;
 import goorm.athena.domain.product.entity.QProduct;
 import goorm.athena.domain.project.entity.QProject;
@@ -23,7 +22,6 @@ import goorm.athena.domain.user.dto.response.MyProjectScrollResponse;
 import goorm.athena.domain.user.entity.QUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
-import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
 import java.util.Collections;

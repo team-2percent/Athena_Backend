@@ -1,8 +1,5 @@
 package goorm.athena.domain.user;
 
-import goorm.athena.domain.bankaccount.entity.BankAccount;
-import goorm.athena.domain.category.entity.Category;
-import goorm.athena.domain.deliveryinfo.entity.DeliveryInfo;
 import goorm.athena.domain.image.repository.ImageRepository;
 import goorm.athena.domain.image.service.ImageService;
 import goorm.athena.domain.image.service.NasService;
@@ -10,19 +7,12 @@ import goorm.athena.domain.imageGroup.entity.ImageGroup;
 import goorm.athena.domain.imageGroup.entity.Type;
 import goorm.athena.domain.imageGroup.repository.ImageGroupRepository;
 import goorm.athena.domain.imageGroup.service.ImageGroupService;
-import goorm.athena.domain.order.entity.Order;
-import goorm.athena.domain.orderitem.entity.OrderItem;
-import goorm.athena.domain.product.entity.Product;
-import goorm.athena.domain.project.entity.PlanName;
-import goorm.athena.domain.project.entity.PlatformPlan;
-import goorm.athena.domain.project.entity.Project;
 import goorm.athena.domain.user.entity.Role;
 import goorm.athena.domain.user.entity.User;
 import goorm.athena.domain.user.repository.UserRepository;
 import goorm.athena.domain.user.service.UserCommandService;
 import goorm.athena.domain.user.service.UserQueryService;
 import goorm.athena.global.jwt.util.JwtTokenizer;
-import goorm.athena.global.jwt.util.LoginUserRequest;
 import goorm.athena.util.IntegrationServiceTestSupport;
 
 import goorm.athena.util.TestEntityFactory;
@@ -35,15 +25,11 @@ import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ResourceLoader;
-import org.springframework.jdbc.datasource.init.ScriptUtils;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.util.ReflectionUtils;
 
-import javax.sql.DataSource;
 import java.lang.reflect.Field;
 import java.nio.file.Path;
-import java.time.LocalDateTime;
 
 public abstract class UserIntegrationTestSupport extends IntegrationServiceTestSupport {
   @Autowired

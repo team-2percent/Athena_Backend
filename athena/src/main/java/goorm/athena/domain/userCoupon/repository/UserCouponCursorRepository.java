@@ -7,7 +7,6 @@ import goorm.athena.domain.coupon.entity.QCoupon;
 import goorm.athena.domain.userCoupon.dto.cursor.UserCouponCursorResponse;
 import goorm.athena.domain.userCoupon.dto.res.UserCouponGetResponse;
 import goorm.athena.domain.userCoupon.entity.QUserCoupon;
-import goorm.athena.domain.userCoupon.entity.UserCoupon;
 import goorm.athena.domain.userCoupon.mapper.UserCouponMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;

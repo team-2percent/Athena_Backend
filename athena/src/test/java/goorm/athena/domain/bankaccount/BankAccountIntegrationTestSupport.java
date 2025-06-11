@@ -8,26 +8,12 @@ import goorm.athena.domain.imageGroup.entity.ImageGroup;
 import goorm.athena.domain.imageGroup.entity.Type;
 import goorm.athena.domain.imageGroup.repository.ImageGroupRepository;
 import goorm.athena.domain.imageGroup.service.ImageGroupService;
-import goorm.athena.domain.order.repository.OrderRepository;
-import goorm.athena.domain.orderitem.repository.OrderItemRepository;
-import goorm.athena.domain.product.entity.Product;
-import goorm.athena.domain.product.repository.ProductRepository;
-import goorm.athena.domain.project.repository.ProjectRepository;
 import goorm.athena.domain.user.entity.Role;
 import goorm.athena.domain.user.entity.User;
 import goorm.athena.domain.user.repository.UserRepository;
 import goorm.athena.util.IntegrationServiceTestSupport;
 import goorm.athena.util.TestEntityFactory;
-import org.junit.After;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ResourceLoader;
-import org.springframework.jdbc.datasource.init.ScriptUtils;
-
-import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.SQLException;
 
 public abstract class BankAccountIntegrationTestSupport extends IntegrationServiceTestSupport {
 

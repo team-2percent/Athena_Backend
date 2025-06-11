@@ -5,8 +5,6 @@ import goorm.athena.domain.comment.dto.res.CommentGetResponse;
 import goorm.athena.domain.comment.entity.Comment;
 import goorm.athena.domain.project.entity.Project;
 import goorm.athena.domain.user.entity.User;
-import org.checkerframework.checker.units.qual.C;
-import org.mapstruct.Context;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 

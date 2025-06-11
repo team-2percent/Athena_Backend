@@ -3,8 +3,6 @@ package goorm.athena.domain.user.mapper;
 import goorm.athena.domain.image.service.ImageService;
 import goorm.athena.domain.user.dto.response.MyProjectScrollResponse;
 import org.springframework.stereotype.Component;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.time.LocalDateTime;
 import java.util.List;

@@ -1,7 +1,6 @@
 package goorm.athena.domain.userCoupon.service;
 
 import goorm.athena.domain.coupon.entity.Coupon;
-import goorm.athena.domain.coupon.entity.CouponStatus;
 import goorm.athena.domain.user.entity.User;
 import goorm.athena.domain.userCoupon.dto.cursor.UserCouponCursorResponse;
 import goorm.athena.domain.userCoupon.dto.req.UserCouponIssueRequest;
@@ -15,7 +14,6 @@ import goorm.athena.global.exception.ErrorCode;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 import static goorm.athena.domain.userCoupon.entity.Status.*;

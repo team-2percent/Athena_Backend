@@ -4,7 +4,6 @@ import goorm.athena.domain.deliveryinfo.DeliveryIntegrationTestSupport;
 import goorm.athena.domain.deliveryinfo.dto.req.DeliveryInfoRequest;
 import goorm.athena.domain.deliveryinfo.dto.res.DeliveryInfoResponse;
 import goorm.athena.domain.deliveryinfo.entity.DeliveryInfo;
-import goorm.athena.domain.imageGroup.entity.ImageGroup;
 import goorm.athena.domain.user.entity.User;
 import goorm.athena.global.exception.CustomException;
 import goorm.athena.global.exception.ErrorCode;
