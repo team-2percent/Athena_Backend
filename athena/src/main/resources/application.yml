@@ -81,7 +81,6 @@ spring:
   sql:
     init:
       mode: always
-      schema-locations: classpath:schema.sql
   config:
     activate:
       on-profile: test

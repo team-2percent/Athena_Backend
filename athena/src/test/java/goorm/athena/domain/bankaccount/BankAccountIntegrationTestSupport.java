@@ -57,12 +57,17 @@ public abstract class BankAccountIntegrationTestSupport extends IntegrationServi
 
     @BeforeEach
     void setup() throws SQLException {
+        ScriptUtils.executeSqlScript(
+                dataSource.getConnection(),
+                resourceLoader.getResource("classpath:/truncate.sql")
+        );
         // 2. SQL 스크립트 실행 (예: user-test-data.sql)
         ScriptUtils.executeSqlScript(
                 dataSource.getConnection(),
                 resourceLoader.getResource("classpath:/data1.sql")
         );
     }
+
 
 
     protected User setupUser(String email, String password, String nickname, ImageGroup imageGroup) {
