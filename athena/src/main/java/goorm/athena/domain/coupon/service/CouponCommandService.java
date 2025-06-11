@@ -5,7 +5,6 @@ import goorm.athena.domain.coupon.dto.res.CouponCreateResponse;
 import goorm.athena.domain.coupon.entity.Coupon;
 import goorm.athena.domain.coupon.mapper.CouponMapper;
 import goorm.athena.domain.coupon.repository.CouponRepository;
-import goorm.athena.domain.userCoupon.repository.UserCouponRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

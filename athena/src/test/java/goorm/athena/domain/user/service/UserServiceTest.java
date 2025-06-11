@@ -24,6 +24,7 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 import java.util.Optional;
 
@@ -432,8 +433,8 @@ class UserServiceTest extends UserIntegrationTestSupport {
     }
 
     @Test
-    @DisplayName("유저를 수정할 때 파일이 null 또는 비어있으면 이미지 업로드가 호출되지 않고 정상 처리된다")
-    void updateUser_fileNullOrEmpty_success() {
+    @DisplayName("유저를 수정할 때 파일이 null이면 비어있으면 이미지 업로드가 호출되지 않고 정상 처리된다")
+    void updateUser_fileNull_success() {
         // given
         User user = setupUser("123", passwordEncoder.encode("123"), "nick", null);
         userRepository.save(user);
@@ -442,6 +443,31 @@ class UserServiceTest extends UserIntegrationTestSupport {
 
         // when
         UserUpdateResponse response = userCommandService.updateUser(user.getId(), request, null);
+
+        // then
+        assertThat(response).isNotNull();
+        assertThat(response.nickname()).isEqualTo("newNick");
+    }
+
+    @Test
+    @DisplayName("유저를 수정할 때 파일이 null이면 비어있으면 이미지 업로드가 호출되지 않고 정상 처리된다")
+    void updateUser_fileEmpty_success() throws IOException {
+        // given
+        User user = setupUser("123", passwordEncoder.encode("123"), "nick", null);
+        userRepository.save(user);
+
+
+        MockMultipartFile multipartFile = new MockMultipartFile(
+                "file",
+                "test.webp",
+                "image/webp",
+                InputStream.nullInputStream()
+        );
+
+        UserUpdateRequest request = new UserUpdateRequest("newNick", "newIntro", "newUrl");
+
+        // when
+        UserUpdateResponse response = userCommandService.updateUser(user.getId(), request, multipartFile);
 
         // then
         assertThat(response).isNotNull();

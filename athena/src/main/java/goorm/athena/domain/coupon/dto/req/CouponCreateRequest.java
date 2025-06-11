@@ -20,16 +20,4 @@ public record CouponCreateRequest(
 
         @Size(min = 1, max = 1000000)
         int stock
-)  {
-    public static CouponCreateRequest of(
-            String title,
-            String content,
-            int price,
-            LocalDateTime startAt,
-            LocalDateTime endAt,
-            LocalDateTime expiresAt,
-            int stock
-    ) {
-        return new CouponCreateRequest(title, content, price, startAt, endAt, expiresAt, stock);
-    }
-}
+)  { }

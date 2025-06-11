@@ -243,25 +243,33 @@ class BankAccountServiceTest extends BankAccountIntegrationTestSupport {
         assertThat(response.isDefault()).isTrue();
     }
 
-
-
-    /*
     @DisplayName("로그인 한 유저가 없는 계좌 정보를 조회하면 에러를 리턴한다.")
     @Test
     void getAccount_Error(){
         // given
-        System.out.println(userRepository.findAll().size()+"가가");
+        User user = userRepository.findById(25L).get();
 
+        BankAccount bankAccount = setupBankAccount(user, "!23", "123", "123", true);
+        BankAccount bankAccount2 = setupBankAccount(user, "!234", "124", "1243", false);
+        bankAccountRepository.saveAll(List.of(bankAccount, bankAccount2));
 
+        // when
+        assertThatThrownBy(() -> bankAccountQueryService.getAccount(user.getId(), 3000000L))
+                .isInstanceOf(CustomException.class)
+                .hasMessageContaining(ErrorCode.BANK_ACCOUNT_NOT_FOUND.getErrorMessage());
     }
 
     @DisplayName("로그인 한 유저의 특정 계좌 정보를 리턴한다.")
     @Test
     void getAccount(){
-        System.out.println(userRepository.findAll().size()+"나나");
+        // given
+        User user = userRepository.findById(25L).get();
 
+        // when
+        BankAccount response = bankAccountQueryService.getAccount(user.getId(), 25L);
 
+        // then
+        assertThat(response.getAccountNumber()).isEqualTo("0000000020");
+        assertThat(response.isDefault()).isTrue();
     }
-
-     */
 }

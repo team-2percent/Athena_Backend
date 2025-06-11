@@ -93,7 +93,7 @@ class UserCouponServiceTest extends UserCouponIntegrationSupport {
         assertThat(userCoupon.getStatus()).isEqualTo(Status.USED);
     }
 
-    @DisplayName("유저가 사용 할 수 없는 쿠폰을 사용하려고 하면 에러를 리턴한다.")
+    @DisplayName("유저가 사용 할 수 없는 쿠폰을 사용하려고 하면 에러를 리턴한다. ( 서비스 단위 )")
     @Test
     void useCoupon_INVALID_USE_COUPON() {
         // given
@@ -108,6 +108,22 @@ class UserCouponServiceTest extends UserCouponIntegrationSupport {
                 .isInstanceOf(CustomException.class)
                 .hasMessageContaining(ErrorCode.INVALID_USE_COUPON.getErrorMessage());
     }
+
+    @DisplayName("유저가 사용 할 수 없는 쿠폰을 사용하려고 하면 에러를 리턴한다. ( 도메인 단위 ) ")
+    @Test
+    void useCoupon_INVALID_COUPON_STATUS() {
+        // given
+        User user = userRepository.findById(25L).get();
+        Coupon coupon = couponRepository.findById(11L).get();
+        UserCoupon userCoupon = setupUserCoupon(user, coupon, EXPIRED);
+
+        // when & then
+        assertThatThrownBy(userCoupon::useCoupon)
+                .isInstanceOf(CustomException.class)
+                .hasMessageContaining(ErrorCode.INVALID_COUPON_STATUS.getErrorMessage());
+    }
+
+
 
     @DisplayName("유저가 자신 이외의 쿠폰을 사용하려고 하면 에러를 리턴한다.")
     @Test
