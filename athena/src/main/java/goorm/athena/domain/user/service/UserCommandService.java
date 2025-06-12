@@ -1,6 +1,6 @@
 package goorm.athena.domain.user.service;
 
-import goorm.athena.domain.image.service.ImageService;
+import goorm.athena.domain.image.service.ImageCommandService;
 import goorm.athena.domain.imageGroup.entity.ImageGroup;
 import goorm.athena.domain.user.dto.request.UserCreateRequest;
 import goorm.athena.domain.user.dto.request.UserLoginRequest;
@@ -28,7 +28,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserCommandService {
     private final UserRepository userRepository;
-    private final ImageService imageService;
+    private final ImageCommandService imageCommandService;
     private final PasswordEncoder passwordEncoder;
     private final TokenCommandService tokenCommandService;
     private final JwtTokenizer jwtTokenizer;
@@ -61,7 +61,7 @@ public class UserCommandService {
 
         // 프로필 이미지가 들어오는 경우에만 등록
         if(file != null && !file.isEmpty()){
-            imageService.uploadImages(List.of(file), updateUser.getImageGroup());
+            imageCommandService.uploadImages(List.of(file), updateUser.getImageGroup());
         }
 
         User savedUser = userRepository.save(updateUser);

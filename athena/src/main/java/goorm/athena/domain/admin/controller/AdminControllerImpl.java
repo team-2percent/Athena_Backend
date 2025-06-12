@@ -11,9 +11,9 @@ import goorm.athena.domain.coupon.mapper.CouponMapper;
 import goorm.athena.domain.coupon.service.CouponQueryService;
 import goorm.athena.domain.project.dto.req.ProjectApprovalRequest;
 import goorm.athena.domain.project.dto.res.ProjectDetailResponse;
-import goorm.athena.domain.project.service.ProjectService;
+import goorm.athena.domain.project.service.ProjectCommandService;
+import goorm.athena.domain.project.service.ProjectQueryService;
 import goorm.athena.domain.settlement.entity.Status;
-import goorm.athena.domain.settlement.service.SettlementCommandService;
 import goorm.athena.domain.settlement.service.SettlementQueryService;
 import goorm.athena.global.jwt.util.CheckLogin;
 import goorm.athena.global.jwt.util.LoginUserRequest;
@@ -28,10 +28,10 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/admin")
 public class AdminControllerImpl implements AdminController {
 
-    private final ProjectService projectService;
+    private final ProjectQueryService projectQueryService;
+    private final ProjectCommandService projectCommandService;
     private final AdminQueryService adminQueryService;
     private final AdminRoleCheckService adminRoleCheckService;
-    private final SettlementCommandService settlementCommandService;
     private final SettlementQueryService settlementQueryService;
     private final CouponQueryService couponQueryService;
 
@@ -44,7 +44,7 @@ public class AdminControllerImpl implements AdminController {
             @RequestBody ProjectApprovalRequest request
     ) {
         adminRoleCheckService.checkAdmin(loginUserRequest);
-        projectService.updateApprovalStatus(projectId, request.approve());
+        projectCommandService.updateApprovalStatus(projectId, request.approve());
         String resultMessage = request.approve() ? "승인되었습니다." : "거절되었습니다.";
         return ResponseEntity.ok(resultMessage);
     }
@@ -65,7 +65,7 @@ public class AdminControllerImpl implements AdminController {
 
     @GetMapping("/project/{projectId}")
     public ResponseEntity<ProjectDetailResponse> getProjectDetail(@PathVariable Long projectId){
-        ProjectDetailResponse response = projectService.getProjectDetail(projectId);
+        ProjectDetailResponse response = projectQueryService.getProjectDetail(projectId);
         return ResponseEntity.ok(response);
     }
 

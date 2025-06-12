@@ -6,7 +6,7 @@ import goorm.athena.domain.deliveryinfo.repository.DeliveryInfoRepository;
 import goorm.athena.domain.imageGroup.entity.ImageGroup;
 import goorm.athena.domain.imageGroup.entity.Type;
 import goorm.athena.domain.imageGroup.repository.ImageGroupRepository;
-import goorm.athena.domain.imageGroup.service.ImageGroupService;
+import goorm.athena.domain.imageGroup.service.ImageGroupCommandService;
 import goorm.athena.domain.order.repository.OrderRepository;
 import goorm.athena.domain.orderitem.repository.OrderItemRepository;
 import goorm.athena.domain.product.repository.ProductRepository;
@@ -43,7 +43,7 @@ public abstract class RefreshTokenIntegrationTestSupport extends IntegrationServ
     protected UserRepository userRepository;
 
     @Autowired
-    protected ImageGroupService imageGroupService;
+    protected ImageGroupCommandService imageGroupCommandService;
 
     @Autowired
     protected ImageGroupRepository imageGroupRepository;
@@ -67,7 +67,7 @@ public abstract class RefreshTokenIntegrationTestSupport extends IntegrationServ
     protected DeliveryInfoRepository deliveryInfoRepository;
 
     protected ImageGroup setupImageGroup() {
-        return imageGroupService.createImageGroup(Type.PROJECT);
+        return imageGroupCommandService.createImageGroup(Type.PROJECT);
     }
 
     protected User setupUser(String email, String password, String nickname, ImageGroup imageGroup) {

@@ -115,7 +115,7 @@ class UserServiceTest extends UserIntegrationTestSupport {
 
         // when
         UserHeaderGetResponse response = userQueryService.getHeaderById(user.getId());
-        String imageUrl = imageService.getImage(user.getImageGroup().getId());
+        String imageUrl = imageQueryService.getImage(user.getImageGroup().getId());
 
         // then
         assertThat(response.nickname()).isEqualTo("nick");

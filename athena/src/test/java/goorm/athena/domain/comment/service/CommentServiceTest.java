@@ -74,7 +74,7 @@ class CommentServiceTest extends CommentIntegrationSupport {
 
         // when
         List<CommentGetResponse> response = commentQueryService.getCommentByProject(project.getId());
-        String expectedImageUrl = imageService.getImage(user.getImageGroup().getId());
+        String expectedImageUrl = imageQueryService.getImage(user.getImageGroup().getId());
 
         // then
         assertThat(response).hasSize(2);
@@ -100,7 +100,7 @@ class CommentServiceTest extends CommentIntegrationSupport {
 
         // when
         List<CommentGetResponse> response = commentQueryService.getCommentByUser(user.getId());
-        String expectedImageUrl = imageService.getImage(user.getImageGroup().getId());
+        String expectedImageUrl = imageQueryService.getImage(user.getImageGroup().getId());
 
         // then
         assertThat(response).hasSize(1);
