@@ -29,7 +29,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -49,6 +48,7 @@ public class ProjectCommandService {
     private final MarkdownParser markdownParser;
     private final PlatformPlanRepository platformPlanRepository;
     private final ProjectQueryService projectQueryService;
+    private final ProjectMapper projectMapper;
 
     /**
      * [프로젝트 등록 Method]
@@ -60,20 +60,16 @@ public class ProjectCommandService {
         BankAccount bankAccount = bankAccountQueryService.getAccount(request.sellerId(), request.bankAccountId());
         PlanName planName = PlanName.valueOf(request.platformPlan());
         PlatformPlan platformPlan = platformPlanRepository.findByName(planName);
-
-        validateProduct(request); // 프로젝트 등록 시 검증
-
-        // 마크다운에 로컬 이미지가 삽입된 경우 이를 이미지 URL로 치환
         String convertedMarkdown = convertMarkdownIfNeeded(request.contentMarkdown(), markdownFiles, imageGroup);
 
-        Project project = ProjectMapper.toEntity(request, seller, imageGroup, category, bankAccount, platformPlan,
-                convertedMarkdown); // 새 프로젝트 생성
-        Project savedProject = projectRepository.save(project); // 프로젝트 저장
+        validateProject(request);
 
-        createProducts(request.products(), project); // 상품 등록 요청 처리
-        // 상품 생성 예외 처리 추가적으로 있을지 고려
+        Project project = projectMapper.toEntity(request, seller, imageGroup, category, bankAccount, platformPlan,
+                convertedMarkdown);
+        Project savedProject = projectRepository.save(project);
+        createProducts(request.products(), project);
 
-        return ProjectMapper.toCreateDto(savedProject);
+        return projectMapper.toCreateDto(savedProject);
     }
 
     // 상품 리스트 생성
@@ -86,7 +82,7 @@ public class ProjectCommandService {
     }
 
     // 프로젝트 등록 검증
-    private void validateProduct(ProjectCreateRequest request) {
+    private void validateProject(ProjectCreateRequest request) {
         if (request.title().length() > 25) {
             throw new CustomException(ErrorCode.INVALID_TITLE_FORMAT);
         }
@@ -109,20 +105,12 @@ public class ProjectCommandService {
             return markdown;
         }
 
-        try {
-            return getConvertedMarkdown(markdownFiles, imageGroup, markdown); // 기존 마크다운 -> URL 치환 마크다운
-        } catch (IOException e) {
-            throw new CustomException(ErrorCode.IMAGES_UPLOAD_FAILED);
-        }
-    }
-
-    private String getConvertedMarkdown(List<MultipartFile> markdownFiles, ImageGroup imageGroup, String markdown)
-            throws IOException {
-        List<String> imagePaths = markdownParser.extractImagePaths(markdown); // 마크다운 내 url 추출
+        List<String> imagePaths = markdownParser.extractImagePaths(markdown);         // 마크다운 내 url 추출
         List<String> realUrls = imageCommandService.uploadMarkdownImages(markdownFiles, imageGroup); // 이미지 저장 및 이미지 서버 url 반환
 
         return markdownParser.replaceMarkdown(markdown, imagePaths, realUrls);
     }
+
 
     /**
      * [프로젝트 수정 Method]
@@ -133,22 +121,14 @@ public class ProjectCommandService {
         Category category = categoryService.getCategoryById(request.categoryId());
         BankAccount bankAccount = bankAccountQueryService.getPrimaryAccount(request.bankAccountId());
 
-        // 마크다운 이미지, 대표 이미지 PUT 작업을 위해서 이미지 미리 전체 삭제
-        imageCommandService.deleteImages(project.getImageGroup());
-
-        // 마크다운에 로컬 이미지가 삽입된 경우 이를 이미지 URL로 치환
-        String convertedMarkdown = convertMarkdownIfNeeded(request.contentMarkdown(), markdownFiles,
-                project.getImageGroup());
-
+        imageCommandService.deleteImages(project.getImageGroup());  // Image reset
         if (!CollectionUtils.isEmpty(files)) {
             imageCommandService.uploadImages(files, project.getImageGroup());
         } else {
             throw new CustomException(ErrorCode.IMAGE_IS_REQUIRED);
         }
-
-        // 상품 업데이트 (가격만)
+        String convertedMarkdown = convertMarkdownIfNeeded(request.contentMarkdown(), markdownFiles, project.getImageGroup());
         productCommandService.updateProducts(request.products(), project);
-
         project.update(
                 category,
                 bankAccount,
@@ -159,10 +139,14 @@ public class ProjectCommandService {
                 request.startAt(),
                 request.endAt(),
                 request.shippedAt());
+    }
 
-        // 상품 및 이미지 업데이트 (PUT)
-        deleteProducts(project);
-        createProducts(request.products(), project);
+    // 프로젝트 승인 여부로 상태 변경
+    public void updateApprovalStatus(Long projectId, boolean isApproved) {
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new CustomException(ErrorCode.PROJECT_NOT_FOUND));
+
+        project.setApprovalStatus(isApproved);
     }
 
     /**
@@ -172,24 +156,11 @@ public class ProjectCommandService {
         Project project = projectQueryService.getById(projectId);
         ImageGroup imageGroup = project.getImageGroup();
 
-        imageCommandService.deleteImages(imageGroup); // 이미지 삭제
-        deleteProducts(project); // 상품 -> 옵션 삭제
-        projectRepository.delete(project); // 프로젝트 삭제
-        imageGroupCommandService.deleteImageGroup(imageGroup); // 이미지 그룹 삭제
+        imageCommandService.deleteImages(imageGroup);           // 이미지 삭제
+        productCommandService.deleteAllByProject(project);      // 상품 -> 옵션 삭제
+        projectRepository.delete(project);                      // 프로젝트 삭제
+        imageGroupCommandService.deleteImageGroup(imageGroup);  // 이미지 그룹 삭제
 
-    }
-
-    // 상품 리스트 삭제
-    private void deleteProducts(Project project) {
-        productCommandService.deleteAllByProject(project);
-    }
-
-    // 프로젝트 승인 여부로 상태 변경
-    public void updateApprovalStatus(Long projectId, boolean isApproved) {
-        Project project = projectRepository.findById(projectId)
-                .orElseThrow(() -> new CustomException(ErrorCode.PROJECT_NOT_FOUND));
-
-        project.setApprovalStatus(isApproved);
     }
 
 }

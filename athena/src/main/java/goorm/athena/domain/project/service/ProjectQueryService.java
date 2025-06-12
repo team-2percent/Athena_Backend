@@ -19,7 +19,6 @@ import goorm.athena.domain.project.repository.query.ProjectQueryRepository;
 import goorm.athena.domain.project.repository.query.ProjectSearchQueryRepository;
 import goorm.athena.domain.project.util.ProjectQueryType;
 import goorm.athena.domain.user.dto.response.UserDetailResponse;
-import goorm.athena.domain.user.entity.User;
 import goorm.athena.domain.user.mapper.UserMapper;
 import goorm.athena.global.exception.CustomException;
 import goorm.athena.global.exception.ErrorCode;
@@ -39,24 +38,21 @@ import java.util.stream.Collectors;
 public class ProjectQueryService {
     private final ProjectRepository projectRepository;
     private final ImageQueryService imageQueryService;
-    private final CategoryService categoryService;
     private final ProductQueryService productQueryService;
     private final ProjectQueryRepository projectQueryRepository;
     private final ProjectFilterQueryRepository projectFilterQueryRepository;
     private final ProjectSearchQueryRepository projectSearchQueryRepository;
+    private final ProjectMapper projectMapper;
 
     // 상세 페이지 조회
     public ProjectDetailResponse getProjectDetail(Long projectId) {
-        Project project = getById(projectId);
+        ProjectDetailDto dto = projectQueryRepository.getProjectDetail(projectId);
 
-        Category category = categoryService.getCategoryById(project.getCategory().getId());
-        List<Image> images = imageQueryService.getProjectImages(project.getImageGroup().getId()); // 마크다운 이미지 제외 가져오기
-        List<String> imageUrls = imageQueryService.getImageUrls(images);
+        UserDetailResponse userDetailResponse = UserMapper.toDetailResponse(dto.seller());
+        List<String> imageUrls = imageQueryService.getImageUrls(dto.images());
+        List<ProductResponse> products = productQueryService.getAllProducts(dto.project());
 
-        UserDetailResponse userDetailResponse = UserMapper.toDetailResponse(project.getSeller());
-        List<ProductResponse> productResponses = productQueryService.getAllProducts(project);
-
-        return ProjectMapper.toDetailDto(project, category, imageUrls, userDetailResponse, productResponses);
+        return projectMapper.toDetailDto(dto.project(), dto.category(), imageUrls, userDetailResponse, products);
     }
 
     // 메인 페이지 조회
@@ -167,7 +163,7 @@ public class ProjectQueryService {
                             .map(project -> {
                                 String imageUrl = imageQueryService.getImage(project.getImageGroup().getId());
                                 System.out.println(imageUrl);
-                                return ProjectMapper.toTopViewResponse(project, imageUrl);
+                                return projectMapper.toTopViewResponse(project, imageUrl);
                             })
                             .toList();
                     return new ProjectByPlanGetResponse(planName, items);
@@ -186,7 +182,7 @@ public class ProjectQueryService {
                 .limit(5)
                 .map(project -> {
                     String imageUrl = imageQueryService.getImage(project.getImageGroup().getId());
-                    return ProjectMapper.toTopViewResponse(project, imageUrl);
+                    return projectMapper.toTopViewResponse(project, imageUrl);
                 })
                 .toList();
 
@@ -201,10 +197,10 @@ public class ProjectQueryService {
                     List<ProjectTopViewResponse> topViewResponses = entry.getValue().stream()
                             .map(project -> {
                                 String imageUrl = imageQueryService.getImage(project.getImageGroup().getId());
-                                return ProjectMapper.toTopViewResponse(project, imageUrl);
+                                return projectMapper.toTopViewResponse(project, imageUrl);
                             })
                             .toList();
-                    return ProjectMapper.toCategoryTopView(category, topViewResponses);
+                    return projectMapper.toCategoryTopView(category, topViewResponses);
                 })
                 .toList();
 
@@ -223,8 +219,4 @@ public class ProjectQueryService {
                 .orElseThrow(() -> new CustomException(ErrorCode.PROJECT_NOT_FOUND));
     }
 
-    public Long getSellerId(Long projectId) {
-        User user = projectRepository.findSellerByProjectId(projectId);
-        return user.getId();
-    }
 }
