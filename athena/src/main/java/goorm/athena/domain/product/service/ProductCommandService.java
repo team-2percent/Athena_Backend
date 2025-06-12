@@ -13,8 +13,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.IntStream;
 
 @Transactional
 @RequiredArgsConstructor
@@ -23,69 +23,60 @@ public class ProductCommandService {
 
     private final ProductRepository productRepository;
     private final OptionRepository optionRepository;    // OptionService를 따로 만들지 않고 여기서 관리
+    private final ProductMapper productMapper;
 
     // 상품 리스트 저장
-    public void saveProducts(List<ProductRequest> requests, Project project){
-        List<Product> products = new ArrayList<>();
+    public void saveProducts(List<ProductRequest> requests, Project project) {
+        List<Product> products = requests.stream()
+                .map(req -> productMapper.toEntity(req, project))
+                .toList();
 
-        for (ProductRequest request : requests) {
-            Product product = ProductMapper.toEntity(request, project);
-            products.add(product);
-        }
+        List<Product> saved = productRepository.saveAll(products);
 
-        List<Product> savedProducts = productRepository.saveAll(products);  // 상품 일괄 저장
+        // 순서 보장 하에 옵션 생성
+        IntStream.range(0, saved.size())
+                .forEach(i -> createOptions(saved.get(i), requests.get(i)));
+    }
 
-        // ProductRequest와 Product의 순서를 맞춰서 옵션 생성
-        for (int i = 0; i < savedProducts.size(); i++) {
-            ProductRequest request = requests.get(i);
-            Product product = savedProducts.get(i);
+    // 상품 업데이트 (수량만)
+    public void updateProducts(List<ProductRequest> requests, Project project) {
+        List<Product> products = productRepository.findAllByProject(project);
 
-            if (request.options() != null && !request.options().isEmpty()) {
-                createOptions(product, request);
-            }
-        }
+        IntStream.range(0, products.size())
+                .forEach(i -> products.get(i).updatePrice(requests.get(i).stock()));
     }
 
     // 상품 리스트 삭제
-    public void deleteAllByProject(Project project){
+    public void deleteAllByProject(Project project) {
         List<Product> products = productRepository.findAllByProject(project);
-        for (Product product : products){
+
+        products.forEach(product -> {
             deleteOptions(product);
             productRepository.delete(product);
-        }
+        });
     }
 
-    public void updateProducts(List<ProductRequest> requests, Project project) {
-        List<Product> products = productRepository.findAllByProject(project);
-        List<Long> prices = requests.stream()
-                .map(ProductRequest::price)
-                .toList();
-
-        for (int i = 0; i < products.size(); i++) {
-            products.get(i).updatePrice(prices.get(i)); // 순서대로 가격 업데이트
-        }
-    }
-
-    // 옵션 리스트 생성
+    // 옵션 생성
     private void createOptions(Product product, ProductRequest request) {
-        List<Option> options = new ArrayList<>();
+        if (request.options() == null || request.options().isEmpty()) return;
 
-        for (String optionName : request.options()) {
-            // 옵션이 빈 문자열이거나 NULL이 아니면 저장
-            if (optionName != null && !optionName.isEmpty()) {
-                Option option = new Option(product, optionName);
-                options.add(option);
-            } else {
-                throw new CustomException(ErrorCode.OPTION_IS_EMPTY);
-            }
-        }
+        List<Option> options = request.options().stream()
+                .map(String::trim)
+                .peek(name -> {
+                    if (name.isEmpty()) {
+                        throw new CustomException(ErrorCode.OPTION_IS_EMPTY);
+                    }
+                })
+                .map(name -> new Option(product, name))
+                .toList();
 
         optionRepository.saveAll(options);
     }
 
-    // 옵션 리스트 삭제
-    private void deleteOptions(Product product){
+    // 옵션 삭제
+    private void deleteOptions(Product product) {
         List<Option> options = optionRepository.findAllByProduct(product);
         optionRepository.deleteAll(options);
     }
+
 }

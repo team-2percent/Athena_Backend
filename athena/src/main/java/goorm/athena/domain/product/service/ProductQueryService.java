@@ -23,39 +23,36 @@ public class ProductQueryService {
 
     private final ProductRepository productRepository;
     private final OptionRepository optionRepository;    // OptionService를 따로 만들지 않고 여기서 관리
+    private final ProductMapper productMapper;
 
-    // 상품 리스트 전체 조회
-    public List<ProductResponse> getAllProducts(Project project){
-        List<Product> products = productRepository.findAllByProject(project);
-        List<ProductResponse> productResponses = new ArrayList<>();
-
-        for (Product product : products){
-            List<String> options = getAllOptions(product);
-            productResponses.add(ProductMapper.toDetailDto(product, options));
-        }
-
-        return productResponses;
+    // 상품 + 옵션 전체 리스트 조회
+    public List<ProductResponse> getAllProducts(Project project) {
+        return productRepository.findAllByProject(project).stream()
+                .map(product -> {
+                    List<String> options = getAllOptions(product);
+                    return productMapper.toDetailDto(product, options);
+                })
+                .toList();
     }
 
-    // 상품 조회
+    // 단일 상품 조회
     public Product getById(Long id) {
         return productRepository.findById(id)
                 .orElseThrow(() -> new CustomException(ErrorCode.PRODUCT_NOT_FOUND));
     }
 
-    // 상품과 연관된 옵션 리스트 전체 조회
-    private List<String> getAllOptions(Product product) {
-        List<String> options = new ArrayList<>();
-        List<Option> productOptions = optionRepository.findAllByProduct(product);
-        productOptions.forEach(option -> options.add(option.getOptionName()));
-        return options;
-    }
-
-    // 프로젝트 ID 기준으로 상품 리스트 조회
+    // 프로젝트 ID 기준으로 상품만 조회
     public List<ProductResponse> getProductsByProjectId(Long projectId) {
         List<Product> products = productRepository.findByProjectId(projectId);
         return products.stream()
-                .map(ProductResponse::from)
+                .map(productMapper::toDto)
+                .toList();
+    }
+
+    // 상품과 연관된 옵션 리스트 전체 조회
+    private List<String> getAllOptions(Product product) {
+        return optionRepository.findAllByProduct(product).stream()
+                .map(Option::getOptionName)
                 .toList();
     }
 }
