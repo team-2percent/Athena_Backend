@@ -59,4 +59,9 @@ public class UserQueryService {
         User user = getUser(userId);
         return UserMapper.toSummaryResponse(user);
     }
+
+    public Long getSellerByProjectId(Long projectId){
+        User user = userRepository.findSellerByProjectId(projectId);
+        return user.getId();
+    }
 }
