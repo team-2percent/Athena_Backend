@@ -9,10 +9,8 @@ import goorm.athena.domain.image.entity.Image;
 import goorm.athena.domain.image.entity.QImage;
 import goorm.athena.domain.image.service.ImageQueryService;
 import goorm.athena.domain.imageGroup.entity.QImageGroup;
-import goorm.athena.domain.product.entity.QProduct;
 import goorm.athena.domain.project.dto.cursor.*;
 import goorm.athena.domain.project.dto.req.ProjectCursorRequest;
-import goorm.athena.domain.project.dto.res.ProjectDetailResponse;
 import goorm.athena.domain.project.dto.res.ProjectRecentResponse;
 import goorm.athena.domain.project.entity.ApprovalStatus;
 import goorm.athena.domain.project.entity.Project;
@@ -38,9 +36,9 @@ public class ProjectQueryRepository {
         QUser user = QUser.user;
 
         Project result = queryFactory.selectFrom(project)
-                .leftJoin(project.category, category).fetchJoin()
-                .leftJoin(project.seller, user).fetchJoin()
-                .leftJoin(project.imageGroup, imageGroup).fetchJoin()
+                .join(project.category, category).fetchJoin()
+                .join(project.seller, user).fetchJoin()
+                .join(project.imageGroup, imageGroup).fetchJoin()
                 .where(project.id.eq(projectId))
                 .fetchOne();
 
