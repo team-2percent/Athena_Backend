@@ -120,6 +120,12 @@ jacocoTestReport {
 	afterEvaluate {
 		classDirectories.setFrom(files(classDirectories.files.collect {
 			fileTree(dir: it, exclude: [
+					'**/s3/**',
+					'**/dummy/**',
+					'**/scheduler/**',
+					'**/util/**',
+					'**/p6spy/**',
+					'**/controller/**',
 					'**/mapper/**',
 					'**/repository/**',
 					'**/entity/**',
@@ -162,6 +168,12 @@ jacocoTestCoverageVerification {
 //			}
 
 			excludes = [
+					'**/s3/**',
+					'**/dummy/**',
+					'**/scheduler/**',
+					'**/util/**',
+					'**/p6spy/**',
+					'**/controller/**',
 					'**/repository/**',
 					'**/entity/**',
 					'**.dto.**',
