@@ -14,14 +14,4 @@ public record ProductResponse(
         Long stock,
 
         List<String> options
-)  {
-    public static ProductResponse from(Product product) {
-        return ProductResponse.builder()
-                .id(product.getId())
-                .name(product.getName())
-                .description(product.getDescription())
-                .price(product.getPrice())
-                .stock(product.getStock())
-                .build();
-    }
-}
+)  { }
