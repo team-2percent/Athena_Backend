@@ -4,6 +4,7 @@ import goorm.athena.domain.image.service.ImageQueryService;
 import goorm.athena.domain.user.dto.response.*;
 import goorm.athena.domain.user.entity.User;
 import goorm.athena.domain.user.mapper.UserMapper;
+import goorm.athena.domain.user.repository.MyInfoQueryRepository;
 import goorm.athena.domain.user.repository.UserRepository;
 import goorm.athena.global.exception.CustomException;
 import goorm.athena.global.exception.ErrorCode;
@@ -19,6 +20,7 @@ import java.util.stream.Collectors;
 public class UserQueryService {
     private final UserRepository userRepository;
     private final ImageQueryService imageQueryService;
+    private final MyInfoQueryRepository myInfoQueryRepository;
 
     @Transactional(readOnly = true)
     public User getUser(Long userId) {
@@ -61,7 +63,7 @@ public class UserQueryService {
     }
 
     public Long getSellerByProjectId(Long projectId){
-        User user = userRepository.findSellerByProjectId(projectId);
+        User user = myInfoQueryRepository.findSellerByProjectId(projectId);
         return user.getId();
     }
 }

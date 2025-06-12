@@ -20,6 +20,7 @@ import goorm.athena.domain.user.dto.response.MyOrderScrollRequest;
 import goorm.athena.domain.user.dto.response.MyOrderScrollResponse;
 import goorm.athena.domain.user.dto.response.MyProjectScrollResponse;
 import goorm.athena.domain.user.entity.QUser;
+import goorm.athena.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -33,6 +34,19 @@ public class MyInfoQueryRepository {
 
     private final JPAQueryFactory queryFactory;
     private final ImageQueryService imageQueryService;
+
+    public User findSellerByProjectId(Long projectId) {
+        QProject project = QProject.project;
+        QUser user = QUser.user;
+
+        return queryFactory
+                .select(user)
+                .from(project)
+                .join(project.seller, user)
+                .where(project.id.eq(projectId))
+                .fetchOne();
+    }
+
 
     public MyProjectScrollResponse findMyProjectsByCursor(
             Long userId,
