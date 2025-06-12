@@ -39,6 +39,9 @@ public abstract class MyInfoIntegrationTestSupport extends IntegrationServiceTes
     protected ProjectService projectService;
 
     @Autowired
+    protected ProjectRepository projectRepository;
+
+    @Autowired
     protected UserRepository userRepository;
 
     @Autowired

@@ -6,6 +6,7 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.core.types.dsl.NumberExpression;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import goorm.athena.domain.comment.entity.QComment;
@@ -16,6 +17,7 @@ import goorm.athena.domain.order.entity.QOrder;
 import goorm.athena.domain.orderitem.entity.QOrderItem;
 import goorm.athena.domain.product.entity.QProduct;
 import goorm.athena.domain.project.entity.QProject;
+import goorm.athena.domain.project.entity.Status;
 import goorm.athena.domain.user.dto.response.MyOrderScrollRequest;
 import goorm.athena.domain.user.dto.response.MyOrderScrollResponse;
 import goorm.athena.domain.user.dto.response.MyProjectScrollResponse;
@@ -44,14 +46,29 @@ public class MyInfoQueryRepository {
         QImage image = QImage.image;
         QImageGroup imageGroup = QImageGroup.imageGroup;
 
+        // ACTIVE = 0, 그 외 = 1
+        NumberExpression<Integer> statusOrder = new CaseBuilder()
+                .when(project.status.eq(Status.ACTIVE)).then(0)
+                .otherwise(1);
+
         BooleanBuilder whereBuilder = new BooleanBuilder()
                 .and(project.seller.id.eq(userId));
 
-        // 커서 조건
         if (cursorCreatedAt != null && cursorProjectId != null) {
+            Integer cursorStatusOrder = queryFactory
+                    .select(new CaseBuilder()
+                            .when(project.status.eq(Status.ACTIVE)).then(0)
+                            .otherwise(1))
+                    .from(project)
+                    .where(project.id.eq(cursorProjectId))
+                    .fetchFirst();
+
             whereBuilder.and(
-                    project.createdAt.lt(cursorCreatedAt)
-                            .or(project.createdAt.eq(cursorCreatedAt).and(project.id.lt(cursorProjectId)))
+                    statusOrder.gt(cursorStatusOrder)
+                            .or(statusOrder.eq(cursorStatusOrder)
+                                    .and(project.createdAt.lt(cursorCreatedAt)
+                                            .or(project.createdAt.eq(cursorCreatedAt)
+                                                    .and(project.id.lt(cursorProjectId)))))
             );
         }
 
@@ -59,14 +76,13 @@ public class MyInfoQueryRepository {
                 .select(Projections.constructor(MyProjectScrollResponse.ProjectPreview.class,
                         project.id,
                         project.title,
-                        project.status.stringValue().eq(goorm.athena.domain.project.entity.Status.COMPLETED.name()),
+                        project.status.stringValue().eq(Status.COMPLETED.name()),
                         project.createdAt,
                         project.endAt,
                         Expressions.numberTemplate(Long.class,
                                 "floor(({0} * 100.0) / nullif({1}, 0))",
                                 project.totalAmount, project.goalAmount),
                         image.originalUrl
-
                 ))
                 .from(project)
                 .leftJoin(project.imageGroup, imageGroup)
@@ -76,15 +92,12 @@ public class MyInfoQueryRepository {
                 )
                 .where(whereBuilder)
                 .orderBy(
-                        new CaseBuilder()
-                                .when(project.status.eq(goorm.athena.domain.project.entity.Status.ACTIVE)).then(0)
-                                .otherwise(1).asc(),
+                        statusOrder.asc(),
                         project.createdAt.desc(),
                         project.id.desc()
                 )
                 .limit(pageSize + 1)
                 .fetch();
-
 
         boolean hasNext = content.size() > pageSize;
         if (hasNext) {
