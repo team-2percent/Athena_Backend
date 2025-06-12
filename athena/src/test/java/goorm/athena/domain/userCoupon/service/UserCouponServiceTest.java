@@ -22,7 +22,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class UserCouponServiceTest extends UserCouponIntegrationSupport {
 
-    @DisplayName("유저가 등록된 쿠폰들 중 '진행 중'인 쿠폰을 발급받는다.")
+    @DisplayName("유저가 진행 중인 쿠폰을 발급 요청하면 쿠폰 내용, 제목, 가격이 정상 반환된다.")
     @Test
     void issueCoupon_Success() {
         // given
@@ -34,14 +34,13 @@ class UserCouponServiceTest extends UserCouponIntegrationSupport {
         // when
         UserCouponIssueResponse response = userCouponCommandService.issueCoupon(user.getId(), request);
 
-
         // then
         assertThat(response.content()).isEqualTo(coupon.getContent());
         assertThat(response.title()).isEqualTo(coupon.getTitle());
         assertThat(response.price()).isEqualTo(coupon.getPrice());
     }
 
-    @DisplayName("유저가 '진행 중' 상태가 아닌 쿠폰을 발급받을려고 하면 에러를 리턴한다..")
+    @DisplayName("유저가 진행 중이 아닌 쿠폰을 발급 요청하면 INVALID_COUPON_STATUS 에러 메시지를 반환한다.")
     @Test
     void issueCoupon_NOT_INPROGRESS() {
         // given
@@ -56,7 +55,7 @@ class UserCouponServiceTest extends UserCouponIntegrationSupport {
                 .hasMessageContaining(ErrorCode.INVALID_COUPON_STATUS.getErrorMessage());
     }
 
-    @DisplayName("유저가 이미 발급받은 쿠폰을 한번 더 발급받을려고 하면 에러를 리턴한다.")
+    @DisplayName("유저가 이미 발급받은 쿠폰을 다시 발급 요청하면 ALREADY_ISSUED_COUPON 에러 메시지를 반환한다.")
     @Test
     void issueCoupon_ALREADY_ISSUED() {
         // given
@@ -74,7 +73,7 @@ class UserCouponServiceTest extends UserCouponIntegrationSupport {
                 .hasMessageContaining(ErrorCode.ALREADY_ISSUED_COUPON.getErrorMessage());
     }
 
-    @DisplayName("유저가 발급받은 쿠폰을 사용한다.")
+    @DisplayName("유저가 발급받은 쿠폰을 사용하면 사용한 쿠폰의 상태가 USED로 변경된다.")
     @Test
     void useCoupon_Success() {
         // given
@@ -91,7 +90,7 @@ class UserCouponServiceTest extends UserCouponIntegrationSupport {
         assertThat(userCoupon.getStatus()).isEqualTo(Status.USED);
     }
 
-    @DisplayName("유저가 사용 할 수 없는 쿠폰을 사용하려고 하면 에러를 리턴한다. ( 서비스 단위 )")
+    @DisplayName("유저가 만료된(EXPIRED) 쿠폰을 사용 요청하면 INVALID_USE_COUPON 에러 메시지를 반환한다. (서비스에서 검증)")
     @Test
     void useCoupon_INVALID_USE_COUPON() {
         // given
@@ -107,7 +106,7 @@ class UserCouponServiceTest extends UserCouponIntegrationSupport {
                 .hasMessageContaining(ErrorCode.INVALID_USE_COUPON.getErrorMessage());
     }
 
-    @DisplayName("유저가 사용 할 수 없는 쿠폰을 사용하려고 하면 에러를 리턴한다. ( 도메인 단위 ) ")
+    @DisplayName("유저가 만료된(EXPIRED) 쿠폰을 사용 요청하면 INVALID_USE_COUPON 에러 메시지를 반환한다. (도메인에서 검증)")
     @Test
     void useCoupon_INVALID_COUPON_STATUS() {
         // given
@@ -121,9 +120,7 @@ class UserCouponServiceTest extends UserCouponIntegrationSupport {
                 .hasMessageContaining(ErrorCode.INVALID_COUPON_STATUS.getErrorMessage());
     }
 
-
-
-    @DisplayName("유저가 자신 이외의 쿠폰을 사용하려고 하면 에러를 리턴한다.")
+    @DisplayName("유저가 자신이 아닌 다른 유저의 쿠폰을 사용 요청하면 USER_COUPON_NOT_FOUND 에러 메시지를 반환한다.")
     @Test
     void useCoupon_NOT_FOUND() {
         // given
@@ -140,7 +137,7 @@ class UserCouponServiceTest extends UserCouponIntegrationSupport {
                 .hasMessageContaining(ErrorCode.USER_COUPON_NOT_FOUND.getErrorMessage());
     }
 
-    @DisplayName("유저가 자신이 보유한 모든 쿠폰들을 조회한다.")
+    @DisplayName("유저가 자신이 보유한 모든 쿠폰을 조회하면 쿠폰 목록의 첫 번째와 마지막 쿠폰이 올바르게 조회된다.")
     @Test
     void getUserCoupon() {
         // given
@@ -165,7 +162,7 @@ class UserCouponServiceTest extends UserCouponIntegrationSupport {
         assertThat(responses.getFirst().content()).isEqualTo(userCoupon.getCoupon().getContent());
     }
 
-    @DisplayName("유저가 커서 페이지 형식으로 자신이 보유한 모든 쿠폰들을 조회한다.")
+    @DisplayName("유저가 커서 기반 페이지네이션으로 쿠폰 목록 조회 요청하면 요청한 범위 내 쿠폰 목록과 총 쿠폰 수가 정상 반환된다.")
     @Test
     void getUserCoupons() {
         // given
@@ -201,7 +198,7 @@ class UserCouponServiceTest extends UserCouponIntegrationSupport {
 
     }
 
-    @DisplayName("특정 쿠폰 ID의 제목을 조회한다.")
+    @DisplayName("유저가 보유한 특정 쿠폰 ID의 제목을 조회하면 해당 쿠폰의 제목을 정상 반환한다ㅏ.")
     @Test
     void getCouponTitle() {
         // given

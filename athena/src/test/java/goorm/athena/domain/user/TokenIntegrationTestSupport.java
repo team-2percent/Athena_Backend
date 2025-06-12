@@ -5,6 +5,7 @@ import goorm.athena.domain.imageGroup.entity.Type;
 import goorm.athena.domain.imageGroup.service.ImageGroupService;
 import goorm.athena.domain.user.entity.Role;
 import goorm.athena.domain.user.entity.User;
+import goorm.athena.domain.user.repository.UserRepository;
 import goorm.athena.domain.user.service.TokenCommandService;
 import goorm.athena.util.IntegrationServiceTestSupport;
 import goorm.athena.util.TestEntityFactory;
@@ -16,11 +17,7 @@ public abstract class TokenIntegrationTestSupport extends IntegrationServiceTest
     protected TokenCommandService tokenCommandService;
 
     @Autowired
-    protected ImageGroupService imageGroupService;
-
-    protected ImageGroup setupImageGroup() {
-        return imageGroupService.createImageGroup(Type.PROJECT);
-    }
+    protected UserRepository userRepository;
 
     protected User setupUser(String email, String password, String nickname, ImageGroup imageGroup) {
         User user = TestEntityFactory.createUser(email, password, nickname, imageGroup, Role.ROLE_USER);

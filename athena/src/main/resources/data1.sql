@@ -70,9 +70,10 @@ INSERT INTO "user" (id, image_group_id, email, password, nickname, role, seller_
 (27, 27, 'user27@example.com', '123', 'User27', 'ROLE_USER', '안녕하세요! User27입니다.', 'https://user27.example.com'),
 (28, 28, 'user28@example.com', '123', 'User28', 'ROLE_USER', '안녕하세요! User28입니다.', 'https://user28.example.com'),
 (29, 29, 'user29@example.com', '123', 'User29', 'ROLE_USER', '안녕하세요! User29입니다.', 'https://user29.example.com'),
-(30, 30, 'user30@example.com', '123', 'User30', 'ROLE_USER', '안녕하세요! User30입니다.', 'https://user30.example.com');
+(30, 30, 'user30@example.com', '123', 'User30', 'ROLE_USER', '안녕하세요! User30입니다.', 'https://user30.example.com'),
+(31, null, 'user31@example.com', '$2a$10$zAruYK01KFiti.O2lO1LF.ohKmQawAlnsgLpJlnfOPLAzhV0w7URW', 'User31', 'ROLE_USER', '안녕하세요! User31입니다.', 'https://user31.example.com');
 
-ALTER TABLE "user" ALTER COLUMN id RESTART WITH 31;
+ALTER TABLE "user" ALTER COLUMN id RESTART WITH 32;
 
 
 
