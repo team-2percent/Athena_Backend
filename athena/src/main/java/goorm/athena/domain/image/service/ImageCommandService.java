@@ -10,8 +10,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.IntStream;
 
 @Transactional
 @RequiredArgsConstructor
@@ -20,6 +20,7 @@ public class ImageCommandService {
     private final ImageRepository imageRepository;
     private final NasService nasService;
     private final ImageQueryService imageQueryService;
+    private final ImageMapper imageMapper;
 
     // 다중 이미지 업로드
     @Transactional
@@ -27,12 +28,11 @@ public class ImageCommandService {
         Long imageGroupId = imageGroup.getId();
         List<ImageCreateRequest> requests = nasService.saveAll(files, imageGroupId); // NAS에 이미지 저장 및 DTO 반환
 
-        List<Image> images = new ArrayList<>();
-        for (int i = 0; i < requests.size(); i++) {
-            ImageCreateRequest request = requests.get(i);
-            Image image = ImageMapper.toEntity(request, imageGroup, (long) (i + 1)); // 순서 부여
-            images.add(image);
-        }
+        List<Image> images =
+                IntStream.range(0, requests.size())
+                        .mapToObj(i -> imageMapper.toEntity(requests.get(i), imageGroup, (long) (i + 1)))
+                        .toList();
+
         imageRepository.saveAll(images);
     }
 
@@ -41,13 +41,11 @@ public class ImageCommandService {
     public List<String> uploadMarkdownImages(List<MultipartFile> files, ImageGroup imageGroup) {
         List<ImageCreateRequest> requests = nasService.saveAll(files, imageGroup.getId());
 
-        List<Image> markdownImages = new ArrayList<>();
-        for (ImageCreateRequest request : requests) {
-            Image image = ImageMapper.toEntity(request, imageGroup, (long) 0);
-            markdownImages.add(image);
-        }
-        imageRepository.saveAll(markdownImages);
+        List<Image> markdownImages = requests.stream()
+                .map(request -> imageMapper.toEntity(request, imageGroup, 0L))
+                .toList();
 
+        imageRepository.saveAll(markdownImages);
         return imageQueryService.getImageUrls(markdownImages);
     }
 
@@ -55,9 +53,7 @@ public class ImageCommandService {
     @Transactional
     public void deleteImages(ImageGroup imageGroup) {
         List<Image> images = imageRepository.findAllByImageGroup(imageGroup);
-        for (Image image : images) {
-            nasService.deleteImageFiles(image.getFileName()); // 이미지 삭제 (NAS)
-        }
+        images.forEach(image -> nasService.deleteImageFiles(image.getFileName()));
         imageRepository.deleteAll(images); // 이미지 삭제 (DB)
     }
 }

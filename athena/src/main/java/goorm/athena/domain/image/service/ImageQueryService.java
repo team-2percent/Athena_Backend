@@ -8,7 +8,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Transactional(readOnly = true)
@@ -33,12 +32,9 @@ public class ImageQueryService {
 
     // 이미지 url 리스트 불러오기
     public List<String> getImageUrls(List<Image> images) {
-        List<String> imageUrls = new ArrayList<>();
-        for (Image image : images) {
-            String fullUrl = getFullUrl(image.getOriginalUrl());
-            imageUrls.add(fullUrl);
-        }
-        return imageUrls;
+        return images.stream()
+                .map(image -> getFullUrl(image.getOriginalUrl()))
+                .toList();
     }
 
     /*
