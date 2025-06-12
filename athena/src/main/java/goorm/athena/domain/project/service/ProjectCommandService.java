@@ -121,12 +121,7 @@ public class ProjectCommandService {
         Category category = categoryService.getCategoryById(request.categoryId());
         BankAccount bankAccount = bankAccountQueryService.getPrimaryAccount(request.bankAccountId());
 
-        imageCommandService.deleteImages(project.getImageGroup());  // Image reset
-        if (!CollectionUtils.isEmpty(files)) {
-            imageCommandService.uploadImages(files, project.getImageGroup());
-        } else {
-            throw new CustomException(ErrorCode.IMAGE_IS_REQUIRED);
-        }
+        updateImages(files, project);
         String convertedMarkdown = convertMarkdownIfNeeded(request.contentMarkdown(), markdownFiles, project.getImageGroup());
         productCommandService.updateProducts(request.products(), project);
         project.update(
@@ -161,6 +156,15 @@ public class ProjectCommandService {
         projectRepository.delete(project);                      // 프로젝트 삭제
         imageGroupCommandService.deleteImageGroup(imageGroup);  // 이미지 그룹 삭제
 
+    }
+
+    private void updateImages(List<MultipartFile> files, Project project) {
+        imageCommandService.deleteImages(project.getImageGroup());  // Image reset
+        if (!CollectionUtils.isEmpty(files)) {
+            imageCommandService.uploadImages(files, project.getImageGroup());
+        } else {
+            throw new CustomException(ErrorCode.IMAGE_IS_REQUIRED);
+        }
     }
 
 }
