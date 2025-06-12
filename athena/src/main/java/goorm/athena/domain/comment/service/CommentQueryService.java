@@ -3,6 +3,7 @@ package goorm.athena.domain.comment.service;
 import goorm.athena.domain.comment.dto.res.CommentGetResponse;
 import goorm.athena.domain.comment.entity.Comment;
 import goorm.athena.domain.comment.mapper.CommentMapper;
+import goorm.athena.domain.comment.repository.CommentQueryRepository;
 import goorm.athena.domain.comment.repository.CommentRepository;
 import goorm.athena.domain.image.service.ImageService;
 import goorm.athena.domain.project.entity.Project;
@@ -18,6 +19,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class CommentQueryService {
+    private final CommentQueryRepository commentQueryRepository;
     private final CommentRepository commentRepository;
     private final UserQueryService userQueryService;
     private final ProjectService projectService;
@@ -28,7 +30,7 @@ public class CommentQueryService {
     public List<CommentGetResponse> getCommentByProject(Long projectId){
         Project project = projectService.getById(projectId);
         // 쿼리 결과를 Object[] 형태로 받아옴 (Comment, 이미지 URL)
-        List<Comment> results = commentRepository.findByProjectWithUserProfileImage(project);
+        List<Comment> results = commentQueryRepository.getCommentsByProject(project);
 
         return results.stream()
                 .map(comment -> {
@@ -41,7 +43,7 @@ public class CommentQueryService {
     @Transactional(readOnly = true)
     public List<CommentGetResponse> getCommentByUser(Long userId){
         User user = userQueryService.getUser(userId);
-        List<Comment> results = commentRepository.findByUserWithProjectImage(user);
+        List<Comment> results = commentQueryRepository.getCommentsByUser(user);
 
         return results.stream()
                 .map(comment -> {

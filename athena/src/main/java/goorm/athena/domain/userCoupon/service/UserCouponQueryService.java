@@ -6,7 +6,7 @@ import goorm.athena.domain.user.service.UserQueryService;
 import goorm.athena.domain.userCoupon.dto.cursor.UserCouponCursorResponse;
 import goorm.athena.domain.userCoupon.dto.res.UserCouponGetResponse;
 import goorm.athena.domain.userCoupon.mapper.UserCouponMapper;
-import goorm.athena.domain.userCoupon.repository.UserCouponCursorRepository;
+import goorm.athena.domain.userCoupon.repository.UserCouponQueryRepository;
 import goorm.athena.domain.userCoupon.repository.UserCouponRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class UserCouponQueryService {
     private final UserCouponRepository userCouponRepository;
-    private final UserCouponCursorRepository userCouponCursorRepository;
+    private final UserCouponQueryRepository userCouponQueryRepository;
     private final UserQueryService userQueryService;
     private final CouponQueryService couponQueryService;
     private final UserCouponMapper userCouponMapper;
@@ -35,7 +35,7 @@ public class UserCouponQueryService {
 
     @Transactional(readOnly = true)
     public UserCouponCursorResponse getUserCoupons(Long userId, Long cursorId, int size){
-        return userCouponCursorRepository.getUserCouponByCursor(userId, cursorId, size);
+        return userCouponQueryRepository.getUserCouponByCursor(userId, cursorId, size);
     }
 
     public String getCouponTitle(Long couponId){
