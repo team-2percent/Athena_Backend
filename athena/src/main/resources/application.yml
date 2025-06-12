@@ -60,8 +60,9 @@ jwt:
   secretKey: ${JWT_SECRET_KEY}
   refreshKey: ${JWT_REFRESH_KEY}
 
-nas:
-  base.path: ${NAS_PATH}
+image:
+  server:
+    url: ${IMAGE_SERVER_URL}
 
 
 fcm:
