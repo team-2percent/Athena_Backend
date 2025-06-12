@@ -4,15 +4,18 @@ import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import goorm.athena.domain.category.entity.QCategory;
+import goorm.athena.domain.image.entity.Image;
 import goorm.athena.domain.image.entity.QImage;
-import goorm.athena.domain.image.service.ImageService;
+import goorm.athena.domain.image.service.ImageQueryService;
 import goorm.athena.domain.imageGroup.entity.QImageGroup;
 import goorm.athena.domain.project.dto.cursor.*;
 import goorm.athena.domain.project.dto.req.ProjectCursorRequest;
 import goorm.athena.domain.project.dto.res.ProjectRecentResponse;
 import goorm.athena.domain.project.entity.ApprovalStatus;
+import goorm.athena.domain.project.entity.Project;
 import goorm.athena.domain.project.entity.QProject;
-import goorm.athena.domain.project.entity.Status;
+import goorm.athena.domain.user.entity.QUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
@@ -24,7 +27,25 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ProjectQueryRepository {
     private final JPAQueryFactory queryFactory;
-    private final ImageService imageService;
+    private final ImageQueryService imageQueryService;
+
+    public ProjectDetailDto getProjectDetail(Long projectId) {
+        QProject project = QProject.project;
+        QCategory category = QCategory.category;
+        QImageGroup imageGroup = QImageGroup.imageGroup;
+        QUser user = QUser.user;
+
+        Project result = queryFactory.selectFrom(project)
+                .join(project.category, category).fetchJoin()
+                .join(project.seller, user).fetchJoin()
+                .join(project.imageGroup, imageGroup).fetchJoin()
+                .where(project.id.eq(projectId))
+                .fetchOne();
+
+        List<Image> images = imageQueryService.getProjectImages(result.getImageGroup().getId());
+
+        return new ProjectDetailDto(result, result.getCategory(), result.getSeller(), images);
+    }
 
     // 최신 프로젝트 조회 (커서 기반 페이징)
     public ProjectRecentCursorResponse getProjectsByNew(ProjectCursorRequest<LocalDateTime> request) {
@@ -77,7 +98,7 @@ public class ProjectQueryRepository {
                 .map(dto -> new ProjectRecentResponse(
                         dto.id(),
                         StringUtils.hasText(dto.imageUrl())
-                                ? imageService.getFullUrl(dto.imageUrl().trim())
+                                ? imageQueryService.getFullUrl(dto.imageUrl().trim())
                                 : null,
                         dto.sellerName(),
                         dto.title(),

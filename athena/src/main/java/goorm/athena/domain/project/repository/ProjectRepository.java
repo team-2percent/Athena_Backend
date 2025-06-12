@@ -12,7 +12,6 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 import goorm.athena.domain.project.entity.Project;
 import goorm.athena.domain.project.entity.ApprovalStatus;
-import goorm.athena.domain.user.entity.User;
 
 public interface ProjectRepository extends JpaRepository<Project, Long>, JpaSpecificationExecutor<Project> {
     @Query("SELECT p FROM Project p " +
@@ -55,14 +54,6 @@ public interface ProjectRepository extends JpaRepository<Project, Long>, JpaSpec
             ORDER BY p.created_at DESC LIMIT 20
             """, nativeQuery = true)
     List<Project> findTop5ProjectsGroupedByPlatformPlan();
-
-    @Query(value = """
-            SELECT u.* 
-            FROM project p
-            JOIN `user` u ON p.seller_id = u.id
-            WHERE p.id = :projectId
-            """, nativeQuery = true)
-    User findSellerByProjectId(@Param("projectId") Long projectId);
 
     Page<Project> findByIsApproved(ApprovalStatus isApproved, Pageable pageable);
 

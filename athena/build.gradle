@@ -84,6 +84,7 @@ dependencies {
 	// MapStruct
 	implementation 'org.mapstruct:mapstruct:1.6.3'
 	annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.3'
+
 }
 
 test {
@@ -119,14 +120,9 @@ jacocoTestReport {
 	afterEvaluate {
 		classDirectories.setFrom(files(classDirectories.files.collect {
 			fileTree(dir: it, exclude: [
-					'**/s3/**',
-					'**/dummy/**',
-					'**/scheduler/**',
-					'**/util/**',
-					'**/p6spy/**',
-					'**/controller/**',
 					'**/mapper/**',
 					'**/repository/**',
+					'**/entity/**',
 					'**/dto/**',
 					'**/*Application*',
 					'**/exception/**',
@@ -166,13 +162,8 @@ jacocoTestCoverageVerification {
 //			}
 
 			excludes = [
-					'**/s3/**',
-					'**/dummy/**',
-					'**/scheduler/**',
-					'**/util/**',
-					'**/p6spy/**',
-					'**/controller/**',
 					'**/repository/**',
+					'**/entity/**',
 					'**.dto.**',
 					'**.*Application*',
 					'**.exception.**',

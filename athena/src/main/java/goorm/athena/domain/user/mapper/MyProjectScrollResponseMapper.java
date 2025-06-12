@@ -1,6 +1,6 @@
 package goorm.athena.domain.user.mapper;
 
-import goorm.athena.domain.image.service.ImageService;
+import goorm.athena.domain.image.service.ImageQueryService;
 import goorm.athena.domain.user.dto.response.MyProjectScrollResponse;
 import org.springframework.stereotype.Component;
 
@@ -11,10 +11,10 @@ import java.util.stream.Collectors;
 @Component
 public class MyProjectScrollResponseMapper {
 
-    private final ImageService imageService;
+    private final ImageQueryService imageQueryService;
 
-    public MyProjectScrollResponseMapper(ImageService imageService) {
-        this.imageService = imageService;
+    public MyProjectScrollResponseMapper(ImageQueryService imageQueryService) {
+        this.imageQueryService = imageQueryService;
     }
 
     public MyProjectScrollResponse toResponse(
@@ -30,7 +30,7 @@ public class MyProjectScrollResponseMapper {
                         p.createdAt(),
                         p.endAt(),
                         p.achievementRate(),
-                        imageService.getFullUrl(p.imageUrl())
+                        imageQueryService.getFullUrl(p.imageUrl())
                 ))
                 .collect(Collectors.toList());
 

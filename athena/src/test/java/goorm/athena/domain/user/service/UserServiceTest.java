@@ -58,7 +58,7 @@ class UserServiceTest extends UserIntegrationTestSupport {
 
         // when
         UserUpdateResponse response = userCommandService.updateUser(user.getId(), request, multipartFile);
-        String imageUrl = imageService.getImage(user.getImageGroup().getId());
+        String imageUrl = imageQueryService.getImage(user.getImageGroup().getId());
 
         // then
         assertThat(response).isNotNull();
@@ -79,7 +79,7 @@ class UserServiceTest extends UserIntegrationTestSupport {
         UserUpdateRequest request = new UserUpdateRequest("newNick", "소개글", "https://link.com");
 
         UserUpdateResponse response = userCommandService.updateUser(user.getId(), request, null);
-        String imageUrl = imageService.getImage(user.getImageGroup().getId());
+        String imageUrl = imageQueryService.getImage(user.getImageGroup().getId());
 
         // then
         assertThat(response).isNotNull();
@@ -148,7 +148,7 @@ class UserServiceTest extends UserIntegrationTestSupport {
     void getHeaderById_returnsHeaderResponse() {
         // given
         User user = userRepository.findById(10L).get();
-        String imageUrl = imageService.getImage(user.getImageGroup().getId());
+        String imageUrl = imageQueryService.getImage(user.getImageGroup().getId());
 
         // when
         UserHeaderGetResponse response = userQueryService.getHeaderById(user.getId());

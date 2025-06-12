@@ -11,7 +11,7 @@ import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import goorm.athena.domain.comment.entity.QComment;
 import goorm.athena.domain.image.entity.QImage;
-import goorm.athena.domain.image.service.ImageService;
+import goorm.athena.domain.image.service.ImageQueryService;
 import goorm.athena.domain.imageGroup.entity.QImageGroup;
 import goorm.athena.domain.order.entity.QOrder;
 import goorm.athena.domain.orderitem.entity.QOrderItem;
@@ -22,6 +22,7 @@ import goorm.athena.domain.user.dto.response.MyOrderScrollRequest;
 import goorm.athena.domain.user.dto.response.MyOrderScrollResponse;
 import goorm.athena.domain.user.dto.response.MyProjectScrollResponse;
 import goorm.athena.domain.user.entity.QUser;
+import goorm.athena.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -34,7 +35,20 @@ import java.util.List;
 public class MyInfoQueryRepository {
 
     private final JPAQueryFactory queryFactory;
-    private final ImageService imageService;
+    private final ImageQueryService imageQueryService;
+
+    public User findSellerByProjectId(Long projectId) {
+        QProject project = QProject.project;
+        QUser user = QUser.user;
+
+        return queryFactory
+                .select(user)
+                .from(project)
+                .join(project.seller, user)
+                .where(project.id.eq(projectId))
+                .fetchOne();
+    }
+
 
     public MyProjectScrollResponse findMyProjectsByCursor(
             Long userId,
@@ -167,7 +181,7 @@ public class MyInfoQueryRepository {
                 .map(row -> {
                     Long rate = row.get(9, Long.class);
                     boolean hasCommented = Boolean.TRUE.equals(row.get(10, Boolean.class));
-                    String processedImageUrl = imageService.getFullUrl(row.get(image.originalUrl));
+                    String processedImageUrl = imageQueryService.getFullUrl(row.get(image.originalUrl));
 
 
                     return new MyOrderScrollResponse.Item(

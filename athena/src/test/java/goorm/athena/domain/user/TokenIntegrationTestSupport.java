@@ -1,8 +1,6 @@
 package goorm.athena.domain.user;
 
 import goorm.athena.domain.imageGroup.entity.ImageGroup;
-import goorm.athena.domain.imageGroup.entity.Type;
-import goorm.athena.domain.imageGroup.service.ImageGroupService;
 import goorm.athena.domain.user.entity.Role;
 import goorm.athena.domain.user.entity.User;
 import goorm.athena.domain.user.repository.UserRepository;

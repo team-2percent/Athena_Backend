@@ -6,7 +6,7 @@ import goorm.athena.domain.bankaccount.service.BankAccountCommandService;
 import goorm.athena.domain.bankaccount.service.BankAccountQueryService;
 import goorm.athena.domain.imageGroup.entity.ImageGroup;
 import goorm.athena.domain.imageGroup.entity.Type;
-import goorm.athena.domain.imageGroup.service.ImageGroupService;
+import goorm.athena.domain.imageGroup.service.ImageGroupCommandService;
 import goorm.athena.domain.user.entity.Role;
 import goorm.athena.domain.user.entity.User;
 import goorm.athena.domain.user.repository.UserRepository;
@@ -20,7 +20,7 @@ public abstract class BankAccountIntegrationTestSupport extends IntegrationServi
     protected UserRepository userRepository;
 
     @Autowired
-    protected ImageGroupService imageGroupService;
+    protected ImageGroupCommandService imageGroupCommandService;
 
     @Autowired
     protected BankAccountRepository bankAccountRepository;
@@ -31,8 +31,9 @@ public abstract class BankAccountIntegrationTestSupport extends IntegrationServi
     @Autowired
     protected BankAccountCommandService bankAccountCommandService;
 
+
     protected ImageGroup setupImageGroup() {
-        return imageGroupService.createImageGroup(Type.USER);
+        return imageGroupCommandService.createImageGroup(Type.USER);
     }
 
     protected User setupUser(String email, String password, String nickname, ImageGroup imageGroup) {

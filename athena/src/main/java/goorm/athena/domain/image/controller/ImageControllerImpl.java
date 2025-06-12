@@ -1,10 +1,8 @@
-    package goorm.athena.domain.image.controller;
+package goorm.athena.domain.image.controller;
 
-
-import goorm.athena.domain.image.entity.Image;
-import goorm.athena.domain.image.service.ImageService;
+import goorm.athena.domain.image.service.ImageCommandService;
 import goorm.athena.domain.imageGroup.entity.ImageGroup;
-import goorm.athena.domain.imageGroup.service.ImageGroupService;
+import goorm.athena.domain.imageGroup.service.ImageGroupQueryService;
 import goorm.athena.global.exception.CustomException;
 import goorm.athena.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -20,8 +18,8 @@ import java.util.List;
 @RestController
 public class ImageControllerImpl implements ImageController {
 
-    private final ImageService imageService;
-    private final ImageGroupService imageGroupService;
+    private final ImageCommandService imageCommandService;
+    private final ImageGroupQueryService imageGroupQueryService;
 
     // 프로젝트 이미지 업로드
     @Override
@@ -29,9 +27,9 @@ public class ImageControllerImpl implements ImageController {
             @RequestParam("files") List<MultipartFile> files,
             @RequestParam("imageGroupId") Long imageGroupId
     ) {
-        ImageGroup imageGroup = imageGroupService.getById(imageGroupId);
+        ImageGroup imageGroup = imageGroupQueryService.getById(imageGroupId);
         if(!CollectionUtils.isEmpty(files)) {
-            imageService.uploadImages(files, imageGroup);
+            imageCommandService.uploadImages(files, imageGroup);
         }
         else {
             throw new CustomException(ErrorCode.IMAGE_IS_REQUIRED);
