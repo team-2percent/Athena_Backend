@@ -43,12 +43,13 @@ public class ProjectQueryService {
     private final ProjectFilterQueryRepository projectFilterQueryRepository;
     private final ProjectSearchQueryRepository projectSearchQueryRepository;
     private final ProjectMapper projectMapper;
+    private final UserMapper userMapper;
 
     // 상세 페이지 조회
     public ProjectDetailResponse getProjectDetail(Long projectId) {
         ProjectDetailDto dto = projectQueryRepository.getProjectDetail(projectId);
 
-        UserDetailResponse userDetailResponse = UserMapper.toDetailResponse(dto.seller());
+        UserDetailResponse userDetailResponse = userMapper.toDetailResponse(dto.seller());
         List<String> imageUrls = imageQueryService.getImageUrls(dto.images());
         List<ProductResponse> products = productQueryService.getAllProducts(dto.project());
 

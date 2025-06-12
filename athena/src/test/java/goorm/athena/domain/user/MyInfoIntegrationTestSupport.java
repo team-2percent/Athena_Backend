@@ -16,7 +16,7 @@ import goorm.athena.domain.product.repository.ProductRepository;
 import goorm.athena.domain.project.entity.Project;
 import goorm.athena.domain.project.repository.PlatformPlanRepository;
 import goorm.athena.domain.project.repository.ProjectRepository;
-import goorm.athena.domain.project.service.ProjectService;
+import goorm.athena.domain.project.service.ProjectQueryService;
 import goorm.athena.domain.user.entity.Role;
 import goorm.athena.domain.user.entity.User;
 import goorm.athena.domain.user.repository.UserRepository;
@@ -33,7 +33,7 @@ public abstract class MyInfoIntegrationTestSupport extends IntegrationServiceTes
     protected MyInfoQueryService myInfoQueryService;
 
     @Autowired
-    protected ProjectService projectService;
+    protected ProjectQueryService projectQueryService;
 
     @Autowired
     protected ProjectRepository projectRepository;

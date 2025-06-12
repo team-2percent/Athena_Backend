@@ -181,7 +181,7 @@ class MyInfoServiceTest extends MyInfoIntegrationTestSupport{
 
         DeliveryInfo deliveryInfo = deliveryInfoRepository.findByUserId(user.getId()).get(0);
 
-        Project project = projectService.getById(2L);
+        Project project = projectQueryService.getById(2L);
         List<Product> products = productRepository.findAllByProject(project);
 
         Order order = setupOrder(user, deliveryInfo, project, LocalDateTime.now().minusDays(1));
