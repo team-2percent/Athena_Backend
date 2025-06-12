@@ -12,7 +12,6 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 import goorm.athena.domain.project.entity.Project;
 import goorm.athena.domain.project.entity.ApprovalStatus;
-import goorm.athena.domain.user.entity.User;
 
 public interface ProjectRepository extends JpaRepository<Project, Long>, JpaSpecificationExecutor<Project> {
     @Query("SELECT p FROM Project p " +

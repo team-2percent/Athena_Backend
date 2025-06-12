@@ -6,6 +6,7 @@ import goorm.athena.domain.product.dto.res.ProductResponse;
 import goorm.athena.domain.product.entity.Product;
 import goorm.athena.domain.product.mapper.ProductMapper;
 import goorm.athena.domain.product.repository.ProductRepository;
+import goorm.athena.domain.product.repository.query.ProductQueryRepository;
 import goorm.athena.domain.project.entity.Project;
 import goorm.athena.global.exception.CustomException;
 import goorm.athena.global.exception.ErrorCode;
@@ -13,7 +14,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Transactional(readOnly = true)
@@ -22,17 +22,13 @@ import java.util.List;
 public class ProductQueryService {
 
     private final ProductRepository productRepository;
+    private final ProductQueryRepository productQueryRepository;
     private final OptionRepository optionRepository;    // OptionService를 따로 만들지 않고 여기서 관리
     private final ProductMapper productMapper;
 
     // 상품 + 옵션 전체 리스트 조회
     public List<ProductResponse> getAllProducts(Project project) {
-        return productRepository.findAllByProject(project).stream()
-                .map(product -> {
-                    List<String> options = getAllOptions(product);
-                    return productMapper.toDetailDto(product, options);
-                })
-                .toList();
+        return productQueryRepository.getAllProducts(project);
     }
 
     // 단일 상품 조회
