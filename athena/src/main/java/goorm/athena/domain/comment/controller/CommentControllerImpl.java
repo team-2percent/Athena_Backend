@@ -7,6 +7,7 @@ import goorm.athena.domain.comment.service.CommentCommandService;
 import goorm.athena.domain.comment.service.CommentQueryService;
 import goorm.athena.domain.notification.service.FcmNotificationService;
 import goorm.athena.domain.project.service.ProjectQueryService;
+import goorm.athena.domain.user.service.UserQueryService;
 import goorm.athena.global.jwt.util.CheckLogin;
 import goorm.athena.global.jwt.util.LoginUserRequest;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +21,7 @@ import java.util.List;
 @RequestMapping("/api/comment")
 public class CommentControllerImpl implements CommentController{
     private final ProjectQueryService projectQueryService;
+    private final UserQueryService userQueryService;
     private final CommentQueryService commentQueryService;
     private final CommentCommandService commentCommandService;
     private final FcmNotificationService fcmNotificationService;
@@ -33,7 +35,7 @@ public class CommentControllerImpl implements CommentController{
                 commentCreateRequest.content());
 
         Long projectId = commentCreateRequest.projectId();
-        fcmNotificationService.notifyReview(projectQueryService.getSellerId(projectId), projectQueryService.getById(projectId).getTitle());
+        fcmNotificationService.notifyReview(userQueryService.getSellerByProjectId(projectId), projectQueryService.getById(projectId).getTitle());
 
         return ResponseEntity.ok(response);
     }

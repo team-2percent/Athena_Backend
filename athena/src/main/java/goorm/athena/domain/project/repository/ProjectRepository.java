@@ -56,14 +56,6 @@ public interface ProjectRepository extends JpaRepository<Project, Long>, JpaSpec
             """, nativeQuery = true)
     List<Project> findTop5ProjectsGroupedByPlatformPlan();
 
-    @Query(value = """
-            SELECT u.* 
-            FROM project p
-            JOIN `user` u ON p.seller_id = u.id
-            WHERE p.id = :projectId
-            """, nativeQuery = true)
-    User findSellerByProjectId(@Param("projectId") Long projectId);
-
     Page<Project> findByIsApproved(ApprovalStatus isApproved, Pageable pageable);
 
     List<Project> findByEndAtIn(List<LocalDateTime> endDates);
