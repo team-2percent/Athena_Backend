@@ -1,6 +1,5 @@
 package goorm.athena.domain.image.service;
 
-import goorm.athena.domain.image.dto.req.ImageCreateRequest;
 import goorm.athena.domain.image.entity.Image;
 import goorm.athena.domain.image.mapper.ImageMapper;
 import goorm.athena.domain.image.repository.ImageRepository;
@@ -20,7 +19,6 @@ import goorm.athena.global.exception.ErrorCode;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.IntStream;
 
 @Transactional
 @RequiredArgsConstructor
@@ -33,14 +31,12 @@ public class ImageCommandService {
     @Value("${image.server.url}")
     private String baseImageUrl;
 
-    private final ImageQueryService imageQueryService;
-    private final ImageMapper imageMapper;
-
     // 단일 이미지 업로드
     public String uploadImage(MultipartFile file, ImageGroup imageGroup) {
         return uploadImage(file, imageGroup, 0L);
     }
 
+    // 실제 업로드 로직
     public String uploadImage(MultipartFile file, ImageGroup imageGroup, Long imageIndex) {
         String originalFilename = file.getOriginalFilename();
 
@@ -91,11 +87,10 @@ public class ImageCommandService {
 
     // 마크다운 이미지 저장 및 주소 반환
     public List<String> uploadMarkdownImages(List<MultipartFile> files, ImageGroup imageGroup) {
-        List<String> imageUrls = files.stream()
+
+        return files.stream()
                 .map(file -> uploadImage(file, imageGroup))
                 .toList();
-
-        return imageUrls;
     }
 
     // 이미지 단일 삭제

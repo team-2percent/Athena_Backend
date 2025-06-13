@@ -8,7 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 @Transactional
 public abstract class ProjectIntegrationTestSupport extends IntegrationServiceTestSupport {
-  @Autowired
-  protected ProjectRepository projectRepository;
+    @Autowired
+    protected ProjectRepository projectRepository;
+
 
 }

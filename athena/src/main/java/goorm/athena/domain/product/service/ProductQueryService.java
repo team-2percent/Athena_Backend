@@ -44,11 +44,4 @@ public class ProductQueryService {
                 .map(productMapper::toDto)
                 .toList();
     }
-
-    // 상품과 연관된 옵션 리스트 전체 조회
-    private List<String> getAllOptions(Product product) {
-        return optionRepository.findAllByProduct(product).stream()
-                .map(Option::getOptionName)
-                .toList();
-    }
 }
