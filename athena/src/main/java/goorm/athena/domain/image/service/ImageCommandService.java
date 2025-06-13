@@ -58,7 +58,7 @@ public class ImageCommandService {
                     .toEntity(String.class)
                     .block();
 
-            if (response.getStatusCode() == HttpStatus.OK) {
+            if (response.getStatusCode() == HttpStatus.CREATED) { // 201
                 Image image = Image.builder()
                         .imageGroup(imageGroup)
                         .fileName(fileName)
