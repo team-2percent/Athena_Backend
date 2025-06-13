@@ -28,7 +28,7 @@ class DeliveryInfoServiceTest extends DeliveryIntegrationTestSupport {
                 .hasMessageContaining(ErrorCode.DELIVERY_NOT_FOUND.getErrorMessage());
     }
 
-    @DisplayName("12번 유저가 기본 배송 정보를 저장했다면 기본 배송 정보의 주인이 12번 유저가 맞는지 검증한다.")
+    @DisplayName("유저가 기본 배송 정보를 저장했다면 기본 배송 정보의 주인이 12번 유저가 맞는지 검증한다.")
     @Test
     void getById() {
         // given
@@ -43,7 +43,7 @@ class DeliveryInfoServiceTest extends DeliveryIntegrationTestSupport {
     }
 
 
-    @DisplayName("4번 유저가 기본 배송지가 없는 상태에서 배송지를 생성했다면 신규 생성 배송지가 기본 배송지인지 검증한다.")
+    @DisplayName("유저가 기본 배송지가 없는 상태에서 배송지를 생성했다면 신규 생성 배송지가 기본 배송지인지 검증한다.")
     @Test
     void addDeliveryInfo_Primary() {
         // given
@@ -63,7 +63,7 @@ class DeliveryInfoServiceTest extends DeliveryIntegrationTestSupport {
     }
 
 
-    @DisplayName("12번 유저의 ID로 기본 배송지를 조회할 시 유저 ID로 저장된 기본 배송지가 존재하지 않으면 'DELIVERY_NOT_FOUND' 에러를 리턴한다.")
+    @DisplayName("유저의 ID로 기본 배송지를 조회할 시 유저 ID로 저장된 기본 배송지가 존재하지 않으면 'DELIVERY_NOT_FOUND' 에러를 리턴한다.")
     @Test
     void getPrimaryDeliveryInfo_ThrowsDeliveryNotFound() {
         // given
@@ -77,7 +77,7 @@ class DeliveryInfoServiceTest extends DeliveryIntegrationTestSupport {
                 .hasMessageContaining(ErrorCode.DELIVERY_NOT_FOUND.getErrorMessage());
     }
 
-    @DisplayName("5번 유저가 이미 기존 배송지를 저장했었다면 현재 배송지는 일반 배송지로 저장한다.")
+    @DisplayName("유저가 이미 기존 배송지를 저장했었다면 현재 배송지는 일반 배송지로 저장한다.")
     @Test
     void addDeliveryInfo_Normal() {
         // given
@@ -121,7 +121,7 @@ class DeliveryInfoServiceTest extends DeliveryIntegrationTestSupport {
                 .hasMessageContaining(ErrorCode.DELIVERY_NOT_FOUND.getErrorMessage());
     }
 
-    @DisplayName("7번 유저가 자신의 기본 계좌를 다시 기본 계좌 상태로 변경하려 하면 ALREADY_DEFAULT 에러를 리턴한다.")
+    @DisplayName("유저가 자신의 기본 계좌를 다시 기본 계좌 상태로 변경하려 하면 ALREADY_DEFAULT 에러를 리턴한다.")
     @Test
     void changeDeliveryState_ALREADY() {
         // given
@@ -133,7 +133,7 @@ class DeliveryInfoServiceTest extends DeliveryIntegrationTestSupport {
                 .hasMessageContaining(ErrorCode.ALREADY_DEFAULT_DELIVERY.getErrorMessage());
     }
 
-    @DisplayName("3번 유저가 기본 배송지, 일반 배송지를 보유 중일 때 기본 배송지를 변경할려고 하면" +
+    @DisplayName("유저가 기본 배송지, 일반 배송지를 보유 중일 때 기본 배송지를 변경할려고 하면" +
             "변경할 일반 배송지를 기본 배송지로 변경하고, 이전 기본 배송지는 일반 배송지로 변경한다.")
     @Test
     void changeDeliveryState() {
@@ -153,7 +153,7 @@ class DeliveryInfoServiceTest extends DeliveryIntegrationTestSupport {
         assertThat(updatedNew.isDefault()).isTrue();
     }
 
-    @DisplayName("12번 유저가 다른 사람의 배송 정보를 삭제하고자 하면 접근 거부 에러를 리턴한다.")
+    @DisplayName("유저가 다른 사람의 배송 정보를 삭제하고자 하면 접근 거부 에러를 리턴한다.")
     @Test
     void deleteDeliveryInfo_NotMyUser() {
         // given
@@ -165,7 +165,7 @@ class DeliveryInfoServiceTest extends DeliveryIntegrationTestSupport {
                 .hasMessageContaining(ErrorCode.ACCESS_DENIED.getErrorMessage());
     }
 
-    @DisplayName("13번 유저가 기본 배송 정보를 삭제하고자 하면 'BASIC_DELIVERY_NOT_DELETED' 에러를 리턴한다.")
+    @DisplayName("유저가 기본 배송 정보를 삭제하고자 하면 'BASIC_DELIVERY_NOT_DELETED' 에러를 리턴한다.")
     @Test
     void deleteDeliveryInfo_Primary() {
         // given
@@ -178,7 +178,7 @@ class DeliveryInfoServiceTest extends DeliveryIntegrationTestSupport {
                 .hasMessageContaining(ErrorCode.BASIC_DELIVERY_NOT_DELETED.getErrorMessage());
     }
 
-    @DisplayName("6번 유저가 기본 배송지와 일반 배송지를 생성한 후, 선택한 일반 배송지를 삭제하면 정상적으로 삭제된다.")
+    @DisplayName("유저가 기본 배송지와 일반 배송지를 생성한 후, 선택한 일반 배송지를 삭제하면 정상적으로 삭제된다.")
     @Test
     void deleteDeliveryInfo_Normal() {
         // given
@@ -195,7 +195,7 @@ class DeliveryInfoServiceTest extends DeliveryIntegrationTestSupport {
         assertThat(exists).isFalse();
     }
 
-    @DisplayName("14번 유저가 배송 정보를 조회할 때, 등록한 모든 배송 정보가 조회된다.")
+    @DisplayName("유저가 배송 정보를 조회할 때, 등록한 모든 배송 정보가 조회된다.")
     @Test
     void getMyDeliveryInfo() {
         // given
@@ -214,7 +214,7 @@ class DeliveryInfoServiceTest extends DeliveryIntegrationTestSupport {
         assertThat(responses.get(2).zipcode()).isEqualTo("!234");
     }
 
-    @DisplayName("1번 유저가 일반 배송지를 두 개 생성하고 기본 배송지를 조회하면, 등록한 기본 배송지만 조회한다.")
+    @DisplayName("유저가 일반 배송지를 두 개 생성하고 기본 배송지를 조회하면, 등록한 기본 배송지만 조회한다.")
     @Test
     void getPrimaryDeliveryInfo() {
         // given

@@ -1,5 +1,6 @@
 package goorm.athena.domain.deliveryinfo.mapper;
 
+import goorm.athena.domain.deliveryinfo.dto.req.DeliveryInfoRequest;
 import goorm.athena.domain.deliveryinfo.dto.res.DeliveryInfoResponse;
 import goorm.athena.domain.deliveryinfo.entity.DeliveryInfo;
 import goorm.athena.domain.user.entity.User;
@@ -12,7 +13,10 @@ import java.util.List;
 public interface DeliveryInfoMapper {
 
     @Mapping(target = "user", source = "user")
-    DeliveryInfo toEntity(User user, String zipcode, String address, String detailAddress, boolean isDefault);
+    @Mapping(target = "zipcode", source = "request.zipcode")
+    @Mapping(target = "address", source = "request.address")
+    @Mapping(target = "detailAddress", source = "request.detailAddress")
+    DeliveryInfo toEntity(User user, DeliveryInfoRequest request, boolean isDefault);
 
     List<DeliveryInfoResponse> toGetResponse(List<DeliveryInfo> deliveryInfo);
 }

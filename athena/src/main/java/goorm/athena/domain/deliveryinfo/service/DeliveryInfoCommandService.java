@@ -29,9 +29,7 @@ public class DeliveryInfoCommandService {
         boolean isDefault = !hasPrimaryDeliveryInfo(userId);
         DeliveryInfo info = deliveryInfoMapper.toEntity(
                 user,
-                request.zipcode(),
-                request.address(),
-                request.detailAddress(),
+                request,
                 isDefault
         );
 

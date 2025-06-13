@@ -30,9 +30,7 @@ public class BankAccountCommandService {
 
         BankAccount info = bankAccountMapper.toEntity(
                 user,
-                request.accountNumber(),
-                request.accountHolder(),
-                request.bankName(),
+                request,
                 isDefault
         );
 
