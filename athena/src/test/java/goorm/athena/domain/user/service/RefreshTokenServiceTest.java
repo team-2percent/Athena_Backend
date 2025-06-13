@@ -1,6 +1,5 @@
 package goorm.athena.domain.user.service;
 
-import goorm.athena.domain.imageGroup.entity.ImageGroup;
 import goorm.athena.domain.user.RefreshTokenIntegrationTestSupport;
 import goorm.athena.domain.user.dto.response.RefreshTokenResponse;
 import goorm.athena.domain.user.entity.User;
@@ -49,9 +48,7 @@ class RefreshTokenServiceTest extends RefreshTokenIntegrationTestSupport {
     @Test
     void reissueToken_whenBothTokensValid_thenReturnSameTokens() {
         // given
-        ImageGroup imageGroup = setupImageGroup();
-        User user = setupUser("test@email.com", "password123", "nickname", imageGroup);
-        userRepository.save(user);
+        User user = userRepository.findById(12L).get();
 
         String accessToken = jwtTokenizer.createAccessToken(
                 user.getId(), user.getNickname(), user.getRole().name(), 24 * 60 * 60 * 1000L);
@@ -71,9 +68,7 @@ class RefreshTokenServiceTest extends RefreshTokenIntegrationTestSupport {
     @DisplayName("토큰을 재발급할 때 액세스 토큰이 만료되고 리프레시 토큰이 만료되지 않았다면 액세스 토큰을 재발급한다.")
     @Test
     void reissueToken_whenAccessExpiredRefreshValid_thenReturnNewAccessToken() {
-        ImageGroup imageGroup = setupImageGroup();
-        User user = setupUser("test@email.com", "password123", "nickname", imageGroup);
-        userRepository.save(user);
+        User user = userRepository.findById(12L).get();
 
         // given
         String accessToken = jwtTokenizer.createAccessToken(
@@ -92,9 +87,7 @@ class RefreshTokenServiceTest extends RefreshTokenIntegrationTestSupport {
     @DisplayName("토큰을 재발급할 때 액세스 토큰이 만료되지 않고 리프레시 토큰이 만료되었다면 에러를 리턴한다.")
     @Test
     void reissueToken_whenRefreshExpired_thenThrowRefreshTokenExpiredException() {
-        ImageGroup imageGroup = setupImageGroup();
-        User user = setupUser("test@email.com", "password123", "nickname", imageGroup);
-        userRepository.save(user);
+        User user = userRepository.findById(12L).get();
 
         // given
         String accessToken = jwtTokenizer.createAccessToken(
@@ -120,9 +113,7 @@ class RefreshTokenServiceTest extends RefreshTokenIntegrationTestSupport {
     @Test
     void reissueToken_whenBothTokensExpired_thenThrowAuthTokenExpiredException() {
         // given
-        ImageGroup imageGroup = setupImageGroup();
-        User user = setupUser("test@email.com", "password123", "nickname", imageGroup);
-        userRepository.save(user);
+        User user = userRepository.findById(12L).get();
 
         String accessToken = jwtTokenizer.createAccessToken(
                 user.getId(), user.getNickname(), user.getRole().name(), 1L);

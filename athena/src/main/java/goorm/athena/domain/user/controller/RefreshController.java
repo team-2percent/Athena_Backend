@@ -1,7 +1,6 @@
 package goorm.athena.domain.user.controller;
 
 import goorm.athena.domain.user.dto.response.RefreshTokenResponse;
-import goorm.athena.domain.user.dto.response.UserLoginResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;

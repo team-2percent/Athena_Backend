@@ -1,13 +1,9 @@
 package goorm.athena.domain.user.mapper;
 
 import goorm.athena.domain.user.dto.response.RefreshTokenResponse;
+import org.mapstruct.Mapper;
 
-public class RefreshTokenMapper {
-
-    public static RefreshTokenResponse toRefreshTokenResponse(Long userId, String accessToken, String refreshToken){
-        return new RefreshTokenResponse(
-                userId,
-                accessToken,
-                refreshToken);
-    }
+@Mapper(componentModel = "spring")
+public interface RefreshTokenMapper {
+    RefreshTokenResponse toRefreshTokenResponse(Long userId, String accessToken, String refreshToken);
 }

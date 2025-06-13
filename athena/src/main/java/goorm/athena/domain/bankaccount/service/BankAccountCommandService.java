@@ -1,7 +1,6 @@
 package goorm.athena.domain.bankaccount.service;
 
 import goorm.athena.domain.bankaccount.dto.req.BankAccountCreateRequest;
-import goorm.athena.domain.bankaccount.dto.res.BankAccountCreateResponse;
 import goorm.athena.domain.bankaccount.entity.BankAccount;
 import goorm.athena.domain.bankaccount.mapper.BankAccountMapper;
 import goorm.athena.domain.bankaccount.repository.BankAccountRepository;
@@ -21,16 +20,21 @@ public class BankAccountCommandService {
     private final BankAccountRepository bankAccountRepository;
     private final UserQueryService userQueryService;
     private final BankAccountQueryService bankAccountQueryService;
+    private final BankAccountMapper bankAccountMapper;
 
     @Transactional
-    public BankAccountCreateResponse createBankAccount(Long userId, BankAccountCreateRequest request){
+    public void createBankAccount(Long userId, BankAccountCreateRequest request){
         User user = userQueryService.getUser(userId);
 
         boolean isDefault = !hasPrimaryDeliveryInfo(userId);
-        BankAccount bankAccount = BankAccountMapper.toEntity(user, request, isDefault);
-        BankAccount saveAccount = bankAccountRepository.save(bankAccount);
 
-        return BankAccountMapper.toCreateResponse(saveAccount);
+        BankAccount info = bankAccountMapper.toEntity(
+                user,
+                request,
+                isDefault
+        );
+
+        bankAccountRepository.save(info);
     }
 
     @Transactional

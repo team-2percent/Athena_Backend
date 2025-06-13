@@ -19,6 +19,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class UserQueryService {
     private final UserRepository userRepository;
+    private final UserMapper userMapper;
     private final ImageQueryService imageQueryService;
     private final MyInfoQueryRepository myInfoQueryRepository;
 
@@ -36,7 +37,7 @@ public class UserQueryService {
         if(user.getImageGroup() != null){
             imageUrl = imageQueryService.getImage(user.getImageGroup().getId());
         }
-        return UserMapper.toHeaderGetResponse(user, imageUrl);
+        return userMapper.toHeaderGetResponse(user, imageUrl);
     }
 
     // 내 정보 조회 임시 로직
@@ -48,7 +49,7 @@ public class UserQueryService {
             imageUrl = imageQueryService.getImage(user.getImageGroup().getId());
         }
 
-        return UserMapper.toGetResponse(user, imageUrl);
+        return userMapper.toGetResponse(user, imageUrl);
     }
 
     public List<Long> getUserIdAll() {
@@ -59,7 +60,7 @@ public class UserQueryService {
 
     public UserSummaryResponse getUserSummary(Long userId){
         User user = getUser(userId);
-        return UserMapper.toSummaryResponse(user);
+        return userMapper.toSummaryResponse(user);
     }
 
     public Long getSellerByProjectId(Long projectId){

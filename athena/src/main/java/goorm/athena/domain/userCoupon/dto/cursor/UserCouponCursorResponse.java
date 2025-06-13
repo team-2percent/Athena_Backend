@@ -8,12 +8,4 @@ public record UserCouponCursorResponse(
         List<UserCouponGetResponse> content,
         Long nextCouponId,
         Long total
-) {
-    public static UserCouponCursorResponse of(
-            List<UserCouponGetResponse> content,
-            Long nextCouponId,
-            Long total
-    ) {
-        return new UserCouponCursorResponse(content, nextCouponId, total);
-    }
-}
+) { }

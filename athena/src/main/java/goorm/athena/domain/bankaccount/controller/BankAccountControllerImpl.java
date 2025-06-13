@@ -26,8 +26,8 @@ public class BankAccountControllerImpl implements BankAccountController{
     @Override
     public ResponseEntity<BankAccountCreateResponse> createBankAccount(@CheckLogin LoginUserRequest loginUserRequest,
                                                                        @RequestBody BankAccountCreateRequest request){
-        BankAccountCreateResponse response = bankAccountCommandService.createBankAccount(loginUserRequest.userId(), request);
-        return ResponseEntity.ok(response);
+        bankAccountCommandService.createBankAccount(loginUserRequest.userId(), request);
+        return ResponseEntity.noContent().build();
     }
 
     @Override

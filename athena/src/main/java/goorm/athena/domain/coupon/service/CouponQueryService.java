@@ -5,7 +5,9 @@ import goorm.athena.domain.coupon.dto.res.CouponGetDetailResponse;
 import goorm.athena.domain.coupon.entity.Coupon;
 import goorm.athena.domain.coupon.entity.CouponStatus;
 import goorm.athena.domain.coupon.mapper.CouponMapper;
+import goorm.athena.domain.coupon.repository.CouponQueryRepository;
 import goorm.athena.domain.coupon.repository.CouponRepository;
+import goorm.athena.domain.userCoupon.repository.UserCouponQueryRepository;
 import goorm.athena.domain.userCoupon.repository.UserCouponRepository;
 import goorm.athena.global.exception.CustomException;
 import goorm.athena.global.exception.ErrorCode;
@@ -24,7 +26,10 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class CouponQueryService {
     private final CouponRepository couponRepository;
+    private final CouponQueryRepository couponQueryRepository;
     private final UserCouponRepository userCouponRepository;
+    private final UserCouponQueryRepository userCouponQueryRepository;
+    private final CouponMapper couponMapper;
 
     @Transactional(readOnly = true)
     public Page<Coupon> getCoupons(int page, int size){
@@ -41,7 +46,7 @@ public class CouponQueryService {
     @Transactional(readOnly = true)
     public CouponGetDetailResponse getCouponDetail(Long couponId){
         Coupon coupon = getCoupon(couponId);
-        return CouponMapper.toGetDetailResponse(coupon);
+        return couponMapper.toGetDetailResponse(coupon);
     }
 
     @Transactional(readOnly = true)
@@ -52,19 +57,19 @@ public class CouponQueryService {
 
     @Transactional(readOnly = true)
     public List<CouponEventGetResponse> getCouponEvent(Long userId) {
-        List<Coupon> couponEventList = couponRepository.findAllInProgressCoupons();
+        List<Coupon> couponEventList = couponQueryRepository.findAllInProgressCoupons();
 
         List<Long> couponIds = couponEventList.stream()
                 .map(event -> event.getId())
                 .toList();
 
-        Set<Long> alreadyIssuedCouponIds = userCouponRepository
+        Set<Long> alreadyIssuedCouponIds = userCouponQueryRepository
                 .findCouponIdsByUserIdAndCouponIdIn(userId, couponIds);
 
         return couponEventList.stream()
                 .map(event -> {
                     boolean alreadyIssued = alreadyIssuedCouponIds.contains(event.getId());
-                    return CouponMapper.toGetEventResponse(event, alreadyIssued);
+                    return couponMapper.toGetEventResponse(event, alreadyIssued);
                 })
                 .toList();
 

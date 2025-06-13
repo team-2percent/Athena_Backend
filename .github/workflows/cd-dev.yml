@@ -53,7 +53,7 @@ jobs:
           ACCESS_KEY=${{ secrets.ACCESS_KEY }}
           SECRET_KEY=${{ secrets.SECRET_KEY }}
           BUCKET_NAME=${{ secrets.BUCKET_NAME }}
-          NAS_PATH=${{ secrets.NAS_PATH }}
+          IMAGE_SERVER_URL=${{ secrets.IMAGE_SERVER_URL }}
           FCM_CERTIFICATION=${{ secrets.FCM_CERTIFICATION }}
           FIREBASE_PROJECT_ID=${{ secrets.FIREBASE_PROJECT_ID }}
           FIREBASE_PRIVATE_KEY_ID=${{ secrets.FIREBASE_PRIVATE_KEY_ID }}

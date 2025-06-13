@@ -20,6 +20,7 @@ public class CommentCommandService {
     private final CommentRepository commentRepository;
     private final UserQueryService userQueryService;
     private final ProjectQueryService projectQueryService;
+    private final CommentMapper commentMapper;
 
     @Transactional
     public CommentCreateResponse createComment(Long projectId, Long userId, String content) {
@@ -35,6 +36,6 @@ public class CommentCommandService {
 
         commentRepository.save(comment);
 
-        return CommentMapper.toCreateResponse(comment);
+        return commentMapper.toCreateResponse(comment);
     }
 }

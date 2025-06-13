@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class RefreshTokenCommandService {
     private final UserQueryService userQueryService;
     private final JwtTokenizer jwtTokenizer;
+    private final RefreshTokenMapper refreshTokenMapper;
 
     @Transactional
     public void deleteRefreshToken(HttpServletResponse response){
@@ -49,7 +50,7 @@ public class RefreshTokenCommandService {
                 Claims claims = jwtTokenizer.parseAccessToken(accessToken);
                 Long userId = Long.parseLong(claims.getSubject());
 
-                return RefreshTokenMapper.toRefreshTokenResponse(userId, accessToken, refreshToken);
+                return refreshTokenMapper.toRefreshTokenResponse(userId, accessToken, refreshToken);
             }
 
 
@@ -62,7 +63,7 @@ public class RefreshTokenCommandService {
 
                 String newAccessToken = jwtTokenizer.createAccessToken(user.getId(), user.getNickname(), user.getRole().name());
 
-                return RefreshTokenMapper.toRefreshTokenResponse(user.getId(), newAccessToken, refreshToken);
+                return refreshTokenMapper.toRefreshTokenResponse(user.getId(), newAccessToken, refreshToken);
             }
 
 
