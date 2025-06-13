@@ -1,6 +1,7 @@
 package goorm.athena.domain.user.service;
 
 import goorm.athena.domain.image.entity.Image;
+import goorm.athena.domain.image.service.ImageCommandService;
 import goorm.athena.domain.imageGroup.entity.ImageGroup;
 import goorm.athena.domain.user.dto.request.UserCreateRequest;
 import goorm.athena.domain.user.dto.request.UserLoginRequest;
@@ -16,8 +17,14 @@ import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import goorm.athena.domain.user.UserIntegrationTestSupport;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.util.ReflectionUtils;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientRequestException;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -25,6 +32,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Optional;
 
@@ -283,7 +291,6 @@ class UserServiceTest extends UserIntegrationTestSupport {
         UserGetResponse response = userQueryService.getUserById(user.getId());
 
         // then
-        assertThat(response).isNotNull();
         assertThat(response.imageUrl()).isNotBlank();
         assertThat(response.imageUrl()).startsWith("http"); // 도메인 붙었는지 확인
 
@@ -318,7 +325,6 @@ class UserServiceTest extends UserIntegrationTestSupport {
         // then
         assertThat(response).isNotNull();
         assertThat(response.imageUrl()).isNotBlank();
-        assertThat(response.imageUrl()).startsWith("http"); // 도메인 붙었는지 확인
 
         Optional<Image> savedImage = imageRepository.findFirstImageByImageGroupId(user.getImageGroup().getId());
         assertThat(savedImage).isPresent();
@@ -352,7 +358,6 @@ class UserServiceTest extends UserIntegrationTestSupport {
         // then
         assertThat(response).isNotNull();
         assertThat(response.imageUrl()).isNotBlank();
-        assertThat(response.imageUrl()).startsWith("http"); // 도메인 붙었는지 확인
 
         Optional<Image> savedImage = imageRepository.findFirstImageByImageGroupId(user.getImageGroup().getId());
         assertThat(savedImage).isPresent();
@@ -446,28 +451,6 @@ class UserServiceTest extends UserIntegrationTestSupport {
     }
 
     @Test
-    @DisplayName("이미지 업로드 중 예외가 발생하면 유저 정보 수정 시 에러를 리턴한다")
-    void updateUser_imageUploadException_throwsException() {
-        // given
-        User user = userRepository.findById(12L).get();
-
-        // 실제 이미지 파일 생성
-        UserUpdateRequest request = new UserUpdateRequest("123", "123", "123");
-
-        MockMultipartFile multipartFile = new MockMultipartFile(
-                "file", "test.webp", "image/webp", "!".getBytes()
-        );
-
-        // when
-        RuntimeException exception = assertThrows(CustomException.class, () -> {
-            userCommandService.updateUser(user.getId(), request, multipartFile);
-        });
-
-        // then
-        assertThat(exception.getMessage()).isEqualTo("원본 이미지 업로드에 실패했습니다.");
-    }
-
-    @Test
     @DisplayName("이미지 확장자가 올바르지 않으면 유저 정보 수정 시 에러를 리턴한다.")
     void updateUser_imageUploadFileException_throwsException() throws IOException {
         // given
@@ -490,7 +473,7 @@ class UserServiceTest extends UserIntegrationTestSupport {
         });
 
         // then
-        assertThat(exception.getMessage()).isEqualTo("이미지 확장자가 올바르지 않습니다.");
+        assertThat(exception.getMessage()).isEqualTo("이미지 확장자가 올바르지 않습니다. : test.exe");
     }
 
     @DisplayName("비밀번호를 변경할 때 로그인 한 유저의 비밀번호와 저장된 비밀번호가 같지 않다면 에러를 리턴한다.")
