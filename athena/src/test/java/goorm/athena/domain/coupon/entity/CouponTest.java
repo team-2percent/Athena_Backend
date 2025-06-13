@@ -1,5 +1,6 @@
 package goorm.athena.domain.coupon.entity;
 
+import goorm.athena.domain.coupon.util.CouponIntegrationTestSupport;
 import goorm.athena.global.exception.CustomException;
 import goorm.athena.global.exception.ErrorCode;
 import goorm.athena.util.TestEntityFactory;
@@ -11,7 +12,7 @@ import java.time.LocalDateTime;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-class CouponTest {
+class CouponTest extends CouponIntegrationTestSupport {
 
     @DisplayName("쿠폰의 재고가 0 이하일 때, 재고가 감소될 경우 에러를 리턴한다.")
     @Test

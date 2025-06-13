@@ -19,8 +19,7 @@ class TokenServiceTest extends TokenIntegrationTestSupport {
     @Test
     void issueToken_shouldReturnRefreshTokenAndSetCookieHeader() {
         // given
-        ImageGroup imageGroup = setupImageGroup();
-        User user = setupUser("123", "123", "123", imageGroup);
+        User user = userRepository.findById(15L).get();
         HttpServletResponse response = spy(MockHttpServletResponse.class);
         ArgumentCaptor<String> cookieCaptor = ArgumentCaptor.forClass(String.class);
 
