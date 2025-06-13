@@ -118,7 +118,7 @@ public class ProjectQueryServiceTest extends ProjectIntegrationTestSupport {
     });
 
     // when
-    ProjectRecentCursorResponse result = (ProjectRecentCursorResponse) projectService.getProjectsWithCursor(
+    ProjectRecentCursorResponse result = (ProjectRecentCursorResponse) projectQueryService.getProjectsWithCursor(
         ProjectQueryType.LATEST, Optional.empty(),
         new ProjectQueryLatestRequest(LocalDateTime.now(), null, 20));
 
@@ -139,7 +139,7 @@ public class ProjectQueryServiceTest extends ProjectIntegrationTestSupport {
     });
 
     // when
-    ProjectCategoryTopResponseWrapper result = projectService.getTopView();
+    ProjectCategoryTopResponseWrapper result = projectQueryService.getTopView();
 
     // then
     assertThat(result.allTopView().size()).isEqualTo(5);

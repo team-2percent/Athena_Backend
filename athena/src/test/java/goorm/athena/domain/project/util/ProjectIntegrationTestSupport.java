@@ -3,6 +3,7 @@ package goorm.athena.domain.project.util;
 import goorm.athena.util.IntegrationServiceTestSupport;
 import jakarta.transaction.Transactional;
 
+import goorm.athena.domain.project.service.ProjectQueryService;
 import goorm.athena.domain.project.repository.ProjectRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -11,4 +12,6 @@ public abstract class ProjectIntegrationTestSupport extends IntegrationServiceTe
   @Autowired
   protected ProjectRepository projectRepository;
 
+  @Autowired
+  protected ProjectQueryService projectQueryService;
 }

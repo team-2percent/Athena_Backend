@@ -5,7 +5,6 @@ import goorm.athena.domain.category.entity.Category;
 import goorm.athena.domain.deliveryinfo.entity.DeliveryInfo;
 import goorm.athena.domain.image.repository.ImageRepository;
 import goorm.athena.domain.image.service.ImageQueryService;
-import goorm.athena.domain.image.service.NasService;
 import goorm.athena.domain.imageGroup.entity.ImageGroup;
 import goorm.athena.domain.imageGroup.entity.Type;
 import goorm.athena.domain.imageGroup.repository.ImageGroupRepository;
@@ -56,9 +55,6 @@ public abstract class UserIntegrationTestSupport extends IntegrationServiceTestS
 
   @Autowired
   protected ImageRepository imageRepository;
-
-  @Autowired
-  protected NasService nasService;
 
   @TempDir
   Path tempDir;
