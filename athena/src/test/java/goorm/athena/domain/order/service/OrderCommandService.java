@@ -43,16 +43,12 @@ public class OrderCommandService extends OrderIntergrationTestSupport {
                 .orElseThrow(() -> new CustomException(ErrorCode.CATEGORY_NOT_FOUND));
         PlatformPlan platformPlan = platformPlanRepository.findById(1L)
                 .orElseThrow(() -> new CustomException(ErrorCode.PROJECTPLAN_NOT_FOUND));
-        Project project = projectRepository.save(
-                setupFullProject(buyer, category, imageGroup, bankAccount, platformPlan)
-        );
+        Project project = projectRepository.save(setupFullProject(buyer, category, imageGroup, bankAccount, platformPlan));
         Product product = productRepository.save(createProduct(project, "기본 상품", "기본 설명", 10_000L, 10L));
 
         // 상품 2개 주문 -> 주문 생성
         OrderItemRequest orderItem = new OrderItemRequest(product.getId(), 2);
-        OrderCreateRequest request = new OrderCreateRequest(
-                project.getId(), delivery.getId(), List.of(orderItem)
-        );
+        OrderCreateRequest request = new OrderCreateRequest(project.getId(), delivery.getId(), List.of(orderItem));
 
         // when
         OrderCreateResponse response = orderCommendService.createOrder(buyer.getId(), request);
@@ -76,10 +72,8 @@ public class OrderCommandService extends OrderIntergrationTestSupport {
                 .orElseThrow(() -> new CustomException(ErrorCode.CATEGORY_NOT_FOUND));
         PlatformPlan platformPlan = platformPlanRepository.findById(1L)
                 .orElseThrow(() -> new CustomException(ErrorCode.PROJECTPLAN_NOT_FOUND));
-        Project project = projectRepository.save(
-                createProject(buyer, category, imageGroup, bankAccount, platformPlan,
-                        "프로젝트 제목", "설명", 100000L, 0L, "마크다운")
-        );
+        Project project = projectRepository.save(createProject(buyer, category, imageGroup, bankAccount, platformPlan,
+                        "프로젝트 제목", "설명", 100000L, 0L, "마크다운"));
         Product product = productRepository.save(createProduct(project, "기본 상품", "기본 설명", 10000L, 10L));
 
         //재고 보다 많게 요청
@@ -111,8 +105,7 @@ public class OrderCommandService extends OrderIntergrationTestSupport {
         PlatformPlan platformPlan = platformPlanRepository.findById(1L)
                 .orElseThrow(() -> new CustomException(ErrorCode.PROJECTPLAN_NOT_FOUND));
         Project project = projectRepository.save(createProject(buyer, category, imageGroup, bankAccount, platformPlan,
-                        "프로젝트 제목", "설명", 100000L, 0L, "마크다운")
-        );
+                        "프로젝트 제목", "설명", 100000L, 0L, "마크다운"));
         Product product = productRepository.save(createProduct(project, "기본 상품", "기본 설명", 10000L, 10L));
 
         OrderItemRequest orderItem = new OrderItemRequest(product.getId(), 3);

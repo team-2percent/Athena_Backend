@@ -27,9 +27,7 @@ public class OrderQueryServiceTest extends OrderIntergrationTestSupport {
     void getById_success() {
         // given
         ImageGroup imageGroup = imageGroupRepository.save(new ImageGroup());
-        User buyer = userRepository.save(
-                createUser("buyer@example.com", "test1234!", "nickname", imageGroup, Role.ROLE_USER)
-        );
+        User buyer = userRepository.save(createUser("buyer@example.com", "test1234!", "nickname", imageGroup, Role.ROLE_USER));
 
         Category category = categoryRepository.save(createCategory("카테고리"));
         BankAccount bankAccount = bankAccountRepository.save(
