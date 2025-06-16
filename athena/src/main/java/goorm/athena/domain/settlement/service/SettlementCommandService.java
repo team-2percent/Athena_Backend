@@ -1,30 +1,19 @@
 package goorm.athena.domain.settlement.service;
 
-import goorm.athena.domain.admin.dto.res.ProductSettlementSummaryResponse;
-import goorm.athena.domain.admin.dto.res.SettlementDetailInfoResponse;
-import goorm.athena.domain.admin.dto.res.SettlementHistoryPageResponse;
 import goorm.athena.domain.bankaccount.entity.BankAccount;
 import goorm.athena.domain.bankaccount.service.BankAccountQueryService;
 import goorm.athena.domain.order.entity.Order;
 import goorm.athena.domain.order.repository.OrderRepository;
-import goorm.athena.domain.order.service.OrderCommendService;
 import goorm.athena.domain.payment.service.PaymentQueryService;
 import goorm.athena.domain.project.entity.PlatformPlan;
 import goorm.athena.domain.project.entity.Project;
 import goorm.athena.domain.project.service.ProjectService;
-import goorm.athena.domain.settlement.dto.res.SettlementSummaryResponse;
 import goorm.athena.domain.settlement.entity.Settlement;
-import goorm.athena.domain.settlement.entity.Status;
 import goorm.athena.domain.settlement.mapper.SettlementMapper;
-import goorm.athena.domain.settlement.repository.SettlementQueryRepository;
 import goorm.athena.domain.settlement.repository.SettlementRepository;
-import goorm.athena.domain.settlementhistory.repository.SettlementHistoryQueryRepository;
 import goorm.athena.domain.settlementhistory.service.SettlementHistoryCommandService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -46,7 +35,6 @@ public class SettlementCommandService {
     private final SettlementHistoryCommandService historyService;
     private final PaymentQueryService paymentQueryService;
     private final SettlementMapper settlementMapper;
-
 
     @Transactional
     public void executeMonthlySettlement(LocalDate settleDate) {
