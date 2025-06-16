@@ -22,6 +22,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.concurrent.TimeUnit;
 
+// AtomicLong만 사용하여 처리속도가 매우 빠름 ( Redis I/O 비용 최소 )
+// 단순한 구조로 구현이 쉬우나 고동시성 환경에선 불안한 단점이 있 ( 중복 처리 요청 민감 )
 @Slf4j
 @Service
 @RequiredArgsConstructor

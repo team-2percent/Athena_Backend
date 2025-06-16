@@ -23,6 +23,11 @@ import org.springframework.stereotype.Service;
 import java.util.Arrays;
 import java.util.List;
 
+/*
+    Lua Script 사용, 동기 처리만 하고 확장성이 떨어지며 병목 위험이 있음
+    요청이 들어오면 Redis, DB 처리 모두 한 트랜잭션 흐름에서 진행되어 동기 블로킹 발생
+    동기는 가장 단순하지만 확장성, 유지보수성에 취약함
+ */
 @Service
 @RequiredArgsConstructor
 public class UserCouponCommandServiceV4_4 {

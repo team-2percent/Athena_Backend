@@ -31,6 +31,10 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
+// RLock 을 통해 Redisson 분산락 적용
+// 하나의 쿠폰 발급에 대한 동시성 제어 가능 및 중복 검증, 재고 감소가 한 트랜잭션에서 이뤄짐
+// 락 획득 시 대기 시간이 존재하여 성능에 저하 가능성이 있음
+
 @Slf4j
 @Service
 @RequiredArgsConstructor

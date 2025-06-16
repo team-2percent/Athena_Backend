@@ -25,6 +25,10 @@ import org.springframework.stereotype.Service;
 import java.util.Arrays;
 import java.util.List;
 
+/*
+    @Async 기반 비동기 처리로 메인에서 Redis 처리 후, 서브 스레드에서 DB 처리 진행함
+    비동기 처리로 병렬화가 가능하나 내부 스레드 기반으로 확장성에 한계가 존재함
+ */
 @Service
 @RequiredArgsConstructor
 public class UserCouponCommandServiceV4_5 {
