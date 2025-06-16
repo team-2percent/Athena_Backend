@@ -355,3 +355,72 @@ INSERT INTO coupon (id, title, content, price, start_at, end_at, expires_at, sto
 (30, '할인쿠폰030', '기프트 전용 할인 쿠폰입니다.', 5000, '2025-06-29', '2025-07-14', '2025-07-15', 160, 'ENDED');
 
 ALTER TABLE coupon ALTER COLUMN id RESTART WITH 31;
+
+
+INSERT INTO orders (id, user_id, project_id, delivery_info_id, quantity, total_price, status, is_settled, ordered_at) VALUES
+(1, 1, 1, 1, 3, 130000, 'ORDERED', false, '2025-04-01T10:00:00'),
+(2, 2, 1, 2, 2, 30000, 'CANCELED', false, '2025-04-02T12:00:00'),
+(3, 3, 2, 3, 4, 252000, 'ORDERED', false, '2025-04-03T14:00:00'),
+(4, 4, 6, 4, 1, 90000, 'CANCELED', false, '2025-05-04T09:30:00'),
+(5, 5, 3, 5, 2, 36000, 'CANCELED', false, '2025-05-05T09:00:00'),
+(6, 6, 2, 6, 1, 40000, 'CANCELED', false, '2025-05-06T13:20:00'),
+(7, 7, 4, 7, 3, 69000, 'ORDERED', false, '2025-05-07T08:00:00'),
+(8, 8, 4, 8, 2, 106000, 'ORDERED', false, '2025-05-08T09:45:00'),
+(9, 9, 5, 9, 1, 53000, 'ORDERED', false, '2025-05-09T11:15:00'),
+(10, 10, 5, 10, 2, 114000, 'ORDERED', false, '2025-06-09T14:30:00'),
+(11, 11, 7, 11, 2, 160000, 'ORDERED', false, '2025-05-17T10:00:00'),
+(12, 12, 8, 12, 1, 960000, 'ORDERED', false, '2025-05-18T09:00:00'),
+(13, 13, 9, 13, 3, 324000, 'ORDERED', false, '2025-05-19T11:00:00'),
+(14, 14, 10, 14, 1, 1200000, 'ORDERED', false, '2025-06-08T15:00:00');
+
+
+ALTER TABLE orders ALTER COLUMN id RESTART WITH 15;
+
+INSERT INTO order_item (id, order_id, product_id, quantity, price) VALUES
+-- Order 1 (project_id=1): 상품1(1개, 72000), 상품2(2개, 2*29000)
+(1, 1, 1, 1, 72000),
+(2, 1, 2, 2, 58000),
+-- Order 2 (project_id=1): 상품3(2개, 2*15000)
+(3, 2, 3, 2, 30000),
+-- Order 3 (project_id=2): 상품6(2개, 2*90000), 상품7(2개, 2*36000)
+(4, 3, 6, 2, 180000),
+(5, 3, 7, 2, 72000),
+-- Order 4 (project_id=2): 상품6(1개, 90000)
+(6, 4, 6, 1, 90000),
+-- Order 5 (project_id=3): 상품11(2개, 2*18000)
+(7, 5, 11, 2, 36000),
+-- Order 6 (project_id=2): 상품8(1개, 40000)
+(8, 6, 8, 1, 40000),
+-- Order 7 (project_id=4): 상품14(3개, 3*23000)
+(9, 7, 14, 3, 69000),
+-- Order 8 (project_id=4): 상품15(2개, 2*53000)
+(10, 8, 15, 2, 106000),
+-- Order 9 (project_id=5): 상품19(1개, 53000)
+(11, 9, 19, 1, 53000),
+-- Order 10 (project_id=5): 상품19(2개, 2*53000)
+(12, 10, 19, 2, 106000),
+(13, 11, 21, 2, 160000),  -- 1개당 80000원
+(14, 12, 22, 1, 960000),
+(15, 13, 23, 3, 324000),  -- 1개당 108000원
+(16, 14, 24, 1, 1200000);
+
+ALTER TABLE order_item ALTER COLUMN id RESTART WITH 17;
+
+
+INSERT INTO payment (id, order_id, user_id, tid, pg_token, amount_total, status, approved_at, created_at) VALUES
+(1, 1, 1, 'TID_1234567890', 'PG_TOKEN_001', 130000, 'APPROVED', '2025-04-01T10:05:00', '2025-04-01T10:00:00'),
+(2, 2, 1, 'TID_2234567890', NULL,30000,  'PENDING',  NULL,'2025-04-02T12:00:00'),
+(3, 3, 2, 'TID_3234567890', 'PG_TOKEN_003', 252000, 'APPROVED', '2025-04-03T14:10:00', '2025-04-03T14:00:00'),
+(4, 4, 3, 'TID_TEST_999', NULL, 90000, 'PENDING', NULL, '2025-05-04T14:00:00'),
+(5, 5, 3, 'TID_5234567890', NULL, 36000, 'PENDING', NULL, '2025-05-05T09:00:00'),
+(6, 6, 4, 'TID_6234567890', NULL, 40000, 'PENDING', NULL, '2025-05-06T13:20:00'),
+(7, 7, 4, 'TID_7234567890', 'PG_TOKEN_007', 69000, 'APPROVED', '2025-05-07T08:10:00', '2025-05-07T08:00:00'),
+(8, 8, 5, 'TID_8234567890', 'PG_TOKEN_008', 106000, 'APPROVED', '2025-05-08T10:00:00', '2025-05-07T09:45:00'),
+(9, 9, 5, 'TID_9234567890', 'PG_TOKEN_009', 53000, 'APPROVED', '2025-05-09T11:30:00', '2025-05-08T11:15:00'),
+(10, 10, 2, 'TID_1034567890', 'PG_TOKEN_010', 114000, 'APPROVED', '2025-06-08T14:40:00', '2025-06-08T14:30:00'),
+(11, 11, 11, 'TID_1134567890', 'PG_TOKEN_011', 160000, 'APPROVED', '2025-05-19T10:10:00', '2025-05-19T10:00:00'),
+(12, 12, 12, 'TID_1234567891', 'PG_TOKEN_012', 960000, 'APPROVED', '2025-05-20T09:10:00', '2025-05-20T09:00:00'),
+(13, 13, 13, 'TID_1334567890', 'PG_TOKEN_013', 324000, 'APPROVED', '2025-05-21T11:10:00', '2025-05-21T11:00:00'),
+(14, 14, 14, 'TID_1434567890', 'PG_TOKEN_014', 1200000, 'APPROVED', '2025-06-10T15:10:00', '2025-06-10T15:00:00');
+
+ALTER TABLE payment ALTER COLUMN id RESTART WITH 15;

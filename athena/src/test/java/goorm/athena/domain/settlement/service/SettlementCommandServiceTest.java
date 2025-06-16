@@ -1,7 +1,7 @@
 package goorm.athena.domain.settlement.service;
 
 import goorm.athena.domain.order.entity.Order;
-import goorm.athena.domain.settlement.SettlementIntergrationTestSupport;
+import goorm.athena.domain.settlement.SettlementIntegrationTestSupport;
 
 import goorm.athena.domain.settlement.entity.Settlement;
 import org.junit.jupiter.api.DisplayName;
@@ -12,7 +12,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
 
-class SettlementCommandServiceTest extends SettlementIntergrationTestSupport {
+class SettlementCommandServiceTest extends SettlementIntegrationTestSupport {
 
 
     @Test

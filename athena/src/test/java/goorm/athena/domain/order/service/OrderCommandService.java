@@ -3,7 +3,7 @@ package goorm.athena.domain.order.service;
 import goorm.athena.domain.bankaccount.entity.BankAccount;
 import goorm.athena.domain.category.entity.Category;
 import goorm.athena.domain.imageGroup.entity.ImageGroup;
-import goorm.athena.domain.order.OrderIntergrationTestSupport;
+import goorm.athena.domain.order.OrderIntegrationTestSupport;
 import goorm.athena.domain.project.entity.PlatformPlan;
 import goorm.athena.domain.user.entity.Role;
 import org.junit.jupiter.api.DisplayName;
@@ -24,7 +24,7 @@ import java.util.List;
 import static goorm.athena.util.TestEntityFactory.*;
 import static org.assertj.core.api.Assertions.*;
 
-public class OrderCommandService extends OrderIntergrationTestSupport {
+public class OrderCommandService extends OrderIntegrationTestSupport {
 
 //    @DisplayName("정상적인 주문 생성에 성공한다")
     @DisplayName("타입 USER 계정인 유저가 하나의 프로젝트에서 가격이 만원인 상품2개를 주문을 했다면, " +

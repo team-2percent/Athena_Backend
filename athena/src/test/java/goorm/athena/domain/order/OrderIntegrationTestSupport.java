@@ -14,7 +14,7 @@ import goorm.athena.domain.user.repository.UserRepository;
 import goorm.athena.util.IntegrationServiceTestSupport;
 import org.springframework.beans.factory.annotation.Autowired;
 
-public abstract class OrderIntergrationTestSupport extends IntegrationServiceTestSupport {
+public abstract class OrderIntegrationTestSupport extends IntegrationServiceTestSupport {
 
     @Autowired
     protected OrderCommendService orderCommendService;

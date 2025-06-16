@@ -2,7 +2,7 @@ package goorm.athena.domain.order.service;
 import goorm.athena.domain.bankaccount.entity.BankAccount;
 import goorm.athena.domain.category.entity.Category;
 import goorm.athena.domain.imageGroup.entity.ImageGroup;
-import goorm.athena.domain.order.OrderIntergrationTestSupport;
+import goorm.athena.domain.order.OrderIntegrationTestSupport;
 import goorm.athena.domain.order.entity.Order;
 import goorm.athena.domain.product.entity.Product;
 import goorm.athena.domain.project.entity.PlatformPlan;
@@ -20,7 +20,7 @@ import static org.assertj.core.api.Assertions.*;
 
 import java.time.LocalDateTime;
 
-public class OrderQueryServiceTest extends OrderIntergrationTestSupport {
+public class OrderQueryServiceTest extends OrderIntegrationTestSupport {
 
     @Test
     @DisplayName("getById - 주문 ID로 주문 정보를 조회할 수 있다")

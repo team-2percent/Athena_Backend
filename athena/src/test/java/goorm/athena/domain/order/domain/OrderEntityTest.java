@@ -1,7 +1,7 @@
 package goorm.athena.domain.order.domain;
 
 import goorm.athena.domain.imageGroup.entity.ImageGroup;
-import goorm.athena.domain.order.OrderIntergrationTestSupport;
+import goorm.athena.domain.order.OrderIntegrationTestSupport;
 import goorm.athena.domain.order.entity.Order;
 import goorm.athena.domain.order.entity.Status;
 import goorm.athena.domain.user.entity.Role;
@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.*;
 
-public class OrderEntityTest  extends OrderIntergrationTestSupport {
+public class OrderEntityTest  extends OrderIntegrationTestSupport {
 
     @Test
     @DisplayName("User, Project, DeliveryInfo 엔티티를 활용해 주문 생성 시, " +

@@ -8,7 +8,7 @@ import goorm.athena.domain.settlement.service.SettlementCommandService;
 import goorm.athena.util.IntegrationServiceTestSupport;
 import org.springframework.beans.factory.annotation.Autowired;
 
-public class SettlementIntergrationTestSupport extends IntegrationServiceTestSupport {
+public class SettlementIntegrationTestSupport extends IntegrationServiceTestSupport {
 
     @Autowired protected SettlementCommandService settlementCommandService;
     @Autowired protected SettlementRepository settlementRepository;
