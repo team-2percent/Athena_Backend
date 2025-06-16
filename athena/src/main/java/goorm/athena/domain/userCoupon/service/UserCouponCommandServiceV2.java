@@ -22,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.concurrent.locks.ReentrantLock;
 
+// DB단계에서 락 적용 ( 비관적 락 ), 정합성은 해결됐으나 DB에 부하가 심함
 @Slf4j
 @Service
 @RequiredArgsConstructor

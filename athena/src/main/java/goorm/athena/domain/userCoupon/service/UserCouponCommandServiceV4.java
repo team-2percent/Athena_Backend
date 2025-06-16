@@ -18,6 +18,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
 
+// Lua 스크립트 내에서 SET + DECR 처리하여 Redis에선 완전 원자적
+// DB 저장은 이벤트 리스너에서 동기적으로 수행함 (EventPublisher 사용)
 @Slf4j
 @Service
 @RequiredArgsConstructor

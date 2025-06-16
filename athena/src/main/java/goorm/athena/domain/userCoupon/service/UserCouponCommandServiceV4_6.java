@@ -16,6 +16,12 @@ import org.springframework.stereotype.Service;
 import java.util.Arrays;
 import java.util.List;
 
+/*
+    ApplicationEvent를 사용한 이벤트 기반 처리
+    Redis 처리 후 내부에서 이벤트를 발행하여 비동기 핸들러 = Listener에서 DB를 처리함
+    쿠폰 발급, 재고 소진 시 동기화 이벤트를 발행하나 DB 저장이 없어 연결 단절 가능성이 존재함
+    빠른 재고 캐싱이 가능하고 락 범위를 최소화했으나 캐시 및 DB 동기화가 필요하며 장애 복구 전략도 필요
+ */
 @Service
 @RequiredArgsConstructor
 public class UserCouponCommandServiceV4_6 {

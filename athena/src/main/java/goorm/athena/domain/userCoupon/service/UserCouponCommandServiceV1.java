@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.concurrent.locks.ReentrantLock;
 
+// 애플리케이션 단위에서 락 적용 ( ReentrantLock 적용 ), 정합성 이슈
 @Slf4j
 @Service
 @RequiredArgsConstructor

@@ -27,6 +27,8 @@ import org.springframework.transaction.event.TransactionalEventListener;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
+// Redis 단계에서 락을 걸고 동기적으로 재고 감소 및 DB 저장까지 한 번에 처리
+// 단순하나, Redis에서 락 오버헤드가 발생함.
 @Slf4j
 @Service
 @RequiredArgsConstructor

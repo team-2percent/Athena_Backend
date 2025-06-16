@@ -22,6 +22,11 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
+/*
+    큐로 비동기 발급 후 DB에 반영하며 락이 없기 때문에 속도가 매우 빠름
+    이벤트 기반으로 확장이 쉬우나 정확한 정합성이 필요하며 난이도가 매우 어려움
+    대신 완전한 이벤트 기반 아키텍처로 확장 가능성이 큼
+ */
 @Service
 @RequiredArgsConstructor
 public class UserCouponCommandServiceV5 {
