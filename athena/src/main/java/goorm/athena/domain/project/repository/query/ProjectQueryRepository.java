@@ -98,7 +98,7 @@ public class ProjectQueryRepository {
                 .map(dto -> new ProjectRecentResponse(
                         dto.id(),
                         StringUtils.hasText(dto.imageUrl())
-                                ? imageQueryService.getFullUrl(dto.imageUrl().trim())
+                                ? dto.imageUrl().trim()
                                 : null,
                         dto.sellerName(),
                         dto.title(),

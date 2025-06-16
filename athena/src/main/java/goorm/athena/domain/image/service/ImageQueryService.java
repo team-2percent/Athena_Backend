@@ -38,11 +38,4 @@ public class ImageQueryService {
                 .map(Image::getOriginalUrl)
                 .toList();
     }
-
-    /*
-     * Path로 이미지 Full URL 조립
-     */
-    public String getFullUrl(String path) {
-        return baseImageUrl + "/" + path;
-    }
 }
