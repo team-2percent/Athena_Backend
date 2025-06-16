@@ -91,7 +91,15 @@ spring:
     driver-class-name: org.h2.Driver
     username: sa
     password:
-
+    hikari:
+      maximum-pool-size: 30     # 동시에 유지 가능한 최대 커넥션 수
+      minimum-idle: 10          # 최소 idle 수 (너무 적으면 예열에 시간 소모)
+      idle-timeout: 30000       # 유휴 커넥션 유지 시간 (30초)
+      max-lifetime: 1800000     # 커넥션 최대 수명 (30분)
+      connection-timeout: 3000  # 커넥션 요청 timeout (3초)
+  h2:
+    console:
+      enabled: true
   jpa:
     hibernate:
       ddl-auto: update
@@ -102,6 +110,14 @@ spring:
         format_sql: true
   defer-datasource-initialization: true
   generate-ddl: true
+  redis:
+    host: localhost
+    port: 6379
+
+redisson:
+  config: |
+    singleServerConfig:
+    address: "redis://localhost:6379"
 logging:
   level:
     org.springframework.jdbc.datasource.init: DEBUG
