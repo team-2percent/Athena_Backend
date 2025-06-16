@@ -78,6 +78,6 @@ public class PaymentEntityTest  extends PaymentIntergrationTestSupport {
         // when & then (결제 재시도)
         assertThatThrownBy(() -> payment.approve("PG_SECOND"))
                 .isInstanceOf(CustomException.class)
-                .isEqualTo(ErrorCode.ALREADY_PAYMENT_COMPLETED);
+                .hasMessage(ErrorCode.ALREADY_PAYMENT_COMPLETED.getErrorMessage());
     }
 }

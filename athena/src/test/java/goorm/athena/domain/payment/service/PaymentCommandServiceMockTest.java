@@ -112,7 +112,7 @@ public class PaymentCommandServiceMockTest {
     }
 
     @Test
-    @DisplayName("결제 승인 요청이 성공하면 상태가 APPROVED로 바뀌고 후속 처리(postPaymentProcess)가 정상 수행된다" +
+    @DisplayName("결제 승인 요청이 성공하면 상태가 APPROVED로 바뀌고 후속 처리( postPaymentProcess()= 재고 감소,후원 결제 금액 추가)가 정상 수행된다" +
             "(정상 결제)")
     void approvePayment_success_thenApprovedAndProcessed() {
         // given
@@ -143,7 +143,7 @@ public class PaymentCommandServiceMockTest {
     }
 
     @Test
-    @DisplayName("카카오페이 결제 요청 중 예외 발생 시 CustomException(KAKAO_PAY_UNAVAILABLE)이 발생한다")
+    @DisplayName("카카오페이 결제 요청 중 서버 장애 발생 시 '카카오페이 서버와의 통신에 실패했습니다' 예외가 발생한다")
     void readyPayment_kakaoPayRequestFails_thenThrowCustomException() {
         // given
         Long orderId = 2L;

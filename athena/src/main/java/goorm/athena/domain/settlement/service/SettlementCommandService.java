@@ -40,17 +40,13 @@ import java.util.stream.Collectors;
 public class SettlementCommandService {
 
     private final ProjectService projectService;
-    private final OrderCommendService orderCommendService;
     private final OrderRepository orderRepository;
     private final SettlementRepository settlementRepository;
     private final BankAccountQueryService bankAccountQueryService;
     private final SettlementHistoryCommandService historyService;
     private final PaymentQueryService paymentQueryService;
-    private final SettlementQueryRepository settlementQueryRepository;
-    private final SettlementHistoryQueryRepository settlementHistoryQueryRepository;
     private final SettlementMapper settlementMapper;
 
-    private static final double PLATFORM_FEE_RATE = 0.10;
 
     @Transactional
     public void executeMonthlySettlement(LocalDate settleDate) {
@@ -58,12 +54,14 @@ public class SettlementCommandService {
 
         // 후원 성공한 정산 대상 프로젝트 조회
         List<Project> projects = projectService.getEligibleProjects(end);
-        log.info("정산 대상 프로젝트 수: {}", projects.size());
+        List<Long> projectIds = projects.stream()
+                .map(Project::getId)
+                .toList();
+        log.info("정산 대상 프로젝트 수: {} | 프로젝트 ID: {}", projects.size(), projectIds);
         if (projects.isEmpty()) {
             log.info("정산 대상 프로젝트 없음. 종료.");
             return;
         }
-        ;
 
         // 전체 프로젝트의 주문을 한 번에 조회
         // ex) 프로젝트 목록에서 후원 기간 처음과 끝 기간중 최소 최대를 필터 후 주문 데이터를 가져옴
