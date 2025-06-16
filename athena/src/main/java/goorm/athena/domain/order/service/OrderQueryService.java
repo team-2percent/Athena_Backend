@@ -23,11 +23,17 @@ public class OrderQueryService {
 
     public Long getSeller(Long orderId) {
         User user = orderQueryRepository.findSellerByOrderId(orderId);
+        if (user == null) {
+            throw new CustomException(ErrorCode.USER_NOT_FOUND);
+        }
         return user.getId();
     }
 
     public Long getBuyer(Long orderId) {
         User user = orderQueryRepository.findBuyerByOrderId(orderId);
+        if (user == null) {
+            throw new CustomException(ErrorCode.USER_NOT_FOUND);
+        }
         return user.getId();
     }
 }

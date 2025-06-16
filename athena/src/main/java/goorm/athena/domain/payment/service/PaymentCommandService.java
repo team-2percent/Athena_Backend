@@ -82,8 +82,8 @@ public class PaymentCommandService {
 
 
         try {
-            payment.approve(pgToken);
             orderCommendService.postPaymentProcess(orderId); //상품 재고 감소 ,주문 금액 만큼 프로젝트 누적 가격 증가
+            payment.approve(pgToken); // 결제 상태 변경
             return response;
 
         } catch (Exception e) {
