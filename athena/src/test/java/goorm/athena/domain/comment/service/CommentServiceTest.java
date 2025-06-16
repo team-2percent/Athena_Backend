@@ -1,13 +1,9 @@
 package goorm.athena.domain.comment.service;
 
-import goorm.athena.domain.bankaccount.entity.BankAccount;
-import goorm.athena.domain.category.entity.Category;
 import goorm.athena.domain.comment.CommentIntegrationSupport;
 import goorm.athena.domain.comment.dto.res.CommentCreateResponse;
 import goorm.athena.domain.comment.dto.res.CommentGetResponse;
 import goorm.athena.domain.comment.entity.Comment;
-import goorm.athena.domain.imageGroup.entity.ImageGroup;
-import goorm.athena.domain.project.entity.PlatformPlan;
 import goorm.athena.domain.project.entity.Project;
 import goorm.athena.domain.user.entity.User;
 import goorm.athena.global.exception.CustomException;
@@ -21,11 +17,10 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
 
-
 @Transactional
 class CommentServiceTest extends CommentIntegrationSupport {
 
-    @DisplayName("유저가 해당 프로젝트에 코멘트를 이미 작성했다면 에러를 리턴한다.")
+    @DisplayName("16번 유저가 16번 프로젝트에 코멘트를 이미 작성했다면 ALREADY_COMMENTED 에러를 리턴한다.")
     @Test
     void createComment_Error() {
         // given
@@ -44,11 +39,11 @@ class CommentServiceTest extends CommentIntegrationSupport {
 
     }
 
-    @DisplayName("유저가 해당 프로젝트에 후기를 작성한다.")
+    @DisplayName("로그인 한 20번 유저가 17번 프로젝트에 입력한 content로 후기를 작성한다.")
     @Test
     void createComment() {
         // given
-        User user = userRepository.findById(17L).get();
+        User user = userRepository.findById(20L).get();
         Project project = projectRepository.findById(17L).get();
 
         // when
@@ -59,7 +54,8 @@ class CommentServiceTest extends CommentIntegrationSupport {
         assertThat(response.content()).isEqualTo("123123");
     }
 
-    @DisplayName("프로젝트 ID로 조회하여 등록된 후기들을 유저 닉네임과 함께 조회한다.")
+    @DisplayName("18번, 19번 유저가 18번 프로젝트에 후기를 등록하고 프로젝트에 후기 목록을 조회하면, " +
+            "유저 닉네임, 내용과 함께 후기 목록을 조회한다.")
     @Test
     void getCommentByProject() {
         // given
@@ -74,7 +70,8 @@ class CommentServiceTest extends CommentIntegrationSupport {
 
         // when
         List<CommentGetResponse> response = commentQueryService.getCommentByProject(project.getId());
-        String expectedImageUrl = imageService.getImage(user.getImageGroup().getId());
+        String expectedImageUrl = imageQueryService.getImage(user.getImageGroup().getId());
+        String expectedImageUrl2 = imageQueryService.getImage(user2.getImageGroup().getId());
 
         // then
         assertThat(response).hasSize(2);
@@ -82,11 +79,16 @@ class CommentServiceTest extends CommentIntegrationSupport {
         CommentGetResponse commentResponse = response.get(0);
         assertThat(commentResponse.content()).isEqualTo("123");
         assertThat(commentResponse.userName()).isEqualTo(user.getNickname());
-
         assertThat(commentResponse.imageUrl()).isEqualTo(expectedImageUrl);
+
+        CommentGetResponse commentResponse2 = response.get(1);
+        assertThat(commentResponse2.content()).isEqualTo("12#");
+        assertThat(commentResponse2.userName()).isEqualTo(user2.getNickname());
+        assertThat(commentResponse2.imageUrl()).isEqualTo(expectedImageUrl2);
     }
 
-    @DisplayName("로그인 한 유저가 자신이 작성한 후기들을 프로젝트 정보와 함께 조회한다.")
+    @DisplayName("20번, 21번 유저가 19번 프로젝트에 후기를 작성하고 20번 유저가 프로젝트의 후기 목록을 조회하면" +
+            "20번 유저가 작성했던 후기들을 프로젝트 정보와 함께 조회한다.")
     @Test
     void getCommentByUser() {
         // given
@@ -100,7 +102,7 @@ class CommentServiceTest extends CommentIntegrationSupport {
 
         // when
         List<CommentGetResponse> response = commentQueryService.getCommentByUser(user.getId());
-        String expectedImageUrl = imageService.getImage(user.getImageGroup().getId());
+        String expectedImageUrl = imageQueryService.getImage(user.getImageGroup().getId());
 
         // then
         assertThat(response).hasSize(1);

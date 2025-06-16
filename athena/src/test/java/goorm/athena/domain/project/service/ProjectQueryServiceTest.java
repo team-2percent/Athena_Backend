@@ -49,6 +49,9 @@ public class ProjectQueryServiceTest extends ProjectIntegrationTestSupport {
   @Autowired
   private BankAccountRepository bankAccountRepository;
 
+  @Autowired
+  private ProjectQueryService projectQueryService;
+
   private Project createProjectWithDependencies(String categoryName, PlanName planName, LocalDateTime startAt,
       LocalDateTime endAt, Long views) {
     categoryName = categoryName == null ? "기타" : categoryName;
@@ -118,7 +121,7 @@ public class ProjectQueryServiceTest extends ProjectIntegrationTestSupport {
     });
 
     // when
-    ProjectRecentCursorResponse result = (ProjectRecentCursorResponse) projectService.getProjectsWithCursor(
+    ProjectRecentCursorResponse result = (ProjectRecentCursorResponse) projectQueryService.getProjectsWithCursor(
         ProjectQueryType.LATEST, Optional.empty(),
         new ProjectQueryLatestRequest(LocalDateTime.now(), null, 20));
 
@@ -139,7 +142,7 @@ public class ProjectQueryServiceTest extends ProjectIntegrationTestSupport {
     });
 
     // when
-    ProjectCategoryTopResponseWrapper result = projectService.getTopView();
+    ProjectCategoryTopResponseWrapper result = projectQueryService.getTopView();
 
     // then
     assertThat(result.allTopView().size()).isEqualTo(5);

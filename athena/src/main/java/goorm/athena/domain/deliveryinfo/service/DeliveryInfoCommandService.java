@@ -2,6 +2,7 @@ package goorm.athena.domain.deliveryinfo.service;
 
 import goorm.athena.domain.deliveryinfo.dto.req.DeliveryInfoRequest;
 import goorm.athena.domain.deliveryinfo.entity.DeliveryInfo;
+import goorm.athena.domain.deliveryinfo.mapper.DeliveryInfoMapper;
 import goorm.athena.domain.deliveryinfo.repository.DeliveryInfoRepository;
 import goorm.athena.domain.user.entity.User;
 import goorm.athena.domain.user.service.UserQueryService;
@@ -19,13 +20,19 @@ public class DeliveryInfoCommandService {
     private final DeliveryInfoRepository deliveryInfoRepository;
     private final UserQueryService userQueryService;
     private final DeliveryInfoQueryService deliveryInfoQueryService;
+    private final DeliveryInfoMapper deliveryInfoMapper;
 
     @Transactional
     public void addDeliveryInfo(Long userId, DeliveryInfoRequest request) {
         User user = userQueryService.getUser(userId);
 
         boolean isDefault = !hasPrimaryDeliveryInfo(userId);
-        DeliveryInfo info = DeliveryInfo.of(user, request, isDefault);
+        DeliveryInfo info = deliveryInfoMapper.toEntity(
+                user,
+                request,
+                isDefault
+        );
+
         deliveryInfoRepository.save(info);
     }
 

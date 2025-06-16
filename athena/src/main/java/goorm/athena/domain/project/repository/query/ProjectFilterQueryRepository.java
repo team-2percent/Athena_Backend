@@ -7,7 +7,7 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import goorm.athena.domain.image.entity.QImage;
-import goorm.athena.domain.image.service.ImageService;
+import goorm.athena.domain.image.service.ImageQueryService;
 import goorm.athena.domain.imageGroup.entity.QImageGroup;
 import goorm.athena.domain.project.dto.cursor.ProjectCategoryCursorResponse;
 import goorm.athena.domain.project.dto.cursor.ProjectDeadlineCursorResponse;
@@ -31,7 +31,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ProjectFilterQueryRepository {
     private final JPAQueryFactory queryFactory;
-    private final ImageService imageService;
+    private final ImageQueryService imageQueryService;
 
     // 카테고리별 프로젝트 조회 (커서 기반 페이징)
     public ProjectCategoryCursorResponse getProjectsByCategory(ProjectCursorRequest<?> request,
@@ -88,7 +88,7 @@ public class ProjectFilterQueryRepository {
                 .map(dto -> new ProjectCategoryResponse(
                         dto.id(),
                         StringUtils.hasText(dto.imageUrl())
-                                ? imageService.getFullUrl(dto.imageUrl().trim())
+                                ? dto.imageUrl().trim()
                                 : null,
                         dto.sellerName(),
                         dto.title(),
@@ -194,7 +194,7 @@ public class ProjectFilterQueryRepository {
                 .map(dto -> new ProjectDeadlineResponse(
                         dto.id(),
                         StringUtils.hasText(dto.imageUrl())
-                                ? imageService.getFullUrl(dto.imageUrl().trim())
+                                ? dto.imageUrl().trim()
                                 : null,
                         dto.sellerName(),
                         dto.title(),

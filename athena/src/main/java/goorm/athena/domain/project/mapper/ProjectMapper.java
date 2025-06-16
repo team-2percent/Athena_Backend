@@ -2,7 +2,6 @@ package goorm.athena.domain.project.mapper;
 
 import goorm.athena.domain.bankaccount.entity.BankAccount;
 import goorm.athena.domain.category.entity.Category;
-import goorm.athena.domain.image.service.ImageService;
 import goorm.athena.domain.imageGroup.entity.ImageGroup;
 import goorm.athena.domain.product.dto.res.ProductResponse;
 import goorm.athena.domain.project.dto.req.ProjectCreateRequest;
@@ -11,84 +10,61 @@ import goorm.athena.domain.project.entity.PlatformPlan;
 import goorm.athena.domain.project.entity.Project;
 import goorm.athena.domain.user.dto.response.UserDetailResponse;
 import goorm.athena.domain.user.entity.User;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
 import java.util.List;
 
-public class ProjectMapper {
+@Mapper(componentModel = "spring")
+public interface ProjectMapper {
 
-    @Autowired
-    private ImageService imageService;
+    // CreateRequest -> Entity
+    @Mapping(target = "description", source = "request.description")
+    @Mapping(target = "views", ignore = true)
+    @Mapping(target = "seller", source = "seller")
+    @Mapping(target = "imageGroup", source = "imageGroup")
+    @Mapping(target = "category", source = "category")
+    @Mapping(target = "bankAccount", source = "bankAccount")
+    @Mapping(target = "platformPlan", source = "platformPlan")
+    @Mapping(target = "contentMarkdown", source = "convertedMarkdown")
+    @Mapping(target = "totalAmount", constant = "0L")
+    Project toEntity(ProjectCreateRequest request,
+                     User seller,
+                     ImageGroup imageGroup,
+                     Category category,
+                     BankAccount bankAccount,
+                     PlatformPlan platformPlan,
+                     String convertedMarkdown);
 
-    // ProjectCreateRequest(Dto) -> Entity
-    // convertedMarkdown parameter 추가 예정
-    public static Project toEntity(ProjectCreateRequest request, User seller,
-                                   ImageGroup imageGroup, Category category, BankAccount bankAccount, PlatformPlan PlatformPlan, String convertedMarkdown) {
-        return Project.builder()
-                .seller(seller)
-                .imageGroup(imageGroup)
-                .category(category)
-                .bankAccount(bankAccount)
-                .title(request.title())
-                .description(request.description())
-                .goalAmount(request.goalAmount())
-                .totalAmount(0L)
-                .contentMarkdown(convertedMarkdown)
-                .startAt(request.startAt())
-                .endAt(request.endAt())
-                .shippedAt(request.shippedAt())
-                .platformPlan(PlatformPlan)
-                .build();
-    }
+    // Entity -> ProjectIdResponse
+    @Mapping(target = "projectId", source = "id")
+    @Mapping(target = "imageGroupId", source = "imageGroup.id")
+    ProjectIdResponse toCreateDto(Project project);
 
-    // Entity -> ProjectIdResponse(Dto)
-    public static ProjectIdResponse toCreateDto(Project project){
-        return ProjectIdResponse.builder()
-                .projectId(project.getId())
-                .imageGroupId(project.getImageGroup().getId())
-                .build();
-    }
 
     // Entity -> ProjectDetailResponse (프로젝트 상세 페이지 조회)
-    public static ProjectDetailResponse toDetailDto(Project project, Category category, List<String> imageUrls,
-                                                    UserDetailResponse userDetailResponse, List<ProductResponse> productResponses){
-        return new ProjectDetailResponse(
-                project.getId(),
-                category.getCategoryName(),
-                project.getTitle(),
-                project.getDescription(),
-                project.getGoalAmount(),
-                project.getTotalAmount(),
-                project.getContentMarkdown(),
-                project.getStartAt(),
-                project.getEndAt(),
-                project.getShippedAt(),
-                project.getCreatedAt(),
-                imageUrls,
-                userDetailResponse,
-                productResponses,
-                project.getStatus(),
-                project.getIsApproved(),
-                project.getPlatformPlan().getName()
-        );
-    }
+    @Mapping(target = "id", source = "project.id")
+    @Mapping(target = "markdown", source = "project.contentMarkdown")
+    @Mapping(target = "planName", source = "project.platformPlan.name")
+    @Mapping(target = "category", source = "category.categoryName")
+    @Mapping(target = "imageUrls", source = "imageUrls")
+    @Mapping(target = "sellerResponse", source = "userDetailResponse")
+    @Mapping(target = "productResponses", source = "productResponses")
+    ProjectDetailResponse toDetailDto(Project project,
+                                      Category category,
+                                      List<String> imageUrls,
+                                      UserDetailResponse userDetailResponse,
+                                      List<ProductResponse> productResponses);
 
-    // Entity -> ProjectTopViewResponse(Dto)
-    public static ProjectTopViewResponse toTopViewResponse(Project project, String imageUrl){
-        return new ProjectTopViewResponse(
-                project.getSeller().getNickname(),
-                project.getTitle(),
-                project.getDescription(),
-                imageUrl,
-                project.getTotalAmount() == 0 || project.getGoalAmount() == 0
-                        ? 0L
-                        : (project.getTotalAmount() * 100) / project.getGoalAmount(),
-                project.getId()
-        );
-    }
+    // Entity -> ProjectTopViewResponse
+    @Mapping(target = "projectId", source = "project.id")
+    @Mapping(target = "sellerName", source = "project.seller.nickname")
+    @Mapping(target = "achievementRate", expression = "java((project.getTotalAmount() == 0 || project.getGoalAmount() == 0) ? 0L : (project.getTotalAmount() * 100) / project.getGoalAmount())")
+    @Mapping(target = "imageUrl", source = "imageUrl")
+    ProjectTopViewResponse toTopViewResponse(Project project, String imageUrl);
 
-
-    public static ProjectCategoryTopViewResponse toCategoryTopView(Category category, List<ProjectTopViewResponse> responses){
-        return new ProjectCategoryTopViewResponse(category.getId(), category.getCategoryName(), responses);
-    }
+    // Entity -> ProjectCategoryTopViewResponse
+    @Mapping(target = "categoryId", source = "category.id")
+    @Mapping(target = "items", source = "responses")
+    ProjectCategoryTopViewResponse toCategoryTopView(Category category, List<ProjectTopViewResponse> responses);
 }

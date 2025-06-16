@@ -7,7 +7,8 @@ import goorm.athena.domain.order.repository.OrderRepository;
 import goorm.athena.domain.payment.service.PaymentQueryService;
 import goorm.athena.domain.project.entity.PlatformPlan;
 import goorm.athena.domain.project.entity.Project;
-import goorm.athena.domain.project.service.ProjectService;
+import goorm.athena.domain.project.service.ProjectQueryService;
+import goorm.athena.domain.settlement.dto.res.SettlementSummaryResponse;
 import goorm.athena.domain.settlement.entity.Settlement;
 import goorm.athena.domain.settlement.mapper.SettlementMapper;
 import goorm.athena.domain.settlement.repository.SettlementRepository;
@@ -28,8 +29,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class SettlementCommandService {
 
-    private final ProjectService projectService;
     private final OrderRepository orderRepository;
+    private final ProjectQueryService projectQueryService;
     private final SettlementRepository settlementRepository;
     private final BankAccountQueryService bankAccountQueryService;
     private final SettlementHistoryCommandService historyService;
@@ -41,7 +42,7 @@ public class SettlementCommandService {
         LocalDate end = YearMonth.from(settleDate.minusMonths(1)).atEndOfMonth();
 
         // 후원 성공한 정산 대상 프로젝트 조회
-        List<Project> projects = projectService.getEligibleProjects(end);
+        List<Project> projects = projectQueryService.getEligibleProjects(end);
         List<Long> projectIds = projects.stream()
                 .map(Project::getId)
                 .toList();

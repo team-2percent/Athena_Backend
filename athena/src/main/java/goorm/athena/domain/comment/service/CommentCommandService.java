@@ -5,7 +5,7 @@ import goorm.athena.domain.comment.entity.Comment;
 import goorm.athena.domain.comment.mapper.CommentMapper;
 import goorm.athena.domain.comment.repository.CommentRepository;
 import goorm.athena.domain.project.entity.Project;
-import goorm.athena.domain.project.service.ProjectService;
+import goorm.athena.domain.project.service.ProjectQueryService;
 import goorm.athena.domain.user.entity.User;
 import goorm.athena.domain.user.service.UserQueryService;
 import goorm.athena.global.exception.CustomException;
@@ -19,12 +19,13 @@ import org.springframework.transaction.annotation.Transactional;
 public class CommentCommandService {
     private final CommentRepository commentRepository;
     private final UserQueryService userQueryService;
-    private final ProjectService projectService;
+    private final ProjectQueryService projectQueryService;
+    private final CommentMapper commentMapper;
 
     @Transactional
     public CommentCreateResponse createComment(Long projectId, Long userId, String content) {
         User user = userQueryService.getUser(userId);
-        Project project = projectService.getById(projectId);
+        Project project = projectQueryService.getById(projectId);
 
         boolean alreadyCommented = commentRepository.existsByUserAndProject(user, project);
         if(alreadyCommented){
@@ -35,6 +36,6 @@ public class CommentCommandService {
 
         commentRepository.save(comment);
 
-        return CommentMapper.toCreateResponse(comment);
+        return commentMapper.toCreateResponse(comment);
     }
 }

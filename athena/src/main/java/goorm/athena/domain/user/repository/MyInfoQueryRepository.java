@@ -6,24 +6,25 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.core.types.dsl.NumberExpression;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import goorm.athena.domain.comment.entity.QComment;
 import goorm.athena.domain.image.entity.QImage;
-import goorm.athena.domain.image.service.ImageService;
+import goorm.athena.domain.image.service.ImageQueryService;
 import goorm.athena.domain.imageGroup.entity.QImageGroup;
 import goorm.athena.domain.order.entity.QOrder;
-import goorm.athena.domain.order.entity.Status;
 import goorm.athena.domain.orderitem.entity.QOrderItem;
 import goorm.athena.domain.product.entity.QProduct;
 import goorm.athena.domain.project.entity.QProject;
+import goorm.athena.domain.project.entity.Status;
 import goorm.athena.domain.user.dto.response.MyOrderScrollRequest;
 import goorm.athena.domain.user.dto.response.MyOrderScrollResponse;
 import goorm.athena.domain.user.dto.response.MyProjectScrollResponse;
 import goorm.athena.domain.user.entity.QUser;
+import goorm.athena.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
-import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -34,7 +35,20 @@ import java.util.List;
 public class MyInfoQueryRepository {
 
     private final JPAQueryFactory queryFactory;
-    private final ImageService imageService;
+    private final ImageQueryService imageQueryService;
+
+    public User findSellerByProjectId(Long projectId) {
+        QProject project = QProject.project;
+        QUser user = QUser.user;
+
+        return queryFactory
+                .select(user)
+                .from(project)
+                .join(project.seller, user)
+                .where(project.id.eq(projectId))
+                .fetchOne();
+    }
+
 
     public MyProjectScrollResponse findMyProjectsByCursor(
             Long userId,
@@ -46,14 +60,29 @@ public class MyInfoQueryRepository {
         QImage image = QImage.image;
         QImageGroup imageGroup = QImageGroup.imageGroup;
 
+        // ACTIVE = 0, 그 외 = 1
+        NumberExpression<Integer> statusOrder = new CaseBuilder()
+                .when(project.status.eq(Status.ACTIVE)).then(0)
+                .otherwise(1);
+
         BooleanBuilder whereBuilder = new BooleanBuilder()
                 .and(project.seller.id.eq(userId));
 
-        // 커서 조건
         if (cursorCreatedAt != null && cursorProjectId != null) {
+            Integer cursorStatusOrder = queryFactory
+                    .select(new CaseBuilder()
+                            .when(project.status.eq(Status.ACTIVE)).then(0)
+                            .otherwise(1))
+                    .from(project)
+                    .where(project.id.eq(cursorProjectId))
+                    .fetchFirst();
+
             whereBuilder.and(
-                    project.createdAt.lt(cursorCreatedAt)
-                            .or(project.createdAt.eq(cursorCreatedAt).and(project.id.lt(cursorProjectId)))
+                    statusOrder.gt(cursorStatusOrder)
+                            .or(statusOrder.eq(cursorStatusOrder)
+                                    .and(project.createdAt.lt(cursorCreatedAt)
+                                            .or(project.createdAt.eq(cursorCreatedAt)
+                                                    .and(project.id.lt(cursorProjectId)))))
             );
         }
 
@@ -61,14 +90,13 @@ public class MyInfoQueryRepository {
                 .select(Projections.constructor(MyProjectScrollResponse.ProjectPreview.class,
                         project.id,
                         project.title,
-                        project.status.stringValue().eq(goorm.athena.domain.project.entity.Status.COMPLETED.name()),
+                        project.status.stringValue().eq(Status.COMPLETED.name()),
                         project.createdAt,
                         project.endAt,
                         Expressions.numberTemplate(Long.class,
                                 "floor(({0} * 100.0) / nullif({1}, 0))",
                                 project.totalAmount, project.goalAmount),
                         image.originalUrl
-
                 ))
                 .from(project)
                 .leftJoin(project.imageGroup, imageGroup)
@@ -78,15 +106,12 @@ public class MyInfoQueryRepository {
                 )
                 .where(whereBuilder)
                 .orderBy(
-                        new CaseBuilder()
-                                .when(project.status.eq(goorm.athena.domain.project.entity.Status.ACTIVE)).then(0)
-                                .otherwise(1).asc(),
+                        statusOrder.asc(),
                         project.createdAt.desc(),
                         project.id.desc()
                 )
                 .limit(pageSize + 1)
                 .fetch();
-
 
         boolean hasNext = content.size() > pageSize;
         if (hasNext) {
@@ -156,7 +181,7 @@ public class MyInfoQueryRepository {
                 .map(row -> {
                     Long rate = row.get(9, Long.class);
                     boolean hasCommented = Boolean.TRUE.equals(row.get(10, Boolean.class));
-                    String processedImageUrl = imageService.getFullUrl(row.get(image.originalUrl));
+                    String processedImageUrl = row.get(image.originalUrl);
 
 
                     return new MyOrderScrollResponse.Item(

@@ -1,6 +1,6 @@
 package goorm.athena.domain.user.service;
 
-import goorm.athena.domain.image.service.ImageService;
+import goorm.athena.domain.image.service.ImageCommandService;
 import goorm.athena.domain.imageGroup.entity.ImageGroup;
 import goorm.athena.domain.user.dto.request.UserCreateRequest;
 import goorm.athena.domain.user.dto.request.UserLoginRequest;
@@ -28,21 +28,22 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserCommandService {
     private final UserRepository userRepository;
-    private final ImageService imageService;
+    private final ImageCommandService imageCommandService;
     private final PasswordEncoder passwordEncoder;
     private final TokenCommandService tokenCommandService;
     private final JwtTokenizer jwtTokenizer;
     private final UserQueryService userQueryService;
+    private final UserMapper userMapper;
 
     @Transactional
     public UserCreateResponse createUser(UserCreateRequest request, ImageGroup imageGroup) {
         Boolean isExist = userRepository.existsByEmail(request.email());
 
         if (!isExist) {
-            User newUser = UserMapper.toEntity(request, imageGroup);
+            User newUser = userMapper.toEntity(request, imageGroup);
             User savedUser = userRepository.save(newUser);
 
-            return UserMapper.toCreateResponse(savedUser);
+            return userMapper.toCreateResponse(savedUser);
         } else {
             throw new CustomException(ErrorCode.ALREADY_EXIST_USER);
         }
@@ -61,12 +62,12 @@ public class UserCommandService {
 
         // 프로필 이미지가 들어오는 경우에만 등록
         if(file != null && !file.isEmpty()){
-            imageService.uploadImages(List.of(file), updateUser.getImageGroup());
+            imageCommandService.uploadImages(List.of(file), updateUser.getImageGroup());
         }
 
         User savedUser = userRepository.save(updateUser);
 
-        return UserMapper.toUpdateResponse(savedUser);
+        return userMapper.toUpdateResponse(savedUser);
     }
 
     @Transactional
@@ -86,7 +87,7 @@ public class UserCommandService {
         // 토큰 발급 공통 로직
         String refreshTokenValue = tokenCommandService.issueToken(user, response);
 
-        return UserMapper.toLoginResponse(user.getId(), accessToken, refreshTokenValue);
+        return userMapper.toLoginResponse(user.getId(), accessToken, refreshTokenValue);
     }
 
     @Transactional

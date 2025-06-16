@@ -2,6 +2,7 @@ package goorm.athena.domain.deliveryinfo.service;
 
 import goorm.athena.domain.deliveryinfo.dto.res.DeliveryInfoResponse;
 import goorm.athena.domain.deliveryinfo.entity.DeliveryInfo;
+import goorm.athena.domain.deliveryinfo.mapper.DeliveryInfoMapper;
 import goorm.athena.domain.deliveryinfo.repository.DeliveryInfoRepository;
 import goorm.athena.domain.user.service.UserQueryService;
 import goorm.athena.global.exception.CustomException;
@@ -18,7 +19,7 @@ import static java.util.stream.Collectors.toList;
 public class DeliveryInfoQueryService {
 
     private final DeliveryInfoRepository deliveryInfoRepository;
-    private final UserQueryService userQueryService;
+    private final DeliveryInfoMapper deliveryInfoMapper;
 
     public DeliveryInfo getById(Long id) {
         return deliveryInfoRepository.findById(id)
@@ -26,9 +27,8 @@ public class DeliveryInfoQueryService {
     }
 
     public List<DeliveryInfoResponse> getMyDeliveryInfo(Long userId) {
-        return deliveryInfoRepository.findByUserId(userId).stream()
-                .map(DeliveryInfoResponse::from)
-                .collect(toList());
+        List<DeliveryInfo> deliveryInfos = deliveryInfoRepository.findByUserId(userId);
+        return deliveryInfoMapper.toGetResponse(deliveryInfos);
     }
 
     public DeliveryInfo getPrimaryDeliveryInfo(Long userId) {

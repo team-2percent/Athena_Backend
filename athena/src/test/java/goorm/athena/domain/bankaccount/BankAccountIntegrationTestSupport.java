@@ -6,28 +6,13 @@ import goorm.athena.domain.bankaccount.service.BankAccountCommandService;
 import goorm.athena.domain.bankaccount.service.BankAccountQueryService;
 import goorm.athena.domain.imageGroup.entity.ImageGroup;
 import goorm.athena.domain.imageGroup.entity.Type;
-import goorm.athena.domain.imageGroup.repository.ImageGroupRepository;
-import goorm.athena.domain.imageGroup.service.ImageGroupService;
-import goorm.athena.domain.order.repository.OrderRepository;
-import goorm.athena.domain.orderitem.repository.OrderItemRepository;
-import goorm.athena.domain.product.entity.Product;
-import goorm.athena.domain.product.repository.ProductRepository;
-import goorm.athena.domain.project.repository.ProjectRepository;
+import goorm.athena.domain.imageGroup.service.ImageGroupCommandService;
 import goorm.athena.domain.user.entity.Role;
 import goorm.athena.domain.user.entity.User;
 import goorm.athena.domain.user.repository.UserRepository;
 import goorm.athena.util.IntegrationServiceTestSupport;
 import goorm.athena.util.TestEntityFactory;
-import org.junit.After;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ResourceLoader;
-import org.springframework.jdbc.datasource.init.ScriptUtils;
-
-import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.SQLException;
 
 public abstract class BankAccountIntegrationTestSupport extends IntegrationServiceTestSupport {
 
@@ -35,7 +20,7 @@ public abstract class BankAccountIntegrationTestSupport extends IntegrationServi
     protected UserRepository userRepository;
 
     @Autowired
-    protected ImageGroupService imageGroupService;
+    protected ImageGroupCommandService imageGroupCommandService;
 
     @Autowired
     protected BankAccountRepository bankAccountRepository;
@@ -47,11 +32,8 @@ public abstract class BankAccountIntegrationTestSupport extends IntegrationServi
     protected BankAccountCommandService bankAccountCommandService;
 
 
-    @Autowired
-    protected ImageGroupRepository imageGroupRepository;
-
     protected ImageGroup setupImageGroup() {
-        return imageGroupService.createImageGroup(Type.USER);
+        return imageGroupCommandService.createImageGroup(Type.USER);
     }
 
     protected User setupUser(String email, String password, String nickname, ImageGroup imageGroup) {

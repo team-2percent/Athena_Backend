@@ -2,6 +2,7 @@ package goorm.athena.domain.coupon.scheduler;
 
 import goorm.athena.domain.coupon.entity.Coupon;
 import goorm.athena.domain.coupon.entity.CouponStatus;
+import goorm.athena.domain.coupon.repository.CouponQueryRepository;
 import goorm.athena.domain.coupon.repository.CouponRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -16,6 +17,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CouponScheduler {
 
+    private final CouponQueryRepository couponQueryRepository;
     private final CouponRepository couponRepository;
 
      // 추후 bulk update ( 한 번에 업데이트 ) 보다는 대용량 처리에 적합한 batch로 쿼리 조회 수 리팩토링 예정
@@ -25,7 +27,7 @@ public class CouponScheduler {
          LocalDateTime now = LocalDateTime.now();
 
          // 발급일 or 만료일이 지난 상태를 업데이트 해야할 쿠폰들만 조회
-         List<Coupon> coupons = couponRepository.findCouponsToUpdate(now);
+         List<Coupon> coupons = couponQueryRepository.findCouponsToUpdate(now);
 
          List<Coupon> updatedCoupons = new ArrayList<>();
 

@@ -3,7 +3,6 @@ package goorm.athena.domain.deliveryinfo.controller;
 
 import goorm.athena.domain.deliveryinfo.dto.req.DeliveryChangeStateRequest;
 import goorm.athena.domain.deliveryinfo.dto.req.DeliveryInfoRequest;
-import goorm.athena.domain.deliveryinfo.dto.req.DeliveryInfoUpdateRequest;
 import goorm.athena.domain.deliveryinfo.dto.res.DeliveryInfoResponse;
 import goorm.athena.global.jwt.util.CheckLogin;
 import goorm.athena.global.jwt.util.LoginUserRequest;

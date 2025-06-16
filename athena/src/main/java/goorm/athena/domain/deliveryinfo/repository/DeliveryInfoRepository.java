@@ -1,7 +1,6 @@
 package goorm.athena.domain.deliveryinfo.repository;
 
 import goorm.athena.domain.deliveryinfo.entity.DeliveryInfo;
-import goorm.athena.domain.user.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

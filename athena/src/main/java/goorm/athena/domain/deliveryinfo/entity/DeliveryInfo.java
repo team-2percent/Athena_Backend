@@ -43,36 +43,7 @@ public class DeliveryInfo {
         this.isDefault = isDefault;
     }
 
-    public static DeliveryInfo of(User user, DeliveryInfoRequest request) {
-        return DeliveryInfo.builder()
-                .user(user)
-                .zipcode(request.zipcode())
-                .address(request.address())
-                .detailAddress(request.detailAddress())
-                .build();
-    }
-
-    public static DeliveryInfo of(User user, DeliveryInfoRequest request, boolean isDefault) {
-        return DeliveryInfo.builder()
-                .user(user)
-                .zipcode(request.zipcode())
-                .address(request.address())
-                .detailAddress(request.detailAddress())
-                .isDefault(isDefault)
-                .build();
-    }
-
-    public void update(String zipcode, String address, String detailAddress) {
-        this.zipcode = zipcode;
-        this.address = address;
-        this.detailAddress = detailAddress;
-    }
-
     public void setAsDefault() { this.isDefault = true; }
 
     public void unsetAsDefault() { this.isDefault = false; }
-
-    public void updateDefault(boolean isDefault) {
-        this.isDefault = isDefault;
-    }
 }
