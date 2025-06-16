@@ -5,8 +5,7 @@ import goorm.athena.domain.userCoupon.dto.req.UserCouponIssueRequest;
 import goorm.athena.domain.userCoupon.dto.req.UserCouponUseRequest;
 import goorm.athena.domain.userCoupon.dto.res.UserCouponIssueResponse;
 import goorm.athena.domain.userCoupon.scheduler.UserCouponScheduler;
-import goorm.athena.domain.userCoupon.service.UserCouponCommandService;
-import goorm.athena.domain.userCoupon.service.UserCouponQueryService;
+import goorm.athena.domain.userCoupon.service.*;
 import goorm.athena.global.jwt.util.CheckLogin;
 import goorm.athena.global.jwt.util.LoginUserRequest;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +18,12 @@ import org.springframework.web.bind.annotation.*;
 public class UserCouponControllerImpl implements UserCouponController {
     private final UserCouponCommandService userCouponCommandService;
     private final UserCouponQueryService userCouponQueryService;
+    private final UserCouponCommandServiceV1 userCouponCommandServiceV1;
+    private final UserCouponCommandServiceV2 userCouponCommandServiceV2;
+    private final UserCouponCommandServiceV3 userCouponCommandServiceV3;
+    private final UserCouponCommandServiceV4_4 userCouponCommandServiceV4;
+    private final UserCouponCommandServiceV4_5 userCouponCommandServiceV5;
+    private final UserCouponCommandServiceV4_6 userCouponCommandServiceV6;
     private final UserCouponScheduler userCouponScheduler;
     private final FcmNotificationService fcmNotificationService;
 
@@ -26,12 +31,12 @@ public class UserCouponControllerImpl implements UserCouponController {
     @PostMapping
     public ResponseEntity<UserCouponIssueResponse> issueCoupon(@CheckLogin LoginUserRequest loginUserRequest,
                                                                @RequestBody UserCouponIssueRequest request){
-        UserCouponIssueResponse response = userCouponCommandService.issueCoupon(loginUserRequest.userId(), request);
+        userCouponCommandServiceV6.issueCoupon(loginUserRequest.userId(), request);
 
         String couponTitle = userCouponQueryService.getCouponTitle(request.couponId());
         fcmNotificationService.notifyCoupon(couponTitle);
 
-        return ResponseEntity.ok(response);
+        return ResponseEntity.noContent().build();
     }
 
     @Override
