@@ -43,7 +43,6 @@ import static org.mockito.Mockito.*;
 
 
 @ExtendWith(MockitoExtension.class)
-@MockitoSettings(strictness = Strictness.LENIENT)
 public class PaymentCommandServiceMockTest {
     @Mock
     private PaymentRepository paymentRepository;
@@ -88,7 +87,6 @@ public class PaymentCommandServiceMockTest {
         ReflectionTestUtils.setField(orderItem, "product", product);
 
         given(paymentRepository.findByOrderId(orderId)).willReturn(Optional.of(payment));
-        given(orderItemRepository.findByOrderId(orderId)).willReturn(List.of(orderItem));
 
         KakaoPayApproveResponse fakeResponse = KakaoPayApproveResponse.ofSuccess(new KakaoPayApproveResponse(
                 "aid", payment.getTid(), "cid", "CARD",
