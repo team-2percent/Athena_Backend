@@ -21,9 +21,11 @@ public class UserCouponControllerImpl implements UserCouponController {
     private final UserCouponCommandServiceV1 userCouponCommandServiceV1;
     private final UserCouponCommandServiceV2 userCouponCommandServiceV2;
     private final UserCouponCommandServiceV3 userCouponCommandServiceV3;
-    private final UserCouponCommandServiceV4_4 userCouponCommandServiceV4;
-    private final UserCouponCommandServiceV4_5 userCouponCommandServiceV5;
-    private final UserCouponCommandServiceV4_6 userCouponCommandServiceV6;
+    private final UserCouponCommandServiceV4_4 userCouponCommandServiceV4_4;
+    private final UserCouponCommandServiceV4_5 userCouponCommandServiceV4_5;
+    private final UserCouponCommandServiceV4_6 userCouponCommandServiceV4_6;
+    private final UserCouponCommandServiceV4_7 userCouponCommandServiceV4_7;
+    private final UserCouponCommandServiceV5 userCouponCommandServiceV5;
     private final UserCouponScheduler userCouponScheduler;
     private final FcmNotificationService fcmNotificationService;
 
@@ -31,7 +33,7 @@ public class UserCouponControllerImpl implements UserCouponController {
     @PostMapping
     public ResponseEntity<UserCouponIssueResponse> issueCoupon(@CheckLogin LoginUserRequest loginUserRequest,
                                                                @RequestBody UserCouponIssueRequest request){
-        userCouponCommandServiceV6.issueCoupon(loginUserRequest.userId(), request);
+        userCouponCommandServiceV4_7.issueCoupon(loginUserRequest.userId(), request);
 
         String couponTitle = userCouponQueryService.getCouponTitle(request.couponId());
         fcmNotificationService.notifyCoupon(couponTitle);

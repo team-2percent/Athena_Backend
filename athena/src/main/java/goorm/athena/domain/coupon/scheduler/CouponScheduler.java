@@ -4,7 +4,9 @@ import goorm.athena.domain.coupon.entity.Coupon;
 import goorm.athena.domain.coupon.entity.CouponStatus;
 import goorm.athena.domain.coupon.repository.CouponQueryRepository;
 import goorm.athena.domain.coupon.repository.CouponRepository;
+import goorm.athena.domain.userCoupon.event.CouponSyncTriggerEvent;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,8 +19,10 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CouponScheduler {
 
+
     private final CouponQueryRepository couponQueryRepository;
     private final CouponRepository couponRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
      // 추후 bulk update ( 한 번에 업데이트 ) 보다는 대용량 처리에 적합한 batch로 쿼리 조회 수 리팩토링 예정
      @Transactional
@@ -47,4 +51,16 @@ public class CouponScheduler {
              couponRepository.saveAll(updatedCoupons);
          }
      }
+
+    // 10초마다 실행, fixedDelay는 이전 작업 종료 후 대기 시간
+    @Scheduled(fixedDelay = 10000)
+    public void publishCouponSyncEvents() {
+        // 활성 쿠폰 ID 리스트 조회 (예: 상태가 ACTIVE인 쿠폰만)
+        List<Long> activeCouponIds = couponRepository.findCouponIdsByStatus(CouponStatus.IN_PROGRESS);
+
+        for (Long couponId : activeCouponIds) {
+            // 이벤트 발행
+            eventPublisher.publishEvent(new CouponSyncTriggerEvent(couponId));
+        }
+    }
 }

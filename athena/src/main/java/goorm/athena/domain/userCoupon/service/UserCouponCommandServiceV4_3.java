@@ -103,7 +103,7 @@ public class UserCouponCommandServiceV4_3 {
             UserCoupon userCoupon = UserCoupon.create(user, coupon);
             userCouponRepository.save(userCoupon);
 
-            eventPublisher.publishEvent(new CouponIssueEvent(user.getId(), coupon.getId()));
+            eventPublisher.publishEvent(new CouponIssueEvent(user.getId(), coupon.getId(), coupon.getTitle()));
 
             return userCouponMapper.toCreateResponse(userCoupon);
         } catch (InterruptedException e){
