@@ -72,6 +72,7 @@ public enum ErrorCode {
     INVALID_COUPON_STATUS(HttpStatus.BAD_REQUEST, "사용할 수 없는 쿠폰입니다."),
     USER_COUPON_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 유저가 사용할 쿠폰이 존재하지 않습니다."),
     INVALID_USE_COUPON(HttpStatus.BAD_REQUEST, "만료됐거나 사용한 쿠폰은 다시 사용할 수 없습니다"),
+
     // 주문
     DELIVERY_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 ID의 배송지가 존재하지 않습니다."),
     PRODUCT_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 상품의 ID가 존재하지 않습니다."),

@@ -1,7 +1,5 @@
 package goorm.athena.domain.product.service;
 
-import goorm.athena.domain.option.entity.Option;
-import goorm.athena.domain.option.repository.OptionRepository;
 import goorm.athena.domain.product.dto.res.ProductResponse;
 import goorm.athena.domain.product.entity.Product;
 import goorm.athena.domain.product.mapper.ProductMapper;
@@ -23,7 +21,6 @@ public class ProductQueryService {
 
     private final ProductRepository productRepository;
     private final ProductQueryRepository productQueryRepository;
-    private final OptionRepository optionRepository;    // OptionService를 따로 만들지 않고 여기서 관리
     private final ProductMapper productMapper;
 
     // 상품 + 옵션 전체 리스트 조회
