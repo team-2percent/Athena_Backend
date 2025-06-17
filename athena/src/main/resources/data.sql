@@ -150,9 +150,6 @@ INSERT INTO bank_account (id, account_number, bank_name, is_default, user_id) VA
 ALTER TABLE bank_account ALTER COLUMN id RESTART WITH 32;
 
 
-
-
-
 INSERT INTO project (
   id, seller_id, image_group_id, category_id, bank_account_id,
   title, description,
