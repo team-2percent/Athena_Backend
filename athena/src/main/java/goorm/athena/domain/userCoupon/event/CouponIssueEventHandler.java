@@ -1,11 +1,15 @@
 package goorm.athena.domain.userCoupon.event;
 
+import goorm.athena.domain.coupon.entity.Coupon;
+import goorm.athena.domain.coupon.entity.CouponStatus;
+import goorm.athena.domain.coupon.service.CouponQueryService;
 import goorm.athena.domain.notification.service.FcmNotificationService;
+import goorm.athena.domain.user.entity.User;
+import goorm.athena.domain.user.service.UserQueryService;
 import goorm.athena.domain.userCoupon.dto.req.UserCouponIssueRequest;
-import goorm.athena.domain.userCoupon.service.UserCouponCommandServiceV4_2;
-import goorm.athena.domain.userCoupon.service.UserCouponCommandServiceV4_3;
-import goorm.athena.domain.userCoupon.service.UserCouponCommandServiceV4_4;
-import goorm.athena.domain.userCoupon.service.UserCouponQueryService;
+import goorm.athena.domain.userCoupon.entity.UserCoupon;
+import goorm.athena.domain.userCoupon.repository.UserCouponRepository;
+import goorm.athena.domain.userCoupon.service.*;
 import goorm.athena.global.exception.CustomException;
 import goorm.athena.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -17,14 +21,11 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class CouponIssueEventHandler {
 
-    private final UserCouponCommandServiceV4_4 userCouponCommandService;
-    private final UserCouponQueryService userCouponQueryService;
     private final FcmNotificationService fcmNotificationService;
 
     @Async
     @EventListener
     public void handleCouponIssueEvent(CouponIssueEvent event) {
-        String couponTitle = userCouponQueryService.getCouponTitle(event.couponId());
-        fcmNotificationService.notifyCoupon(couponTitle);
+        fcmNotificationService.notifyCoupon(event.couponTitle());
     }
 }

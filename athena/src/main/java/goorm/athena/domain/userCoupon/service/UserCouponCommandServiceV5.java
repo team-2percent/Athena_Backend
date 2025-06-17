@@ -1,6 +1,7 @@
 package goorm.athena.domain.userCoupon.service;
 
 import goorm.athena.domain.coupon.entity.Coupon;
+import goorm.athena.domain.coupon.repository.CouponRepository;
 import goorm.athena.domain.coupon.service.CouponQueryService;
 import goorm.athena.domain.user.entity.User;
 import goorm.athena.domain.user.service.UserQueryService;
@@ -35,13 +36,18 @@ public class UserCouponCommandServiceV5 {
     private final UserQueryService userQueryService;
     private final CouponQueryService couponQueryService;
     private final UserCouponRepository userCouponRepository;
+    private final CouponRepository couponRepository;
     private final UserCouponMapper userCouponMapper;
     private final ApplicationEventPublisher eventPublisher;
 
-    // Redis 롤백 메서드 분리
-    private void rollbackRedis(Long couponId, Long userId) {
-        String issuedSetKey = "issued_users_" + couponId;
-        redissonClient.getSet(issuedSetKey).remove(String.valueOf(userId));
+    public UserCouponIssueResponse issueCoupon(Long userId, UserCouponIssueRequest request) {
+        Long couponId = request.couponId();
+
+        checkAndMarkIssuedWithLock(couponId, userId);
+        UserCouponIssueResponse response = saveCouponIssue(userId, couponId);
+        eventPublisher.publishEvent(new CouponIssueEvent(userId, couponId, response.title()));
+
+        return response;
     }
 
     // Redis에서 중복 및 재고 체크 + 락 적용 예시
@@ -74,6 +80,18 @@ public class UserCouponCommandServiceV5 {
                         issuedSet.remove(String.valueOf(userId));
                         throw new CustomException(ErrorCode.COUPON_OUT_STOCK);
                     }
+/*
+                    if (issuedCount == total) {
+                        Coupon coupon = couponQueryService.getCoupon(couponId);
+                        if (coupon.getStock() > 0) {
+                            coupon.markAsSoldOut();
+                            couponRepository.save(coupon);
+                            System.out.println(couponRepository.findById(coupon.getId()).get().getStock());
+                        }
+                    }
+
+ */
+
                 } finally {
                     lock.unlock();
                 }
@@ -84,6 +102,12 @@ public class UserCouponCommandServiceV5 {
             Thread.currentThread().interrupt();
             throw new CustomException(ErrorCode.ALREADY_ISSUED_COUPON);
         }
+    }
+
+    // Redis 롤백 메서드 분리
+    private void rollbackRedis(Long couponId, Long userId) {
+        String issuedSetKey = "issued_users_" + couponId;
+        redissonClient.getSet(issuedSetKey).remove(String.valueOf(userId));
     }
 
     @Transactional
@@ -102,15 +126,5 @@ public class UserCouponCommandServiceV5 {
             rollbackRedis(couponId, userId);
             throw e;
         }
-    }
-
-    public UserCouponIssueResponse issueCoupon(Long userId, UserCouponIssueRequest request) {
-        Long couponId = request.couponId();
-
-        checkAndMarkIssuedWithLock(couponId, userId);
-        UserCouponIssueResponse response = saveCouponIssue(userId, couponId);
-        eventPublisher.publishEvent(new CouponIssueEvent(userId, couponId));
-
-        return response;
     }
 }
