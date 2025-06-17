@@ -20,9 +20,4 @@ public interface ProductMapper {
     // Entity -> ProductResponse (options 포함 X)
     @Mapping(target = "options", ignore = true)
     ProductResponse toDto(Product product);
-
-    // Entity -> ProductResponse (options 포함)
-    @Mapping(target = "options", source = "options")
-    ProductResponse toDetailDto(Product product, List<String> options);
-
 }
