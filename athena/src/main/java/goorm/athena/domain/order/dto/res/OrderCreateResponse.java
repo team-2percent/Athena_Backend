@@ -19,4 +19,10 @@ public record OrderCreateResponse(
 
         return new OrderCreateResponse(order.getId(), order.getTotalPrice(), order.getOrderedAt(), itemResponses);
     }
+
+    public int quantity() {
+        return items.stream()
+                .mapToInt(OrderItemCreateResponse::quantity)
+                .sum();
+    }
 }

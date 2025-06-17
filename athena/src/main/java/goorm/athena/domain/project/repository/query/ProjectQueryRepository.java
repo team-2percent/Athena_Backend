@@ -16,12 +16,18 @@ import goorm.athena.domain.project.entity.ApprovalStatus;
 import goorm.athena.domain.project.entity.Project;
 import goorm.athena.domain.project.entity.QProject;
 import goorm.athena.domain.user.entity.QUser;
+import goorm.athena.domain.project.entity.Status;
+import static goorm.athena.domain.payment.entity.Status.APPROVED;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
 import java.util.List;
+
+import static goorm.athena.domain.order.entity.QOrder.order;
+import static goorm.athena.domain.payment.entity.QPayment.payment;
+import static goorm.athena.domain.project.entity.QProject.project;
 
 @Repository
 @RequiredArgsConstructor
@@ -118,5 +124,23 @@ public class ProjectQueryRepository {
 
         // 다음 커서 계산: 마지막 프로젝트 ID를 nextCursor로 반환
         return ProjectRecentCursorResponse.ofByCreatedAt(content, totalCount);// Pageable.unpaged()를 사용하여 페이징 없이 총 수만 반환
+    }
+
+
+    public List<Project> findProjectsWithUnsettledOrders(LocalDateTime endAt) {
+        return queryFactory
+                .selectDistinct(project)
+                .from(payment)
+                .join(payment.order, order)
+                .join(order.project, project)
+                .where(
+                        project.endAt.lt(endAt),
+                        project.status.eq(Status.COMPLETED),
+                        project.isApproved.eq(ApprovalStatus.APPROVED),
+                        project.totalAmount.goe(project.goalAmount),
+                        order.isSettled.isFalse(),
+                        payment.status.eq(APPROVED)
+                )
+                .fetch();
     }
 }

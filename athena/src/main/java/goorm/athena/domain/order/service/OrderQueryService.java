@@ -1,6 +1,7 @@
 package goorm.athena.domain.order.service;
 
 import goorm.athena.domain.order.entity.Order;
+import goorm.athena.domain.order.repository.OrderQueryRepository;
 import goorm.athena.domain.order.repository.OrderRepository;
 import goorm.athena.domain.user.entity.User;
 import goorm.athena.global.exception.CustomException;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 public class OrderQueryService {
 
     private final OrderRepository orderRepository;
+    private final OrderQueryRepository orderQueryRepository;
 
     public Order getById(Long id) {
         return orderRepository.findById(id)
@@ -20,12 +22,18 @@ public class OrderQueryService {
     }
 
     public Long getSeller(Long orderId) {
-        User user = orderRepository.findSellerByOrderId(orderId);
+        User user = orderQueryRepository.findSellerByOrderId(orderId);
+        if (user == null) {
+            throw new CustomException(ErrorCode.USER_NOT_FOUND);
+        }
         return user.getId();
     }
 
     public Long getBuyer(Long orderId) {
-        User user = orderRepository.findBuyerByOrderId(orderId);
+        User user = orderQueryRepository.findBuyerByOrderId(orderId);
+        if (user == null) {
+            throw new CustomException(ErrorCode.USER_NOT_FOUND);
+        }
         return user.getId();
     }
 }
