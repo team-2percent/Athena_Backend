@@ -2,15 +2,18 @@ package goorm.athena.domain.payment.entity;
 
 import goorm.athena.domain.order.entity.Order;
 import goorm.athena.domain.user.entity.User;
+import goorm.athena.global.exception.CustomException;
+import goorm.athena.global.exception.ErrorCode;
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Getter
-@RequiredArgsConstructor
+@NoArgsConstructor
 public class Payment {
 
     @Id
@@ -48,7 +51,7 @@ public class Payment {
 
     public void approve(String pgToken) {
         if (this.status != Status.PENDING) {
-            throw new IllegalStateException("결제는 READY 상태에서만 승인될 수 있습니다.");
+            throw new CustomException(ErrorCode.ALREADY_PAYMENT_COMPLETED);
         }
         this.pgToken = pgToken;
         this.approvedAt = LocalDateTime.now();

@@ -181,7 +181,7 @@ public class MyInfoQueryRepository {
                 .map(row -> {
                     Long rate = row.get(9, Long.class);
                     boolean hasCommented = Boolean.TRUE.equals(row.get(10, Boolean.class));
-                    String processedImageUrl = imageQueryService.getFullUrl(row.get(image.originalUrl));
+                    String processedImageUrl = row.get(image.originalUrl);
 
 
                     return new MyOrderScrollResponse.Item(

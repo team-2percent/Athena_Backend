@@ -88,7 +88,7 @@ public class ProjectFilterQueryRepository {
                 .map(dto -> new ProjectCategoryResponse(
                         dto.id(),
                         StringUtils.hasText(dto.imageUrl())
-                                ? imageQueryService.getFullUrl(dto.imageUrl().trim())
+                                ? dto.imageUrl().trim()
                                 : null,
                         dto.sellerName(),
                         dto.title(),
@@ -194,7 +194,7 @@ public class ProjectFilterQueryRepository {
                 .map(dto -> new ProjectDeadlineResponse(
                         dto.id(),
                         StringUtils.hasText(dto.imageUrl())
-                                ? imageQueryService.getFullUrl(dto.imageUrl().trim())
+                                ? dto.imageUrl().trim()
                                 : null,
                         dto.sellerName(),
                         dto.title(),

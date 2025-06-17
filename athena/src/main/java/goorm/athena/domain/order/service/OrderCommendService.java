@@ -37,15 +37,6 @@ public class OrderCommendService {
     private final UserQueryService userQueryService;
     private final DeliveryInfoQueryService deliveryInfoQueryService;
 
-//    public Order getById(Long id) {
-//        return orderRepository.findById(id)
-//                .orElseThrow(() -> new CustomException(ErrorCode.ORDER_NOT_FOUND));
-//    }
-
-    public void saveAll(List<Order> orders) {
-        orderRepository.saveAll(orders);
-    }
-
     @Transactional
     public OrderCreateResponse createOrder(Long userId, OrderCreateRequest request) {
 
@@ -82,19 +73,6 @@ public class OrderCommendService {
         return OrderCreateResponse.from(order, orderItems);
     }
 
-//    public void decreaseInventory(Long orderId) {
-//        List<OrderItem> orderItems = orderItemRepository.findByOrderId(orderId);
-//        for (OrderItem item : orderItems) {
-//            item.getProduct().decreaseStock(item.getQuantity());
-//        }
-//    }
-//
-//    public void increaseProjectFunding(Long orderId) {
-//        List<OrderItem> orderItems = orderItemRepository.findByOrderId(orderId);
-//        for (OrderItem item : orderItems) {
-//            item.getOrder().getProject().increasePrice(item.getPrice());
-//        }
-//    }
 
     public void postPaymentProcess(Long orderId) {
         for (OrderItem item : orderItemRepository.findByOrderId(orderId)) {
@@ -102,16 +80,5 @@ public class OrderCommendService {
             item.getOrder().getProject().increasePrice(item.getPrice());
         }
     }
-
-
-//    public Long getSeller(Long orderId){
-//        User user = orderRepository.findSellerByOrderId(orderId);
-//        return user.getId();
-//    }
-
-//    public Long getBuyer(Long orderId){
-//        User user =  orderRepository.findBuyerByOrderId(orderId);
-//        return user.getId();
-//    }
 
 }

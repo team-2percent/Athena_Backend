@@ -1,6 +1,7 @@
 package goorm.athena.domain.user;
 
 import goorm.athena.domain.image.repository.ImageRepository;
+import goorm.athena.domain.image.service.ImageCommandService;
 import goorm.athena.domain.image.service.ImageQueryService;
 import goorm.athena.domain.imageGroup.entity.ImageGroup;
 import goorm.athena.domain.imageGroup.entity.Type;
@@ -55,6 +56,9 @@ public abstract class UserIntegrationTestSupport extends IntegrationServiceTestS
   protected ImageGroupCommandService imageGroupCommandService;
 
   @Autowired
+  protected ImageCommandService imageCommandService;
+
+  @Autowired
   protected UserQueryService userQueryService;
 
   @Autowired
@@ -65,9 +69,9 @@ public abstract class UserIntegrationTestSupport extends IntegrationServiceTestS
   @BeforeEach
   protected void setUp() {
     // 테스트에서 nasService로 내부 경로를 강제 주입하여 임시 디렉터리로 파일 I/O 수행함
-    Field imagePathField = ReflectionUtils.findField(NasService.class, "imagePath");
+    Field imagePathField = ReflectionUtils.findField(ImageCommandService.class, "baseImageUrl");
     imagePathField.setAccessible(true);
-    ReflectionUtils.setField(imagePathField, nasService, tempDir.toAbsolutePath().toString());
+    ReflectionUtils.setField(imagePathField, imageCommandService, tempDir.toAbsolutePath().toString());
   }
 
   @BeforeAll

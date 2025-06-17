@@ -45,7 +45,7 @@ class BankAccountServiceTest extends BankAccountIntegrationTestSupport {
     @Test
     void createBankAccount_Primary() {
         // given
-        User user = userRepository.findById(8L).get();
+        User user = userRepository.findById(30L).get();
 
         BankAccountCreateRequest request = new BankAccountCreateRequest("123", "123", "123");
 
@@ -62,7 +62,7 @@ class BankAccountServiceTest extends BankAccountIntegrationTestSupport {
     @Test
     void getPrimaryDeliveryInfo_ThrowsDeliveryNotFound() {
         // given
-        User user = userRepository.findById(2L).get();
+        User user = userRepository.findById(3L).get();
 
         // when & then
         assertThatThrownBy(() -> bankAccountQueryService.getPrimaryAccount(100000L))

@@ -1,29 +1,20 @@
 package goorm.athena.domain.settlement.service;
 
-import goorm.athena.domain.admin.dto.res.ProductSettlementSummaryResponse;
-import goorm.athena.domain.admin.dto.res.SettlementDetailInfoResponse;
-import goorm.athena.domain.admin.dto.res.SettlementHistoryPageResponse;
 import goorm.athena.domain.bankaccount.entity.BankAccount;
 import goorm.athena.domain.bankaccount.service.BankAccountQueryService;
 import goorm.athena.domain.order.entity.Order;
-import goorm.athena.domain.order.service.OrderCommendService;
+import goorm.athena.domain.order.repository.OrderRepository;
 import goorm.athena.domain.payment.service.PaymentQueryService;
 import goorm.athena.domain.project.entity.PlatformPlan;
 import goorm.athena.domain.project.entity.Project;
 import goorm.athena.domain.project.service.ProjectQueryService;
 import goorm.athena.domain.settlement.dto.res.SettlementSummaryResponse;
 import goorm.athena.domain.settlement.entity.Settlement;
-import goorm.athena.domain.settlement.entity.Status;
 import goorm.athena.domain.settlement.mapper.SettlementMapper;
-import goorm.athena.domain.settlement.repository.SettlementQueryRepository;
 import goorm.athena.domain.settlement.repository.SettlementRepository;
-import goorm.athena.domain.settlementhistory.repository.SettlementHistoryQueryRepository;
 import goorm.athena.domain.settlementhistory.service.SettlementHistoryCommandService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,17 +29,13 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class SettlementCommandService {
 
+    private final OrderRepository orderRepository;
     private final ProjectQueryService projectQueryService;
-    private final OrderCommendService orderCommendService;
     private final SettlementRepository settlementRepository;
     private final BankAccountQueryService bankAccountQueryService;
     private final SettlementHistoryCommandService historyService;
     private final PaymentQueryService paymentQueryService;
-    private final SettlementQueryRepository settlementQueryRepository;
-    private final SettlementHistoryQueryRepository settlementHistoryQueryRepository;
     private final SettlementMapper settlementMapper;
-
-    private static final double PLATFORM_FEE_RATE = 0.10;
 
     @Transactional
     public void executeMonthlySettlement(LocalDate settleDate) {
@@ -56,12 +43,14 @@ public class SettlementCommandService {
 
         // 후원 성공한 정산 대상 프로젝트 조회
         List<Project> projects = projectQueryService.getEligibleProjects(end);
-        log.info("정산 대상 프로젝트 수: {}", projects.size());
+        List<Long> projectIds = projects.stream()
+                .map(Project::getId)
+                .toList();
+        log.info("정산 대상 프로젝트 수: {} | 프로젝트 ID: {}", projects.size(), projectIds);
         if (projects.isEmpty()) {
             log.info("정산 대상 프로젝트 없음. 종료.");
             return;
         }
-        ;
 
         // 전체 프로젝트의 주문을 한 번에 조회
         // ex) 프로젝트 목록에서 후원 기간 처음과 끝 기간중 최소 최대를 필터 후 주문 데이터를 가져옴
@@ -84,7 +73,7 @@ public class SettlementCommandService {
                     project.getId(), settlement.getTotalSales(), orders.size());
 
             orders.forEach(Order::markAsSettled);
-            orderCommendService.saveAll(orders);
+            orderRepository.saveAll(orders);
         }
     }
 

@@ -8,6 +8,7 @@ public enum ErrorCode {
 
     // 프로젝트, 상품
     PROJECT_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 프로젝트 ID가 존재하지 않습니다."),
+    PROJECTPLAN_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 프로젝트 플랜이 존재하지 않습니다."),
     PRODUCT_IS_EMPTY(HttpStatus.NOT_FOUND, "등록된 상품이 없습니다."),
     OPTION_IS_EMPTY(HttpStatus.NOT_FOUND, "옵션은 빈 문자열일 수 없습니다."),
     INVALID_TITLE_FORMAT(HttpStatus.BAD_REQUEST, "제목은 25자 이하여야 합니다"),
