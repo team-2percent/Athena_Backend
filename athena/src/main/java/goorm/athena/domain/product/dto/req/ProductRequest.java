@@ -4,10 +4,8 @@ package goorm.athena.domain.product.dto.req;
 import jakarta.persistence.Column;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.Getter;
 
 import java.util.List;
-
 
 public record ProductRequest (
         @Column(length = 25, nullable = false)

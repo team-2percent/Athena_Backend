@@ -62,8 +62,8 @@ public class Product {
         return price;
     }
 
-    public void updatePrice(Long price) {
-        this.price = price;
+    public void updateStock(Long stock) {
+        this.stock = stock;
     }
 
 }
