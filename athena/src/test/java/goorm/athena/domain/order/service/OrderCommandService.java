@@ -48,7 +48,7 @@ public class OrderCommandService extends OrderIntegrationTestSupport {
 
         // 상품 2개 주문 -> 주문 생성
         OrderItemRequest orderItem = new OrderItemRequest(product.getId(), 2);
-        OrderCreateRequest request = new OrderCreateRequest(project.getId(), delivery.getId(), List.of(orderItem));
+        OrderCreateRequest request = new OrderCreateRequest(delivery.getId(), project.getId(), List.of(orderItem));
 
         // when
         OrderCreateResponse response = orderCommendService.createOrder(buyer.getId(), request);
@@ -79,8 +79,8 @@ public class OrderCommandService extends OrderIntegrationTestSupport {
         //재고 보다 많게 요청
         OrderItemRequest orderItem = new OrderItemRequest(product.getId(), 15);
         OrderCreateRequest request = new OrderCreateRequest(
-                project.getId(),
                 delivery.getId(),
+                project.getId(),
                 List.of(orderItem)
         );
 
@@ -110,8 +110,8 @@ public class OrderCommandService extends OrderIntegrationTestSupport {
 
         OrderItemRequest orderItem = new OrderItemRequest(product.getId(), 3);
         OrderCreateRequest request = new OrderCreateRequest(
-                project.getId(),
                 delivery.getId(),
+                project.getId(),
                 List.of(orderItem)
         );
         OrderCreateResponse response = orderCommendService.createOrder(buyer.getId(), request);

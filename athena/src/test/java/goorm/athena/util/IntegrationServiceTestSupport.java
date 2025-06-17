@@ -32,7 +32,7 @@ public abstract class IntegrationServiceTestSupport {
 
             ScriptUtils.executeSqlScript(
                     conn,
-                    resourceLoader.getResource("classpath:/data1.sql")
+                    resourceLoader.getResource("classpath:/data.sql")
             );
         } // 여기서 conn이 자동으로 닫힘
     }
