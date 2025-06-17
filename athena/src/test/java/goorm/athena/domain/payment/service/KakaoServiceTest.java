@@ -1,7 +1,6 @@
 package goorm.athena.domain.payment.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import goorm.athena.domain.payment.PaymentIntergrationTestSupport;
 import goorm.athena.domain.payment.dto.req.PaymentApproveRequest;
 import goorm.athena.domain.payment.dto.req.PaymentReadyRequest;
 import goorm.athena.domain.payment.dto.res.KakaoPayApproveResponse;

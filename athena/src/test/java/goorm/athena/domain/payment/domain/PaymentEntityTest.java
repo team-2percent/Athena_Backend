@@ -1,6 +1,6 @@
 package goorm.athena.domain.payment.domain;
 
-import goorm.athena.domain.payment.PaymentIntergrationTestSupport;
+import goorm.athena.domain.payment.PaymentIntegrationTestSupport;
 import goorm.athena.domain.order.entity.Order;
 import goorm.athena.domain.payment.entity.Payment;
 import goorm.athena.domain.payment.entity.Status;
@@ -10,13 +10,12 @@ import goorm.athena.global.exception.ErrorCode;
 import goorm.athena.util.TestEntityFactory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.*;
 
-public class PaymentEntityTest  extends PaymentIntergrationTestSupport {
+public class PaymentEntityTest  extends PaymentIntegrationTestSupport {
 
 
     @Test

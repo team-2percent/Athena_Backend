@@ -6,7 +6,7 @@ import goorm.athena.util.IntegrationServiceTestSupport;
 import org.springframework.beans.factory.annotation.Autowired;
 
 
-public class PaymentIntergrationTestSupport extends IntegrationServiceTestSupport {
+public class PaymentIntegrationTestSupport extends IntegrationServiceTestSupport {
 
     @Autowired
     protected UserRepository userRepository;
