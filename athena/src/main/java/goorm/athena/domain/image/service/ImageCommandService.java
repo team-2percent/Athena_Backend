@@ -1,7 +1,6 @@
 package goorm.athena.domain.image.service;
 
 import goorm.athena.domain.image.entity.Image;
-import goorm.athena.domain.image.mapper.ImageMapper;
 import goorm.athena.domain.image.repository.ImageRepository;
 import goorm.athena.domain.imageGroup.entity.ImageGroup;
 import lombok.RequiredArgsConstructor;
@@ -79,7 +78,7 @@ public class ImageCommandService {
     // 다중 이미지 업로드
     // 이미지 인덱스는 항상 1부터 시작하며, 0은 마크다운을 나타낸다.
     public void uploadImages(List<MultipartFile> files, ImageGroup imageGroup) {
-        Long imageIndex = 1L;
+        long imageIndex = 1L;
         for (MultipartFile file : files) {
             uploadImage(file, imageGroup, imageIndex++);
         }
@@ -103,7 +102,7 @@ public class ImageCommandService {
                     .toEntity(String.class)
                     .block();
 
-            if (response.getStatusCode() == HttpStatus.OK) {
+            if (response.getStatusCode() == HttpStatus.NO_CONTENT || response.getStatusCode() == HttpStatus.OK) {    // 204
                 imageRepository.delete(image);
             }
         } catch (Exception e) {
