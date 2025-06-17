@@ -73,16 +73,16 @@ class ProjectCommandServiceTest extends ProjectIntegrationTestSupport {
         assertThat(markdownImages).isEmpty();
     }
 
-    @DisplayName("상품 리스트가 비어있는 경우 예외가 발생한다.")
-    @Test
-    void createProjectWithEmptyProductList(){
-        // given
-
-        // when
-
-        // then
-
-    }
+//    @DisplayName("상품 리스트가 비어있는 경우 예외가 발생한다.")
+//    @Test
+//    void createProjectWithEmptyProductList(){
+//        // given
+//
+//        // when
+//
+//        // then
+//
+//    }
 
     @DisplayName("제목 길이가 25자를 초과하면 예외가 발생한다.")
     @Test

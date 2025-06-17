@@ -3,9 +3,7 @@ package goorm.athena.domain.project.util;
 import goorm.athena.domain.bankaccount.entity.BankAccount;
 import goorm.athena.domain.bankaccount.service.BankAccountQueryService;
 import goorm.athena.domain.category.entity.Category;
-import goorm.athena.domain.category.repository.CategoryRepository;
 import goorm.athena.domain.category.service.CategoryService;
-import goorm.athena.domain.image.entity.Image;
 import goorm.athena.domain.image.service.ImageQueryService;
 import goorm.athena.domain.imageGroup.entity.ImageGroup;
 import goorm.athena.domain.imageGroup.entity.Type;
@@ -18,6 +16,7 @@ import goorm.athena.domain.project.entity.PlanName;
 import goorm.athena.domain.project.entity.PlatformPlan;
 import goorm.athena.domain.project.entity.Project;
 import goorm.athena.domain.project.repository.PlatformPlanRepository;
+import goorm.athena.domain.project.repository.ProjectRepository;
 import goorm.athena.domain.project.service.ProjectCommandService;
 import goorm.athena.domain.user.entity.User;
 import goorm.athena.domain.user.service.UserQueryService;
@@ -56,6 +55,9 @@ public abstract class ProjectIntegrationTestSupport extends IntegrationServiceTe
 
     @Autowired
     private UserQueryService userQueryService;
+
+    @Autowired
+    protected ProjectRepository projectRepository;
 
     @Autowired
     private ImageGroupCommandService imageGroupCommandService;
