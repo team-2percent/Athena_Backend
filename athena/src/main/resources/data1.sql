@@ -30,9 +30,10 @@ INSERT INTO image_group (id, type) VALUES
 (27, 'USER'),
 (28, 'USER'),
 (29, 'USER'),
-(30, 'USER');
+(30, 'USER'),
+(31, 'PROJECT');
 
-ALTER TABLE image_group ALTER COLUMN id RESTART WITH 31;
+ALTER TABLE image_group ALTER COLUMN id RESTART WITH 32;
 
 INSERT INTO image (id, image_group_id, image_index, file_name, file_type, original_url) VALUES
 (1, 10, 1, 'test/webp','png', '/images/71b6fe04-cca5-4281-8095-5fd739e3e18a.webp');
@@ -190,9 +191,10 @@ INSERT INTO project (
 (27, 2, 27, 1, 27, '프로젝트 제목 27', '설명 27', 2700000, 3240000.0, '내용 27', '2025-01-27', '2025-02-27', '2025-03-27', 'REJECTED', 'CANCELLED', '2025-01-27', 3, 371),
 (28, 2, 28, 1, 28, '프로젝트 제목 28', '설명 28', 2800000, 3360000.0, '내용 28', '2025-01-28', '2025-02-28', '2025-03-28', 'APPROVED', 'ACTIVE', '2025-01-28', 1, 83),
 (29, 2, 29, 1, 29, '프로젝트 제목 29', '설명 29', 2900000, 3480000.0, '내용 29', '2025-01-29', '2025-03-01', '2025-03-29', 'APPROVED', 'ACTIVE', '2025-01-29', 3, 917),
-(30, 2, 30, 1, 30, '프로젝트 제목 30', '설명 30', 3000000, 3600000.0, '내용 30', '2025-01-30', '2025-03-02', '2025-03-30', 'REJECTED', 'CANCELLED', '2025-01-30', 2, 551);
+(30, 2, 30, 1, 30, '프로젝트 제목 30', '설명 30', 3000000, 3600000.0, '내용 30', '2025-01-30', '2025-03-02', '2025-03-30', 'REJECTED', 'CANCELLED', '2025-01-30', 2, 551),
+(31, 20, 31, 1, 30, '프로젝트 제목 31', '설명 31', 3000000, 3600000.0, '내용 31', '2025-01-30', '2025-03-02', '2025-03-30', 'REJECTED', 'ACTIVE', '2025-01-31', 2, 500);
 
-ALTER TABLE project ALTER COLUMN id RESTART WITH 31;
+ALTER TABLE project ALTER COLUMN id RESTART WITH 32;
 
 INSERT INTO product (id, project_id, name, description, price, stock) VALUES
 (1, 1, '상품1', '상품1 설명입니다.', 72000, 100),
@@ -321,6 +323,18 @@ INSERT INTO product (id, project_id, name, description, price, stock) VALUES
 (124, 30, '상품124', '상품124 설명입니다.', 59000, 100);
 
 ALTER TABLE product ALTER COLUMN id RESTART WITH 125;
+
+
+INSERT INTO options (id, product_id, option_name) VALUES
+(1, 120, '옵션1-1'),
+(2, 120, '옵션1-2'),
+(3, 121, '옵션2-1'),
+(4, 122, '옵션3-1'),
+(5, 123, '옵션4-1'),
+(6, 123, '옵션4-2');
+
+ALTER TABLE options ALTER COLUMN id RESTART WITH 7;
+
 
 INSERT INTO coupon (id, title, content, price, start_at, end_at, expires_at, stock, coupon_status) VALUES
 (1, '할인쿠폰001', '신규 가입자 전용 쿠폰입니다.', 3000, '2025-06-01', '2025-06-15', '2025-06-16', 300, 'PREVIOUS'),
