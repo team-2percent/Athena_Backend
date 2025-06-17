@@ -51,7 +51,7 @@ class ProjectTest extends ProjectIntegrationTestSupport {
         assertThat(project.getIsApproved()).isEqualTo(ApprovalStatus.REJECTED);
     }
 
-    @DisplayName("받아온 입력 값에 맞춰 프로젝트 정보가 수정된다.")
+    @DisplayName("프로젝트 정보 수정 요청 시, 카테고리/계좌/제목/설명/목표금액/마크다운/날짜 필드 요청 값에 따라 모두 수정된다.")
     @Test
     void updateProjectInfo(){
         // given
@@ -72,7 +72,7 @@ class ProjectTest extends ProjectIntegrationTestSupport {
         assertThat(project.getContentMarkdown()).isEqualTo("수정된 마크다운");
     }
 
-    @DisplayName("받아온 금액이 totalAmount에 누적 값으로 반영된다.")
+    @DisplayName("프로젝트 후원 금액이 정상적으로 누적된다.")
     @Test
     void increaseTotalAmount(){
         // given

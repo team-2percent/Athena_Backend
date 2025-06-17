@@ -12,6 +12,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 class ProductQueryServiceTest extends ProductIntegrationTestSupport {
+
     @DisplayName("전체 리스트를 조회하는 경우, 상품과 상품과 연관된 옵션들이 모두 올바르게 매핑되어 조회된다." +
                 "(프로젝트 30번 사용 중, 옵션을 추가한 프로젝트입니다.)")
     @Test

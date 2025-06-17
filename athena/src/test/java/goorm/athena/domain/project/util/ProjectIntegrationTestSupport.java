@@ -69,7 +69,7 @@ public abstract class ProjectIntegrationTestSupport extends IntegrationServiceTe
     private PlatformPlanRepository platformPlanRepository;
 
     /***
-     * 프로젝트 테스트 시, data1.sql의 User(id=1)를 사용합니다.
+     * 프로젝트 테스트 시, data.sql의 User(id=1)를 사용합니다.
      ***/
 
     protected ProjectCreateRequest createProjectRequest(String title, String description, String contentMarkDown, LocalDateTime startAt){

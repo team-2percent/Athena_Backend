@@ -73,18 +73,18 @@ class ProjectCommandServiceTest extends ProjectIntegrationTestSupport {
         assertThat(markdownImages).isEmpty();
     }
 
-//    @DisplayName("상품 리스트가 비어있는 경우 예외가 발생한다.")
-//    @Test
-//    void createProjectWithEmptyProductList(){
-//        // given
-//
-//        // when
-//
-//        // then
-//
-//    }
+    @DisplayName("프로젝트 생성 시, 상품 리스트가 비어있는 경우 예외가 발생한다.")
+    @Test
+    void createProjectWithEmptyProductList(){
+        // given
 
-    @DisplayName("제목 길이가 25자를 초과하면 예외가 발생한다.")
+        // when
+
+        // then
+
+    }
+
+    @DisplayName("프로젝트 제목 길이가 25자를 초과하면 예외가 발생한다.")
     @Test
     void createProjectWithTitleTooLong(){
         // given
@@ -98,7 +98,7 @@ class ProjectCommandServiceTest extends ProjectIntegrationTestSupport {
                 .hasFieldOrPropertyWithValue("errorCode", ErrorCode.INVALID_TITLE_FORMAT);
     }
 
-    @DisplayName("설명 길이가 50자를 초과하면 예외가 발생한다.")
+    @DisplayName("프로젝트 설명 길이가 50자를 초과하면 예외가 발생한다.")
     @Test
     void createProjectWithDescriptionTooLong(){
         // given
@@ -112,7 +112,7 @@ class ProjectCommandServiceTest extends ProjectIntegrationTestSupport {
                 .hasFieldOrPropertyWithValue("errorCode", ErrorCode.INVALID_DESCRIPTION_FORMAT);
     }
 
-    @DisplayName("시작일이 현재 날짜 +7일보다 이전일 경우, 예외가 발생한다.")
+    @DisplayName("프로젝트 시작일이 현재 날짜 +7일보다 이전일 경우, 예외가 발생한다.")
     @Test
     void createProjectWithInvalidStartDate(){
         // given
@@ -160,6 +160,17 @@ class ProjectCommandServiceTest extends ProjectIntegrationTestSupport {
                 imageUrls.stream()
                         .allMatch(url -> updatedProject.getContentMarkdown().contains(url))
         ).isTrue();
+    }
+
+    @DisplayName("프로젝트 수정 시, 받아오는 이미지가 존재하지 않는다면 예외가 발생한다.")
+    @Test
+    void updateProjectWithoutImage(){
+        // given
+
+        // when
+
+        // then
+
     }
 
     @DisplayName("프로젝트 삭제 시, 이미지/상품/프로젝트/이미지그룹이 모두 삭제된다.")
