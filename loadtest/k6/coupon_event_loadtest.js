@@ -4,10 +4,6 @@ import { check, sleep } from 'k6';
 // ======= 테스트 실행을 위한 값 설정 =======
 const BASE_URL = 'https://athena-local.i-am-jay.com';
 
-// 아래 숫자만큼 쿠폰을 발급 받을 사용자를 생성합니다.
-// ID로 지정한 쿠폰의 재고가 테스트 횟수보다 여유로운지 확인해주세요.
-const REPS_TO_CREATE_USER_COUPON = 1000000;
-
 // 테스트할 쿠폰 ID를 직접 지정
 const TEST_COUPON_ID = 95;
 // ================================================
