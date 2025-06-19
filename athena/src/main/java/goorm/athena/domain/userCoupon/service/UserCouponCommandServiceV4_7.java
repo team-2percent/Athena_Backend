@@ -69,7 +69,7 @@ public class UserCouponCommandServiceV4_7 {
             int result = checkAndDecreaseRedisStock(couponId);
 
             // 3. 발급 성공 시 이벤트 발행
-            eventPublisher.publishEvent(new CouponIssueEvent(userId, couponId, "123"));
+            eventPublisher.publishEvent(new CouponIssueEvent(userId, couponId));
 
             // 4. 재고 소진 플래그가 Lua 스크립트에서 세팅되었을 경우 동기화 이벤트 발행
             if (result == 2) {
