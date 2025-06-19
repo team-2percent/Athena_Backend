@@ -18,14 +18,19 @@ import org.springframework.web.bind.annotation.*;
 public class UserCouponControllerImpl implements UserCouponController {
     private final UserCouponCommandService userCouponCommandService;
     private final UserCouponQueryService userCouponQueryService;
+
     private final UserCouponCommandServiceV1 userCouponCommandServiceV1;
     private final UserCouponCommandServiceV2 userCouponCommandServiceV2;
     private final UserCouponCommandServiceV3 userCouponCommandServiceV3;
+    private final UserCouponCommandServiceV4 userCouponCommandServiceV4_1; // 현재 단계에서 인자값 오류로 주석 처리
+    private final UserCouponCommandServiceV4_2 userCouponCommandServiceV4_2;
+    private final UserCouponCommandServiceV4_3 userCouponCommandServiceV4_3;
     private final UserCouponCommandServiceV4_4 userCouponCommandServiceV4_4;
     private final UserCouponCommandServiceV4_5 userCouponCommandServiceV4_5;
     private final UserCouponCommandServiceV4_6 userCouponCommandServiceV4_6;
     private final UserCouponCommandServiceV4_7 userCouponCommandServiceV4_7;
     private final UserCouponCommandServiceV5 userCouponCommandServiceV5;
+
     private final UserCouponScheduler userCouponScheduler;
     private final FcmNotificationService fcmNotificationService;
 
@@ -33,7 +38,7 @@ public class UserCouponControllerImpl implements UserCouponController {
     @PostMapping
     public ResponseEntity<UserCouponIssueResponse> issueCoupon(@CheckLogin LoginUserRequest loginUserRequest,
                                                                @RequestBody UserCouponIssueRequest request){
-        userCouponCommandServiceV4_7.issueCoupon(loginUserRequest.userId(), request);
+        userCouponCommandService.issueCoupon(loginUserRequest.userId(), request);
 
         String couponTitle = userCouponQueryService.getCouponTitle(request.couponId());
         fcmNotificationService.notifyCoupon(couponTitle);
@@ -53,6 +58,129 @@ public class UserCouponControllerImpl implements UserCouponController {
     @PostMapping("/scheduler")
     public void schedulerExpiredUserCoupon(){
         userCouponScheduler.expiredUserCoupon();
+    }
+
+    // test ----------------------------------------------------------
+    // 애플리케이션 락
+    @PostMapping("/v1")
+    public ResponseEntity<UserCouponIssueResponse> issueCouponWithReentrantLock(@CheckLogin LoginUserRequest loginUserRequest,
+                                                               @RequestBody UserCouponIssueRequest request){
+        userCouponCommandServiceV1.issueCoupon(loginUserRequest.userId(), request);
+
+        String couponTitle = userCouponQueryService.getCouponTitle(request.couponId());
+        fcmNotificationService.notifyCoupon(couponTitle);
+
+        return ResponseEntity.noContent().build();
+    }
+
+    // 비관적 락
+    @PostMapping("/v2")
+    public ResponseEntity<UserCouponIssueResponse> issueCouponWithDBLock(@CheckLogin LoginUserRequest loginUserRequest,
+                                                                                @RequestBody UserCouponIssueRequest request){
+        userCouponCommandServiceV2.issueCoupon(loginUserRequest.userId(), request);
+
+        String couponTitle = userCouponQueryService.getCouponTitle(request.couponId());
+        fcmNotificationService.notifyCoupon(couponTitle);
+
+        return ResponseEntity.noContent().build();
+    }
+
+    // Redis 락
+    @PostMapping("/v3")
+    public ResponseEntity<UserCouponIssueResponse> issueCouponWithRedisLock(@CheckLogin LoginUserRequest loginUserRequest,
+                                                                         @RequestBody UserCouponIssueRequest request){
+        userCouponCommandServiceV3.issueCoupon(loginUserRequest.userId(), request);
+
+        String couponTitle = userCouponQueryService.getCouponTitle(request.couponId());
+        fcmNotificationService.notifyCoupon(couponTitle);
+
+        return ResponseEntity.noContent().build();
+    }
+
+    // Redis 락 ( 원자값 )
+    @PostMapping("/v4_2")
+    public ResponseEntity<UserCouponIssueResponse> issueCouponWithRedisAtomic(@CheckLogin LoginUserRequest loginUserRequest,
+                                                                            @RequestBody UserCouponIssueRequest request){
+        userCouponCommandServiceV4_2.issueCoupon(loginUserRequest.userId(), request);
+
+        String couponTitle = userCouponQueryService.getCouponTitle(request.couponId());
+        fcmNotificationService.notifyCoupon(couponTitle);
+
+        return ResponseEntity.noContent().build();
+    }
+
+    // Redis 분산 락
+    @PostMapping("/v4_3")
+    public ResponseEntity<UserCouponIssueResponse> issueCouponWithRedisDistributedLock(@CheckLogin LoginUserRequest loginUserRequest,
+                                                                              @RequestBody UserCouponIssueRequest request){
+        userCouponCommandServiceV4_3.issueCoupon(loginUserRequest.userId(), request);
+
+        String couponTitle = userCouponQueryService.getCouponTitle(request.couponId());
+        fcmNotificationService.notifyCoupon(couponTitle);
+
+        return ResponseEntity.noContent().build();
+    }
+
+    // 동기 기반 Lua Script 사용
+    @PostMapping("/v4_4")
+    public ResponseEntity<UserCouponIssueResponse> issueCouponWithLuaScript(@CheckLogin LoginUserRequest loginUserRequest,
+                                                                                       @RequestBody UserCouponIssueRequest request){
+        userCouponCommandServiceV4_4.issueCoupon(loginUserRequest.userId(), request);
+
+        String couponTitle = userCouponQueryService.getCouponTitle(request.couponId());
+        fcmNotificationService.notifyCoupon(couponTitle);
+
+        return ResponseEntity.noContent().build();
+    }
+
+    // 유사 비동기 기반 Lua Script + Redis Set 사용
+    @PostMapping("/v4_5")
+    public ResponseEntity<UserCouponIssueResponse> issueCouponWithLuaScriptAsync(@CheckLogin LoginUserRequest loginUserRequest,
+                                                                            @RequestBody UserCouponIssueRequest request){
+        userCouponCommandServiceV4_5.issueCoupon(loginUserRequest.userId(), request);
+
+        String couponTitle = userCouponQueryService.getCouponTitle(request.couponId());
+        fcmNotificationService.notifyCoupon(couponTitle);
+
+        return ResponseEntity.noContent().build();
+    }
+
+    /**
+     * 이벤트 기반 쿠폰 발급 서비스 (버전 4.6)
+     * - Redis에서 재고를 Lua 스크립트로 체크 및 감소
+     * - 쿠폰 발급 후 ApplicationEvent를 통해 비동기 DB 저장 및 재고 동기화 처리
+     * - 재고 소진 시 별도의 동기화 이벤트 발행 (중복 이벤트 방지 플래그 없음)
+     * - 빠른 캐시 처리 및 락 최소화를 목표로 하나, 재고 동기화 및 장애 복구 전략 필요
+     */
+    @PostMapping("/v4_6")
+    public ResponseEntity<UserCouponIssueResponse> issueCouponWithLuaAndJavaCheck(@CheckLogin LoginUserRequest loginUserRequest,
+                                                                                 @RequestBody UserCouponIssueRequest request){
+        userCouponCommandServiceV4_6.issueCoupon(loginUserRequest.userId(), request);
+
+        String couponTitle = userCouponQueryService.getCouponTitle(request.couponId());
+        fcmNotificationService.notifyCoupon(couponTitle);
+
+        return ResponseEntity.noContent().build();
+    }
+
+    /**
+     * 이벤트 기반 쿠폰 발급 서비스 (버전 4.7)
+     * - Redis Lua 스크립트 내에서 재고 체크, 감소 및 품절 플래그 설정까지 처리
+     * - 마지막 쿠폰 발급 시 품절 플래그를 Redis에 SETNX로 세팅하여 중복 이벤트 방지
+     * - 플래그 TTL(60초)로 중복 동기화 이벤트 발행 방지
+     * - 내부에서 재고 상태 및 이벤트 발행을 원자적으로 처리하여 동기화 안정성 향상
+     * - 쿠폰 발급 성공 후 ApplicationEventPublisher를 통해 비동기 이벤트(CouponIssueEvent, CouponSyncTriggerEvent)를 발행
+     * - 비동기 이벤트 리스너에서 DB 저장 및 재고 동기화 작업을 처리하여 응답 지연 최소화 및 시스템 확장성 확보
+     */
+    @PostMapping("/v4_7")
+    public ResponseEntity<UserCouponIssueResponse> issueCouponWithLuaAndStockAsync(@CheckLogin LoginUserRequest loginUserRequest,
+                                                                                  @RequestBody UserCouponIssueRequest request){
+        userCouponCommandServiceV4_7.issueCoupon(loginUserRequest.userId(), request);
+
+        String couponTitle = userCouponQueryService.getCouponTitle(request.couponId());
+        fcmNotificationService.notifyCoupon(couponTitle);
+
+        return ResponseEntity.noContent().build();
     }
 
 }
