@@ -55,7 +55,6 @@ public class UserCouponCommandServiceV4_7 {
         return 1  -- 정상 발급
     """;
 
-    @Transactional
     public void issueCoupon(Long userId, UserCouponIssueRequest request) {
         Long couponId = request.couponId();
 

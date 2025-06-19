@@ -41,4 +41,10 @@ public class CouponControllerImpl implements CouponController{
     public void scheduleUpdateCoupon(){
         couponScheduler.updateCouponStatuses();
     }
+
+    @Override
+    @PostMapping("/schedulerSync")
+    public void scheduleSync(){
+        couponScheduler.publishCouponSyncEvents();
+    }
 }

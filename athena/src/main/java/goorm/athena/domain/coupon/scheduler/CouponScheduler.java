@@ -61,7 +61,8 @@ public class CouponScheduler {
      }
 
     // 10초마다 실행, fixedDelay는 이전 작업 종료 후 대기 시간
-    @Scheduled(fixedDelay = 10000)
+    //@Scheduled(fixedDelay = 10000)
+    @Scheduled(cron = "2 0 0 * * *")
     public void publishCouponSyncEvents() {
         // 활성 쿠폰 ID 리스트 조회 (예: 상태가 ACTIVE인 쿠폰만)
         List<Long> activeCouponIds = couponRepository.findCouponIdsByStatus(CouponStatus.IN_PROGRESS);
