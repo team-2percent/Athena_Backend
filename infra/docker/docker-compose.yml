@@ -39,6 +39,7 @@ services:
       - --requirepass ${REDIS_PASSWORD}
 
   athena:
+    build: ../../athena
     image: docker-athena:${IMAGE_TAG}
     container_name: athena
     depends_on:
@@ -69,8 +70,6 @@ services:
       FCM_CERTIFICATION: ${FCM_CERTIFICATION}
     ports:
       - "8080:8080"
-    volumes:
-      - /Volumes/Data/images:/Volumes/Data/images
     networks:
       - backend_network
 
