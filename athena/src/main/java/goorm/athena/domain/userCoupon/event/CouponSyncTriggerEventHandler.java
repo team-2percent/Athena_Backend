@@ -54,9 +54,6 @@ public class CouponSyncTriggerEventHandler {
         } else {
             couponRepository.save(coupon);
         }
-
-        System.out.println(couponRepository.findById(couponId).get().getStock()+"123123");
-
     }
 }
 

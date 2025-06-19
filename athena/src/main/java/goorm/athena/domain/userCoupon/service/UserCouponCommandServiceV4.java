@@ -18,17 +18,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
 
-/*
 // Lua 스크립트 내에서 SET + DECR 처리하여 Redis에선 완전 원자적
 // DB 저장은 이벤트 리스너에서 동기적으로 수행함 (EventPublisher 사용)
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserCouponCommandServiceV4 {
-    private final UserQueryService userQueryService;
-    private final CouponQueryService couponQueryService;
-    private final UserCouponRepository userCouponRepository;
-    private final UserCouponMapper userCouponMapper;
     private final RedissonClient redissonClient;  // Redis 클라이언트 주입
     private final ApplicationEventPublisher eventPublisher;
 
@@ -40,8 +35,8 @@ public class UserCouponCommandServiceV4 {
             case OUT_OF_STOCK -> throw new CustomException(ErrorCode.COUPON_OUT_STOCK);
             case ALREADY_ISSUED -> throw new CustomException(ErrorCode.ALREADY_ISSUED_COUPON);
             case SUCCESS -> {
-                // DB 저장은 비동기 이벤트로
-                eventPublisher.publishEvent(new CouponIssueEvent(userId, couponId));
+                // DB 저장은 비동기 이벤트로 할려고 했으나 이벤트 입력 값이 바뀌어서 임시 주석 처리
+ //               eventPublisher.publishEvent(new CouponIssueEvent(userId, couponId));
             }
         }
     }
@@ -85,5 +80,3 @@ public class UserCouponCommandServiceV4 {
         };
     }
 }
-
- */
