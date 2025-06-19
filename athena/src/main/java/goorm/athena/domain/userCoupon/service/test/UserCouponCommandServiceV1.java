@@ -1,4 +1,4 @@
-package goorm.athena.domain.userCoupon.service;
+package goorm.athena.domain.userCoupon.service.test;
 
 import goorm.athena.domain.coupon.entity.Coupon;
 import goorm.athena.domain.coupon.entity.CouponStatus;
