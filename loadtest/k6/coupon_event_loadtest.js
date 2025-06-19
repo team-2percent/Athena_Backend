@@ -1,21 +1,24 @@
 import http from 'k6/http';
 import { check, sleep } from 'k6';
 
-// ======= 테스트 실행을 위한 값 설정 =======
+// >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+// 테스트 실행을 위한 값 설정
 const BASE_URL = 'https://athena-local.i-am-jay.com';
 
 // 테스트할 쿠폰 ID를 직접 지정
 const TEST_COUPON_ID = 95;
-// ================================================
 
 export const options = {
-  vus: 1, // JMeter ThreadGroup.num_threads // 반복 횟수
-  duration: '30s', // 테스트 시간
-  rampingVus: [
-    { duration: '1s', target: 100 }, // JMeter ramp_time 1초
-    { duration: '29s', target: 100 }, // 나머지 시간 유지
-  ],
+  scenarios: {
+    coupon_event_loadtest: {
+      executor: 'shared-iterations', // 사전정의된 executor를 사용해야 함. executor의 종류와 차이점은 https://grafana.com/docs/k6/latest/using-k6/scenarios/ 참고
+      vus: 100, // 동시 실행되는 VU 수
+      iterations: 1000000, // 반복 횟수
+      maxDuration: '1m', // 최대 테스트 시간; 테스트 시간이 더 길어지면 테스트 종료
+    },
+  },
 };
+// <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 export default function () {
   const couponId = TEST_COUPON_ID;
