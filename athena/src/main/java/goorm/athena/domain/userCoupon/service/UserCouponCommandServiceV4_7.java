@@ -5,6 +5,7 @@ import goorm.athena.domain.userCoupon.event.CouponIssueEvent;
 import goorm.athena.domain.userCoupon.event.CouponSyncTriggerEvent;
 import goorm.athena.global.exception.CustomException;
 import goorm.athena.global.exception.ErrorCode;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.redisson.api.RBucket;
 import org.redisson.api.RScript;
@@ -54,6 +55,7 @@ public class UserCouponCommandServiceV4_7 {
         return 1  -- 정상 발급
     """;
 
+    @Transactional
     public void issueCoupon(Long userId, UserCouponIssueRequest request) {
         Long couponId = request.couponId();
 
