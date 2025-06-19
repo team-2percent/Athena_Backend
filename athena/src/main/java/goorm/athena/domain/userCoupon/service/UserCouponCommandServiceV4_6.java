@@ -59,7 +59,7 @@ public class UserCouponCommandServiceV4_6 {
             checkAndDecreaseRedisStock(couponId);
 
             // 3. 발급 성공 시 CouponIssueEvent 발행
-            eventPublisher.publishEvent(new CouponIssueEvent(userId, couponId, "123"));
+            eventPublisher.publishEvent(new CouponIssueEvent(userId, couponId));
 
             // 3. 재고가 소진되었으면 동기화 이벤트 발행
             if (isStockDepleted(couponId)) {

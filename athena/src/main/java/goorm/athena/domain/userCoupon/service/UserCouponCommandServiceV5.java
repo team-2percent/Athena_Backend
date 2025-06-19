@@ -45,7 +45,7 @@ public class UserCouponCommandServiceV5 {
 
         checkAndMarkIssuedWithLock(couponId, userId);
         UserCouponIssueResponse response = saveCouponIssue(userId, couponId);
-        eventPublisher.publishEvent(new CouponIssueEvent(userId, couponId, response.title()));
+        eventPublisher.publishEvent(new CouponIssueEvent(userId, couponId));
 
         return response;
     }

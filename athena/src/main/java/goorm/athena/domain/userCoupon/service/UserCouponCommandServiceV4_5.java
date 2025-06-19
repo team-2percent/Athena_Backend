@@ -124,7 +124,7 @@ public class UserCouponCommandServiceV4_5 {
             UserCouponIssueResponse response = saveCouponIssue(userId, couponId);
 
             // 4) 이벤트 발행
-            eventPublisher.publishEvent(new CouponIssueEvent(userId, couponId, response.title()));
+            eventPublisher.publishEvent(new CouponIssueEvent(userId, couponId));
             return response;
         } catch (CustomException e) {
             // Redis Set에서 userId 제거(롤백)

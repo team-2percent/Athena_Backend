@@ -96,7 +96,7 @@ public class UserCouponCommandServiceV4_4 {
     public UserCouponIssueResponse issueCoupon(Long userId, UserCouponIssueRequest request) {
         checkAndDecreaseRedisStock(request.couponId()); // Redis 처리
         UserCouponIssueResponse response = saveCouponIssue(userId, request.couponId()); // DB 저장
-        eventPublisher.publishEvent(new CouponIssueEvent(userId, request.couponId(), response.title())); // 이벤트 발행
+        eventPublisher.publishEvent(new CouponIssueEvent(userId, request.couponId())); // 이벤트 발행
         return response;
     }
 }
