@@ -1,7 +1,6 @@
-package goorm.athena.domain.userCoupon.service;
+package goorm.athena.domain.userCoupon.service.test;
 
 import goorm.athena.domain.coupon.entity.Coupon;
-import goorm.athena.domain.coupon.entity.CouponStatus;
 import goorm.athena.domain.coupon.repository.CouponRepository;
 import goorm.athena.domain.coupon.service.CouponQueryService;
 import goorm.athena.domain.user.entity.User;
@@ -9,6 +8,7 @@ import goorm.athena.domain.user.service.UserQueryService;
 import goorm.athena.domain.userCoupon.dto.req.UserCouponIssueRequest;
 import goorm.athena.domain.userCoupon.dto.res.UserCouponIssueResponse;
 import goorm.athena.domain.userCoupon.entity.UserCoupon;
+import goorm.athena.domain.userCoupon.event.CouponIssueEvent;
 import goorm.athena.domain.userCoupon.mapper.UserCouponMapper;
 import goorm.athena.domain.userCoupon.repository.UserCouponRepository;
 import goorm.athena.global.exception.CustomException;
@@ -18,27 +18,27 @@ import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RAtomicLong;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
-import org.springframework.scheduling.annotation.Async;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.event.TransactionPhase;
-import org.springframework.transaction.event.TransactionalEventListener;
 
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.ReentrantLock;
 
-// Redis 단계에서 락을 걸고 동기적으로 재고 감소 및 DB 저장까지 한 번에 처리
-// 단순하나, Redis에서 락 오버헤드가 발생함.
+// RLock 을 통해 Redisson 분산락 적용
+// 하나의 쿠폰 발급에 대한 동시성 제어 가능 및 중복 검증, 재고 감소가 한 트랜잭션에서 이뤄짐
+// 락 획득 시 대기 시간이 존재하여 성능에 저하 가능성이 있음
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class UserCouponCommandServiceV3 {
+public class UserCouponCommandServiceV4_3 {
     private final UserQueryService userQueryService;
     private final CouponQueryService couponQueryService;
     private final CouponRepository couponRepository;
     private final UserCouponRepository userCouponRepository;
     private final UserCouponMapper userCouponMapper;
     private final RedissonClient redissonClient;  // Redis 클라이언트 주입
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
     public UserCouponIssueResponse issueCoupon(Long userId, UserCouponIssueRequest request) {
@@ -95,6 +95,8 @@ public class UserCouponCommandServiceV3 {
 
             UserCoupon userCoupon = UserCoupon.create(user, coupon);
             userCouponRepository.save(userCoupon);
+
+            eventPublisher.publishEvent(new CouponIssueEvent(user.getId(), coupon.getId()));
 
             return userCouponMapper.toCreateResponse(userCoupon);
         } catch (InterruptedException e){

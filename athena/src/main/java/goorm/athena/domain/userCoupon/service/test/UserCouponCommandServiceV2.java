@@ -1,6 +1,7 @@
-package goorm.athena.domain.userCoupon.service;
+package goorm.athena.domain.userCoupon.service.test;
 
 import goorm.athena.domain.coupon.entity.Coupon;
+import goorm.athena.domain.coupon.entity.CouponStatus;
 import goorm.athena.domain.coupon.repository.CouponRepository;
 import goorm.athena.domain.coupon.service.CouponQueryService;
 import goorm.athena.domain.user.entity.User;
@@ -14,62 +15,50 @@ import goorm.athena.global.exception.CustomException;
 import goorm.athena.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.redisson.api.RAtomicLong;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.concurrent.TimeUnit;
-
-// AtomicLong만 사용하여 처리속도가 매우 빠름 ( Redis I/O 비용 최소 )
-// 단순한 구조로 구현이 쉬우나 고동시성 환경에선 불안한 단점이 있 ( 중복 처리 요청 민감 )
+// DB단계에서 락 적용 ( 비관적 락 ), 정합성은 해결됐으나 DB에 부하가 심함
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class UserCouponCommandServiceV4_2 {
+public class UserCouponCommandServiceV2 {
     private final UserQueryService userQueryService;
     private final CouponQueryService couponQueryService;
     private final CouponRepository couponRepository;
     private final UserCouponRepository userCouponRepository;
     private final UserCouponMapper userCouponMapper;
-    private final RedissonClient redissonClient;  // Redis 클라이언트 주입
+
+    private final RedissonClient redissonClient;
 
     @Transactional
-    public void issueCoupon(Long userId, UserCouponIssueRequest request) {
-        Long couponId = request.couponId();
-        String totalKey = "coupon_total_" + couponId;
-        String usedKey = "coupon_used_" + couponId;
-        String successKey = "coupon_success_" + couponId;
+    public UserCouponIssueResponse issueCoupon(Long userId, UserCouponIssueRequest request) {
+        // 락 키를 couponId 기반으로 생성 (쿠폰 단위로 락을 걸음)
+        String lockKey = "coupon_issue_lock_" + request.couponId();
+        RLock lock = redissonClient.getLock(lockKey);
 
-        // 1. 총량 확인
-        RAtomicLong totalAtomic = redissonClient.getAtomicLong(totalKey);
-        RAtomicLong usedAtomic = redissonClient.getAtomicLong(usedKey);
-        RAtomicLong successAtomic = redissonClient.getAtomicLong(successKey);
+        User user = userQueryService.getUser(userId);
+        Coupon coupon = couponRepository.findByIdForUpdate(request.couponId()).orElseThrow(
+                () -> new CustomException(ErrorCode.COUPON_NOT_FOUND)
+        );
 
-        long total = totalAtomic.get();
-        long used = usedAtomic.incrementAndGet(); // ✅ 먼저 선점
-
-        if (used > total) {
-            usedAtomic.decrementAndGet(); // ❌ 선점 취소
-            throw new CustomException(ErrorCode.COUPON_OUT_STOCK);
+        // 1. 발급받을 수 있는 쿠폰인지 확인
+        if (!coupon.getCouponStatus().equals(CouponStatus.IN_PROGRESS)) {
+            throw new CustomException(ErrorCode.INVALID_COUPON_STATUS);
         }
 
-        // 2. 사용자/쿠폰 중복 확인 (조심)
-        User user = userQueryService.getUser(userId);
-        Coupon coupon = couponQueryService.getCoupon(couponId);
-
+        // 2. 이미 발급받은 쿠폰인지 확인
         if (userCouponRepository.existsByUserAndCoupon(user, coupon)) {
-            usedAtomic.decrementAndGet(); // 중복일 경우 롤백
             throw new CustomException(ErrorCode.ALREADY_ISSUED_COUPON);
         }
 
-        // 3. DB 저장
+        coupon.decreaseStock();
+
         UserCoupon userCoupon = UserCoupon.create(user, coupon);
         userCouponRepository.save(userCoupon);
 
-        // 4. 성공 수 증가
-        successAtomic.incrementAndGet();
-
+        return userCouponMapper.toCreateResponse(userCoupon);
     }
 }

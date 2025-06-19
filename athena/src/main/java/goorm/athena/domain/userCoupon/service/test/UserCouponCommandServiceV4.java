@@ -1,10 +1,5 @@
-package goorm.athena.domain.userCoupon.service;
+package goorm.athena.domain.userCoupon.service.test;
 
-import goorm.athena.domain.coupon.service.CouponQueryService;
-import goorm.athena.domain.user.service.UserQueryService;
-import goorm.athena.domain.userCoupon.event.CouponIssueEvent;
-import goorm.athena.domain.userCoupon.mapper.UserCouponMapper;
-import goorm.athena.domain.userCoupon.repository.UserCouponRepository;
 import goorm.athena.global.exception.CustomException;
 import goorm.athena.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;

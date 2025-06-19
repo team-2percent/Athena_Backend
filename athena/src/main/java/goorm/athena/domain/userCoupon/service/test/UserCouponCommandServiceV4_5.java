@@ -1,4 +1,4 @@
-package goorm.athena.domain.userCoupon.service;
+package goorm.athena.domain.userCoupon.service.test;
 
 import goorm.athena.domain.coupon.entity.Coupon;
 import goorm.athena.domain.coupon.service.CouponQueryService;
@@ -28,6 +28,7 @@ import java.util.List;
 /*
     @Async 기반 비동기 처리로 메인에서 Redis 처리 후, 서브 스레드에서 DB 처리 진행함
     비동기 처리로 병렬화가 가능하나 내부 스레드 기반으로 확장성에 한계가 존재함
+    또한, Redis Set을 사용하여 Lock을 사용하지 않음으로써 Lock으로 발생하는 부하를 줄임
  */
 @Service
 @RequiredArgsConstructor
