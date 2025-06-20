@@ -45,7 +45,7 @@ public class UserCouponCommandServiceV4_8 {
         redis.call('INCR', KEYS[2])
         used = used + 1
 
-        if used >= total then
+        if used == total then
             local setFlag = redis.call('SETNX', flagKey, '1')
             if setFlag == 1 then
                 redis.call('EXPIRE', flagKey, 60)
