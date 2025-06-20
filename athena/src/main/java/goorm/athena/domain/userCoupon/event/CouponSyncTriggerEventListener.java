@@ -39,13 +39,11 @@ public class CouponSyncTriggerEventListener {
         int used = Integer.parseInt(usedBucket.get());
 
         int remainingStock = Math.max(0, total - used);
+        coupon.markAsSoldOut(remainingStock); // 재고 설정
         if (remainingStock == 0 && coupon.getCouponStatus() == CouponStatus.IN_PROGRESS) {
-            coupon.markAsSoldOut(remainingStock); // 재고 설정
             coupon.completed();
-            couponRepository.save(coupon);
-        } else {
-            couponRepository.save(coupon);
         }
+        couponRepository.save(coupon);
     }
 }
 
