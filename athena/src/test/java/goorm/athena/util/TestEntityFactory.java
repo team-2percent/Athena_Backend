@@ -148,4 +148,10 @@ public class TestEntityFactory {
         ReflectionTestUtils.setField(userCoupon, "status", status);
         return userCoupon;
     }
+
+    public static Project setupFullProject(User buyer, Category category, ImageGroup imageGroup,
+                                           BankAccount bankAccount, PlatformPlan plan) {
+        return createProject(buyer, category, imageGroup, bankAccount, plan,
+                "프로젝트 제목", "설명", 100_000L, 0L, "마크다운");
+    }
 }

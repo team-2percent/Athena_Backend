@@ -21,16 +21,6 @@ public interface ProjectRepository extends JpaRepository<Project, Long>, JpaSpec
                         "ORDER BY p.views DESC LIMIT :limit")
         List<Project> findTopNWithImageGroupByOrderByViewsDesc(@Param("limit") int limit);
 
-    @Query("""
-            SELECT DISTINCT p.order.project FROM Payment p
-            WHERE p.order.project.endAt < :endAt
-              AND p.order.project.status = 'COMPLETED'
-              AND p.order.project.isApproved = 'APPROVED'
-              AND p.order.project.totalAmount >= p.order.project.goalAmount
-              AND p.order.isSettled = false
-              AND p.status = 'APPROVED'
-            """)
-    List<Project> findProjectsWithUnsettledOrders(@Param("endAt") LocalDateTime endAt);
 
     @Query(value = """
                 SELECT *

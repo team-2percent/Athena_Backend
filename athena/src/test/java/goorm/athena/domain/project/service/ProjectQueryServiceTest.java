@@ -49,9 +49,6 @@ public class ProjectQueryServiceTest extends ProjectIntegrationTestSupport {
   @Autowired
   private BankAccountRepository bankAccountRepository;
 
-  @Autowired
-  private ProjectQueryService projectQueryService;
-
   private Project createProjectWithDependencies(String categoryName, PlanName planName, LocalDateTime startAt,
       LocalDateTime endAt, Long views) {
     categoryName = categoryName == null ? "기타" : categoryName;

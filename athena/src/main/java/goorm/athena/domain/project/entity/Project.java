@@ -75,7 +75,6 @@ public class Project {
     @Enumerated(EnumType.STRING)
     private Status status = Status.QUEUED;
 
-
     private Long views = 0L;
 
     @Builder
@@ -112,7 +111,6 @@ public class Project {
         }
     }
 
-
     public void update(Category category, BankAccount bankAccount,
                        String title, String description, Long goalAmount, String contentMarkdown,
                        LocalDateTime startAt, LocalDateTime endAt, LocalDateTime shippedAt) {
@@ -125,11 +123,6 @@ public class Project {
         this.startAt = startAt;
         this.endAt = endAt;
         this.shippedAt = shippedAt;
-    }
-    
-    // 조회수 증가
-    public void increaseViews(){
-        this.views++;
     }
 
     public void increasePrice(Long price){

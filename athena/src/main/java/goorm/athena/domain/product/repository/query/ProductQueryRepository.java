@@ -28,7 +28,7 @@ public class ProductQueryRepository {
         List<Tuple> results = queryFactory
                 .select(product, option)
                 .from(product)
-                .join(option).on(option.product.eq(product))
+                .leftJoin(option).on(option.product.eq(product))
                 .where(product.project.eq(project))
                 .fetch();
 

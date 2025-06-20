@@ -2,6 +2,7 @@ package goorm.athena.domain.image.service;
 
 import goorm.athena.domain.image.entity.Image;
 import goorm.athena.domain.image.repository.ImageRepository;
+import goorm.athena.domain.imageGroup.entity.ImageGroup;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -37,6 +38,11 @@ public class ImageQueryService {
         return images.stream()
                 .map(Image::getOriginalUrl)
                 .toList();
+    }
+
+    // 모든 이미지 불러오기
+    public List<Image> getAllImages(ImageGroup imageGroup) {
+        return imageRepository.findAllByImageGroup(imageGroup);
     }
 
     /*

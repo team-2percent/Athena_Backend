@@ -80,44 +80,16 @@ public class PaymentCommandService {
             return KakaoPayApproveResponse.ofFailure("카카오페이 연동 실패 발생");
         };
 
-        if (response.tid() == null) {
-            log.warn("카카오 결제 승인 내부 응답값이 올바르지 않음");
-            return KakaoPayApproveResponse.ofFailure("카카오 결제 승인 내부 응답값이 올바르지 않음");
-        }
-
 
         try {
-            payment.approve(pgToken);
-
-//            orderCommendService.decreaseInventory(payment.getOrder().getId()); // 재고 감소
-//            orderCommendService.increaseProjectFunding(orderId); // 누적 가격 증가
-            orderCommendService.postPaymentProcess(orderId); // 재고 감소 ,누적 가격 증가
-
+            orderCommendService.postPaymentProcess(orderId); //상품 재고 감소 ,주문 금액 만큼 프로젝트 누적 가격 증가
+            payment.approve(pgToken); // 결제 상태 변경
             return response;
 
         } catch (Exception e) {
             log.error("결제 승인 후 내부 처리 오류", e);
-            return KakaoPayApproveResponse.ofFailure("걀제 승인 후 재고,누적 처리 오류");
+            return KakaoPayApproveResponse.ofFailure("결제 승인 후 재고,누적 처리 오류");
         }
 
-
-//        KakaoPayApproveResponse response;
-//        try {
-//            response = kakaoPayService
-//                    .approveKakaoPayment(payment.getTid(), requestDto, user);
-//        } catch (Exception e) {
-//            log.error(" 카카오 결제 승인 실패", e);
-//            return KakaoPayApproveResponse.ofFailure();
-//        }
-
-//        payment.approve(pgToken);
-//
-//        List<OrderItem> orderItems = orderItemRepository.findByOrderId(payment.getOrder().getId());
-//        for (OrderItem item : orderItems) {
-//            item.getProduct().decreaseStock(item.getQuantity());
-//            item.getOrder().getProject().increasePrice(item.getPrice());
-//        }
-//        return KakaoPayApproveResponse.ofSuccess(response);
-//    }
     }
 }

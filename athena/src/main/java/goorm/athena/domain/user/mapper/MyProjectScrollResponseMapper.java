@@ -30,7 +30,7 @@ public class MyProjectScrollResponseMapper {
                         p.createdAt(),
                         p.endAt(),
                         p.achievementRate(),
-                        imageQueryService.getFullUrl(p.imageUrl())
+                        p.imageUrl()
                 ))
                 .collect(Collectors.toList());
 

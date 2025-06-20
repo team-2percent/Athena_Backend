@@ -1,8 +1,6 @@
 package goorm.athena.domain.image.service;
 
-import goorm.athena.domain.image.dto.req.ImageCreateRequest;
 import goorm.athena.domain.image.entity.Image;
-import goorm.athena.domain.image.mapper.ImageMapper;
 import goorm.athena.domain.image.repository.ImageRepository;
 import goorm.athena.domain.imageGroup.entity.ImageGroup;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +18,6 @@ import goorm.athena.global.exception.ErrorCode;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.IntStream;
 
 @Transactional
 @RequiredArgsConstructor
@@ -33,14 +30,12 @@ public class ImageCommandService {
     @Value("${image.server.url}")
     private String baseImageUrl;
 
-    private final ImageQueryService imageQueryService;
-    private final ImageMapper imageMapper;
-
     // 단일 이미지 업로드
     public String uploadImage(MultipartFile file, ImageGroup imageGroup) {
         return uploadImage(file, imageGroup, 0L);
     }
 
+    // 실제 업로드 로직
     public String uploadImage(MultipartFile file, ImageGroup imageGroup, Long imageIndex) {
         String originalFilename = file.getOriginalFilename();
 
@@ -61,8 +56,7 @@ public class ImageCommandService {
                     .retrieve()
                     .toEntity(String.class)
                     .block();
-
-
+                    
             if (response.getStatusCode() == HttpStatus.CREATED) { // 201
                 Image image = Image.builder()
                         .imageGroup(imageGroup)
@@ -84,7 +78,7 @@ public class ImageCommandService {
     // 다중 이미지 업로드
     // 이미지 인덱스는 항상 1부터 시작하며, 0은 마크다운을 나타낸다.
     public void uploadImages(List<MultipartFile> files, ImageGroup imageGroup) {
-        Long imageIndex = 1L;
+        long imageIndex = 1L;
         for (MultipartFile file : files) {
             uploadImage(file, imageGroup, imageIndex++);
         }
@@ -92,11 +86,10 @@ public class ImageCommandService {
 
     // 마크다운 이미지 저장 및 주소 반환
     public List<String> uploadMarkdownImages(List<MultipartFile> files, ImageGroup imageGroup) {
-        List<String> imageUrls = files.stream()
+
+        return files.stream()
                 .map(file -> uploadImage(file, imageGroup))
                 .toList();
-
-        return imageUrls;
     }
 
     // 이미지 단일 삭제
@@ -109,7 +102,7 @@ public class ImageCommandService {
                     .toEntity(String.class)
                     .block();
 
-            if (response.getStatusCode() == HttpStatus.OK) {
+            if (response.getStatusCode() == HttpStatus.NO_CONTENT || response.getStatusCode() == HttpStatus.OK) {    // 204
                 imageRepository.delete(image);
             }
         } catch (Exception e) {

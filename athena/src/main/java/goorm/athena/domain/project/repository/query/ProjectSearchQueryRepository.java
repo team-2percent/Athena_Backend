@@ -86,7 +86,7 @@ public class ProjectSearchQueryRepository {
                 .map(dto -> new ProjectSearchResponse(
                         dto.id(),
                         StringUtils.hasText(dto.imageUrl())
-                                ? imageQueryService.getFullUrl(dto.imageUrl().trim())
+                                ? dto.imageUrl().trim()
                                 : null,
                         dto.sellerName(),
                         dto.title(),
