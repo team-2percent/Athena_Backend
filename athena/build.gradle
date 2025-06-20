@@ -87,6 +87,10 @@ dependencies {
 
 	// WebClient
 	implementation 'org.springframework.boot:spring-boot-starter-webflux'
+	
+	// for 모니터링
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+	implementation 'io.micrometer:micrometer-registry-prometheus'
 }
 
 test {

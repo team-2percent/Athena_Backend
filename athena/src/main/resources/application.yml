@@ -76,6 +76,20 @@ firebase:
   clientId: ${FIREBASE_CLIENT_ID}
   clientX509CertUrl: ${FIREBASE_CLIENT_X509_CERT_URL}
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: prometheus,health,info,metrics
+      base-path: /actuator
+  health:
+    probes:
+      enabled: true
+  endpoint:
+    health:
+      show-details: always
+    prometheus:
+      enabled: true
 ---
 
 spring:
