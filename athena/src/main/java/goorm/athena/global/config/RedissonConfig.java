@@ -23,10 +23,8 @@ public class RedissonConfig {
     public RedissonClient redissonClient() {
         Config config = new Config();
         config.useSingleServer()
-                .setAddress("redis://" + redisHost + ":" + redisPort)  // 하드코딩
+                .setAddress("redis://" + redisHost + ":" + redisPort)
                 .setPassword(redisPassword)
-                .setConnectionMinimumIdleSize(5)
-                .setConnectionPoolSize(64)
                 .setTimeout(10000)
                 .setConnectTimeout(10000)
                 .setRetryAttempts(3)
