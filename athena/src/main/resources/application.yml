@@ -76,6 +76,13 @@ firebase:
   clientId: ${FIREBASE_CLIENT_ID}
   clientX509CertUrl: ${FIREBASE_CLIENT_X509_CERT_URL}
 
+opentracing:
+  jaeger:
+    service-name: gateway-svc # jaeger service name
+    udp-sender:
+      host: 15.164.171.211 # jaeger server ip
+      port: 6831           # jaeger udp port
+
 ---
 
 spring:
