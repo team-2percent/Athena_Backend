@@ -41,9 +41,6 @@ public class UserCouponControllerImpl implements UserCouponController {
                                                                @RequestBody UserCouponIssueRequest request){
         userCouponCommandService.issueCoupon(loginUserRequest.userId(), request);
 
-        String couponTitle = userCouponQueryService.getCouponTitle(request.couponId());
-        fcmNotificationService.notifyCoupon(couponTitle);
-
         return ResponseEntity.noContent().build();
     }
 
@@ -68,9 +65,6 @@ public class UserCouponControllerImpl implements UserCouponController {
                                                                @RequestBody UserCouponIssueRequest request){
         userCouponCommandServiceV1.issueCoupon(loginUserRequest.userId(), request);
 
-        String couponTitle = userCouponQueryService.getCouponTitle(request.couponId());
-        fcmNotificationService.notifyCoupon(couponTitle);
-
         return ResponseEntity.noContent().build();
     }
 
@@ -79,9 +73,6 @@ public class UserCouponControllerImpl implements UserCouponController {
     public ResponseEntity<UserCouponIssueResponse> issueCouponWithDBLock(@CheckLogin LoginUserRequest loginUserRequest,
                                                                                 @RequestBody UserCouponIssueRequest request){
         userCouponCommandServiceV2.issueCoupon(loginUserRequest.userId(), request);
-
-        String couponTitle = userCouponQueryService.getCouponTitle(request.couponId());
-        fcmNotificationService.notifyCoupon(couponTitle);
 
         return ResponseEntity.noContent().build();
     }
@@ -92,9 +83,6 @@ public class UserCouponControllerImpl implements UserCouponController {
                                                                          @RequestBody UserCouponIssueRequest request){
         userCouponCommandServiceV3.issueCoupon(loginUserRequest.userId(), request);
 
-        String couponTitle = userCouponQueryService.getCouponTitle(request.couponId());
-        fcmNotificationService.notifyCoupon(couponTitle);
-
         return ResponseEntity.noContent().build();
     }
 
@@ -103,9 +91,6 @@ public class UserCouponControllerImpl implements UserCouponController {
     public ResponseEntity<UserCouponIssueResponse> issueCouponWithRedisAtomic(@CheckLogin LoginUserRequest loginUserRequest,
                                                                             @RequestBody UserCouponIssueRequest request){
         userCouponCommandServiceV4_2.issueCoupon(loginUserRequest.userId(), request);
-
-        String couponTitle = userCouponQueryService.getCouponTitle(request.couponId());
-        fcmNotificationService.notifyCoupon(couponTitle);
 
         return ResponseEntity.noContent().build();
     }
@@ -116,9 +101,6 @@ public class UserCouponControllerImpl implements UserCouponController {
                                                                               @RequestBody UserCouponIssueRequest request){
         userCouponCommandServiceV4_3.issueCoupon(loginUserRequest.userId(), request);
 
-        String couponTitle = userCouponQueryService.getCouponTitle(request.couponId());
-        fcmNotificationService.notifyCoupon(couponTitle);
-
         return ResponseEntity.noContent().build();
     }
 
@@ -128,9 +110,6 @@ public class UserCouponControllerImpl implements UserCouponController {
                                                                                        @RequestBody UserCouponIssueRequest request){
         userCouponCommandServiceV4_4.issueCoupon(loginUserRequest.userId(), request);
 
-        String couponTitle = userCouponQueryService.getCouponTitle(request.couponId());
-        fcmNotificationService.notifyCoupon(couponTitle);
-
         return ResponseEntity.noContent().build();
     }
 
@@ -139,9 +118,6 @@ public class UserCouponControllerImpl implements UserCouponController {
     public ResponseEntity<UserCouponIssueResponse> issueCouponWithLuaScriptAsync(@CheckLogin LoginUserRequest loginUserRequest,
                                                                             @RequestBody UserCouponIssueRequest request){
         userCouponCommandServiceV4_5.issueCoupon(loginUserRequest.userId(), request);
-
-        String couponTitle = userCouponQueryService.getCouponTitle(request.couponId());
-        fcmNotificationService.notifyCoupon(couponTitle);
 
         return ResponseEntity.noContent().build();
     }
@@ -157,9 +133,6 @@ public class UserCouponControllerImpl implements UserCouponController {
     public ResponseEntity<UserCouponIssueResponse> issueCouponWithLuaAndJavaCheck(@CheckLogin LoginUserRequest loginUserRequest,
                                                                                  @RequestBody UserCouponIssueRequest request){
         userCouponCommandServiceV4_6.issueCoupon(loginUserRequest.userId(), request);
-
-        String couponTitle = userCouponQueryService.getCouponTitle(request.couponId());
-        fcmNotificationService.notifyCoupon(couponTitle);
 
         return ResponseEntity.noContent().build();
     }
@@ -178,9 +151,6 @@ public class UserCouponControllerImpl implements UserCouponController {
                                                                                   @RequestBody UserCouponIssueRequest request){
         userCouponCommandServiceV4_7.issueCoupon(loginUserRequest.userId(), request);
 
-        String couponTitle = userCouponQueryService.getCouponTitle(request.couponId());
-        fcmNotificationService.notifyCoupon(couponTitle);
-
         return ResponseEntity.noContent().build();
     }
 
@@ -197,9 +167,6 @@ public class UserCouponControllerImpl implements UserCouponController {
     public ResponseEntity<UserCouponIssueResponse> issueCouponWithLuaAndStockAsync8(@CheckLogin LoginUserRequest loginUserRequest,
                                                                                    @RequestBody UserCouponIssueRequest request){
         userCouponCommandServiceV4_8.issueCoupon(loginUserRequest.userId(), request);
-
-        String couponTitle = userCouponQueryService.getCouponTitle(request.couponId());
-        fcmNotificationService.notifyCoupon(couponTitle);
 
         return ResponseEntity.noContent().build();
     }
