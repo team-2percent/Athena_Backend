@@ -41,4 +41,7 @@ public interface CouponController {
     @PostMapping("/scheduler")
     public void scheduleUpdateCoupon();
 
+    @Operation(summary = "쿠폰 재고 동기 API", description = "쿠폰의 재고 동기를 수동으로 작동합니다.")
+    @PostMapping("/schedulerSync")
+    public void scheduleSync();
 }
