@@ -8,10 +8,12 @@ import goorm.athena.domain.notification.entity.FcmToken;
 import goorm.athena.global.exception.CustomException;
 import goorm.athena.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class FcmNotificationService {
@@ -46,7 +48,6 @@ public class FcmNotificationService {
         allTokens.forEach(token ->
                 send(token.getToken(), fcmMessage)
         );
-
     }
 
     private void sendToUser(Long userId, FcmMessageFactory.FcmMessage fcmMessage){
@@ -57,7 +58,7 @@ public class FcmNotificationService {
     }
 
     // 실제 알림 전송 로직
-    private void send(String token, FcmMessageFactory.FcmMessage fcmMessage) {
+    public void send(String token, FcmMessageFactory.FcmMessage fcmMessage) {
         try{
             Message message = Message.builder()
                     .setToken(token)
@@ -67,9 +68,14 @@ public class FcmNotificationService {
                             .build())
                     .build();
 
-            FirebaseMessaging.getInstance().send(message);  // 알림 보내기
+            String response = FirebaseMessaging.getInstance().send(message);  // 알림 보내기
+            log.info("[FCM SUCCESS]: token={}, response={}", token, response);
         } catch(FirebaseMessagingException e){
-            e.printStackTrace();
+            log.error("[FCM ERROR] Code={}, Message={}, HttpCode={}",
+                    e.getMessagingErrorCode(), e.getMessage(), e.getHttpResponse().getStatusCode());
+            throw new CustomException(ErrorCode.FAILED_TO_SEND);
+        } catch (Exception e) {
+            log.error("[FCM UNKNOWN ERROR] {}", e.getMessage(), e); // 전체 스택까지 찍기
             throw new CustomException(ErrorCode.FAILED_TO_SEND);
         }
     }
