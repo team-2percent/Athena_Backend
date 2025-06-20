@@ -42,6 +42,7 @@ public class CouponSyncTriggerEventListener {
         if (remainingStock == 0 && coupon.getCouponStatus() == CouponStatus.IN_PROGRESS) {
             coupon.markAsSoldOut(remainingStock); // 재고 설정
             coupon.completed();
+            couponRepository.save(coupon);
         } else {
             couponRepository.save(coupon);
         }
