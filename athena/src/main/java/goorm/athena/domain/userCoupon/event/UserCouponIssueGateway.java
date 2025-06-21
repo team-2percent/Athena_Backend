@@ -26,7 +26,6 @@ public class UserCouponIssueGateway {
                 userCouponStockOperation.removeUserFromIssuedSet(couponId, userId);
                 if(luaResult == 1 || luaResult == 2){
                     eventPublisher.publishEvent(new CouponRollbackEvent(couponId));
-                  //  throw new RuntimeException("유저 쿠폰 롤백 중 에러 발생");
                 }
             } catch (Exception rollbackEx) {
                 log.error("[Redis 롤백 실패] couponId: {}, rollbackEx: {}", couponId, rollbackEx.getMessage(), rollbackEx);

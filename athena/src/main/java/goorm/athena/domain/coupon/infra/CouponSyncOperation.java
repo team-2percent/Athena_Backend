@@ -5,7 +5,7 @@ import goorm.athena.domain.coupon.entity.CouponStatus;
 import goorm.athena.domain.coupon.repository.CouponRepository;
 import goorm.athena.domain.coupon.service.CouponQueryService;
 import lombok.RequiredArgsConstructor;
-import org.redisson.api.RBucket;
+import org.redisson.api.RMap;
 import org.redisson.api.RedissonClient;
 import org.redisson.client.codec.StringCodec;
 import org.springframework.stereotype.Component;
@@ -23,14 +23,14 @@ public class CouponSyncOperation {
     public void syncCouponStock(Long couponId){
         Coupon coupon = couponQueryService.getCoupon(couponId);
 
-        String totalKey = "coupon_total_" + couponId;
-        String usedKey = "coupon_used_" + couponId;
+        String metaKey = "coupon_meta_" + couponId;
+        RMap<String, String> couponMeta = redissonClient.getMap(metaKey, StringCodec.INSTANCE);
 
-        RBucket<String> totalBucket = redissonClient.getBucket(totalKey, StringCodec.INSTANCE);
-        RBucket<String> usedBucket = redissonClient.getBucket(usedKey, StringCodec.INSTANCE);
+        String totalKey = couponMeta.get("total");
+        String usedKey = couponMeta.get("used");
 
-        int total = Integer.parseInt(totalBucket.get());
-        int used = Integer.parseInt(usedBucket.get());
+        int total = Integer.parseInt(totalKey);
+        int used = usedKey != null ? Integer.parseInt(usedKey) : 0;
 
         int remainingStock = Math.max(0, total - used);
         coupon.stockSync(remainingStock); // 재고 설정
