@@ -14,6 +14,10 @@ import goorm.athena.domain.userCoupon.repository.UserCouponRepository;
 import goorm.athena.global.exception.CustomException;
 import goorm.athena.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
+import org.redisson.api.RBucket;
+import org.redisson.api.RSet;
+import org.redisson.api.RedissonClient;
+import org.redisson.client.codec.StringCodec;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,6 +28,7 @@ public class UserCouponCommandService {
     private final CouponQueryService couponQueryService;
     private final UserCouponRepository userCouponRepository;
     private final UserCouponMapper userCouponMapper;
+    private final RedissonClient redissonClient;
 
     @Transactional
     public UserCouponIssueResponse issueCoupon(Long userId, UserCouponIssueRequest request){
@@ -63,4 +68,12 @@ public class UserCouponCommandService {
         }
     }
 
+    @Transactional
+    public void issueUserCoupon(Long userId, Long couponId){
+        User user = userQueryService.getUser(userId);
+        Coupon coupon = couponQueryService.getCoupon(couponId);
+
+        UserCoupon userCoupon = UserCoupon.create(user, coupon);
+        userCouponRepository.save(userCoupon);
+    }
 }
