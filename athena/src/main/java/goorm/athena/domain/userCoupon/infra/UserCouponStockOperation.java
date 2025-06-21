@@ -77,11 +77,4 @@ public class UserCouponStockOperation {
         RSet<String> issuedSet = redissonClient.getSet(key, StringCodec.INSTANCE);
         issuedSet.remove(String.valueOf(userId));
     }
-
-    public void rollbackRedisStock(Long couponId) {
-        String usedKey = "coupon_used_" + couponId;
-        RBucket<Integer> usedBucket = redissonClient.getBucket(usedKey);
-        // Redis 사용 카운트 원복 (감소)
-        usedBucket.getAndSet(usedBucket.get() - 1);
-    }
 }
