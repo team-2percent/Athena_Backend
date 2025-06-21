@@ -1,8 +1,8 @@
 package goorm.athena.domain.userCoupon.service.test;
 
 import goorm.athena.domain.userCoupon.dto.req.UserCouponIssueRequest;
-import goorm.athena.domain.userCoupon.event.CouponIssueEvent;
-import goorm.athena.domain.userCoupon.event.CouponSyncTriggerEvent;
+import goorm.athena.domain.userCoupon.event.UserCouponIssueEvent;
+import goorm.athena.domain.coupon.event.CouponSyncTriggerEvent;
 import goorm.athena.global.exception.CustomException;
 import goorm.athena.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -71,7 +71,7 @@ public class UserCouponCommandServiceV4_7 {
             int result = checkAndDecreaseRedisStock(couponId);
 
             // 3. 발급 성공 시 이벤트 발행
-            eventPublisher.publishEvent(new CouponIssueEvent(userId, couponId));
+            eventPublisher.publishEvent(new UserCouponIssueEvent(userId, couponId, result));
 
             // 4. 재고 소진 플래그가 Lua 스크립트에서 세팅되었을 경우 동기화 이벤트 발행
             if (result == 2) {

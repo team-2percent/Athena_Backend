@@ -7,7 +7,6 @@ import goorm.athena.domain.user.service.UserQueryService;
 import goorm.athena.domain.userCoupon.dto.req.UserCouponIssueRequest;
 import goorm.athena.domain.userCoupon.dto.res.UserCouponIssueResponse;
 import goorm.athena.domain.userCoupon.entity.UserCoupon;
-import goorm.athena.domain.userCoupon.event.CouponIssueEvent;
 import goorm.athena.domain.userCoupon.mapper.UserCouponMapper;
 import goorm.athena.domain.userCoupon.repository.UserCouponRepository;
 import goorm.athena.global.exception.CustomException;
@@ -96,7 +95,6 @@ public class UserCouponCommandServiceV4_4 {
     public UserCouponIssueResponse issueCoupon(Long userId, UserCouponIssueRequest request) {
         checkAndDecreaseRedisStock(request.couponId()); // Redis 처리
         UserCouponIssueResponse response = saveCouponIssue(userId, request.couponId()); // DB 저장
-        eventPublisher.publishEvent(new CouponIssueEvent(userId, request.couponId())); // 이벤트 발행
         return response;
     }
 }
