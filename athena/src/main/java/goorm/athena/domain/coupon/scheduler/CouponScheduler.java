@@ -4,7 +4,7 @@ import goorm.athena.domain.coupon.entity.Coupon;
 import goorm.athena.domain.coupon.entity.CouponStatus;
 import goorm.athena.domain.coupon.repository.CouponQueryRepository;
 import goorm.athena.domain.coupon.repository.CouponRepository;
-import goorm.athena.domain.userCoupon.event.CouponSyncTriggerEvent;
+import goorm.athena.domain.coupon.event.CouponSyncTriggerEvent;
 import lombok.RequiredArgsConstructor;
 import org.redisson.api.RedissonClient;
 import org.springframework.context.ApplicationEventPublisher;
