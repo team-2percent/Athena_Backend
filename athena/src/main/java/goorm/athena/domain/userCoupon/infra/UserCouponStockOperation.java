@@ -18,9 +18,9 @@ public class UserCouponStockOperation {
     private final RedissonClient redissonClient;
 
     private static final String LUA_SCRIPT = """
-        local total = tonumber(redis.call('GET', KEYS[1]))
-        local used = tonumber(redis.call('GET', KEYS[2])) or 0
-        local flagKey = KEYS[3]
+        local metaKey = KEYS[1]
+        local total = tonumber(redis.call('HGET', metaKey, 'total'))
+        local used = tonumber(redis.call('HGET', metaKey, 'used')) or 0
 
         if not total then
             return -1  -- 쿠폰 없음
@@ -30,13 +30,13 @@ public class UserCouponStockOperation {
             return 0  -- 품절
         end
 
-        redis.call('INCR', KEYS[2])
+        redis.call('HINCRBY', metaKey, 'used', 1)
         used = used + 1
 
         if used == total then
-            local setFlag = redis.call('SETNX', flagKey, '1')
-            if setFlag == 1 then
-                redis.call('EXPIRE', flagKey, 60)
+            local isTriggered = redis.call('HGET', metaKey, 'sync_triggered')
+            if isTriggered == 1 then
+                redis.call('EXPIRE', metaKey, 600)
                 return 2  -- 마지막 쿠폰 발급 + 플래그 세팅 완료
             else
                 return 2  -- 플래그 이미 세팅됨
@@ -47,11 +47,9 @@ public class UserCouponStockOperation {
     """;
 
     public int checkAndDecreaseRedisStock(Long couponId) {
-        String totalKey = "coupon_total_" + couponId;
-        String usedKey = "coupon_used_" + couponId;
-        String flagKey = "coupon_sync_triggered_" + couponId;
+        String metaKey = "coupon_meta_" + couponId;
 
-        List<Object> keys = List.of(totalKey, usedKey, flagKey);
+        List<Object> keys = List.of(metaKey);
         RScript script = redissonClient.getScript();
 
         Long result = script.eval(RScript.Mode.READ_WRITE, LUA_SCRIPT, RScript.ReturnType.INTEGER, keys);

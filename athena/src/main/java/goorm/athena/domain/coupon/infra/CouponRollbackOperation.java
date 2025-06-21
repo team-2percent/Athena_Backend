@@ -19,18 +19,18 @@ public class CouponRollbackOperation {
             return -1
         end
         redis.call('SET', rollbackFlagKey, '1', 'EX', 30)
-        local used = tonumber(redis.call('GET', KEYS[1]) or '0')
+        local used = tonumber(redis.call('HGET', KEYS[1], 'used') or '0')
         if used <= 0 then
             redis.call('DEL', rollbackFlagKey)
             return 0
         end
-        redis.call('DECR', KEYS[1])
+        redis.call('HINCRBY', KEYS[1], 'used', -1)
         redis.call('DEL', rollbackFlagKey)
         return 1
     """;
 
     public void rollbackRedisStock(Long couponId) {
-        String usedKey = "coupon_used_" + couponId;
+        String metaKey = "coupon_meta_" + couponId;
         String flagKey = "rollback_flag_" + couponId;
 
         RScript script = redissonClient.getScript();
@@ -38,7 +38,7 @@ public class CouponRollbackOperation {
             RScript.Mode.READ_WRITE,
             LUA_ROLLBACK_SCRIPT,
             RScript.ReturnType.INTEGER,
-            List.of(usedKey, flagKey)
+            List.of(metaKey, flagKey)
         );
 
         if (result == null || result <= 0) {
