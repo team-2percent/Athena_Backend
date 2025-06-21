@@ -57,15 +57,16 @@ public class PaymentCommandService1 {
     public void approvePayment(String pgToken, Long orderId) {
         Payment payment = getPayment(orderId);
 
-        postApproveProcess(orderId, pgToken);
+//        postApproveProcess(orderId, pgToken);
+        postApproveProcess(orderId);
         eventPublisher.publishEvent(new KakaoPayApproveEvent(payment, pgToken));
     }
 
     @Transactional
-    public void postApproveProcess(Long orderId, String pgToken) {
-        Payment payment = getPayment(orderId);
+    public void postApproveProcess(Long orderId) {
+//        Payment payment = getPayment(orderId);
         orderCommendService.postPaymentProcess(orderId); // 재고 감소, 누적 후원액 증가 등
-        payment.approve(pgToken); // 결제 상태 변경
+//        payment.approve(pgToken); // 결제 상태 변경
     }
 
     private Payment getPayment(Long orderId) {
