@@ -3,7 +3,6 @@ package goorm.athena.domain.userCoupon.infra;
 import goorm.athena.global.exception.CustomException;
 import goorm.athena.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
-import org.redisson.api.RBucket;
 import org.redisson.api.RScript;
 import org.redisson.api.RSet;
 import org.redisson.api.RedissonClient;
