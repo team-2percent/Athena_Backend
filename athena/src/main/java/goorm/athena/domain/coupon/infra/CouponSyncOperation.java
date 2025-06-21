@@ -1,32 +1,26 @@
-package goorm.athena.domain.userCoupon.event;
+package goorm.athena.domain.coupon.infra;
 
 import goorm.athena.domain.coupon.entity.Coupon;
 import goorm.athena.domain.coupon.entity.CouponStatus;
 import goorm.athena.domain.coupon.repository.CouponRepository;
 import goorm.athena.domain.coupon.service.CouponQueryService;
-import goorm.athena.domain.notification.service.FcmNotificationService;
-import goorm.athena.domain.user.service.UserQueryService;
-import goorm.athena.domain.userCoupon.repository.UserCouponRepository;
 import lombok.RequiredArgsConstructor;
 import org.redisson.api.RBucket;
 import org.redisson.api.RedissonClient;
 import org.redisson.client.codec.StringCodec;
-import org.springframework.context.event.EventListener;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 @Component
 @RequiredArgsConstructor
-public class CouponSyncTriggerEventListener {
+public class CouponSyncOperation {
 
+    private final RedissonClient redissonClient;
     private final CouponQueryService couponQueryService;
     private final CouponRepository couponRepository;
-    private final RedissonClient redissonClient;
 
-    @Async
-    @EventListener
-    public void handleCouponSyncTriggerEvent(CouponSyncTriggerEvent event) {
-        Long couponId = event.couponId();
+    @Transactional
+    public void syncCouponStock(Long couponId){
         Coupon coupon = couponQueryService.getCoupon(couponId);
 
         String totalKey = "coupon_total_" + couponId;
@@ -39,11 +33,12 @@ public class CouponSyncTriggerEventListener {
         int used = Integer.parseInt(usedBucket.get());
 
         int remainingStock = Math.max(0, total - used);
-        coupon.markAsSoldOut(remainingStock); // 재고 설정
+        coupon.stockSync(remainingStock); // 재고 설정
+
         if (remainingStock == 0 && coupon.getCouponStatus() == CouponStatus.IN_PROGRESS) {
             coupon.completed();
         }
+
         couponRepository.save(coupon);
     }
 }
-
