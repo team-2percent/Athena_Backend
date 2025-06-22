@@ -28,6 +28,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class OrderCommendService {
 
     private final OrderRepository orderRepository;
@@ -37,7 +38,6 @@ public class OrderCommendService {
     private final UserQueryService userQueryService;
     private final DeliveryInfoQueryService deliveryInfoQueryService;
 
-    @Transactional
     public OrderCreateResponse createOrder(Long userId, OrderCreateRequest request) {
 
         User user = userQueryService.getUser(userId);
@@ -79,6 +79,20 @@ public class OrderCommendService {
             item.getProduct().decreaseStock(item.getQuantity());
             item.getOrder().getProject().increasePrice(item.getPrice());
         }
+    }
+
+
+    public void rollbackStock(Long orderId) {
+        List<OrderItem> orderItems = orderItemRepository.findByOrderId(orderId);
+
+        for (OrderItem item : orderItems) {
+            item.getProduct().increaseStock(item.getQuantity());
+            item.getOrder().getProject().decreasePrice(item.getPrice());
+        }
+
+        Order order = orderItems.get(0).getOrder();
+        order.cancel();
+
     }
 
 }
