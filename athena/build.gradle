@@ -25,6 +25,13 @@ repositories {
     maven { url 'https://jitpack.io' }
 }
 
+dependencyManagement {
+	imports {
+		mavenBom("io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom:2.6.0")
+	}
+}
+
+
 dependencies {
 
 	implementation 'org.springframework.boot:spring-boot-starter-security'
@@ -87,6 +94,10 @@ dependencies {
 
 	// WebClient
 	implementation 'org.springframework.boot:spring-boot-starter-webflux'
+
+	// Jaeger
+	implementation "io.opentelemetry.instrumentation:opentelemetry-spring-boot-starter"
+	implementation "io.opentelemetry:opentelemetry-exporter-jaeger:1.34.1"
 }
 
 test {

@@ -74,9 +74,9 @@ public class KakaoPayImpl implements KakaoPay {
     }
 
     @Override
-    public KakaoPayApproveResponse approveKakaoPayment(KakaoPayApproveRequest approveRequest) {
+    public KakaoPayApproveResponse approveKakaoPayment(KakaoPayApproveEvent event) {
 
-        HttpEntity<String> entity = createPaymentApproveEntity(approveRequest);
+        HttpEntity<String> entity = createPaymentApproveEntity(event);
 
         ResponseEntity<KakaoPayApproveResponse> response = restTemplate.exchange(
                 KAKAO_PAY_APPROVE_URL,
@@ -113,13 +113,16 @@ public class KakaoPayImpl implements KakaoPay {
         return createHttpEntity(params);
     }
 
-    private HttpEntity<String> createPaymentApproveEntity(KakaoPayApproveRequest dto) {
+    private HttpEntity<String> createPaymentApproveEntity(KakaoPayApproveEvent event) {
+        Payment payment = event.getPayment();
+        String pgToken = event.getPgToken();
+
         Map<String, Object> params = new HashMap<>();
         params.put("cid", cid);
-        params.put("tid", dto.tid());
-        params.put("partner_order_id", dto.orderId());
-        params.put("partner_user_id", dto.userId());
-        params.put("pg_token", dto.pgToken());
+        params.put("tid", payment.getTid());
+        params.put("partner_order_id", payment.getOrder().getId());
+        params.put("partner_user_id", payment.getUser().getId());
+        params.put("pg_token", pgToken);
 
         return createHttpEntity(params);
     }

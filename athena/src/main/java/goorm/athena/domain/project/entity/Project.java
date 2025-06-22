@@ -129,5 +129,9 @@ public class Project {
         this.totalAmount += price;
     }
 
+    public void decreasePrice(Long price) {
+        this.totalAmount -= price;
+
+    }
 
 }

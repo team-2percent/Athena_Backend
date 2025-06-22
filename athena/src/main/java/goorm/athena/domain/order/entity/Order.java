@@ -60,4 +60,8 @@ public class Order {
     public void markAsSettled() {
         this.isSettled = true;
     }
+
+    public void cancel() {
+        this.status = Status.CANCELED;
+    }
 }

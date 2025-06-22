@@ -47,6 +47,10 @@ public class Product {
         this.stock = stock;
     }
 
+    public void increaseStock(int quantity) {
+        this.stock += quantity;
+    }
+
     public void decreaseStock(int quantity) {
         if (this.stock < quantity) {
             throw new CustomException(ErrorCode.INSUFFICIENT_INVENTORY);
