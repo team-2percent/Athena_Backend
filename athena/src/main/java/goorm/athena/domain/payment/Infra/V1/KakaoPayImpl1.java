@@ -43,7 +43,13 @@ public class KakaoPayImpl1 implements KakaoPay {
         params.put("quantity", dto.quantity());
         params.put("total_amount", dto.totalAmount());
 
-        return sendPost(url, params, KakaoPayReadyResponse.class);
+        KakaoPayReadyResponse response = sendPost(url, params, KakaoPayReadyResponse.class);
+
+        return new KakaoPayReadyResponse(
+                response.next_redirect_pc_url(),
+                response.tid(),
+                orderId
+        );
     }
 
     @Override
