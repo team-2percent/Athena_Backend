@@ -31,6 +31,7 @@ spring:
 
   kakao:
     api:
+      base-url: "http://localhost:8081/kakao"
       cid: ${KAKAO_API_CID}
       admin-key: ${KAKAO_API_ADMIN_KEY}
       approval-url: ${KAKAO_API_APPROVAL_URL}
@@ -82,10 +83,14 @@ firebase:
 otel:
   exporter:
     otlp:
-      protocol: grpc
+      protocol : grpc
       endpoint: http://localhost:4317
   traces:
     exporter: jaeger
+  logs:
+    exporter: none
+  metrics:
+    exporter: none
 
 ---
 
