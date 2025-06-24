@@ -18,7 +18,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
+
+import java.util.Random;
 
 @Slf4j
 @Component
@@ -30,6 +35,7 @@ public class PaymentCommandService2 {
     private final OrderQueryService orderQueryService;
     private final PaymentRepository paymentRepository;
     private final ApplicationEventPublisher eventPublisher;
+    private final PlatformTransactionManager transactionManager;
 
     public KakaoPayReadyResponse readyPayment(Long orderId) {
         Order order = orderQueryService.getById(orderId);
@@ -53,9 +59,43 @@ public class PaymentCommandService2 {
     }
 
     public void approvePayment(String pgToken, Long orderId) {
+//        Payment payment = getPayment(orderId);
+//        postApproveProcess(orderId);
+//
+//
+//        eventPublisher.publishEvent(new KakaoPayApproveEvent(payment, pgToken));
         Payment payment = getPayment(orderId);
-        postApproveProcess(orderId);
+        int retries = 5;
+
+        while (retries > 0) {
+            TransactionStatus status = transactionManager.getTransaction(new DefaultTransactionDefinition());
+
+            try {
+                orderCommendService.postPaymentProcess(orderId);
+                transactionManager.commit(status);
+                break;
+            } catch (Exception e) {
+                transactionManager.rollback(status);
+                retries--;
+                try {
+                    Thread.sleep(100 + new Random().nextInt(100));
+                } catch (InterruptedException ie) {
+                    Thread.currentThread().interrupt(); // 인터럽트 상태 복구
+                    throw new CustomException(ErrorCode.SLEEP_THREAD);
+                }
+
+                if (retries == 0) {
+                    // 최대 재시도 초과 후 실패
+                    log.error("최대 재시도 초과", e);
+                    throw new CustomException(ErrorCode.PAYMENT_RETRY_OVER);
+                }
+
+            }
+        }
+
         eventPublisher.publishEvent(new KakaoPayApproveEvent(payment, pgToken));
+
+
     }
 
     @Transactional

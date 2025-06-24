@@ -47,8 +47,8 @@ public class KakaoPayImpl1 implements KakaoPay {
 
         return new KakaoPayReadyResponse(
                 response.next_redirect_pc_url(),
-                response.tid(),
-                orderId
+                response.tid()
+//                orderId
         );
     }
 

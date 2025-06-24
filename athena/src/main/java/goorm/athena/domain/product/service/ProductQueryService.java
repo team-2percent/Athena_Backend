@@ -41,4 +41,10 @@ public class ProductQueryService {
                 .map(productMapper::toDto)
                 .toList();
     }
+
+    public Product getProductWithLock(Long productId) {
+        return productRepository.findByIdWithLock(productId)
+                .orElseThrow(() -> new RuntimeException("Product not found"));
+    }
+
 }

@@ -24,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -37,6 +38,7 @@ public class OrderCommendService {
     private final ProjectQueryService projectQueryService;
     private final UserQueryService userQueryService;
     private final DeliveryInfoQueryService deliveryInfoQueryService;
+
 
     public OrderCreateResponse createOrder(Long userId, OrderCreateRequest request) {
 
@@ -75,10 +77,34 @@ public class OrderCommendService {
 
 
     public void postPaymentProcess(Long orderId) {
-        for (OrderItem item : orderItemRepository.findByOrderId(orderId)) {
-            item.getProduct().decreaseStock(item.getQuantity());
-            item.getOrder().getProject().increasePrice(item.getPrice());
+
+        List<OrderItem> orderItems = orderItemRepository.findByOrderId(orderId);
+
+        // 1. 정렬 - 락 획득 순서 통일
+        List<OrderItem> sortedItems = orderItems.stream()
+                .sorted(Comparator
+                        .comparing((OrderItem item) -> item.getProduct().getId())
+                        .thenComparing(item -> item.getOrder().getProject().getId()))
+                .toList();
+
+        for (OrderItem item : sortedItems) {
+            Long productId = item.getProduct().getId();
+            Long projectId = item.getOrder().getProject().getId();
+
+            // 2. 비관적 락 걸고 가져오기
+            Product product = productQueryService.getProductWithLock(productId);
+            Project project = projectQueryService.getProjectWithLock(projectId);
+
+            // 3. 재고 차감 / 누적 금액 증가
+            product.decreaseStock(item.getQuantity());
+            project.increasePrice(item.getPrice());
         }
+
+
+//        for (OrderItem item : orderItemRepository.findByOrderId(orderId)) {
+//            item.getProduct().decreaseStock(item.getQuantity());
+//            item.getOrder().getProject().increasePrice(item.getPrice());
+//        }
     }
 
 

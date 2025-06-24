@@ -48,7 +48,7 @@ public class PaymentControllerImpl2 implements PaymentController     {
 //        Long sellerId = orderQueryService.getSeller(orderId);
 //        Long buyerId = orderQueryService.getBuyer(orderId);
 //        String buyerName = userQueryService.getUser(buyerId).getNickname();
-//        fcmNotificationService.notifyPurchase(buyerId, sellerId, buyerName);
+//        fcmNotificationSe rvice.notifyPurchase(buyerId, sellerId, buyerName);
 
         return buildHtmlResponse(200, HtmlTemplates.kakaoSuccessHtml());
     }
