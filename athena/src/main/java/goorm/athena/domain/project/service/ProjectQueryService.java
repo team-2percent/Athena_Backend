@@ -220,4 +220,10 @@ public class ProjectQueryService {
                 .orElseThrow(() -> new CustomException(ErrorCode.PROJECT_NOT_FOUND));
     }
 
+
+    public Project getProjectWithLock(Long projectId) {
+        return projectRepository.findByIdWithLock(projectId)
+                .orElseThrow(() -> new RuntimeException("Project not found"));
+    }
+
 }

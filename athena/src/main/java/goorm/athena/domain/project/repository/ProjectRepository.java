@@ -2,9 +2,12 @@ package goorm.athena.domain.project.repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
+import jakarta.persistence.LockModeType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -48,4 +51,8 @@ public interface ProjectRepository extends JpaRepository<Project, Long>, JpaSpec
     Page<Project> findByIsApproved(ApprovalStatus isApproved, Pageable pageable);
 
     List<Project> findByEndAtIn(List<LocalDateTime> endDates);
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("select p from Project p where p.id = :id")
+    Optional<Project> findByIdWithLock(@Param("id") Long id);
 }
