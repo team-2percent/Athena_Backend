@@ -80,17 +80,17 @@ firebase:
   clientId: ${FIREBASE_CLIENT_ID}
   clientX509CertUrl: ${FIREBASE_CLIENT_X509_CERT_URL}
 
-otel:
-  exporter:
-    otlp:
-      protocol : grpc
-      endpoint: http://localhost:4317
-  traces:
-    exporter: jaeger
-  logs:
-    exporter: none
-  metrics:
-    exporter: none
+#otel:
+#  exporter:
+#    otlp:
+#      protocol : grpc
+#      endpoint: http://localhost:4317
+#  traces:
+#    exporter: jaeger
+#  logs:
+#    exporter: none
+#  metrics:
+#    exporter: none
 
 ---
 
