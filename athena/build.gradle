@@ -25,6 +25,13 @@ repositories {
     maven { url 'https://jitpack.io' }
 }
 
+//dependencyManagement {
+//	imports {
+//		mavenBom("io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom:2.6.0")
+//	}
+//}
+
+
 dependencies {
 
 	implementation 'org.springframework.boot:spring-boot-starter-security'
@@ -88,12 +95,17 @@ dependencies {
 	// WebClient
 	implementation 'org.springframework.boot:spring-boot-starter-webflux'
 
+	// Jaeger
+//	implementation "io.opentelemetry.instrumentation:opentelemetry-spring-boot-starter"
+//	implementation "io.opentelemetry:opentelemetry-exporter-jaeger:1.34.1"
+
 	// Redis
 	implementation 'org.redisson:redisson-spring-boot-starter:3.23.0'
-	
+
 	// for 모니터링
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 	implementation 'io.micrometer:micrometer-registry-prometheus'
+
 }
 
 test {
@@ -137,7 +149,6 @@ jacocoTestReport {
 					'**/controller/**',
 					'**/mapper/**',
 					'**/repository/**',
-					'**/service/test/**',
 					'**/dto/**',
 					'**/*Application*',
 					'**/exception/**',
@@ -184,7 +195,6 @@ jacocoTestCoverageVerification {
 					'**/p6spy/**',
 					'**/controller/**',
 					'**/repository/**',
-					'**/service/test/**',
 					'**.dto.**',
 					'**.*Application*',
 					'**.exception.**',

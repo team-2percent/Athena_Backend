@@ -10,6 +10,7 @@ import org.springframework.web.client.RestTemplate;
 @EnableAsync
 @SpringBootApplication
 @EnableScheduling
+@EnableAsync
 public class AthenaApplication {
 
 	public static void main(String[] args) {
