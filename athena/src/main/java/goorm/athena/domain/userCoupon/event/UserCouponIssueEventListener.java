@@ -11,7 +11,7 @@ public class UserCouponIssueEventListener {
 
     private final UserCouponIssueGateway userCouponIssueGateway;
 
-    @Async
+    @Async("UserCouponIssue")
     @EventListener
     public void listenerCouponIssueEvent(UserCouponIssueEvent event) {
         userCouponIssueGateway.issueUserCoupon(event.userId(), event.couponId(), event.luaResult());
