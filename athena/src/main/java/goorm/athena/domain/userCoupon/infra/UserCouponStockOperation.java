@@ -3,6 +3,9 @@ package goorm.athena.domain.userCoupon.infra;
 import goorm.athena.global.exception.CustomException;
 import goorm.athena.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
+import org.apache.kafka.common.protocol.types.Field;
+import org.checkerframework.checker.guieffect.qual.SafeType;
+import org.redisson.api.RMap;
 import org.redisson.api.RScript;
 import org.redisson.api.RSet;
 import org.redisson.api.RedissonClient;
@@ -10,6 +13,7 @@ import org.redisson.client.codec.StringCodec;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @Component
 @RequiredArgsConstructor
@@ -21,38 +25,31 @@ public class UserCouponStockOperation {
         local metaKey = KEYS[1]
         local total = tonumber(redis.call('HGET', metaKey, 'total'))
         local used = tonumber(redis.call('HGET', metaKey, 'used')) or 0
-
+        
         if not total then
-            return -1  -- 쿠폰 없음
+            return -1 -- 쿠폰 없음
         end
-
-        if used >= total then
-            return 0  -- 품절
-        end
-
-        redis.call('HINCRBY', metaKey, 'used', 1)
-        used = used + 1
-
+        
         if used == total then
-            local isTriggered = redis.call('HGET', metaKey, 'sync_triggered')
-            if isTriggered == 1 then
-                redis.call('EXPIRE', metaKey, 600)
-                return 2  -- 마지막 쿠폰 발급 + 플래그 세팅 완료
-            else
-                return 2  -- 플래그 이미 세팅됨
-            end
+            return 0 -- 품절 
         end
-
-        return 1  -- 정상 발급
+        
+        redis.call('HINCRBY', metaKey, 'used', 1)
+        return 1 -- 정상 발급
     """;
 
     public int checkAndDecreaseRedisStock(Long couponId) {
         String metaKey = "coupon_meta_" + couponId;
-
-        List<Object> keys = List.of(metaKey);
         RScript script = redissonClient.getScript();
 
-        Long result = script.eval(RScript.Mode.READ_WRITE, LUA_SCRIPT, RScript.ReturnType.INTEGER, keys);
+        List<Object> keys = List.of(metaKey);
+        Long result = script.eval(
+            RScript.Mode.READ_WRITE,
+            LUA_SCRIPT,
+            RScript.ReturnType.INTEGER,
+            keys
+        );
+
 
         if (result == null || result == -1) {
             throw new CustomException(ErrorCode.COUPON_NOT_FOUND);
@@ -60,7 +57,18 @@ public class UserCouponStockOperation {
             throw new CustomException(ErrorCode.COUPON_OUT_STOCK);
         }
 
-        return result.intValue();
+        RMap<String, String> metaMap = redissonClient.getMap(metaKey, StringCodec.INSTANCE);
+        int total = Integer.parseInt(metaMap.get("total"));
+        int used = Integer.parseInt(metaMap.get("used"));
+        String triggered = metaMap.getOrDefault("sync_triggered", "0");
+
+        if (used == total && !"1".equals(triggered)) {
+            metaMap.put("sync_triggered", "1");
+            metaMap.expire(600, TimeUnit.SECONDS);
+            return 2;
+        }
+
+        return 1;
     }
 
     public boolean addUserToIssuedSet(Long couponId, Long userId) {
