@@ -58,4 +58,8 @@ public class Payment {
         this.status = Status.APPROVED;
     }
 
+    public void failApprove() {
+        this.status = Status.FAILED;
+    }
+
 }

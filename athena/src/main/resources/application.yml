@@ -1,5 +1,8 @@
 spring:
 
+  application:
+    name: athena
+
   servlet:
     multipart:
       enabled: true
@@ -17,7 +20,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
     properties:
       hibernate:
         jdbc:
@@ -32,6 +35,7 @@ spring:
 
   kakao:
     api:
+      base-url: "http://athena-local.i-am-jay.com:8082/kakao"
       cid: ${KAKAO_API_CID}
       admin-key: ${KAKAO_API_ADMIN_KEY}
       approval-url: ${KAKAO_API_APPROVAL_URL}
@@ -80,6 +84,18 @@ firebase:
   clientId: ${FIREBASE_CLIENT_ID}
   clientX509CertUrl: ${FIREBASE_CLIENT_X509_CERT_URL}
 
+#otel:
+#  exporter:
+#    otlp:
+#      protocol : grpc
+#      endpoint: http://localhost:4317
+#  traces:
+#    exporter: jaeger
+#  logs:
+#    exporter: none
+#  metrics:
+#    exporter: none
+
 management:
   endpoints:
     web:
@@ -94,6 +110,7 @@ management:
       show-details: always
     prometheus:
       enabled: true
+
 ---
 
 spring:

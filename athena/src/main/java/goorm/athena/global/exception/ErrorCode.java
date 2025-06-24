@@ -40,6 +40,8 @@ public enum ErrorCode {
     KAKAO_PAY_APPROVE_FAILED(HttpStatus.NOT_FOUND, "카카오페이 승인 실패"),
     JSON_PROCESSING_ERROR(HttpStatus.NOT_FOUND, "JSON 직렬화 실패: 결제 요청 파라미터를 JSON으로 변환할 수 없습니다"),
     ALREADY_PAYMENT_COMPLETED(HttpStatus.BAD_REQUEST, "이미 결제가 완료된 주문입니다."),
+    PAYMENT_RETRY_OVER(HttpStatus.BAD_REQUEST, "결제 최대 재시도 초과."),
+    SLEEP_THREAD(HttpStatus.BAD_REQUEST, "슬립 스레드 과정에서 오류 발생."),
 
     // 인증
     AUTH_INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "유효하지 않은 토큰입니다."),

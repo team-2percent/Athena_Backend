@@ -5,8 +5,11 @@
 //import goorm.athena.domain.payment.dto.HtmlTemplates;
 //import goorm.athena.domain.payment.dto.res.KakaoPayApproveResponse;
 //import goorm.athena.domain.payment.dto.res.KakaoPayReadyResponse;
+//import goorm.athena.domain.payment.entity.Payment;
+//import goorm.athena.domain.payment.entity.Status;
 //import goorm.athena.domain.payment.service.PaymentCommandService;
 //import goorm.athena.domain.payment.service.V0.PaymentCommandService1;
+//import goorm.athena.domain.payment.service.V0.PaymentQueryService1;
 //import goorm.athena.domain.user.service.UserQueryService;
 //import lombok.RequiredArgsConstructor;
 //import org.springframework.http.MediaType;
@@ -16,9 +19,10 @@
 //@RestController
 //@RequiredArgsConstructor
 //@RequestMapping("/api/payment")
-//public class PaymentControllerImpl implements PaymentController {
+//public class PaymentControllerImpl1 implements PaymentController {
 //
-//    private final PaymentCommandService paymentCommandService;
+//    private final PaymentCommandService1 paymentCommandService;
+//    private final PaymentQueryService1 paymentQueryService1;
 //    private final OrderQueryService orderQueryService;
 //    private final FcmNotificationService fcmNotificationService;
 //    private final UserQueryService userQueryService;
@@ -37,10 +41,10 @@
 //            @PathVariable Long orderId,
 //            @RequestParam("pg_token") String pgToken
 //    ) {
-//        KakaoPayApproveResponse response = paymentCommandService.approvePayment(pgToken, orderId);
-//
-//        if (response.tid() == null) {
-//            return buildHtmlResponse(400, HtmlTemplates.kakaoFailHtml());  // 실패 시 HTML
+//        try {
+//            paymentCommandService.approvePayment(pgToken, orderId);
+//        } catch (Exception e) {
+//            return buildHtmlResponse(400, HtmlTemplates.kakaoFailHtml());
 //        }
 //
 //        Long sellerId = orderQueryService.getSeller(orderId);
@@ -57,4 +61,15 @@
 //                .contentType(MediaType.TEXT_HTML)
 //                .body(html);
 //    }
+//
+//
+//    // 상태 확인 요청
+//    @GetMapping("/status/{orderId}")
+//    public ResponseEntity<String> getPaymentStatus(@PathVariable Long orderId) {
+//        Payment payment = paymentQueryService1.findByOrderId(orderId); // 여기!
+//        return ResponseEntity.ok(payment.getStatus().name());
+//    }
+//
+//
+//
 //}
