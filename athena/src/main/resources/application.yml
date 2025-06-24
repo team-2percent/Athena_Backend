@@ -28,6 +28,10 @@ spring:
         order_inserts: true
         order_updates: true
 
+  redis:
+    host: ${REDIS_HOST}
+    port: 6379
+    password: ${REDIS_PASSWORD}
 
   kakao:
     api:
@@ -92,6 +96,21 @@ otel:
   metrics:
     exporter: none
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: prometheus,health,info,metrics
+      base-path: /actuator
+  health:
+    probes:
+      enabled: true
+  endpoint:
+    health:
+      show-details: always
+    prometheus:
+      enabled: true
+
 ---
 
 spring:
@@ -118,9 +137,14 @@ spring:
         format_sql: true
   defer-datasource-initialization: true
   generate-ddl: true
+
+  redis:
+    host: ${REDIS_HOST}
+    port: 6379
+    password: ${REDIS_PASSWORD}
+
 logging:
   level:
     org.springframework.jdbc.datasource.init: DEBUG
-
 ---
 
