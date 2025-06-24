@@ -1,4 +1,6 @@
 spring:
+  tomcat:
+    accept-count: 10000
 
   application:
     name: athena
@@ -20,7 +22,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
     properties:
       hibernate:
         jdbc:
