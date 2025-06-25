@@ -1,34 +1,36 @@
-package goorm.athena.domain.payment.service.V1;
-
+package goorm.athena.domain.payment.service.V3;
 
 import goorm.athena.domain.order.entity.Order;
 import goorm.athena.domain.order.service.OrderCommendService;
 import goorm.athena.domain.order.service.OrderQueryService;
 import goorm.athena.domain.payment.dto.req.PaymentReadyRequest;
-import goorm.athena.domain.payment.dto.res.KakaoPayApproveResponse;
 import goorm.athena.domain.payment.dto.res.KakaoPayReadyResponse;
 import goorm.athena.domain.payment.entity.Payment;
 import goorm.athena.domain.payment.entity.Status;
-import goorm.athena.domain.payment.event.KakaoPayApproveEvent;
 import goorm.athena.domain.payment.repository.PaymentRepository;
+import goorm.athena.domain.payment.service.V1.KakaoPayService2;
 import goorm.athena.domain.user.entity.User;
 import goorm.athena.global.exception.CustomException;
 import goorm.athena.global.exception.ErrorCode;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.transaction.PlatformTransactionManager;
+
+import goorm.athena.domain.payment.event.KakaoPayApproveEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 
-import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class PaymentCommandService2 {
+public class PaymentCommandService3 {
+
 
     private final KakaoPayService2 kakaoPayService;
     private final OrderCommendService orderCommendService;
@@ -36,6 +38,7 @@ public class PaymentCommandService2 {
     private final PaymentRepository paymentRepository;
     private final ApplicationEventPublisher eventPublisher;
     private final PlatformTransactionManager transactionManager;
+    private final RedissonClient redissonClient;
 
     public KakaoPayReadyResponse readyPayment(Long orderId) {
         Order order = orderQueryService.getById(orderId);
@@ -59,53 +62,42 @@ public class PaymentCommandService2 {
     }
 
     public void approvePayment(String pgToken, Long orderId) {
-//        Payment payment = getPayment(orderId);
-//        postApproveProcess(orderId);
-//
-//
-//        eventPublisher.publishEvent(new KakaoPayApproveEvent(payment, pgToken));
-        Payment payment = getPayment(orderId);
-        int retries = 5;
+        Payment payment = paymentRepository.findByOrderId(orderId)
+                .orElseThrow(() -> new CustomException(ErrorCode.PAYMENT_NOT_FOUND));
 
-        while (retries > 0) {
+        String lockKey = "lock:approvePayment:" + orderId;
+        RLock lock = redissonClient.getLock(lockKey);
+
+        boolean acquired = false;
+        try {
+            // 최대 3초 대기, 10초 후 자동 해제
+            acquired = lock.tryLock(3, 10, TimeUnit.SECONDS);
+
+            if (!acquired) {
+                throw new CustomException(ErrorCode.LOCK_ACQUIRE_FAILED);
+            }
+
             TransactionStatus status = transactionManager.getTransaction(new DefaultTransactionDefinition());
 
             try {
+                // 동시성 제어가 필요한 핵심 비즈니스 로직 실행
                 orderCommendService.postPaymentProcess(orderId);
+
                 transactionManager.commit(status);
-                break;
             } catch (Exception e) {
                 transactionManager.rollback(status);
-                retries--;
-                try {
-                    Thread.sleep(100 + new Random().nextInt(100));
-                } catch (InterruptedException ie) {
-                    Thread.currentThread().interrupt(); // 인터럽트 상태 복구
-                    throw new CustomException(ErrorCode.SLEEP_THREAD);
-                }
+                throw e; // 필요 시 커스텀 예외로 래핑
+            }
 
-                if (retries == 0) {
-                    // 최대 재시도 초과 후 실패
-                    log.error("최대 재시도 초과", e);
-                    throw new CustomException(ErrorCode.PAYMENT_RETRY_OVER);
-                }
-
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR);
+        } finally {
+            if (acquired && lock.isHeldByCurrentThread()) {
+                lock.unlock();
             }
         }
 
-        // 재시도 로직, 결제에 문제가 없는 경우에만 진행
         eventPublisher.publishEvent(new KakaoPayApproveEvent(payment, pgToken));
-
-
-    }
-
-    @Transactional
-    public void postApproveProcess(Long orderId) {
-        orderCommendService.postPaymentProcess(orderId);
-    }
-
-    private Payment getPayment(Long orderId) {
-        return paymentRepository.findByOrderId(orderId)
-                .orElseThrow(() -> new CustomException(ErrorCode.PAYMENT_NOT_FOUND));
     }
 }

@@ -42,6 +42,8 @@ public enum ErrorCode {
     ALREADY_PAYMENT_COMPLETED(HttpStatus.BAD_REQUEST, "이미 결제가 완료된 주문입니다."),
     PAYMENT_RETRY_OVER(HttpStatus.BAD_REQUEST, "결제 최대 재시도 초과."),
     SLEEP_THREAD(HttpStatus.BAD_REQUEST, "슬립 스레드 과정에서 오류 발생."),
+    LOCK_ACQUIRE_FAILED(HttpStatus.BAD_REQUEST, "락 획득 실패."),
+    INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "서버 내부 오류가 발생했습니다."),
 
     // 인증
     AUTH_INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "유효하지 않은 토큰입니다."),
