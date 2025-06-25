@@ -1,9 +1,9 @@
-package goorm.athena.domain.notification.service;
+package goorm.athena.domain.notification.event;
 
 import org.springframework.stereotype.Component;
 
 @Component
-public class FcmMessageFactory {
+public class MessageFactory {
 
     public FcmMessage forLogin(String userName){
         return new FcmMessage("로그인 성공", userName + " 님, 환영합니다! 즐거운 쇼핑하세요 🛍️");

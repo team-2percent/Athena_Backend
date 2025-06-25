@@ -2,8 +2,8 @@ package goorm.athena.domain.notification.controller;
 
 
 import goorm.athena.domain.notification.dto.FcmLoginRequest;
-import goorm.athena.domain.notification.service.FcmMessageFactory;
-import goorm.athena.domain.notification.service.FcmNotificationService;
+import goorm.athena.domain.notification.event.MessageFactory;
+import goorm.athena.domain.notification.service.NotificationService;
 import goorm.athena.domain.notification.service.FcmTokenService;
 import goorm.athena.domain.user.entity.User;
 import goorm.athena.domain.user.service.UserQueryService;
@@ -19,15 +19,15 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/fcm")
 public class FcmControllerImpl implements FcmController{
     private final FcmTokenService fcmTokenService;
-    private final FcmNotificationService fcmNotificationService;
+    private final NotificationService notificationService;
     private final UserQueryService userQueryService;
-    private final FcmMessageFactory fcmMessageFactory;
+    private final MessageFactory messageFactory;
 
     @Override
     public ResponseEntity<Void> createToken(@RequestBody FcmLoginRequest fcmLoginRequest){
         fcmTokenService.saveToken(fcmLoginRequest);
         User user = userQueryService.getUser(fcmLoginRequest.userId());
-        fcmNotificationService.notifyLogin(fcmLoginRequest.userId(), user.getNickname());
+        notificationService.notifyLogin(fcmLoginRequest.userId(), user.getNickname());
 
         return ResponseEntity.ok().build();
     }
@@ -36,13 +36,16 @@ public class FcmControllerImpl implements FcmController{
      * 알림 테스트용 API
      */
     @Override
-    public ResponseEntity<Void> test(@RequestParam("token") String token){
-        if (token == null || token.trim().isEmpty()) {
-            return ResponseEntity.badRequest().build();
-        }
-
-        fcmNotificationService.send(token, fcmMessageFactory.forReview("테스트 알림"));
+    public ResponseEntity<Void> testToUser(@RequestParam("userId") Long userId){
+        notificationService.notifyReview(userId, "테스트 사용자");
         return ResponseEntity.ok().build();
     }
+
+    @Override
+    public ResponseEntity<Void> testToAll(){
+        notificationService.notifyCoupon("테스트 쿠폰");
+        return ResponseEntity.ok().build();
+    }
+
 
 }

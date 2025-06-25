@@ -1,6 +1,6 @@
 package goorm.athena.domain.userCoupon.controller;
 
-import goorm.athena.domain.notification.service.FcmNotificationService;
+import goorm.athena.domain.notification.service.NotificationService;
 import goorm.athena.domain.userCoupon.dto.req.UserCouponIssueRequest;
 import goorm.athena.domain.userCoupon.dto.req.UserCouponUseRequest;
 import goorm.athena.domain.userCoupon.dto.res.UserCouponIssueResponse;
@@ -20,7 +20,7 @@ public class UserCouponControllerImpl implements UserCouponController {
     private final UserCouponCommandService userCouponCommandService;
     private final UserCouponQueryService userCouponQueryService;
     private final UserCouponScheduler userCouponScheduler;
-    private final FcmNotificationService fcmNotificationService;
+    private final NotificationService notificationService;
 
     @Override
     @PostMapping
@@ -29,7 +29,7 @@ public class UserCouponControllerImpl implements UserCouponController {
         UserCouponIssueResponse response = userCouponCommandService.issueCoupon(loginUserRequest.userId(), request);
 
         String couponTitle = userCouponQueryService.getCouponTitle(request.couponId());
-        fcmNotificationService.notifyCoupon(couponTitle);
+        notificationService.notifyCoupon(couponTitle);
 
         return ResponseEntity.ok(response);
     }

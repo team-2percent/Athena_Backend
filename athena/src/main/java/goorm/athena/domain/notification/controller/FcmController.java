@@ -27,8 +27,13 @@ public interface FcmController {
     /***
      * 알림 테스트용 API
      */
-    @Operation(summary = "FCM 테스트 API", description = "FCM 부하 테스트 용 API 입니다.")
+    @Operation(summary = "FCM 개별 발송 테스트 API", description = "FCM 부하 테스트 용 API 입니다.")
     @ApiResponse(responseCode = "200", description = "FCM 알림 전송 성공")
-    @PostMapping("/test")
-    ResponseEntity<Void> test(@RequestParam("token") String token);
+    @PostMapping("/test/toUser")
+    ResponseEntity<Void> testToUser(@RequestParam("userId") Long userId);
+
+    @Operation(summary = "FCM 전체 발송 테스트 API", description = "FCM 부하 테스트 용 API 입니다.")
+    @ApiResponse(responseCode = "200", description = "FCM 알림 전송 성공")
+    @PostMapping("/test/toAll")
+    ResponseEntity<Void> testToAll();
 }
