@@ -6,8 +6,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadPoolExecutor;
+
 
 @EnableAsync
 @Configuration
@@ -16,9 +15,9 @@ public class AsyncConfig {
     @Bean(name = "fcmTaskExecutor")
     public Executor fcmTaskExecutor(){
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(20);
-        executor.setMaxPoolSize(50);
-        executor.setQueueCapacity(5000);
+        executor.setCorePoolSize(10);
+        executor.setMaxPoolSize(20);
+        executor.setQueueCapacity(10000);
         executor.setThreadNamePrefix("Fcm-Task-");
         executor.initialize();
         return executor;
@@ -28,7 +27,7 @@ public class AsyncConfig {
     public Executor fcmCallBackExecutor(){
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
         executor.setCorePoolSize(10);
-        executor.setMaxPoolSize(30);
+        executor.setMaxPoolSize(20);
         executor.setQueueCapacity(2000);
         executor.setThreadNamePrefix("Fcm-callback-");
         executor.initialize();

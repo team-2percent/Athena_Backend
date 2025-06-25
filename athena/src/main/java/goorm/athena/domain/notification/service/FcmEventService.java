@@ -43,7 +43,7 @@ public class FcmEventService {
      * @Async
      */
     @Async
-    public void notifyLoginV1(Long userId, String userName) {
+    public void notifyReviewV1(Long userId, String userName) {
         sendToUser(userId, messageFactory.forLogin(userName));
     }
 
@@ -52,7 +52,7 @@ public class FcmEventService {
      * @Async with custom executor
      */
     @Async("fcmTaskExecutor")
-    public void notifyLoginV2(Long userId, String userName) {
+    public void notifyReviewV2(Long userId, String userName) {
         sendToUser(userId, messageFactory.forLogin(userName));
     }
 
@@ -60,8 +60,8 @@ public class FcmEventService {
      * v3
      * @Async with custom executor + sendAsync()
      */
-    @Async("fcmTaskExecutor")
-    public void notifyLoginV3(Long userId, String userName) {
+    // @Async("fcmTaskExecutor")
+    public void notifyReviewV3(Long userId, String userName) {
         sendToUserWithAsync(userId, messageFactory.forLogin(userName));
     }
 

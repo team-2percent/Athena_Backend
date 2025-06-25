@@ -15,10 +15,11 @@ public interface CommentMapper {
     @Mapping(target = "project", source = "project")
     Comment toEntity(User user, Project project, String content);
 
-    @Mapping(target = "description", source = "comment.user.nickname")
+    @Mapping(target = "userName", source = "comment.user.nickname")
     CommentCreateResponse toCreateResponse(Comment comment);
+
     @Mapping(target = "id", source = "comment.id")
-    @Mapping(target = "description", source = "comment.user.nickname")
+    @Mapping(target = "userName", source = "comment.user.nickname")
     @Mapping(target = "projectName", source = "comment.project.title")
     @Mapping(target = "content", source = "comment.content")
     @Mapping(target = "createdAt", source = "comment.createdAt")
