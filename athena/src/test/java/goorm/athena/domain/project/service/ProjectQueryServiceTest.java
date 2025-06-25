@@ -144,4 +144,17 @@ public class ProjectQueryServiceTest extends ProjectIntegrationTestSupport {
     // then
     assertThat(result.allTopView().size()).isEqualTo(5);
   }
+  
+  @DisplayName("프로젝트 카테고리 조회에서 조회수 기준 TOP5 항목을 조회합니다.")
+  @Test
+  void testGetTop5ProjectsByCategory() {
+    // given
+    // data.sql에 있는 프로젝트 중 조회수가 높은 순으로 5개를 조회합니다.
+
+    // when
+    ProjectCategoryTopResponseWrapper result = projectQueryService.getTopView();
+
+    // then
+    assertThat(result.allTopView().size()).isEqualTo(5);
+  }
 }
