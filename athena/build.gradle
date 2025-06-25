@@ -101,6 +101,7 @@ dependencies {
 
 	// Redis
 	implementation 'org.redisson:redisson-spring-boot-starter:3.23.0'
+	testImplementation 'org.redisson:redisson-spring-boot-starter:3.23.0'
 
 //	// Jaeger
 //	implementation "io.opentelemetry.instrumentation:opentelemetry-spring-boot-starter"
