@@ -27,7 +27,6 @@ import java.util.Set;
 public class CouponQueryService {
     private final CouponRepository couponRepository;
     private final CouponQueryRepository couponQueryRepository;
-    private final UserCouponRepository userCouponRepository;
     private final UserCouponQueryRepository userCouponQueryRepository;
     private final CouponMapper couponMapper;
 

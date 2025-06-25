@@ -1,4 +1,9 @@
 spring:
+  tomcat:
+    accept-count: 10000
+
+  application:
+    name: athena
 
   servlet:
     multipart:
@@ -25,9 +30,14 @@ spring:
         order_inserts: true
         order_updates: true
 
+  redis:
+    host: ${REDIS_HOST}
+    port: 6379
+    password: ${REDIS_PASSWORD}
 
   kakao:
     api:
+      base-url: "http://athena-local.i-am-jay.com:8082/kakao"
       cid: ${KAKAO_API_CID}
       admin-key: ${KAKAO_API_ADMIN_KEY}
       approval-url: ${KAKAO_API_APPROVAL_URL}
@@ -76,6 +86,33 @@ firebase:
   clientId: ${FIREBASE_CLIENT_ID}
   clientX509CertUrl: ${FIREBASE_CLIENT_X509_CERT_URL}
 
+#otel:
+#  exporter:
+#    otlp:
+#      protocol : grpc
+#      endpoint: http://localhost:4317
+#  traces:
+#    exporter: jaeger
+#  logs:
+#    exporter: none
+#  metrics:
+#    exporter: none
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: prometheus,health,info,metrics
+      base-path: /actuator
+  health:
+    probes:
+      enabled: true
+  endpoint:
+    health:
+      show-details: always
+    prometheus:
+      enabled: true
+
 ---
 
 spring:
@@ -102,9 +139,14 @@ spring:
         format_sql: true
   defer-datasource-initialization: true
   generate-ddl: true
+
+  redis:
+    host: ${REDIS_HOST}
+    port: 6379
+    password: ${REDIS_PASSWORD}
+
 logging:
   level:
     org.springframework.jdbc.datasource.init: DEBUG
-
 ---
 

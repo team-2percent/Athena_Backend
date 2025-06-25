@@ -67,9 +67,15 @@ public class Coupon {
         }
     }
 
+    public void stockSync(int stock){
+        this.stock = stock;
+    }
+
     public void active(){
         this.couponStatus = CouponStatus.IN_PROGRESS;
     }
+
+    public void completed() { this.couponStatus = CouponStatus.COMPLETED; }
 
     public void expired(){
         this.couponStatus = CouponStatus.ENDED;
