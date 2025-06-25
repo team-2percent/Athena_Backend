@@ -7,7 +7,6 @@ import goorm.athena.domain.user.service.UserQueryService;
 import goorm.athena.domain.userCoupon.dto.req.UserCouponIssueRequest;
 import goorm.athena.domain.userCoupon.dto.res.UserCouponIssueResponse;
 import goorm.athena.domain.userCoupon.entity.UserCoupon;
-import goorm.athena.domain.userCoupon.event.CouponIssueEvent;
 import goorm.athena.domain.userCoupon.mapper.UserCouponMapper;
 import goorm.athena.domain.userCoupon.repository.UserCouponRepository;
 import goorm.athena.global.exception.CustomException;
@@ -125,7 +124,6 @@ public class UserCouponCommandServiceV4_5 {
             UserCouponIssueResponse response = saveCouponIssue(userId, couponId);
 
             // 4) 이벤트 발행
-            eventPublisher.publishEvent(new CouponIssueEvent(userId, couponId));
             return response;
         } catch (CustomException e) {
             // Redis Set에서 userId 제거(롤백)

@@ -63,4 +63,12 @@ public class UserCouponCommandService {
         }
     }
 
+    @Transactional
+    public void issueUserCoupon(Long userId, Long couponId){
+        User user = userQueryService.getUser(userId);
+        Coupon coupon = couponQueryService.getCoupon(couponId);
+
+        UserCoupon userCoupon = UserCoupon.create(user, coupon);
+        userCouponRepository.save(userCoupon);
+    }
 }

@@ -1,8 +1,8 @@
 package goorm.athena.domain.userCoupon.service.test;
 
 import goorm.athena.domain.userCoupon.dto.req.UserCouponIssueRequest;
-import goorm.athena.domain.userCoupon.event.CouponIssueEvent;
-import goorm.athena.domain.userCoupon.event.CouponSyncTriggerEvent;
+import goorm.athena.domain.userCoupon.event.UserCouponIssueEvent;
+import goorm.athena.domain.coupon.event.CouponSyncTriggerEvent;
 import goorm.athena.global.exception.CustomException;
 import goorm.athena.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -56,10 +56,10 @@ public class UserCouponCommandServiceV4_6 {
 
         try {
             // 2. Redis 재고 체크
-            checkAndDecreaseRedisStock(couponId);
+            int result = checkAndDecreaseRedisStock(couponId);
 
             // 3. 발급 성공 시 CouponIssueEvent 발행
-            eventPublisher.publishEvent(new CouponIssueEvent(userId, couponId));
+            eventPublisher.publishEvent(new UserCouponIssueEvent(userId, couponId, result));
 
             // 3. 재고가 소진되었으면 동기화 이벤트 발행
             if (isStockDepleted(couponId)) {
@@ -72,7 +72,7 @@ public class UserCouponCommandServiceV4_6 {
         }
     }
 
-    private void checkAndDecreaseRedisStock(Long couponId) {
+    private int checkAndDecreaseRedisStock(Long couponId) {
         String totalKey = "coupon_total_" + couponId;
         String usedKey = "coupon_used_" + couponId;
 
@@ -86,6 +86,7 @@ public class UserCouponCommandServiceV4_6 {
         } else if (result == 0) {
             throw new CustomException(ErrorCode.COUPON_OUT_STOCK);
         }
+        return result.intValue();
     }
 
     private boolean isStockDepleted(Long couponId) {
