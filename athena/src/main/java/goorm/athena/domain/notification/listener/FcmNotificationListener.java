@@ -18,7 +18,7 @@ public class FcmNotificationListener {
     @Async
     @EventListener
     public void handleLoginNotification(FcmLoginEvent event){
-        fcmEventService.notifyLogin(event.userId(), event.description());
+        fcmEventService.notifyLoginV1(event.userId(), event.description());
     }
 
     @Async

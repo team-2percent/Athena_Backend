@@ -2,7 +2,6 @@ package goorm.athena.domain.notification.controller;
 
 
 import goorm.athena.domain.notification.dto.FcmLoginRequest;
-import goorm.athena.domain.notification.service.MessageFactory;
 import goorm.athena.domain.notification.service.NotificationService;
 import goorm.athena.domain.notification.service.FcmTokenService;
 import goorm.athena.domain.user.entity.User;
@@ -21,7 +20,6 @@ public class FcmControllerImpl implements FcmController{
     private final FcmTokenService fcmTokenService;
     private final NotificationService notificationService;
     private final UserQueryService userQueryService;
-    private final MessageFactory messageFactory;
 
     @Override
     public ResponseEntity<Void> createToken(@RequestBody FcmLoginRequest fcmLoginRequest){
@@ -35,8 +33,15 @@ public class FcmControllerImpl implements FcmController{
     /***
      * 알림 테스트용 API
      */
+
     @Override
-    public ResponseEntity<Void> testToUser(@RequestParam("userId") Long userId){
+    public ResponseEntity<Void> testToUser1(@RequestParam("userId") Long userId){
+        notificationService.notifyLogin(userId, "테스트 사용자");
+        return ResponseEntity.ok().build();
+    }
+
+    @Override
+    public ResponseEntity<Void> testToUser2(@RequestParam("userId") Long userId){
         notificationService.notifyReview(userId, "테스트 프로젝트");
         return ResponseEntity.ok().build();
     }

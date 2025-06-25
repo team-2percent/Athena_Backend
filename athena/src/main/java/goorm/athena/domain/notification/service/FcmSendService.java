@@ -60,10 +60,9 @@ public class FcmSendService {
 
             // FCM 비동기 발송
             ApiFuture<String> apiFuture = FirebaseMessaging.getInstance().sendAsync(message);
-            // Non-blocking
             apiFuture.addListener(() -> {
                 try {
-                    String response = apiFuture.get(); // 결과 기다림 (논블로킹)
+                    String response = apiFuture.get(); // 결과 기다림 (Blocking)
                     log.info("[FCM SUCCESS] token={}, response={}", token, response);
                 } catch (Exception e) {
                     log.error("[FCM ERROR - Future Fail] token={}, error={}", token, e.getMessage(), e);
