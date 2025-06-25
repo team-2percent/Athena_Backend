@@ -34,6 +34,8 @@ public class AsyncConfig {
         executor.setMaxPoolSize(20);
         executor.setQueueCapacity(2000);
         executor.setThreadNamePrefix("Fcm-callback-");
+        executor.initialize();
+        return executor;
     }
 
 
