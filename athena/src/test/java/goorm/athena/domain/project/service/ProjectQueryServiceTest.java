@@ -28,6 +28,7 @@ import goorm.athena.domain.project.util.ProjectQueryType;
 import goorm.athena.domain.project.dto.cursor.ProjectRecentCursorResponse;
 import goorm.athena.domain.project.dto.req.ProjectQueryLatestRequest;
 import goorm.athena.domain.project.dto.res.ProjectCategoryTopResponseWrapper;
+import goorm.athena.domain.project.dto.req.ProjectCursorRequest;
 
 /*
  * 프로젝트 서비스 중 조회 관련 메서드를 테스트합니다.
@@ -160,16 +161,27 @@ public class ProjectQueryServiceTest extends ProjectIntegrationTestSupport {
     });
   }
   
-  @DisplayName("프로젝트 카테고리 조회에서 조회수 기준 TOP5 항목을 조회합니다.")
+  @DisplayName("프로젝트 전체 조회에서 페이지 2를 조회합니다.")
   @Test
-  void testGetTop5ProjectsByCategory() {
+  void testGetProjectsPage2() {
     // given
-    // data.sql에 있는 프로젝트 중 조회수가 높은 순으로 5개를 조회합니다.
+    // data.sql에 있는 프로젝트 데이터 활용
+    ProjectRecentCursorResponse firstPageResult = (ProjectRecentCursorResponse) projectQueryService
+        .getProjectsWithCursor(
+            ProjectQueryType.LATEST, Optional.empty(),
+            new ProjectQueryLatestRequest(LocalDateTime.now(), null, 20));
 
     // when
-    ProjectCategoryTopResponseWrapper result = projectQueryService.getTopView();
+    ProjectRecentCursorResponse secondPageResult = (ProjectRecentCursorResponse) projectQueryService
+        .getProjectsWithCursor(
+            ProjectQueryType.LATEST,
+            Optional
+                .of(new ProjectCursorRequest<>(firstPageResult.nextCursorValue(), firstPageResult.nextProjectId(), 20)),
+            new ProjectQueryLatestRequest(firstPageResult.nextCursorValue(), firstPageResult.nextProjectId(), 20));
 
     // then
-    assertThat(result.allTopView().size()).isEqualTo(5);
+    assertThat(secondPageResult.content().size()).isNotNull();
+    assertThat(secondPageResult.content().size()).isGreaterThanOrEqualTo(1);
+    assertThat(secondPageResult.content().get(0).id()).isNotEqualTo(firstPageResult.content().get(0).id());
   }
 }
