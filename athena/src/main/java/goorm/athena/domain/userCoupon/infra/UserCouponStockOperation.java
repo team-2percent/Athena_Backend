@@ -3,8 +3,6 @@ package goorm.athena.domain.userCoupon.infra;
 import goorm.athena.global.exception.CustomException;
 import goorm.athena.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
-import org.apache.kafka.common.protocol.types.Field;
-import org.checkerframework.checker.guieffect.qual.SafeType;
 import org.redisson.api.RMap;
 import org.redisson.api.RScript;
 import org.redisson.api.RSet;
