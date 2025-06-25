@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Tag(name = "FCM", description = "FCM 알림 API")
 @RequestMapping("/api/fcm")
@@ -22,4 +23,17 @@ public interface FcmController {
             content = @Content(schema = @Schema(implementation = FcmToken.class)))
     @PostMapping("/register")
     ResponseEntity<Void> createToken(@RequestBody FcmLoginRequest fcmLoginRequest);
+
+    /***
+     * 알림 테스트용 API
+     */
+    @Operation(summary = "FCM 개별 발송 테스트 API", description = "FCM 부하 테스트 용 API 입니다.")
+    @ApiResponse(responseCode = "200", description = "FCM 알림 전송 성공")
+    @PostMapping("/test/toUser")
+    ResponseEntity<Void> testToUser(@RequestParam("userId") Long userId);
+
+    @Operation(summary = "FCM 전체 발송 테스트 API", description = "FCM 부하 테스트 용 API 입니다.")
+    @ApiResponse(responseCode = "200", description = "FCM 알림 전송 성공")
+    @PostMapping("/test/toAll")
+    ResponseEntity<Void> testToAll();
 }

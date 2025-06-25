@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -23,16 +24,13 @@ public class FcmTokenService {
         String token = fcmLoginRequest.token();
         Long userId = fcmLoginRequest.userId();
 
-        // 기존 유저나 토큰은 조회 없이 바로 삭제
         fcmTokenRepository.deleteByToken(token);
         fcmTokenRepository.deleteByUserId(userId);
 
-        // 토큰 저장
         fcmTokenRepository.save(new FcmToken(token, userId));
     }
 
     // 사용자 ID 기반으로 FCM 토큰을 삭제
-    @Transactional
     public void deleteToken(Long userId) {
         fcmTokenRepository.findByUserId(userId).ifPresentOrElse(
                 fcmTokenRepository::delete,

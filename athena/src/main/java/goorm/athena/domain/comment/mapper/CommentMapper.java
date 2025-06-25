@@ -17,6 +17,7 @@ public interface CommentMapper {
 
     @Mapping(target = "userName", source = "comment.user.nickname")
     CommentCreateResponse toCreateResponse(Comment comment);
+
     @Mapping(target = "id", source = "comment.id")
     @Mapping(target = "userName", source = "comment.user.nickname")
     @Mapping(target = "projectName", source = "comment.project.title")
