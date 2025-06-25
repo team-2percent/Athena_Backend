@@ -12,7 +12,7 @@ public class FcmNotificationListener {
 
     @Async
     @EventListener
-    public void handleLoginNotification(FcmEvent event){
+    public void handleLoginNotification(FcmLoginEvent event){
         fcmEventService.notifyLogin(event.userId(), event.description());
     }
 
@@ -24,8 +24,8 @@ public class FcmNotificationListener {
 
     @Async
     @EventListener
-    public void handleReviewNotification(FcmEvent event){
-        fcmEventService.notifyReview(event.userId(), event.description());
+    public void handleReviewNotification(FcmReviewEvent event){
+        fcmEventService.notifyReview(event.userId(), event.projectTitle());
     }
 
     @Async

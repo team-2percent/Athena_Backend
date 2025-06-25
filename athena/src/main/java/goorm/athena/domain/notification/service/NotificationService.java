@@ -2,7 +2,8 @@ package goorm.athena.domain.notification.service;
 
 import goorm.athena.domain.notification.event.FcmCouponEvent;
 import goorm.athena.domain.notification.event.FcmPurchaseEvent;
-import goorm.athena.domain.notification.event.FcmEvent;
+import goorm.athena.domain.notification.event.FcmLoginEvent;
+import goorm.athena.domain.notification.event.FcmReviewEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
@@ -17,7 +18,7 @@ public class NotificationService {
 
     // 로그인 시
     public void notifyLogin(Long userId, String userName) {
-        eventPublisher.publishEvent(new FcmEvent(userId, userName));
+        eventPublisher.publishEvent(new FcmLoginEvent(userId, userName));
     }
 
     // 프로젝트 결제 시
@@ -27,7 +28,7 @@ public class NotificationService {
 
     // 리뷰 작성 시
     public void notifyReview(Long sellerId, String projectTitle){
-        eventPublisher.publishEvent(new FcmEvent(sellerId, projectTitle));
+        eventPublisher.publishEvent(new FcmReviewEvent(sellerId, projectTitle));
     }
 
     // 쿠폰 발행 시
