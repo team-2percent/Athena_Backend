@@ -2,7 +2,7 @@ package goorm.athena.domain.notification.controller;
 
 
 import goorm.athena.domain.notification.dto.FcmLoginRequest;
-import goorm.athena.domain.notification.event.MessageFactory;
+import goorm.athena.domain.notification.service.MessageFactory;
 import goorm.athena.domain.notification.service.NotificationService;
 import goorm.athena.domain.notification.service.FcmTokenService;
 import goorm.athena.domain.user.entity.User;
@@ -37,7 +37,7 @@ public class FcmControllerImpl implements FcmController{
      */
     @Override
     public ResponseEntity<Void> testToUser(@RequestParam("userId") Long userId){
-        notificationService.notifyReview(userId, "테스트 사용자");
+        notificationService.notifyReview(userId, "테스트 프로젝트");
         return ResponseEntity.ok().build();
     }
 

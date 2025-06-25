@@ -1,26 +1,25 @@
-package goorm.athena.domain.notification.event;
+package goorm.athena.domain.notification.service;
 
 import com.google.api.core.ApiFuture;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingException;
 import com.google.firebase.messaging.Message;
 import com.google.firebase.messaging.Notification;
-import goorm.athena.domain.notification.entity.FcmToken;
-import goorm.athena.domain.notification.service.FcmTokenService;
 import goorm.athena.global.exception.CustomException;
 import goorm.athena.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class FcmSendService {
+
+    private final Executor fcmCallBackExecutor;
 
     /***
      * 실제 FCM 알림 발송 로직
@@ -60,8 +59,9 @@ public class FcmSendService {
                             .build())
                     .build();
 
+            // FCM 비동기 발송
             ApiFuture<String> apiFuture = FirebaseMessaging.getInstance().sendAsync(message);
-            // 비동기 응답 처리
+            // Non-blocking
             apiFuture.addListener(() -> {
                 try {
                     String response = apiFuture.get(); // 결과 기다림 (논블로킹)
@@ -69,7 +69,7 @@ public class FcmSendService {
                 } catch (Exception e) {
                     log.error("[FCM ERROR - Future Fail] token={}, error={}", token, e.getMessage(), e);
                 }
-            }, Executors.newSingleThreadExecutor());
+            }, fcmCallBackExecutor);
 
         } catch (Exception e) {
             log.error("[FCM UNKNOWN ERROR] token={}, message={}", token, e.getMessage(), e);

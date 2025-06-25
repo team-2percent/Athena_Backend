@@ -24,4 +24,15 @@ public class AsyncConfig {
         return executor;
     }
 
+    @Bean(name = "fcmCallBackExecutor")
+    public Executor fcmCallBackExecutor(){
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(10);
+        executor.setMaxPoolSize(30);
+        executor.setQueueCapacity(2000);
+        executor.setThreadNamePrefix("Fcm-callback-");
+        executor.initialize();
+        return executor;
+    }
+
 }

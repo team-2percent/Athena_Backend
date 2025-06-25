@@ -1,7 +1,8 @@
-package goorm.athena.domain.notification.event;
+package goorm.athena.domain.notification.service;
 
 import goorm.athena.domain.notification.entity.FcmToken;
-import goorm.athena.domain.notification.service.FcmTokenService;
+import goorm.athena.domain.notification.event.FcmCouponEvent;
+import goorm.athena.domain.notification.event.FcmReviewEvent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
@@ -38,8 +39,35 @@ public class FcmEventService {
     }
 
     /***
+     * v1
+     * @Async
+     */
+    @Async
+    public void notifyLoginV1(Long userId, String userName) {
+        sendToUser(userId, messageFactory.forLogin(userName));
+    }
+
+    /***
+     * v2
+     * @Async with custom executor
+     */
+    @Async("fcmTaskExecutor")
+    public void notifyLoginV2(Long userId, String userName) {
+        sendToUser(userId, messageFactory.forLogin(userName));
+    }
+
+    /***
+     * v3
+     * @Async with custom executor + sendAsync()
+     */
+    @Async("fcmTaskExecutor")
+    public void notifyLoginV3(Long userId, String userName) {
+        sendToUserWithAsync(userId, messageFactory.forLogin(userName));
+    }
+
+
+    /***
      * [알림 발송]
-     * 부하 테스트에 따른 고도화 진행
      */
 
     // 일괄 발송

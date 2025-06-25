@@ -1,5 +1,10 @@
-package goorm.athena.domain.notification.event;
+package goorm.athena.domain.notification.listener;
 
+import goorm.athena.domain.notification.event.FcmCouponEvent;
+import goorm.athena.domain.notification.event.FcmLoginEvent;
+import goorm.athena.domain.notification.event.FcmPurchaseEvent;
+import goorm.athena.domain.notification.event.FcmReviewEvent;
+import goorm.athena.domain.notification.service.FcmEventService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
@@ -13,7 +18,7 @@ public class FcmNotificationListener {
     @Async
     @EventListener
     public void handleLoginNotification(FcmLoginEvent event){
-        fcmEventService.notifyLogin(event.userId(), event.description());
+        fcmEventService.notifyLoginV3(event.userId(), event.description());
     }
 
     @Async

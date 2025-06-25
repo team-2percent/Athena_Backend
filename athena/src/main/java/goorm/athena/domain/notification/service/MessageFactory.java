@@ -1,4 +1,4 @@
-package goorm.athena.domain.notification.event;
+package goorm.athena.domain.notification.service;
 
 import org.springframework.stereotype.Component;
 
