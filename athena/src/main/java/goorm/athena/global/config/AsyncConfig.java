@@ -15,7 +15,7 @@ public class AsyncConfig {
     @Bean(name = "fcmTaskExecutor")
     public Executor fcmTaskExecutor(){
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(10);
+        executor.setCorePoolSize(20);
         executor.setMaxPoolSize(20);
         executor.setQueueCapacity(10000);
         executor.setThreadNamePrefix("Fcm-Task-");
