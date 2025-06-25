@@ -29,6 +29,8 @@ import goorm.athena.domain.project.dto.cursor.ProjectRecentCursorResponse;
 import goorm.athena.domain.project.dto.req.ProjectQueryLatestRequest;
 import goorm.athena.domain.project.dto.res.ProjectCategoryTopResponseWrapper;
 import goorm.athena.domain.project.dto.req.ProjectCursorRequest;
+import goorm.athena.domain.project.entity.SortTypeLatest;
+import goorm.athena.domain.project.dto.cursor.ProjectCategoryCursorResponse;
 
 /*
  * 프로젝트 서비스 중 조회 관련 메서드를 테스트합니다.
@@ -183,5 +185,26 @@ public class ProjectQueryServiceTest extends ProjectIntegrationTestSupport {
     assertThat(secondPageResult.content().size()).isNotNull();
     assertThat(secondPageResult.content().size()).isGreaterThanOrEqualTo(1);
     assertThat(secondPageResult.content().get(0).id()).isNotEqualTo(firstPageResult.content().get(0).id());
+  }
+
+  @DisplayName("프로젝트 카테고리 조회에서 페이지 1을 조회합니다")
+  @Test
+  void testGetProjectsPage1ByCategory() {
+    // given
+    DefaultCategories.VALUES.forEach(categoryName -> {
+      for (int i = 0; i < 30; i++) {
+        createProjectWithDependencies(categoryName, PlanName.BASIC, LocalDateTime.now(),
+            LocalDateTime.now().plusDays(30), 0L);
+      }
+    });
+
+    // when -> then
+    DefaultCategories.VALUES.forEach(categoryName -> {
+      Long categoryId = categoryRepository.findByCategoryName(categoryName).get().getId();
+      ProjectCursorRequest<Object> cursorRequest = new ProjectCursorRequest<>(null, null, 20);
+      ProjectCategoryCursorResponse result = projectQueryService.getProjectsByCategory(cursorRequest, categoryId,
+          SortTypeLatest.LATEST);
+      assertThat(result.content().size()).isEqualTo(20);
+    });
   }
 }

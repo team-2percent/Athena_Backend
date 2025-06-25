@@ -70,7 +70,7 @@ public class ProjectFilterQueryRepository {
                                 project.totalAmount, project.goalAmount),
                         project.createdAt,
                         project.endAt,
-                        Expressions.numberTemplate(Integer.class, "DATEDIFF({0}, CURRENT_DATE)", project.endAt, LocalDateTime.now()),
+                        Expressions.numberTemplate(Integer.class, "TIMESTAMPDIFF(DAY, CURRENT_DATE, {0})", project.endAt),
                         project.views
                 ))
                 .from(project)
@@ -176,7 +176,7 @@ public class ProjectFilterQueryRepository {
                                 project.totalAmount, project.goalAmount),
                         project.createdAt,
                         project.endAt,
-                        Expressions.numberTemplate(Integer.class, "DATEDIFF({0}, CURRENT_DATE)", project.endAt),
+                        Expressions.numberTemplate(Integer.class, "TIMESTAMPDIFF(DAY, CURRENT_DATE, {0})", project.endAt),
                         project.views
                 ))
                 .from(project)
