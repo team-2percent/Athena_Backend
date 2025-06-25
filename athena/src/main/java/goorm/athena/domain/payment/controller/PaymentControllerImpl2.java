@@ -1,11 +1,9 @@
 package goorm.athena.domain.payment.controller;
 
-import goorm.athena.domain.notification.service.FcmNotificationService;
+import goorm.athena.domain.notification.service.NotificationService;
 import goorm.athena.domain.order.service.OrderQueryService;
 import goorm.athena.domain.payment.dto.HtmlTemplates;
-import goorm.athena.domain.payment.dto.res.KakaoPayApproveResponse;
 import goorm.athena.domain.payment.dto.res.KakaoPayReadyResponse;
-import goorm.athena.domain.payment.entity.Payment;
 import goorm.athena.domain.payment.service.V1.PaymentCommandService2;
 //import goorm.athena.domain.payment.service.V1.PaymentQueryService2;
 import goorm.athena.domain.user.service.UserQueryService;
@@ -22,7 +20,7 @@ public class PaymentControllerImpl2 implements PaymentController     {
     private final PaymentCommandService2 paymentCommandService;
 //    private final PaymentQueryService2 paymentQueryService;
     private final OrderQueryService orderQueryService;
-    private final FcmNotificationService fcmNotificationService;
+    private final NotificationService notificationService;
     private final UserQueryService userQueryService;
 
     @PostMapping("/ready/{orderId}")
@@ -48,7 +46,7 @@ public class PaymentControllerImpl2 implements PaymentController     {
 //        Long sellerId = orderQueryService.getSeller(orderId);
 //        Long buyerId = orderQueryService.getBuyer(orderId);
 //        String buyerName = userQueryService.getUser(buyerId).getNickname();
-//        fcmNotificationSe rvice.notifyPurchase(buyerId, sellerId, buyerName);
+        // notificationService.notifyPurchase(sellerId, buyerId, buyerName);
 
         return buildHtmlResponse(200, HtmlTemplates.kakaoSuccessHtml());
     }
