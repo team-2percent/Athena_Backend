@@ -155,7 +155,20 @@ jacocoTestReport {
 					'**/exception/**',
 					'**/config/**',
 					'**/project/spec/**',
-					'**/jwt/**'
+					'**/jwt/**',
+					
+					// event, 비동기, 부하테스트를 위한 API는 제외
+					'goorm/athena/domain/payment/service/V0/**',
+					'goorm/athena/domain/payment/service/V1/**',
+					'goorm/athena/domain/notification/service/**',
+					'goorm/athena/domain/payment/Infra/V1/**',
+					'goorm/athena/domain/userCoupon/infra/**',
+					'goorm/athena/domain/coupon/infra/**',
+					'goorm/athena/domain/userCoupon/event/**',
+					'goorm/athena/domain/admin/service/**',
+					'goorm/athena/domain/payment/event/listener/**',
+					'goorm/athena/domain/category/service/**',
+					'goorm/athena/domain/search/service/**'
 			] + QDomainList)
 		}))
 	}
@@ -202,7 +215,20 @@ jacocoTestCoverageVerification {
 					'**.exception.**',
 					'**.config.**',
 					'**/project/spec/**',
-					'**/jwt/**'
+					'**/jwt/**',
+					
+					// event, 비동기, 부하테스트를 위한 API는 제외
+					'goorm/athena/domain/payment/service/V0/**',
+					'goorm/athena/domain/payment/service/V1/**',
+					'goorm/athena/domain/notification/service/**',
+					'goorm/athena/domain/payment/Infra/V1/**',
+					'goorm/athena/domain/userCoupon/infra/**',
+					'goorm/athena/domain/coupon/infra/**',
+					'goorm/athena/domain/userCoupon/event/**',
+					'goorm/athena/domain/admin/service/**',
+					'goorm/athena/domain/payment/event/listener/**',
+					'goorm/athena/domain/category/service/**',
+					'goorm/athena/domain/search/service/**'
 			] + QDomainList
 		}
 	}
