@@ -1,8 +1,6 @@
 package goorm.athena.domain.project.service;
 
 import goorm.athena.domain.category.entity.Category;
-import goorm.athena.domain.category.service.CategoryService;
-import goorm.athena.domain.image.entity.Image;
 import goorm.athena.domain.image.service.ImageQueryService;
 import goorm.athena.domain.product.dto.res.ProductResponse;
 import goorm.athena.domain.product.service.ProductQueryService;
@@ -17,7 +15,6 @@ import goorm.athena.domain.project.repository.ProjectRepository;
 import goorm.athena.domain.project.repository.query.ProjectFilterQueryRepository;
 import goorm.athena.domain.project.repository.query.ProjectQueryRepository;
 import goorm.athena.domain.project.repository.query.ProjectSearchQueryRepository;
-import goorm.athena.domain.project.util.ProjectQueryType;
 import goorm.athena.domain.user.dto.response.UserDetailResponse;
 import goorm.athena.domain.user.mapper.UserMapper;
 import goorm.athena.global.exception.CustomException;
@@ -68,56 +65,6 @@ public class ProjectQueryService {
                     return ProjectAllResponse.from(project, imageUrl, currentRank);
                 })
                 .collect(Collectors.toList());
-    }
-
-    // ToDo 커서 기반 페이징 조회 메서드 통합 중
-    // ToDo 각 case 안에서 requestDto를 다운캐스팅하여 사용하고 있지만, 추후 일반화 할 예정
-    public <T extends ProjectQueryBaseRequest> ProjectCursorBaseResponse getProjectsWithCursor(
-            ProjectQueryType queryType,
-            Optional<ProjectCursorRequest<?>> cursorRequest,
-            T requestDto // queryType에 따라 requestDto 타입이 달라지도록 추상화
-    ) {
-        switch (queryType) {
-            case LATEST:
-                if (requestDto instanceof ProjectQueryLatestRequest latestRequest) {
-                    return getProjectsByNew(latestRequest.lastStartAt(), latestRequest.lastProjectId(),
-                            latestRequest.pageSize());
-                }
-                // ToDo 팔로워 수 기준 조회 기능 추가 예정
-                // case POPULAR:
-                // if (requestDto instanceof ProjectQueryPopularRequest popularRequest) {
-                // return getProjectsByPopular(popularRequest.lastStartAt(),
-                // popularRequest.lastProjectId(),
-                // popularRequest.pageSize());
-                // }
-            case CATEGORY:
-                if (requestDto instanceof ProjectQueryCategoryRequest categoryRequest) {
-                    if (cursorRequest.isEmpty()) {
-                        throw new IllegalArgumentException("cursorRequest는 null일 수 없습니다.");
-                    }
-                    return getProjectsByCategory(cursorRequest.get(), categoryRequest.categoryId(),
-                            categoryRequest.sortType());
-                }
-            case DEADLINE:
-                if (requestDto instanceof ProjectQueryDeadlineRequest deadlineRequest) {
-                    return getProjectsByDeadLine(deadlineRequest.lastStartAt(), deadlineRequest.sortTypeDeadline(),
-                            deadlineRequest.lastProjectId(), deadlineRequest.pageSize());
-                }
-                // ToDo 성공률 기준 조회 기능 추가 예정
-                // case SUCCESS_RATE:
-                // if (requestDto instanceof ProjectQuerySuccessRateRequest successRateRequest)
-                // {
-                // return getProjectsBySuccessRate(cursorRequest);
-                // }
-            case SEARCH:
-                if (requestDto instanceof ProjectQuerySearchRequest searchRequest) {
-                    if (cursorRequest.isEmpty()) {
-                        throw new IllegalArgumentException("cursorRequest는 null일 수 없습니다.");
-                    }
-                    return searchProjects(cursorRequest.get(), searchRequest.searchTerms(), searchRequest.sortType());
-                }
-        }
-        return null;
     }
 
     // 최신 프로젝트 조회 (커서 기반 페이징)

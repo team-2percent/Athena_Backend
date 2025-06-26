@@ -1,7 +1,7 @@
 package goorm.athena.domain.project.service;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
+import java.util.List;
 import java.util.Random;
 
 import org.junit.jupiter.api.DisplayName;
@@ -24,13 +24,17 @@ import goorm.athena.domain.project.entity.Project;
 import goorm.athena.domain.project.repository.PlatformPlanRepository;
 import goorm.athena.domain.project.entity.PlanName;
 import goorm.athena.domain.category.util.DefaultCategories;
-import goorm.athena.domain.project.util.ProjectQueryType;
 import goorm.athena.domain.project.dto.cursor.ProjectRecentCursorResponse;
-import goorm.athena.domain.project.dto.req.ProjectQueryLatestRequest;
 import goorm.athena.domain.project.dto.res.ProjectCategoryTopResponseWrapper;
 import goorm.athena.domain.project.dto.req.ProjectCursorRequest;
+import goorm.athena.domain.project.entity.SortTypeDeadline;
 import goorm.athena.domain.project.entity.SortTypeLatest;
 import goorm.athena.domain.project.dto.cursor.ProjectCategoryCursorResponse;
+import goorm.athena.domain.project.dto.cursor.ProjectDeadlineCursorResponse;
+import goorm.athena.domain.project.dto.cursor.ProjectSearchCursorResponse;
+import goorm.athena.domain.project.dto.res.ProjectByPlanGetResponse;
+import goorm.athena.domain.project.dto.res.ProjectAllResponse;
+import goorm.athena.domain.project.dto.res.ProjectDetailResponse;
 
 /*
  * 프로젝트 서비스 중 조회 관련 메서드를 테스트합니다.
@@ -121,9 +125,7 @@ public class ProjectQueryServiceTest extends ProjectIntegrationTestSupport {
     });
 
     // when
-    ProjectRecentCursorResponse result = (ProjectRecentCursorResponse) projectQueryService.getProjectsWithCursor(
-        ProjectQueryType.LATEST, Optional.empty(),
-        new ProjectQueryLatestRequest(LocalDateTime.now(), null, 20));
+    ProjectRecentCursorResponse result = projectQueryService.getProjectsByNew(LocalDateTime.now(), null, 20);
 
     // then
     assertThat(result.content().size()).isGreaterThanOrEqualTo(20);
@@ -168,18 +170,10 @@ public class ProjectQueryServiceTest extends ProjectIntegrationTestSupport {
   void testGetProjectsPage2() {
     // given
     // data.sql에 있는 프로젝트 데이터 활용
-    ProjectRecentCursorResponse firstPageResult = (ProjectRecentCursorResponse) projectQueryService
-        .getProjectsWithCursor(
-            ProjectQueryType.LATEST, Optional.empty(),
-            new ProjectQueryLatestRequest(LocalDateTime.now(), null, 20));
+    ProjectRecentCursorResponse firstPageResult = projectQueryService.getProjectsByNew(LocalDateTime.now(), null, 20);
 
     // when
-    ProjectRecentCursorResponse secondPageResult = (ProjectRecentCursorResponse) projectQueryService
-        .getProjectsWithCursor(
-            ProjectQueryType.LATEST,
-            Optional
-                .of(new ProjectCursorRequest<>(firstPageResult.nextCursorValue(), firstPageResult.nextProjectId(), 20)),
-            new ProjectQueryLatestRequest(firstPageResult.nextCursorValue(), firstPageResult.nextProjectId(), 20));
+    ProjectRecentCursorResponse secondPageResult = projectQueryService.getProjectsByNew(firstPageResult.nextCursorValue(), firstPageResult.nextProjectId(), 20);
 
     // then
     assertThat(secondPageResult.content().size()).isNotNull();
