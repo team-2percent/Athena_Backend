@@ -201,4 +201,86 @@ public class ProjectQueryServiceTest extends ProjectIntegrationTestSupport {
       assertThat(result.content().size()).isEqualTo(20);
     });
   }
+  
+  @DisplayName("프로젝트 마감기한 조회에서 페이지 1을 조회합니다")
+  @Test
+  void testGetProjectsPage1ByDeadline() {
+    // given
+    for (int i = 0; i < 30; i++) {
+      // 마감되지 않는 선에서 마감 날짜를 미래 날짜로 설정
+      LocalDateTime endAt = LocalDateTime.now().plusDays(i + 1);
+      createProjectWithDependencies(null, PlanName.BASIC, LocalDateTime.now(),
+          endAt, 0L);
+    }
+    
+    // when
+    ProjectDeadlineCursorResponse result = projectQueryService.getProjectsByDeadLine(LocalDateTime.now(), SortTypeDeadline.DEADLINE, null, 20);
+    
+    // then
+    assertThat(result.content().size()).isEqualTo(20);
+  }
+  
+  @DisplayName("프로젝트 검색 조회에서 페이지 1을 조회합니다.")
+  @Test
+  void testGetProjectsPage1BySearch() {
+    // given
+    for (int i = 0; i < 30; i++) {
+      createProjectWithDependencies(null, PlanName.BASIC, LocalDateTime.now(),
+          LocalDateTime.now().plusDays(30), 0L);
+    }
+    
+    // when
+    ProjectSearchCursorResponse result = projectQueryService.searchProjects(new ProjectCursorRequest<>(null, null, 20), "테스트", SortTypeLatest.LATEST);
+    
+    // then
+    assertThat(result.content().size()).isEqualTo(20);
+  }
+  
+  @DisplayName("에디터 선정 프로젝트 조회 메서드를 테스트합니다.")
+  @Test
+  void testGetTopViewByPlan() {
+    // given
+    for (PlanName planName : PlanName.values()) {
+      for (int i = 0; i < 5; i++) {
+        Long views = (long) (new Random().nextInt(1000) + 1);
+        createProjectWithDependencies(null, planName, LocalDateTime.now(),
+            LocalDateTime.now().plusDays(30), views);
+      }
+    }
+    
+    // when
+    List<ProjectByPlanGetResponse> result = projectQueryService.getTopViewByPlan();
+    
+    // then
+    result.forEach(projectByPlanGetResponse -> {
+      assertThat(projectByPlanGetResponse.items().size()).isGreaterThanOrEqualTo(1);
+    });
+  }
+  
+  @DisplayName("프로젝트 전체 조회 메서드를 테스트합니다.")
+  @Test
+  void testGetProjectsAll() {
+    // given
+    // data.sql에 있는 프로젝트 데이터 활용
+    
+    // when
+    List<ProjectAllResponse> result = projectQueryService.getProjects();
+    
+    // then
+    assertThat(result.size()).isEqualTo(20);
+  }
+  
+  @DisplayName("프로젝트 상세 조회 메서드를 테스트합니다.")
+  @Test
+  void testGetProjectDetail() {
+    // given
+    Project project = createProjectWithDependencies(null, PlanName.BASIC, LocalDateTime.now(),
+        LocalDateTime.now().plusDays(30), 0L);
+    
+    // when
+    ProjectDetailResponse result = projectQueryService.getProjectDetail(project.getId());
+    
+    // then
+    assertThat(result.id()).isEqualTo(project.getId());
+  }
 }

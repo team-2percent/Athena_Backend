@@ -51,8 +51,11 @@ public class ProjectQueryHelper {
 
         switch (sortType) {
             case LATEST -> {
-                String rawCursor = (String) request.cursorValue();
-                LocalDateTime cursorCreatedAt = rawCursor != null ? LocalDateTime.parse(rawCursor) : null;
+                LocalDateTime cursorCreatedAt = request.cursorValue() instanceof String rawCursorStr
+                    ? LocalDateTime.parse(rawCursorStr)
+                    : request.cursorValue() instanceof LocalDateTime rawCursorLocalDateTime
+                        ? rawCursorLocalDateTime
+                        : null;
                 Long cursorId = request.cursorId();
                 if (cursorCreatedAt != null && cursorId != null) {
                     builder.and(project.createdAt.lt(cursorCreatedAt)

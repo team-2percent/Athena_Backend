@@ -102,6 +102,8 @@ public class ProjectFilterQueryRepository {
                 .toList();
 
         BooleanBuilder countCondition = new BooleanBuilder();
+        countCondition.and(project.isApproved.eq(ApprovalStatus.APPROVED));
+        
         if (categoryId != null) {
             countCondition.and(project.category.id.eq(categoryId));
         }
@@ -109,7 +111,7 @@ public class ProjectFilterQueryRepository {
         Long totalCount = queryFactory
                 .select(project.count())
                 .from(project)
-                .where(builder)
+                .where(countCondition)
                 .fetchOne();
 
         // next cursor 구하기
