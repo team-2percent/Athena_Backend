@@ -68,11 +68,9 @@ public class KakaoPayService {
         }
     }
 
-    public KakaoPayApproveResponse approveKakaoPayment(KakaoPayApproveEvent event) {
-        Payment payment = event.getPayment();
-        String pgToken = event.getPgToken();
+    public KakaoPayApproveResponse approveKakaoPayment(String tid, PaymentApproveRequest dto, User user) {
 
-        HttpEntity<String> entity = createPaymentApproveEntity(payment, pgToken);
+        HttpEntity<String> entity = createPaymentApproveEntity(tid, dto.pgToken(), dto.orderId(), user.getId());
         try {
             ResponseEntity<KakaoPayApproveResponse> response = restTemplate.exchange(
                     KAKAO_PAY_APPROVE_URL,
@@ -112,12 +110,12 @@ public class KakaoPayService {
         return createHttpEntity(params);
     }
 
-    private HttpEntity<String> createPaymentApproveEntity(Payment payment, String pgToken) {
+    private HttpEntity<String> createPaymentApproveEntity(String tid, String pgToken, Long orderId, Long userId) {
         Map<String, Object> params = new HashMap<>();
         params.put("cid", cid);
-        params.put("tid", payment.getTid());
-        params.put("partner_order_id", payment.getOrder().getId());
-        params.put("partner_user_id", payment.getUser().getId());
+        params.put("tid", tid);
+        params.put("partner_order_id", orderId);
+        params.put("partner_user_id", userId);
         params.put("pg_token", pgToken);
 
         return createHttpEntity(params);
