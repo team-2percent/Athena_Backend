@@ -6,6 +6,8 @@ import goorm.athena.domain.payment.dto.req.PaymentApproveRequest;
 import goorm.athena.domain.payment.dto.req.PaymentReadyRequest;
 import goorm.athena.domain.payment.dto.res.KakaoPayApproveResponse;
 import goorm.athena.domain.payment.dto.res.KakaoPayReadyResponse;
+import goorm.athena.domain.payment.entity.Payment;
+import goorm.athena.domain.payment.event.KakaoPayApproveEvent;
 import goorm.athena.domain.user.entity.User;
 import goorm.athena.global.exception.CustomException;
 import goorm.athena.global.exception.ErrorCode;
@@ -44,20 +46,19 @@ public class KakaoPayService {
     @Value("${spring.kakao.api.fail-url}")
     private String failUrl;
 
+    private static final String KAKAO_PAY_READY_URL = "https://open-api.kakaopay.com/online/v1/payment/ready";
+    private static final String KAKAO_PAY_APPROVE_URL = "https://open-api.kakaopay.com/online/v1/payment/approve";
+
     public KakaoPayReadyResponse requestKakaoPayment(PaymentReadyRequest requestDto, User user, Long orderId) {
         HttpEntity<String> entity = createPaymentRequestEntity(requestDto, user, orderId);
-        log.info("adminKey 확인: {}", adminKey);
-
 
         try {
             ResponseEntity<KakaoPayReadyResponse> response = restTemplate.exchange(
-                    "https://open-api.kakaopay.com/online/v1/payment/ready",
+                    KAKAO_PAY_READY_URL,
                     HttpMethod.POST,
                     entity,
                     KakaoPayReadyResponse.class
             );
-
-//            String tid = response.getBody().tid();
             log.info("카카오페이 결제 요청 성공");
 
             return response.getBody();
@@ -67,12 +68,14 @@ public class KakaoPayService {
         }
     }
 
-    public KakaoPayApproveResponse approveKakaoPayment(String tid, PaymentApproveRequest requestDto, User user) {
-        HttpEntity<String> entity = createPaymentApproveEntity(requestDto, user, tid);
+    public KakaoPayApproveResponse approveKakaoPayment(KakaoPayApproveEvent event) {
+        Payment payment = event.getPayment();
+        String pgToken = event.getPgToken();
 
+        HttpEntity<String> entity = createPaymentApproveEntity(payment, pgToken);
         try {
             ResponseEntity<KakaoPayApproveResponse> response = restTemplate.exchange(
-                    "https://open-api.kakaopay.com/online/v1/payment/approve",
+                    KAKAO_PAY_APPROVE_URL,
                     HttpMethod.POST,
                     entity,
                     KakaoPayApproveResponse.class
@@ -109,13 +112,13 @@ public class KakaoPayService {
         return createHttpEntity(params);
     }
 
-    private HttpEntity<String> createPaymentApproveEntity(PaymentApproveRequest dto, User user, String tid) {
+    private HttpEntity<String> createPaymentApproveEntity(Payment payment, String pgToken) {
         Map<String, Object> params = new HashMap<>();
         params.put("cid", cid);
-        params.put("tid", tid);
-        params.put("partner_order_id", dto.orderId());
-        params.put("partner_user_id", user.getId());
-        params.put("pg_token", dto.pgToken());
+        params.put("tid", payment.getTid());
+        params.put("partner_order_id", payment.getOrder().getId());
+        params.put("partner_user_id", payment.getUser().getId());
+        params.put("pg_token", pgToken);
 
         return createHttpEntity(params);
     }

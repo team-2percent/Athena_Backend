@@ -1,10 +1,9 @@
-package goorm.athena.domain.payment.service.V1;
+package goorm.athena.domain.payment.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import goorm.athena.domain.payment.dto.req.PaymentReadyRequest;
 import goorm.athena.domain.payment.dto.res.KakaoPayApproveResponse;
 import goorm.athena.domain.payment.dto.res.KakaoPayReadyResponse;
-import goorm.athena.domain.payment.entity.Payment;
 import goorm.athena.domain.payment.event.KakaoPayApproveEvent;
 import goorm.athena.domain.user.entity.User;
 import goorm.athena.global.exception.CustomException;

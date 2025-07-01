@@ -16,7 +16,7 @@ public enum ErrorCode {
     INVALID_STARTDATE(HttpStatus.BAD_REQUEST, "상품 판매 시작일은 등록일로부터 최소 7일 이후여야 합니다."),
     INVALID_JSON_FORMAT(HttpStatus.BAD_REQUEST, "JSON 형태가 올바르지 않습니다."),
     INVALID_PROJECT_ORDER(HttpStatus.BAD_REQUEST, "해당 카테고리에서는 할 수 없는 정렬입니다."),
-
+    INVALID_ORDER_ORDERITEM(HttpStatus.BAD_REQUEST, "해당 주문에 대한 상세 내역이 없습니다."),
     // 카테고리
     CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, "카테고리를 찾을 수 없습니다."),
 

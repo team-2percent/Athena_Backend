@@ -1,4 +1,4 @@
-package goorm.athena.domain.payment.service.V3;
+package goorm.athena.domain.payment.service;
 
 import goorm.athena.domain.order.entity.Order;
 import goorm.athena.domain.order.service.OrderCommendService;
@@ -8,7 +8,7 @@ import goorm.athena.domain.payment.dto.res.KakaoPayReadyResponse;
 import goorm.athena.domain.payment.entity.Payment;
 import goorm.athena.domain.payment.entity.Status;
 import goorm.athena.domain.payment.repository.PaymentRepository;
-import goorm.athena.domain.payment.service.V1.KakaoPayService2;
+import goorm.athena.domain.payment.service.KakaoPayService2;
 import goorm.athena.domain.user.entity.User;
 import goorm.athena.global.exception.CustomException;
 import goorm.athena.global.exception.ErrorCode;
@@ -30,9 +30,9 @@ import java.util.concurrent.TimeUnit;
 @Component
 @RequiredArgsConstructor
 public class PaymentCommandService3 {
+    // 레디스 락
 
-
-    private final KakaoPayService2 kakaoPayService;
+    private final KakaoPayService2 kakaoPayService2;
     private final OrderCommendService orderCommendService;
     private final OrderQueryService orderQueryService;
     private final PaymentRepository paymentRepository;
@@ -53,7 +53,7 @@ public class PaymentCommandService3 {
         });
 
         PaymentReadyRequest requestDto = PaymentReadyRequest.from(order);
-        KakaoPayReadyResponse response = kakaoPayService.requestKakaoPayment(requestDto, user, orderId);
+        KakaoPayReadyResponse response = kakaoPayService2.requestKakaoPayment(requestDto, user, orderId);
 
         Payment payment = Payment.create(order, user, response.tid(), order.getTotalPrice());
         paymentRepository.save(payment);

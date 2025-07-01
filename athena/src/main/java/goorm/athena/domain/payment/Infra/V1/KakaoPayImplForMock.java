@@ -23,17 +23,16 @@ import java.util.Map;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class KakaoPayImpl1 implements KakaoPay {
+public class KakaoPayImplForMock implements KakaoPay {
 
+    private String base_url = "http://localhost:8081/kakao";
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
 
-    @Value("${spring.kakao.api.base-url}")
-    private String baseUrl;
 
     @Override
     public KakaoPayReadyResponse requestKakaoPayment(PaymentReadyRequest dto, User user, Long orderId) {
-        String url = baseUrl + "/ready";
+        String url = base_url + "/ready";
 
         Map<String, Object> params = new HashMap<>();
         params.put("cid", "TC0ONETIME");
@@ -54,7 +53,7 @@ public class KakaoPayImpl1 implements KakaoPay {
 
     @Override
     public KakaoPayApproveResponse approveKakaoPayment(KakaoPayApproveEvent event) {
-        String url = baseUrl + "/approve";
+        String url = base_url + "/approve";
 
         Map<String, Object> params = new HashMap<>();
         params.put("pg_token", event.getPgToken());

@@ -37,7 +37,7 @@ spring:
 
   kakao:
     api:
-      base-url: "http://athena-local.i-am-jay.com:8082/kakao"
+#      base-url: "https://athena-local.i-am-jay.com:8082/kakao"
       cid: ${KAKAO_API_CID}
       admin-key: ${KAKAO_API_ADMIN_KEY}
       approval-url: ${KAKAO_API_APPROVAL_URL}

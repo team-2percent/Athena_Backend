@@ -2,8 +2,6 @@
 //
 //import com.fasterxml.jackson.core.JsonProcessingException;
 //import com.fasterxml.jackson.databind.ObjectMapper;
-//import goorm.athena.domain.payment.dto.req.KakaoPayApproveRequest;
-//import goorm.athena.domain.payment.dto.req.PaymentApproveRequest;
 //import goorm.athena.domain.payment.dto.req.PaymentReadyRequest;
 //import goorm.athena.domain.payment.dto.res.KakaoPayApproveResponse;
 //import goorm.athena.domain.payment.dto.res.KakaoPayReadyResponse;
@@ -21,7 +19,6 @@
 //
 //import java.util.HashMap;
 //import java.util.Map;
-//import java.util.Optional;
 //
 //@Slf4j
 //@Component
