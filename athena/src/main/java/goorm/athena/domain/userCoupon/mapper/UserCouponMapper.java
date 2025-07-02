@@ -24,6 +24,7 @@ public interface UserCouponMapper {
     @Mapping(target = "price", source = "userCoupon.coupon.price")
     @Mapping(target = "stock", source = "userCoupon.coupon.stock")
     @Mapping(target = "expires", source = "userCoupon.coupon.expiresAt")
+    @Mapping(target = "couponId", source = "userCoupon.coupon.id")
     UserCouponGetResponse toGetResponse(UserCoupon userCoupon);
 
     UserCouponCursorResponse toGetCursorResponse(List<UserCouponGetResponse> content, Long nextCouponId, Long total);

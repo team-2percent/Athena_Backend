@@ -16,5 +16,6 @@ public interface BankAccountMapper {
     BankAccount toEntity(User user, BankAccountCreateRequest request, Boolean isDefault);
 
     @Mapping(target = "bankAccount", source = "accountNumber")
+    @Mapping(target = "isDefault", source = "default")
     BankAccountGetResponse toGetResponse(BankAccount bankAccount);
 }
