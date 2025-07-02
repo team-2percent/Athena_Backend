@@ -1,6 +1,6 @@
 package goorm.athena.domain.userCoupon.controller;
 
-import goorm.athena.domain.notification.service.FcmNotificationService;
+import goorm.athena.domain.notification.service.NotificationService;
 import goorm.athena.domain.userCoupon.dto.req.UserCouponIssueRequest;
 import goorm.athena.domain.userCoupon.dto.req.UserCouponUseRequest;
 import goorm.athena.domain.userCoupon.dto.res.UserCouponIssueResponse;
@@ -33,7 +33,7 @@ public class UserCouponControllerImpl implements UserCouponController {
     private final UserCouponCommandServiceV4_8 userCouponCommandServiceV4_8;
 
     private final UserCouponScheduler userCouponScheduler;
-    private final FcmNotificationService fcmNotificationService;
+    private final NotificationService notificationService;
 
     @Override
     @PostMapping

@@ -67,7 +67,7 @@ public class Coupon {
         }
     }
 
-    public void markAsSoldOut(int stock){
+    public void stockSync(int stock){
         this.stock = stock;
     }
 

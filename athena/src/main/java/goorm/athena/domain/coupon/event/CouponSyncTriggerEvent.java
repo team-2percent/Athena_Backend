@@ -1,4 +1,4 @@
-package goorm.athena.domain.userCoupon.event;
+package goorm.athena.domain.coupon.event;
 
 public record CouponSyncTriggerEvent(Long couponId) {
 }

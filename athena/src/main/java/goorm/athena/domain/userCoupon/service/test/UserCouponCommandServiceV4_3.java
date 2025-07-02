@@ -1,14 +1,12 @@
 package goorm.athena.domain.userCoupon.service.test;
 
 import goorm.athena.domain.coupon.entity.Coupon;
-import goorm.athena.domain.coupon.repository.CouponRepository;
 import goorm.athena.domain.coupon.service.CouponQueryService;
 import goorm.athena.domain.user.entity.User;
 import goorm.athena.domain.user.service.UserQueryService;
 import goorm.athena.domain.userCoupon.dto.req.UserCouponIssueRequest;
 import goorm.athena.domain.userCoupon.dto.res.UserCouponIssueResponse;
 import goorm.athena.domain.userCoupon.entity.UserCoupon;
-import goorm.athena.domain.userCoupon.event.CouponIssueEvent;
 import goorm.athena.domain.userCoupon.mapper.UserCouponMapper;
 import goorm.athena.domain.userCoupon.repository.UserCouponRepository;
 import goorm.athena.global.exception.CustomException;
@@ -18,7 +16,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RAtomicLong;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,11 +31,9 @@ import java.util.concurrent.TimeUnit;
 public class UserCouponCommandServiceV4_3 {
     private final UserQueryService userQueryService;
     private final CouponQueryService couponQueryService;
-    private final CouponRepository couponRepository;
     private final UserCouponRepository userCouponRepository;
     private final UserCouponMapper userCouponMapper;
     private final RedissonClient redissonClient;  // Redis 클라이언트 주입
-    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
     public UserCouponIssueResponse issueCoupon(Long userId, UserCouponIssueRequest request) {
@@ -95,8 +90,6 @@ public class UserCouponCommandServiceV4_3 {
 
             UserCoupon userCoupon = UserCoupon.create(user, coupon);
             userCouponRepository.save(userCoupon);
-
-            eventPublisher.publishEvent(new CouponIssueEvent(user.getId(), coupon.getId()));
 
             return userCouponMapper.toCreateResponse(userCoupon);
         } catch (InterruptedException e){

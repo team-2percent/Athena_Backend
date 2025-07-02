@@ -5,8 +5,6 @@ import goorm.athena.domain.coupon.dto.res.CouponCreateResponse;
 import goorm.athena.domain.coupon.entity.Coupon;
 import goorm.athena.domain.coupon.mapper.CouponMapper;
 import goorm.athena.domain.coupon.repository.CouponRepository;
-import goorm.athena.global.exception.CustomException;
-import goorm.athena.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,12 +22,5 @@ public class CouponCommandService {
         couponRepository.save(coupon);
 
         return couponMapper.toCreateResponse(coupon);
-    }
-
-    @Transactional
-    public void decreaseCouponQuantity(Long couponId) {
-        Coupon coupon = couponRepository.findById(couponId)
-                .orElseThrow(() -> new CustomException(ErrorCode.COUPON_OUT_STOCK, String.valueOf(couponId)));
-        coupon.decreaseStock();
     }
 }

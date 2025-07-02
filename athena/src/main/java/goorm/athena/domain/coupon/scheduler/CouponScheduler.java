@@ -4,9 +4,11 @@ import goorm.athena.domain.coupon.entity.Coupon;
 import goorm.athena.domain.coupon.entity.CouponStatus;
 import goorm.athena.domain.coupon.repository.CouponQueryRepository;
 import goorm.athena.domain.coupon.repository.CouponRepository;
-import goorm.athena.domain.userCoupon.event.CouponSyncTriggerEvent;
+import goorm.athena.domain.coupon.event.CouponSyncTriggerEvent;
 import lombok.RequiredArgsConstructor;
+import org.redisson.api.RMap;
 import org.redisson.api.RedissonClient;
+import org.redisson.client.codec.StringCodec;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -43,6 +45,12 @@ public class CouponScheduler {
                      !coupon.getStartAt().isAfter(now) && !coupon.getEndAt().isBefore(now)) {
                  coupon.active();
                  updatedCoupons.add(coupon);
+
+                 String metaKey = "coupon_meta_" + coupon.getId();
+                 RMap<String, String> couponMeta = redissonClient.getMap(metaKey, StringCodec.INSTANCE);
+                 couponMeta.put("total", String.valueOf(coupon.getStock()));
+                 couponMeta.put("used", "0");
+                 couponMeta.put("sync_triggered", "0");
 
                  redissonClient.getAtomicLong("coupon_total_" + coupon.getId()).set(coupon.getStock()); // DB 기준
                  redissonClient.getAtomicLong("coupon_used_" + coupon.getId()).set(0L);
