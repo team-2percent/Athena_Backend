@@ -4,13 +4,13 @@ package goorm.athena.domain.payment.service;
 import goorm.athena.domain.order.entity.Order;
 import goorm.athena.domain.order.service.OrderCommendService;
 import goorm.athena.domain.order.service.OrderQueryService;
+import goorm.athena.domain.payment.Infra.V1.KakaoPayImplForMock;
 import goorm.athena.domain.payment.dto.req.PaymentReadyRequest;
 import goorm.athena.domain.payment.dto.res.KakaoPayReadyResponse;
 import goorm.athena.domain.payment.entity.Payment;
 import goorm.athena.domain.payment.entity.Status;
 import goorm.athena.domain.payment.event.KakaoPayApproveEvent;
 import goorm.athena.domain.payment.repository.PaymentRepository;
-import goorm.athena.domain.payment.service.KakaoPayService2;
 import goorm.athena.domain.user.entity.User;
 import goorm.athena.global.exception.CustomException;
 import goorm.athena.global.exception.ErrorCode;
@@ -30,7 +30,8 @@ import java.util.Random;
 @RequiredArgsConstructor
 public class PaymentCommandService2 {
 
-    private final KakaoPayService2 kakaoPayService2;
+
+    private final KakaoPayImplForMock kakaoPayImplForMock;
     private final OrderCommendService orderCommendService;
     private final OrderQueryService orderQueryService;
     private final PaymentRepository paymentRepository;
@@ -50,7 +51,7 @@ public class PaymentCommandService2 {
         });
 
         PaymentReadyRequest requestDto = PaymentReadyRequest.from(order);
-        KakaoPayReadyResponse response = kakaoPayService2.requestKakaoPayment(requestDto, user, orderId);
+        KakaoPayReadyResponse response = kakaoPayImplForMock.requestKakaoPayment(requestDto, user, orderId);
 
         Payment payment = Payment.create(order, user, response.tid(), order.getTotalPrice());
         paymentRepository.save(payment);
@@ -58,6 +59,8 @@ public class PaymentCommandService2 {
         return response;
     }
 
+
+    // 재시도 로직 추가
     public void approvePayment(String pgToken, Long orderId) {
         Payment payment = getPayment(orderId);
         int retries = 3;

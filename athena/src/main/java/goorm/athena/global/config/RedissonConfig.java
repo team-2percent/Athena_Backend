@@ -20,11 +20,15 @@ public class RedissonConfig {
     private String redisPassword;
 
     @Bean(destroyMethod = "shutdown")
+    // 기본 커넥션 수 기본값 : 10,000
     public RedissonClient redissonClient() {
         Config config = new Config();
         config.useSingleServer()
                 .setAddress("redis://" + redisHost + ":" + redisPort)
                 .setPassword(redisPassword)
+//                 기본값
+//                .setConnectionPoolSize(64)
+//                .setConnectionMinimumIdleSize(24)
                 .setTimeout(10000)
                 .setConnectTimeout(10000)
                 .setRetryAttempts(3)

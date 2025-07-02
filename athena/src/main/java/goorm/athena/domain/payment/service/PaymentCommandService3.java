@@ -3,12 +3,12 @@ package goorm.athena.domain.payment.service;
 import goorm.athena.domain.order.entity.Order;
 import goorm.athena.domain.order.service.OrderCommendService;
 import goorm.athena.domain.order.service.OrderQueryService;
+import goorm.athena.domain.payment.Infra.V1.KakaoPayImplForMock;
 import goorm.athena.domain.payment.dto.req.PaymentReadyRequest;
 import goorm.athena.domain.payment.dto.res.KakaoPayReadyResponse;
 import goorm.athena.domain.payment.entity.Payment;
 import goorm.athena.domain.payment.entity.Status;
 import goorm.athena.domain.payment.repository.PaymentRepository;
-import goorm.athena.domain.payment.service.KakaoPayService2;
 import goorm.athena.domain.user.entity.User;
 import goorm.athena.global.exception.CustomException;
 import goorm.athena.global.exception.ErrorCode;
@@ -30,9 +30,8 @@ import java.util.concurrent.TimeUnit;
 @Component
 @RequiredArgsConstructor
 public class PaymentCommandService3 {
-    // 레디스 락
 
-    private final KakaoPayService2 kakaoPayService2;
+    private final KakaoPayImplForMock kakaoPayImplForMock;
     private final OrderCommendService orderCommendService;
     private final OrderQueryService orderQueryService;
     private final PaymentRepository paymentRepository;
@@ -53,7 +52,7 @@ public class PaymentCommandService3 {
         });
 
         PaymentReadyRequest requestDto = PaymentReadyRequest.from(order);
-        KakaoPayReadyResponse response = kakaoPayService2.requestKakaoPayment(requestDto, user, orderId);
+        KakaoPayReadyResponse response = kakaoPayImplForMock.requestKakaoPayment(requestDto, user, orderId);
 
         Payment payment = Payment.create(order, user, response.tid(), order.getTotalPrice());
         paymentRepository.save(payment);
@@ -61,10 +60,15 @@ public class PaymentCommandService3 {
         return response;
     }
 
+
+    // 레디스 락
     public void approvePayment(String pgToken, Long orderId) {
         Payment payment = paymentRepository.findByOrderId(orderId)
                 .orElseThrow(() -> new CustomException(ErrorCode.PAYMENT_NOT_FOUND));
 
+        // 전역락이 아닌 주문 단위로 분산락
+        // 동일한 주문에 대해서만 락 적용
+        // 서로 다른 주문 병렬 처리
         String lockKey = "lock:approvePayment:" + orderId;
         RLock lock = redissonClient.getLock(lockKey);
 
@@ -80,17 +84,16 @@ public class PaymentCommandService3 {
             TransactionStatus status = transactionManager.getTransaction(new DefaultTransactionDefinition());
 
             try {
-                // 동시성 제어가 필요한 핵심 비즈니스 로직 실행
                 orderCommendService.postPaymentProcess(orderId);
-
                 transactionManager.commit(status);
             } catch (Exception e) {
                 transactionManager.rollback(status);
-                throw e; // 필요 시 커스텀 예외로 래핑
+                throw e;
             }
 
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
+        } catch (InterruptedException e) { // 방어적 코드 : 서블릿 타임아웃,백그라운드 작업 취소 <- 이런 요청 방지
+            Thread.currentThread().interrupt(); //스레드 인터럽트 상태 유지 ->
+            // (이 코드가 없으면) 코드나 외부 프레임워크가 인터럽트 상태 인식 할수 없게됨
             throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR);
         } finally {
             if (acquired && lock.isHeldByCurrentThread()) {
