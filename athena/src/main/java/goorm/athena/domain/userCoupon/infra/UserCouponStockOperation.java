@@ -10,6 +10,7 @@ import org.redisson.api.RedissonClient;
 import org.redisson.client.codec.StringCodec;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -36,14 +37,24 @@ public class UserCouponStockOperation {
         return 1 -- 정상 발급
     """;
 
+    // SHA 캐시 빌드
+    private String luaScriptSha;
+
+    @PostConstruct
+    public void loadScript(){
+        // LuaScript를 Redis에 등록하고 SHA1 해시값으로 등록함
+        RScript script = redissonClient.getScript();
+        luaScriptSha = script.scriptLoad(LUA_SCRIPT);
+    }
+
     public int checkAndDecreaseRedisStock(Long couponId) {
         String metaKey = "coupon_meta_" + couponId;
         RScript script = redissonClient.getScript();
 
         List<Object> keys = List.of(metaKey);
-        Long result = script.eval(
+        Long result = script.evalSha(
             RScript.Mode.READ_WRITE,
-            LUA_SCRIPT,
+            luaScriptSha, // 재사용을 위해 캐싱된 LuaScript 사용
             RScript.ReturnType.INTEGER,
             keys
         );
