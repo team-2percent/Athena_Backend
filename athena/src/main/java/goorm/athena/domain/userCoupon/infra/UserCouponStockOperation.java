@@ -49,6 +49,7 @@ public class UserCouponStockOperation {
 
     public int checkAndDecreaseRedisStock(Long couponId) {
         String metaKey = "coupon_meta_" + couponId;
+        String ttlKey = "coupon_ttl_" + couponId;
         RScript script = redissonClient.getScript();
 
         List<Object> keys = List.of(metaKey);
@@ -65,6 +66,10 @@ public class UserCouponStockOperation {
         } else if (result == 0) {
             throw new CustomException(ErrorCode.COUPON_OUT_STOCK);
         }
+
+        // TTL 키에 TTL 설정
+        redissonClient.getBucket(ttlKey, StringCodec.INSTANCE)
+                .set("1", 10, TimeUnit.SECONDS);  // TTL이 종료되면 Redis Expired Event 발생
 
         RMap<String, String> metaMap = redissonClient.getMap(metaKey, StringCodec.INSTANCE);
         int total = Integer.parseInt(metaMap.get("total"));
