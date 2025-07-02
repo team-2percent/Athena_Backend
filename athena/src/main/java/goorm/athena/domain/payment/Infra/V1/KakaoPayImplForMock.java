@@ -1,10 +1,11 @@
-package goorm.athena.domain.payment.service.V1;
+package goorm.athena.domain.payment.Infra.V1;
+
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import goorm.athena.domain.payment.Infra.KakaoPay;
 import goorm.athena.domain.payment.dto.req.PaymentReadyRequest;
 import goorm.athena.domain.payment.dto.res.KakaoPayApproveResponse;
 import goorm.athena.domain.payment.dto.res.KakaoPayReadyResponse;
-import goorm.athena.domain.payment.entity.Payment;
 import goorm.athena.domain.payment.event.KakaoPayApproveEvent;
 import goorm.athena.domain.user.entity.User;
 import goorm.athena.global.exception.CustomException;
@@ -22,16 +23,17 @@ import java.util.Map;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class KakaoPayService2 {
+public class KakaoPayImplForMock implements KakaoPay {
 
+    private String base_url = "http://localhost:8081/kakao";
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
 
-    @Value("${spring.kakao.api.base-url}")
-    private String baseUrl;
 
+    @Override
     public KakaoPayReadyResponse requestKakaoPayment(PaymentReadyRequest dto, User user, Long orderId) {
-        String url = baseUrl + "/ready";
+        String url = base_url + "/ready";
+
         Map<String, Object> params = new HashMap<>();
         params.put("cid", "TC0ONETIME");
         params.put("partner_order_id", orderId);
@@ -40,13 +42,22 @@ public class KakaoPayService2 {
         params.put("quantity", dto.quantity());
         params.put("total_amount", dto.totalAmount());
 
-        return sendPost(url, params, KakaoPayReadyResponse.class);
+        KakaoPayReadyResponse response = sendPost(url, params, KakaoPayReadyResponse.class);
+
+        return new KakaoPayReadyResponse(
+                response.next_redirect_pc_url(),
+                response.tid()
+//                orderId
+        );
     }
 
+    @Override
     public KakaoPayApproveResponse approveKakaoPayment(KakaoPayApproveEvent event) {
-        String url = baseUrl + "/approve";
+        String url = base_url + "/approve";
+
         Map<String, Object> params = new HashMap<>();
         params.put("pg_token", event.getPgToken());
+
         return sendPost(url, params, KakaoPayApproveResponse.class);
     }
 
@@ -56,7 +67,10 @@ public class KakaoPayService2 {
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
             HttpEntity<String> entity = new HttpEntity<>(body, headers);
-            return restTemplate.exchange(url, HttpMethod.POST, entity, clazz).getBody();
+
+            log.info("Mock 카카오 서버 요청: {}", body);
+            ResponseEntity<T> response = restTemplate.exchange(url, HttpMethod.POST, entity, clazz);
+            return response.getBody();
         } catch (Exception e) {
             log.error("Mock 카카오페이 요청 실패", e);
             throw new CustomException(ErrorCode.KAKAO_PAY_REQUEST_FAILED);

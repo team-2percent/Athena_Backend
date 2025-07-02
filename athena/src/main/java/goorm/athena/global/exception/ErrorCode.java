@@ -16,7 +16,7 @@ public enum ErrorCode {
     INVALID_STARTDATE(HttpStatus.BAD_REQUEST, "상품 판매 시작일은 등록일로부터 최소 7일 이후여야 합니다."),
     INVALID_JSON_FORMAT(HttpStatus.BAD_REQUEST, "JSON 형태가 올바르지 않습니다."),
     INVALID_PROJECT_ORDER(HttpStatus.BAD_REQUEST, "해당 카테고리에서는 할 수 없는 정렬입니다."),
-
+    INVALID_ORDER_ORDERITEM(HttpStatus.BAD_REQUEST, "해당 주문에 대한 상세 내역이 없습니다."),
     // 카테고리
     CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, "카테고리를 찾을 수 없습니다."),
 
@@ -42,6 +42,8 @@ public enum ErrorCode {
     ALREADY_PAYMENT_COMPLETED(HttpStatus.BAD_REQUEST, "이미 결제가 완료된 주문입니다."),
     PAYMENT_RETRY_OVER(HttpStatus.BAD_REQUEST, "결제 최대 재시도 초과."),
     SLEEP_THREAD(HttpStatus.BAD_REQUEST, "슬립 스레드 과정에서 오류 발생."),
+    LOCK_ACQUIRE_FAILED(HttpStatus.BAD_REQUEST, "락 획득 실패."),
+    INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "서버 내부 오류가 발생했습니다."),
 
     // 인증
     AUTH_INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "유효하지 않은 토큰입니다."),

@@ -5,8 +5,6 @@ import goorm.athena.domain.payment.Infra.KakaoPay;
 import goorm.athena.domain.payment.dto.res.KakaoPayApproveResponse;
 import goorm.athena.domain.payment.entity.Payment;
 import goorm.athena.domain.payment.event.KakaoPayApproveEvent;
-import goorm.athena.domain.payment.repository.PaymentRepository;
-import goorm.athena.domain.payment.service.V0.KakaoPayService1;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

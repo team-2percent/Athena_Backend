@@ -1,11 +1,11 @@
-package goorm.athena.domain.payment.service.V1;
+package goorm.athena.domain.payment.service;
 
 
 import goorm.athena.domain.order.entity.Order;
 import goorm.athena.domain.order.service.OrderCommendService;
 import goorm.athena.domain.order.service.OrderQueryService;
+import goorm.athena.domain.payment.Infra.V1.KakaoPayImplForMock;
 import goorm.athena.domain.payment.dto.req.PaymentReadyRequest;
-import goorm.athena.domain.payment.dto.res.KakaoPayApproveResponse;
 import goorm.athena.domain.payment.dto.res.KakaoPayReadyResponse;
 import goorm.athena.domain.payment.entity.Payment;
 import goorm.athena.domain.payment.entity.Status;
@@ -30,7 +30,8 @@ import java.util.Random;
 @RequiredArgsConstructor
 public class PaymentCommandService2 {
 
-    private final KakaoPayService2 kakaoPayService;
+
+    private final KakaoPayImplForMock kakaoPayImplForMock;
     private final OrderCommendService orderCommendService;
     private final OrderQueryService orderQueryService;
     private final PaymentRepository paymentRepository;
@@ -50,7 +51,7 @@ public class PaymentCommandService2 {
         });
 
         PaymentReadyRequest requestDto = PaymentReadyRequest.from(order);
-        KakaoPayReadyResponse response = kakaoPayService.requestKakaoPayment(requestDto, user, orderId);
+        KakaoPayReadyResponse response = kakaoPayImplForMock.requestKakaoPayment(requestDto, user, orderId);
 
         Payment payment = Payment.create(order, user, response.tid(), order.getTotalPrice());
         paymentRepository.save(payment);
@@ -58,14 +59,11 @@ public class PaymentCommandService2 {
         return response;
     }
 
+
+    // 재시도 로직 추가
     public void approvePayment(String pgToken, Long orderId) {
-//        Payment payment = getPayment(orderId);
-//        postApproveProcess(orderId);
-//
-//
-//        eventPublisher.publishEvent(new KakaoPayApproveEvent(payment, pgToken));
         Payment payment = getPayment(orderId);
-        int retries = 5;
+        int retries = 3;
 
         while (retries > 0) {
             TransactionStatus status = transactionManager.getTransaction(new DefaultTransactionDefinition());
@@ -93,6 +91,7 @@ public class PaymentCommandService2 {
             }
         }
 
+        // 재시도 로직, 결제에 문제가 없는 경우에만 진행
         eventPublisher.publishEvent(new KakaoPayApproveEvent(payment, pgToken));
 
 

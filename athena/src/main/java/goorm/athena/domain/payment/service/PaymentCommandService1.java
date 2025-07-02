@@ -1,11 +1,10 @@
-package goorm.athena.domain.payment.service.V0;
+package goorm.athena.domain.payment.service;
 
 import goorm.athena.domain.order.entity.Order;
 import goorm.athena.domain.order.service.OrderCommendService;
 import goorm.athena.domain.order.service.OrderQueryService;
-import goorm.athena.domain.payment.dto.req.PaymentApproveRequest;
+import goorm.athena.domain.payment.Infra.V1.KakaoPayImplForMock;
 import goorm.athena.domain.payment.dto.req.PaymentReadyRequest;
-import goorm.athena.domain.payment.dto.res.KakaoPayApproveResponse;
 import goorm.athena.domain.payment.dto.res.KakaoPayReadyResponse;
 import goorm.athena.domain.payment.entity.Payment;
 import goorm.athena.domain.payment.entity.Status;
@@ -26,7 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Component
 public class PaymentCommandService1 {
 
-    private final KakaoPayService1 kakaoPayService1;
+    private final KakaoPayImplForMock kakaoPayImplForMock;
     private final OrderCommendService orderCommendService;
     private final OrderQueryService orderQueryService;
     private final PaymentRepository paymentRepository;
@@ -45,7 +44,7 @@ public class PaymentCommandService1 {
         });
 
         PaymentReadyRequest requestDto = PaymentReadyRequest.from(order);
-        KakaoPayReadyResponse response = kakaoPayService1
+        KakaoPayReadyResponse response = kakaoPayImplForMock
                 .requestKakaoPayment(requestDto, user, orderId);
 
         Payment payment = Payment.create(order, user, response.tid(), order.getTotalPrice());
@@ -54,6 +53,8 @@ public class PaymentCommandService1 {
         return response;
     }
 
+
+    // 정렬순위 + 락
     public void approvePayment(String pgToken, Long orderId) {
         Payment payment = getPayment(orderId);
 
