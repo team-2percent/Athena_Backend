@@ -1,6 +1,6 @@
 spring:
-  tomcat:
-    accept-count: 10000
+#  tomcat:
+#    accept-count: 10000
 
   application:
     name: athena
@@ -60,7 +60,11 @@ cloud:
       auto: false
 logging:
   level:
+#    root: INFO
     p6spy: info
+#  file:
+#    name: logs/app.log
+
 
 decorator:
   datasource:
@@ -112,6 +116,7 @@ management:
       show-details: always
     prometheus:
       enabled: true
+
 
 ---
 
