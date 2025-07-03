@@ -53,13 +53,31 @@ public class UserCouponStockOperation {
         RScript script = redissonClient.getScript();
 
         List<Object> keys = List.of(metaKey);
-        Long result = script.evalSha(
-            RScript.Mode.READ_WRITE,
-            luaScriptSha, // 재사용을 위해 캐싱된 LuaScript 사용
-            RScript.ReturnType.INTEGER,
-            keys
-        );
+        Long result;
 
+        // Redis 서버 재시작시, SHA 캐시가 사라지므로 try-catch를 사용하여 캐시 재 등록
+        try{
+            result = script.evalSha(
+                    RScript.Mode.READ_WRITE,
+                    luaScriptSha, // 재사용을 위해 캐싱된 LuaScript 사용
+                    RScript.ReturnType.INTEGER,
+                    keys
+            );
+        } catch (Exception e){
+            if (e.getMessage().contains("NOSCRIPT")) {
+                // fallback: Lua 스크립트를 다시 eval로 실행하면서 등록
+                result = script.eval(
+                        RScript.Mode.READ_WRITE,
+                        LUA_SCRIPT,
+                        RScript.ReturnType.INTEGER,
+                        keys
+                );
+                // 재등록된 SHA 값으로 다시 저장
+                luaScriptSha = script.scriptLoad(LUA_SCRIPT);
+            } else {
+                throw e;
+            }
+        }
 
         if (result == null || result == -1) {
             throw new CustomException(ErrorCode.COUPON_NOT_FOUND);
