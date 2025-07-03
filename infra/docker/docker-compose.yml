@@ -37,6 +37,8 @@ services:
     command:
       - redis-server
       - --requirepass ${REDIS_PASSWORD}
+      - --notify-keyspace-events
+      - Ex
 
   athena:
     build: ../../athena

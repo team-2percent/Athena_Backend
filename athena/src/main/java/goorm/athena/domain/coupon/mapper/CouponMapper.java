@@ -11,8 +11,10 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring")
 public interface CouponMapper {
 
+    @Mapping(target = "status", source = "couponStatus")
     CouponCreateResponse toCreateResponse(Coupon coupon);
 
+    @Mapping(target = "status", source = "couponStatus")
     CouponGetResponse toGetResponse(Coupon coupon);
 
     @Mapping(target = "status", source = "couponStatus")

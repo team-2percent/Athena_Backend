@@ -10,6 +10,7 @@ import org.redisson.api.RedissonClient;
 import org.redisson.client.codec.StringCodec;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -36,24 +37,57 @@ public class UserCouponStockOperation {
         return 1 -- 정상 발급
     """;
 
+    // SHA 캐시 빌드
+    private String luaScriptSha;
+
+    @PostConstruct
+    public void loadScript(){
+        // LuaScript를 Redis에 등록하고 SHA1 해시값으로 등록함
+        RScript script = redissonClient.getScript();
+        luaScriptSha = script.scriptLoad(LUA_SCRIPT);
+    }
+
     public int checkAndDecreaseRedisStock(Long couponId) {
         String metaKey = "coupon_meta_" + couponId;
+        String ttlKey = "coupon_ttl_" + couponId;
         RScript script = redissonClient.getScript();
 
         List<Object> keys = List.of(metaKey);
-        Long result = script.eval(
-            RScript.Mode.READ_WRITE,
-            LUA_SCRIPT,
-            RScript.ReturnType.INTEGER,
-            keys
-        );
+        Long result;
 
+        // Redis 서버 재시작시, SHA 캐시가 사라지므로 try-catch를 사용하여 캐시 재 등록
+        try{
+            result = script.evalSha(
+                    RScript.Mode.READ_WRITE,
+                    luaScriptSha, // 재사용을 위해 캐싱된 LuaScript 사용
+                    RScript.ReturnType.INTEGER,
+                    keys
+            );
+        } catch (Exception e){
+            if (e.getMessage().contains("NOSCRIPT")) {
+                // fallback: Lua 스크립트를 다시 eval로 실행하면서 등록
+                result = script.eval(
+                        RScript.Mode.READ_WRITE,
+                        LUA_SCRIPT,
+                        RScript.ReturnType.INTEGER,
+                        keys
+                );
+                // 재등록된 SHA 값으로 다시 저장
+                luaScriptSha = script.scriptLoad(LUA_SCRIPT);
+            } else {
+                throw e;
+            }
+        }
 
         if (result == null || result == -1) {
             throw new CustomException(ErrorCode.COUPON_NOT_FOUND);
         } else if (result == 0) {
             throw new CustomException(ErrorCode.COUPON_OUT_STOCK);
         }
+
+        // TTL 키에 TTL 설정
+        redissonClient.getBucket(ttlKey, StringCodec.INSTANCE)
+                .set("1", 10, TimeUnit.SECONDS);  // TTL이 종료되면 Redis Expired Event 발생
 
         RMap<String, String> metaMap = redissonClient.getMap(metaKey, StringCodec.INSTANCE);
         int total = Integer.parseInt(metaMap.get("total"));

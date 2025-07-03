@@ -52,6 +52,8 @@ public class CouponScheduler {
                  couponMeta.put("used", "0");
                  couponMeta.put("sync_triggered", "0");
 
+                 // total, used : 이전 버전들을 위한 Redis 키 ( v4_8은 해시 키로 통합 관리하여 미사용 )
+                 // issued_users : 어느 유저가 쿠폰을 발급했는지 확인하기 위한 Redis key
                  redissonClient.getAtomicLong("coupon_total_" + coupon.getId()).set(coupon.getStock()); // DB 기준
                  redissonClient.getAtomicLong("coupon_used_" + coupon.getId()).set(0L);
                  redissonClient.getSet("issued_users_" + coupon.getId()).clear();

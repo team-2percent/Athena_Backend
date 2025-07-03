@@ -18,5 +18,8 @@ public interface DeliveryInfoMapper {
     @Mapping(target = "detailAddress", source = "request.detailAddress")
     DeliveryInfo toEntity(User user, DeliveryInfoRequest request, boolean isDefault);
 
+    @Mapping(target = "isDefault", source = "default")
+    DeliveryInfoResponse toGetResponse(DeliveryInfo deliveryInfo);
+
     List<DeliveryInfoResponse> toGetResponse(List<DeliveryInfo> deliveryInfo);
 }
