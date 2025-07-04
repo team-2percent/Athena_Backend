@@ -20,6 +20,7 @@ import java.util.stream.IntStream;
 public class ProductCommandService {
 
     private final ProductRepository productRepository;
+    private final ProductQueryService productQueryService;
     private final OptionRepository optionRepository;    // OptionService를 따로 만들지 않고 여기서 관리
     private final ProductMapper productMapper;
 
@@ -76,6 +77,12 @@ public class ProductCommandService {
     private void deleteOptions(Product product) {
         List<Option> options = optionRepository.findAllByProduct(product);
         optionRepository.deleteAll(options);
+    }
+
+
+    public void updateStock(Long productId, Long stock) {
+        Product product = productQueryService.getById(productId);
+        product.updateStock(stock);
     }
 
 }

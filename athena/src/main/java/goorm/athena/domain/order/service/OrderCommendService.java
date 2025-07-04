@@ -7,7 +7,9 @@ import goorm.athena.domain.order.dto.res.OrderCreateResponse;
 import goorm.athena.domain.order.repository.OrderRepository;
 import goorm.athena.domain.orderitem.entity.OrderItem;
 import goorm.athena.domain.orderitem.repository.OrderItemRepository;
+import goorm.athena.domain.payment.service.RedisStockDeductionResult;
 import goorm.athena.domain.product.entity.Product;
+import goorm.athena.domain.product.service.ProductCommandService;
 import goorm.athena.domain.product.service.ProductQueryService;
 import goorm.athena.domain.project.entity.Project;
 import goorm.athena.domain.project.service.ProjectQueryService;
@@ -19,6 +21,7 @@ import goorm.athena.domain.user.service.UserQueryService;
 import goorm.athena.global.exception.CustomException;
 import goorm.athena.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,7 +29,9 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -35,6 +40,7 @@ public class OrderCommendService {
     private final OrderRepository orderRepository;
     private final OrderItemRepository orderItemRepository;
     private final ProductQueryService productQueryService;
+    private final ProductCommandService productCommandService;
     private final ProjectQueryService projectQueryService;
     private final UserQueryService userQueryService;
     private final DeliveryInfoQueryService deliveryInfoQueryService;
@@ -100,11 +106,6 @@ public class OrderCommendService {
             project.increasePrice(item.getPrice());
         }
 
-
-//        for (OrderItem item : orderItemRepository.findByOrderId(orderId)) {
-//            item.getProduct().decreaseStock(item.getQuantity());
-//            item.getOrder().getProject().increasePrice(item.getPrice());
-//        }
     }
 
 
@@ -120,5 +121,33 @@ public class OrderCommendService {
         order.cancel();
 
     }
+
+
+    // -- 레디스 lua 적용 후 -PaymentService4
+    // 	@Async는 새로운 쓰레드에서 실행되기 때문에 기존 트랜잭션 컨텍스트가 전달되지 않습니다. 따라서 @Transactional이 붙어 있어도 무시됩니다.
+
+    public void syncRedisToDb(List<OrderItem> orderItems, RedisStockDeductionResult deducted) {
+
+        log.info("orderItems: {}", orderItems);
+        // 1. Redis → DB 재고 동기화
+        for (Map.Entry<String, Integer> entry : deducted.getDeductedStocks().entrySet()) {
+            String key = entry.getKey(); // "product:stock:1"
+            String productIdStr = key.replace("product:stock:", ""); // "1"
+            Long productId = Long.parseLong(productIdStr);
+            Long redisStock = entry.getValue().longValue();
+            productCommandService.updateStock(productId, redisStock);
+        }
+
+        // 2. 프로젝트 후원 금액 증가
+        for (OrderItem item : orderItems) {
+            OrderItem managedItem = orderItemRepository.findById(item.getId())
+                    .orElseThrow(() -> new RuntimeException("OrderItem not found"));
+
+            Long projectId = managedItem.getOrder().getProject().getId();
+            Project project = projectQueryService.getById(projectId);
+            project.increasePrice(managedItem.getPrice());
+        }
+    }
+
 
 }

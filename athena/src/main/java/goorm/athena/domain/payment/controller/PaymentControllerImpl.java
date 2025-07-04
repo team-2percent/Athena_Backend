@@ -1,11 +1,12 @@
 package goorm.athena.domain.payment.controller;
 
-import goorm.athena.domain.notification.service.FcmNotificationService;
+//import goorm.athena.domain.notification.service.FcmNotificationService;
 import goorm.athena.domain.order.service.OrderQueryService;
 import goorm.athena.domain.payment.dto.HtmlTemplates;
 import goorm.athena.domain.payment.dto.res.KakaoPayApproveResponse;
 import goorm.athena.domain.payment.dto.res.KakaoPayReadyResponse;
 import goorm.athena.domain.payment.service.PaymentCommandService3;
+import goorm.athena.domain.payment.service.PaymentCommandService4;
 import goorm.athena.domain.user.service.UserQueryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -17,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/payment")
 public class PaymentControllerImpl implements PaymentController {
 
-    private final PaymentCommandService3 paymentCommandService;
+    private final PaymentCommandService4 paymentCommandService;
 //    private final OrderQueryService orderQueryService;
 //    private final FcmNotificationService fcmNotificationService;
 //    private final UserQueryService userQueryService;

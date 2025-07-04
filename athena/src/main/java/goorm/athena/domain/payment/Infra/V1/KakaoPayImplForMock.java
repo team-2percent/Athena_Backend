@@ -7,6 +7,7 @@ import goorm.athena.domain.payment.dto.req.PaymentReadyRequest;
 import goorm.athena.domain.payment.dto.res.KakaoPayApproveResponse;
 import goorm.athena.domain.payment.dto.res.KakaoPayReadyResponse;
 import goorm.athena.domain.payment.event.KakaoPayApproveEvent;
+import goorm.athena.domain.payment.event.KakaoPayApproveEvent2;
 import goorm.athena.domain.user.entity.User;
 import goorm.athena.global.exception.CustomException;
 import goorm.athena.global.exception.ErrorCode;
@@ -53,6 +54,16 @@ public class KakaoPayImplForMock implements KakaoPay {
 
     @Override
     public KakaoPayApproveResponse approveKakaoPayment(KakaoPayApproveEvent event) {
+        String url = base_url + "/approve";
+
+        Map<String, Object> params = new HashMap<>();
+        params.put("pg_token", event.getPgToken());
+
+        return sendPost(url, params, KakaoPayApproveResponse.class);
+    }
+
+    @Override
+    public KakaoPayApproveResponse approveKakaoPayment(KakaoPayApproveEvent2 event) {
         String url = base_url + "/approve";
 
         Map<String, Object> params = new HashMap<>();

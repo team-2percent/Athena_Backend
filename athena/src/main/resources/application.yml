@@ -62,6 +62,7 @@ logging:
   level:
 #    root: INFO
     p6spy: info
+    org.springframework.beans: DEBUG
 #  file:
 #    name: logs/app.log
 

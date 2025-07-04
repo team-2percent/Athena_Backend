@@ -17,6 +17,7 @@ public enum ErrorCode {
     INVALID_JSON_FORMAT(HttpStatus.BAD_REQUEST, "JSON 형태가 올바르지 않습니다."),
     INVALID_PROJECT_ORDER(HttpStatus.BAD_REQUEST, "해당 카테고리에서는 할 수 없는 정렬입니다."),
     INVALID_ORDER_ORDERITEM(HttpStatus.BAD_REQUEST, "해당 주문에 대한 상세 내역이 없습니다."),
+
     // 카테고리
     CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, "카테고리를 찾을 수 없습니다."),
 
@@ -82,6 +83,7 @@ public enum ErrorCode {
     DELIVERY_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 ID의 배송지가 존재하지 않습니다."),
     PRODUCT_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 상품의 ID가 존재하지 않습니다."),
     INSUFFICIENT_INVENTORY(HttpStatus.BAD_REQUEST, "재고가 부족합니다."),
+    ORDER_ITEM_NOT_FOUND(HttpStatus.BAD_REQUEST, "해당 주문에 대한 주문 내역이 없습니다."),
 
     // 카카오 api
     KAKAO_PAY_UNAVAILABLE(HttpStatus.SERVICE_UNAVAILABLE, "카카오페이 서버와의 통신에 실패했습니다. 잠시 후 다시 시도해주세요."),
