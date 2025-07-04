@@ -1,7 +1,6 @@
 package goorm.athena.domain.userCoupon.service.test;
 
 import goorm.athena.domain.coupon.entity.Coupon;
-import goorm.athena.domain.coupon.repository.CouponRepository;
 import goorm.athena.domain.coupon.service.CouponQueryService;
 import goorm.athena.domain.user.entity.User;
 import goorm.athena.domain.user.service.UserQueryService;
@@ -30,7 +29,6 @@ import java.util.concurrent.TimeUnit;
 public class UserCouponCommandServiceV3 {
     private final UserQueryService userQueryService;
     private final CouponQueryService couponQueryService;
-    private final CouponRepository couponRepository;
     private final UserCouponRepository userCouponRepository;
     private final UserCouponMapper userCouponMapper;
     private final RedissonClient redissonClient;  // Redis 클라이언트 주입
@@ -58,10 +56,6 @@ public class UserCouponCommandServiceV3 {
 
             if (total == null) {
                 throw new CustomException(ErrorCode.COUPON_NOT_FOUND);
-            }
-
-            if (used == null) {
-                used = 0L;
             }
 
             // 2. 재고 확인
