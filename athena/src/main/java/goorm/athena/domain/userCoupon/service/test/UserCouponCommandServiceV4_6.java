@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 
 
 /*
- 이전 4_7에 비해 Lua Script로 재고 관리를 하는 건 똑같음.
+ 이전 4_5에 비해 Lua Script로 재고 관리를 하는 건 똑같음.
  단, 성능은 아주 약간 저하했지만 실패 시 롤백을 하는 이벤트를 추가하여 안정성을 더 확보했음.
  실패 시 재고를 원복하는 과정에서 Set, Get이 1~2회 더 발생하지만 큰 차이는 없어 부하 높은 상황을 대비함
  */

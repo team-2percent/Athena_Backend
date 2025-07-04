@@ -145,7 +145,7 @@ public class UserCouponControllerImpl implements UserCouponController {
 
     /**
      * 이벤트 기반 쿠폰 발급 서비스 (버전 4.6)
-     * - 4.7 버전의 Redis Lua 스크립트를 활용한 재고 체크 및 품절 플래그 설정 기능 유지
+     * - 4.5 버전의 Redis Lua 스크립트를 활용한 재고 체크 및 품절 플래그 설정 기능 유지
      * - 쿠폰 발급 실패 시 Redis 재고와 발급자 정보(Set) 롤백 기능 추가로 안정성 강화
      * - 롤백 처리 과정에서 Redis Set과 Get이 추가 발생하지만, 부하 높은 상황에 대비한 신뢰성 향상 목적
      * - 발급 성공 시 ApplicationEventPublisher를 통한 비동기 이벤트(CouponIssueEvent, CouponSyncTriggerEvent) 발행 유지
