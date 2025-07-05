@@ -16,6 +16,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class RedisTransactionUtil {
     private final RedisTemplate<String, Integer> integerRedisTemplate;
+    private final RedisTemplate<String, String> stringRedisTemplate;
 
     @SuppressWarnings("unchecked")
     public <T> T transaction(Function<RedisOperations<String, Integer>, T> commands) {
@@ -36,7 +37,12 @@ public class RedisTransactionUtil {
         });
     }
 
+
     public RedisTemplate<String, Integer> getIntegerRedisTemplate() {
         return integerRedisTemplate;
+    }
+
+    public RedisTemplate<String, String> getStringRedisTemplate() {
+        return stringRedisTemplate;
     }
 }

@@ -135,7 +135,15 @@ public class OrderCommendService {
             String productIdStr = key.replace("product:stock:", ""); // "1"
             Long productId = Long.parseLong(productIdStr);
             Long redisStock = entry.getValue().longValue();
-            productCommandService.updateStock(productId, redisStock);
+
+            Product product = productQueryService.getById(productId);
+            Long newStock = product.getStock() - redisStock;
+
+            if (newStock < 0) {
+                throw new IllegalStateException("DB 재고가 음수가 될 수 없습니다. productId=" + productId);
+            }
+
+            productCommandService.updateStock(productId, newStock);
         }
 
         // 2. 프로젝트 후원 금액 증가

@@ -39,18 +39,19 @@ public class PaymentApproveService {
         TransactionStatus status = transactionManager.getTransaction(new DefaultTransactionDefinition());
 
         try {
-            orderCommendService.syncRedisToDb(event.getOrderItems(), event.getDeductedStocks());
+//            orderCommendService.syncRedisToDb(event.getOrderItems(), event.getDeductedStocks());
             KakaoPayApproveResponse response = retryApprove(event, 2);
 
             if (response.aid() != null && !response.aid().isBlank()) {
                 payment.approve(event.getPgToken());
                 paymentRepository.save(payment);
 
-                event.getOrderItems().forEach(item -> {
-                    String key = "product:stock:" + item.getProduct().getId();
-                    transactionUtil.getIntegerRedisTemplate().delete(key);
-                    log.info("Redis 키 삭제 성공: {}", key);
-                });
+//                event.getOrderItems().forEach(item -> {
+//                    String key = "product:stock:" + item.getProduct().getId();
+//
+//                    transactionUtil.getIntegerRedisTemplate().delete(key);
+//                    log.info("Redis 키 삭제 성공: {}", key);
+//                });
                 transactionManager.commit(status);
                 log.info("결제 승인 성공: paymentId={}, orderId={}", payment.getId(), orderId);
             } else {
@@ -59,6 +60,8 @@ public class PaymentApproveService {
 
 
         } catch (Exception e) {
+            // 결제가 잘못되었다면 레디스도 되돌려야 하지 않나
+
             transactionManager.rollback(status);
             orderCommendService.rollbackStock(orderId);
             payment.failApprove();

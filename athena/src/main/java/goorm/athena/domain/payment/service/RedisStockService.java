@@ -74,13 +74,22 @@ public class RedisStockService {
 
             if (results == null || results.contains(-1L)) {
                 log.warn("Lua 재고 차감 실패: 재고 부족");
-                rollbackStocks(deductedStocks);
                 return new RedisStockDeductionResult(false, Map.of());
             }
 
             for (int i = 0; i < items.size(); i++) {
+                int deducted = items.get(i).getQuantity();
+
+                Long remainingStock = results.get(i);
                 deductedStocks.put(keys.get(i), items.get(i).getQuantity());
+
+                log.info("상품 ID: {}, 차감된 수량: {}, 차감 후 Redis 재고: {}",
+                        items.get(i).getProduct().getId(),
+                        deducted,
+                        remainingStock);
             }
+            log.info("deductedStocks 결과: {}", deductedStocks);
+
 
             return new RedisStockDeductionResult(true, deductedStocks);
         } catch (Exception e) {
@@ -89,6 +98,8 @@ public class RedisStockService {
         }
     }
 
+
+    // lua는 성공 but 서비스 로직에서 예외 발생경우 롤백
     public void rollbackStocks(Map<String, Integer> deductedStocks) {
         if (deductedStocks.isEmpty()) return;
         int retries = 3;
