@@ -48,11 +48,12 @@
 | Category         | Stack                                                                 |
 |------------------|------------------------------------------------------------------------|
 | **Language**     | ![Java](https://img.shields.io/badge/Java-21-007396?logo=java&logoColor=white) |
-| **Framework**    | ![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.4.5-6DB33F?logo=springboot) <br> ![Spring Batch](https://img.shields.io/badge/Spring%20Batch-6DB33F?logo=spring&logoColor=white) <br> ![Spring Security](https://img.shields.io/badge/Security-Spring-6DB33F?logo=springsecurity) |
+| **Framework**    | ![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.4.5-6DB33F?logo=springboot) <br> ![Spring Batch](https://img.shields.io/badge/Spring%20Batch-6DB33F?logo=spring&logoColor=white) <br> ![Spring Security](https://img.shields.io/badge/Security-Spring-6DB33F?logo=springsecurity) ![JWT](https://img.shields.io/badge/JWT-0.12.4-blueviolet?logo=jsonwebtokens&logoColor=white) |
 | **Database**     | ![MySQL](https://img.shields.io/badge/MySQL-5.7-4479A1?logo=mysql) <br> ![Redis](https://img.shields.io/badge/Redis-7.0-DC382D?logo=redis) <br> ![JPA](https://img.shields.io/badge/JPA-Hibernate-59666C?logo=hibernate) <br> ![QueryDSL](https://img.shields.io/badge/QueryDSL-Enabled-4B8BBE) |
 | **DevOps**       | ![Docker](https://img.shields.io/badge/Docker-2496ED?logo=docker&logoColor=white)
 | **CI/CD**        | ![GitHub Actions](https://img.shields.io/badge/GitHub%20Actions-Automated-2088FF?logo=githubactions&logoColor=white) |
 | **Notification** | ![Firebase](https://img.shields.io/badge/FCM-Firebase-FFCA28?logo=firebase&logoColor=white) |
-| **Testing & Monitoring** | ![JUnit5](https://img.shields.io/badge/JUnit-5-25A162?logo=jest&logoColor=white) <br> ![Apache JMeter](https://img.shields.io/badge/JMeter-Performance%20Test-D22128?logo=apachejmeter&logoColor=white) <br> ![Signoz](https://img.shields.io/badge/Signoz-Observability-4B32C3?logo=signoz&logoColor=white) |
+| **Testing & Monitoring** | ![JUnit5](https://img.shields.io/badge/JUnit-5-25A162?logo=jest&logoColor=white) <br> ![Apache JMeter](https://img.shields.io/badge/JMeter-Performance%20Test-D22128?logo=apachejmeter&logoColor=white) <br> ![Signoz](https://img.shields.io/badge/Signoz-Observability-4B32C3?logo=signoz&logoColor=white) <br> ![JaCoCo](https://img.shields.io/badge/JaCoCo-0.8.11-BB4B4B?logo=codecov&logoColor=white) |
+| **Docs**         | ![Swagger](https://img.shields.io/badge/Swagger-2.8.3-85EA2D?logo=swagger&logoColor=black) |
 
 <br>   
