@@ -35,7 +35,7 @@ public class Product {
     @Max(1_000_000_000)
     private Long price;                 // 상품 가격
 
-    @Max(50_000)
+    @Max(100_000)
     private Long stock;                 // 상품 재고
 
     @Builder

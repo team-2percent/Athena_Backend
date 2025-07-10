@@ -2,7 +2,10 @@ package goorm.athena.domain.payment.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -10,10 +13,11 @@ import java.time.LocalDateTime;
 
 @Entity
 @Getter
-@NoArgsConstructor
+@Builder
+@AllArgsConstructor
 public class StockHistory {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private Long productId;
@@ -24,8 +28,10 @@ public class StockHistory {
 
     private Integer deductedQuantity;
 
+    @Builder.Default
     private Boolean synced = false;
 
+    @Builder.Default
     private LocalDateTime createdAt = LocalDateTime.now();
 
 }

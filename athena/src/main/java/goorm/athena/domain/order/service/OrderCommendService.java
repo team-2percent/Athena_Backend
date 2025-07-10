@@ -131,19 +131,19 @@ public class OrderCommendService {
         log.info("orderItems: {}", orderItems);
         // 1. Redis → DB 재고 동기화
         for (Map.Entry<String, Integer> entry : deducted.getDeductedStocks().entrySet()) {
-            String key = entry.getKey(); // "product:stock:1"
-            String productIdStr = key.replace("product:stock:", ""); // "1"
-            Long productId = Long.parseLong(productIdStr);
-            Long redisStock = entry.getValue().longValue();
+            String key = entry.getKey(); // 예: "product:stock:1"
+            Long productId = Long.parseLong(key.replace("product:stock:", ""));
+            int deductedQty = entry.getValue(); // 실제 차감 수량
 
-            Product product = productQueryService.getById(productId);
-            Long newStock = product.getStock() - redisStock;
+//            Product product = productQueryService.getById(productId);
+            Product product = productQueryService.getProductWithLock(productId);
 
-            if (newStock < 0) {
+            if (product.getStock() < deductedQty) {
                 throw new IllegalStateException("DB 재고가 음수가 될 수 없습니다. productId=" + productId);
             }
 
-            productCommandService.updateStock(productId, newStock);
+            product.decreaseStock(deductedQty); // 차감된 수량만 감소
+            log.info("상품 ID: {} → DB 재고 차감: {} → 현재 재고: {}", productId, deductedQty, product.getStock());
         }
 
         // 2. 프로젝트 후원 금액 증가
@@ -152,9 +152,14 @@ public class OrderCommendService {
                     .orElseThrow(() -> new RuntimeException("OrderItem not found"));
 
             Long projectId = managedItem.getOrder().getProject().getId();
-            Project project = projectQueryService.getById(projectId);
-            project.increasePrice(managedItem.getPrice());
+
+//            Project project = projectQueryService.getById(projectId);
+            Project project = projectQueryService.getProjectWithLock(projectId);
+            project.increasePrice(managedItem.getPrice()); // 후원금액 증가
+            log.info("프로젝트 ID: {} → 후원 금액 증가: {}", projectId, managedItem.getPrice());
         }
+
+        log.info("Redis → DB 재고 동기화 완료");
     }
 
 

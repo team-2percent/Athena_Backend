@@ -13,11 +13,14 @@ public class KakaoPayApproveEvent2 {
     private final String pgToken;
     private final List<OrderItem> orderItems;
     private final RedisStockDeductionResult deductedStocks;
+    private final Long userId;
 
-    public KakaoPayApproveEvent2(Payment payment, String pgToken, List<OrderItem> orderItems, RedisStockDeductionResult deductedStocks) {
+    public KakaoPayApproveEvent2(Payment payment, String pgToken, List<OrderItem> orderItems,
+                                 RedisStockDeductionResult deductedStocks, Long userId) {
         this.payment = payment;
         this.pgToken = pgToken;
         this.orderItems = orderItems;
         this.deductedStocks = deductedStocks;
+        this.userId = userId;
     }
 }

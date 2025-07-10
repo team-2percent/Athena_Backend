@@ -79,7 +79,7 @@ public class PaymentCommandService4 {
     public void approvePayment(String pgToken, Long orderId) {
         Payment payment = paymentRepository.findByOrderId(orderId)
                 .orElseThrow(() -> new CustomException(ErrorCode.PAYMENT_NOT_FOUND));
-
+        Long userId = payment.getUser().getId();
         // 전역락이 아닌 주문 단위로 분산락
         // 동일한 주문에 대해서만 락 적용
         // 서로 다른 주문 병렬 처리
@@ -107,7 +107,7 @@ public class PaymentCommandService4 {
             }
 
 //            eventPublisher.publishEvent(new KakaoPayApproveEvent(payment, pgToken));
-            eventPublisher.publishEvent(new KakaoPayApproveEvent2(payment, pgToken, orderItems, result));
+            eventPublisher.publishEvent(new KakaoPayApproveEvent2(payment, pgToken, orderItems, result , userId));
 
         } finally {
             redisTemplate.delete(lockKey);
