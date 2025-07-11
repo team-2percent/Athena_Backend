@@ -23,15 +23,17 @@ public class RedisStockService {
     private final ProductQueryService productQueryService;
 
     private static final String REDIS_PRODUCT_STOCK_KEY_PREFIX = "product:stock:";
+    private static final int stockTtl = 60;
 
     // 각 상품 별 재고를 계산 후 배열로 리턴
     private static final String LUA_SCRIPT =
             "local results = {} " +
+                    "local ttl = tonumber(ARGV[#ARGV]) " +
                     "for i, key in ipairs(KEYS) do " +
                     "    local stock = redis.call('GET', key) " +
                     "    if not stock then " +
                     "        stock = ARGV[i * 2 - 1] " +
-                    "        redis.call('SET', key, stock) " +
+                    "        redis.call('SETEX', key, ttl, stock) " +
                     "    end " +
                     "    stock = tonumber(stock) " +
                     "    local quantity = tonumber(ARGV[i * 2]) " +
@@ -69,6 +71,8 @@ public class RedisStockService {
                 args.add(stock);
                 args.add(item.getQuantity());
             }
+            args.add(stockTtl);
+
 
             List<Long> results = transactionUtil.getIntegerRedisTemplate().execute(script, keys, args.toArray());
 
