@@ -31,6 +31,12 @@
 
 🎟️ **선착순 쿠폰 발급**  
 > 관리자가 지정한 수량과 조건에 따라, 사용자에게 자동으로 쿠폰이 발급됩니다.
+> <br> 🔗 [1. Lock 기반 제어 도입](https://github.com/team-2percent/Athena_Backend/wiki/%5B%EC%84%B1%EB%8A%A5%EA%B0%9C%EC%84%A0%5D-%EC%BF%A0%ED%8F%B0-%EB%B0%9C%EA%B8%89-%EA%B0%9C%EC%84%A0-%E2%80%90-1.-Lock-%EA%B8%B0%EB%B0%98-%EC%A0%9C%EC%96%B4-%EB%8F%84%EC%9E%85)
+> <br> 🔗 [2. Lock 제거를 통한 Redis 원자적 처리](https://github.com/team-2percent/Athena_Backend/wiki/%5B%EC%84%B1%EB%8A%A5%EA%B0%9C%EC%84%A0%5D-%EC%BF%A0%ED%8F%B0-%EB%B0%9C%EA%B8%89-%EA%B0%9C%EC%84%A0-%E2%80%90-2.-Lock-%EC%A0%9C%EA%B1%B0%EB%A5%BC-%ED%86%B5%ED%95%9C-Redis-%EC%9B%90%EC%9E%90%EC%A0%81-%EC%B2%98%EB%A6%AC)
+> <br> 🔗 [3. 이벤트 기반 비동기 처리로 성능 개선](https://github.com/team-2percent/Athena_Backend/wiki/%5B%EC%84%B1%EB%8A%A5-%EA%B0%9C%EC%84%A0%5D-%EC%BF%A0%ED%8F%B0-%EB%B0%9C%EA%B8%89-%EA%B0%9C%EC%84%A0-%E2%80%90-3.-%EC%9D%B4%EB%B2%A4%ED%8A%B8-%EA%B8%B0%EB%B0%98-%EB%B9%84%EB%8F%99%EA%B8%B0-%EC%B2%98%EB%A6%AC%EB%A1%9C-%EC%84%B1%EB%8A%A5-%EA%B0%9C%EC%84%A0)
+> <br> 🔗 [4. 이벤트 구조 개선 및 보상 트랜잭션 설계](https://github.com/team-2percent/Athena_Backend/wiki/%5B%EC%84%B1%EB%8A%A5-%EA%B0%9C%EC%84%A0%5D-%EC%BF%A0%ED%8F%B0-%EB%B0%9C%EA%B8%89-%EA%B0%9C%EC%84%A0-%E2%80%90-4.-%EC%9D%B4%EB%B2%A4%ED%8A%B8-%EA%B5%AC%EC%A1%B0-%EA%B0%9C%EC%84%A0-%EB%B0%8F-%EB%B3%B4%EC%83%81-%ED%8A%B8%EB%9E%9C%EC%9E%AD%EC%85%98-%EC%84%A4%EA%B3%84)
+
+> <br> 📈 [성능 비교 그래프 및 쿠폰 발급 아키텍처 보기](https://github.com/team-2percent/Athena_Backend/wiki/%5B%EC%84%B1%EB%8A%A5-%EA%B0%9C%EC%84%A0%5D-%EC%BF%A0%ED%8F%B0-%EB%B0%9C%EA%B8%89-%EA%B0%9C%EC%84%A0-%E2%80%90-%EC%84%B1%EB%8A%A5-%EB%B9%84%EA%B5%90-%EB%B0%8F-%EC%BF%A0%ED%8F%B0-%EB%B0%9C%EA%B8%89-%EC%95%84%ED%82%A4%ED%85%8D%EC%B2%98)
 
 📩 **알림 시스템**  
 > 주문, 쿠폰 발급 등 주요 이벤트 발생 시, 사용자에게 실시간 알림을 전송합니다.
@@ -49,7 +55,7 @@
 |------------------|------------------------------------------------------------------------|
 | **Language**     | ![Java](https://img.shields.io/badge/Java-21-007396?logo=java&logoColor=white) |
 | **Framework**    | ![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.4.5-6DB33F?logo=springboot) <br> ![Spring Batch](https://img.shields.io/badge/Spring%20Batch-6DB33F?logo=spring&logoColor=white) <br> ![Spring Security](https://img.shields.io/badge/Security-Spring-6DB33F?logo=springsecurity) ![JWT](https://img.shields.io/badge/JWT-0.12.4-blueviolet?logo=jsonwebtokens&logoColor=white) |
-| **Database**     | ![MySQL](https://img.shields.io/badge/MySQL-5.7-4479A1?logo=mysql) <br> ![Redis](https://img.shields.io/badge/Redis-7.0-DC382D?logo=redis) <br> ![JPA](https://img.shields.io/badge/JPA-Hibernate-59666C?logo=hibernate) <br> ![QueryDSL](https://img.shields.io/badge/QueryDSL-Enabled-4B8BBE) |
+| **Database**     | ![MySQL](https://img.shields.io/badge/MySQL-5.7-4479A1?logo=mysql) <br> ![Redis](https://img.shields.io/badge/Redis-8.0.2-DC382D?logo=redis) <br> ![JPA](https://img.shields.io/badge/JPA-Hibernate-59666C?logo=hibernate) <br> ![QueryDSL](https://img.shields.io/badge/QueryDSL-Enabled-4B8BBE) |
 | **DevOps**       | ![Docker](https://img.shields.io/badge/Docker-2496ED?logo=docker&logoColor=white)
 | **CI/CD**        | ![GitHub Actions](https://img.shields.io/badge/GitHub%20Actions-Automated-2088FF?logo=githubactions&logoColor=white) |
 | **Notification** | ![Firebase](https://img.shields.io/badge/FCM-Firebase-FFCA28?logo=firebase&logoColor=white) |
