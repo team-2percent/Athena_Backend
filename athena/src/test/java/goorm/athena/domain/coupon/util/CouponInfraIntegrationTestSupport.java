@@ -7,6 +7,7 @@ import goorm.athena.domain.coupon.repository.CouponRepository;
 import goorm.athena.domain.coupon.service.CouponQueryService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.redisson.api.RKeys;
 import org.redisson.api.RMap;
 import org.redisson.api.RedissonClient;
 import org.redisson.client.codec.StringCodec;
@@ -31,6 +32,9 @@ public abstract class CouponInfraIntegrationTestSupport {
 
     @MockBean
     protected RedissonClient redissonClient;
+
+    @MockBean
+    protected RKeys rKeys;
 
     @MockBean
     protected CouponQueryService couponQueryService;
@@ -70,5 +74,7 @@ public abstract class CouponInfraIntegrationTestSupport {
         // RedisMap 내 값 세팅
         when(couponMeta.get("total")).thenReturn(String.valueOf(coupon.getStock()));
         when(couponMeta.get("used")).thenReturn("20");
+
+        when(redissonClient.getKeys()).thenReturn(rKeys);
     }
 }
