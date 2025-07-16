@@ -65,6 +65,13 @@ public class CouponSyncOperation {
 
         // 쿠폰 상태를 SYNC_FAILED로 변경하여 서비스에서 사용 금지 처리
         log.info("recover - 쿠폰 상태 변경 시작");
+        redissonClient.getKeys().delete("coupon_meta_" + couponId);
+        redissonClient.getKeys().delete("coupon_ttl_" + couponId);
+
+        // 발급 실패 쿠폰의 사용자 발급 이력 제거
+        // 추후 재발급 시 각 유저의 쿠폰 발급 DB 상태를 기준으로 Redis를 초기화하여 동기화할 계획
+        redissonClient.getKeys().delete("issued_users" + couponId);
+
         Coupon coupon = couponRepository.findById(couponId)
                 .orElseThrow(() -> new RuntimeException("쿠폰을 찾을 수 없습니다: " + couponId));
         coupon.syncFailed();
