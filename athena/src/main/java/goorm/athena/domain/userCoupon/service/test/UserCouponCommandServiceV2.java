@@ -3,7 +3,6 @@ package goorm.athena.domain.userCoupon.service.test;
 import goorm.athena.domain.coupon.entity.Coupon;
 import goorm.athena.domain.coupon.entity.CouponStatus;
 import goorm.athena.domain.coupon.repository.CouponRepository;
-import goorm.athena.domain.coupon.service.CouponQueryService;
 import goorm.athena.domain.user.entity.User;
 import goorm.athena.domain.user.service.UserQueryService;
 import goorm.athena.domain.userCoupon.dto.req.UserCouponIssueRequest;
@@ -15,8 +14,6 @@ import goorm.athena.global.exception.CustomException;
 import goorm.athena.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.redisson.api.RLock;
-import org.redisson.api.RedissonClient;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,18 +23,15 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class UserCouponCommandServiceV2 {
     private final UserQueryService userQueryService;
-    private final CouponQueryService couponQueryService;
     private final CouponRepository couponRepository;
     private final UserCouponRepository userCouponRepository;
     private final UserCouponMapper userCouponMapper;
 
-    private final RedissonClient redissonClient;
 
     @Transactional
     public UserCouponIssueResponse issueCoupon(Long userId, UserCouponIssueRequest request) {
         // 락 키를 couponId 기반으로 생성 (쿠폰 단위로 락을 걸음)
         String lockKey = "coupon_issue_lock_" + request.couponId();
-        RLock lock = redissonClient.getLock(lockKey);
 
         User user = userQueryService.getUser(userId);
         Coupon coupon = couponRepository.findByIdForUpdate(request.couponId()).orElseThrow(

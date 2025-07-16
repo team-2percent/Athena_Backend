@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 
 @Component
@@ -54,7 +55,6 @@ public class UserCouponStockOperation {
 
         List<Object> keys = List.of(metaKey);
         Long result;
-
         // Redis 서버 재시작시, SHA 캐시가 사라지므로 try-catch를 사용하여 캐시 재 등록
         try{
             result = script.evalSha(
@@ -85,9 +85,13 @@ public class UserCouponStockOperation {
             throw new CustomException(ErrorCode.COUPON_OUT_STOCK);
         }
 
+        int baseTtl = 15;
+        int jitter = ThreadLocalRandom.current().nextInt(-5, 10);
+        int ttlWithJitter = baseTtl + jitter;
+
         // TTL 키에 TTL 설정
         redissonClient.getBucket(ttlKey, StringCodec.INSTANCE)
-                .set("1", 10, TimeUnit.SECONDS);  // TTL이 종료되면 Redis Expired Event 발생
+                .set("1", ttlWithJitter, TimeUnit.SECONDS);  // TTL이 종료되면 Redis Expired Event 발생
 
         RMap<String, String> metaMap = redissonClient.getMap(metaKey, StringCodec.INSTANCE);
         int total = Integer.parseInt(metaMap.get("total"));

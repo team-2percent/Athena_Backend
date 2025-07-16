@@ -11,94 +11,127 @@ import goorm.athena.domain.userCoupon.mapper.UserCouponMapper;
 import goorm.athena.domain.userCoupon.repository.UserCouponRepository;
 import goorm.athena.global.exception.CustomException;
 import goorm.athena.global.exception.ErrorCode;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.redisson.api.RAtomicLong;
-import org.redisson.api.RLock;
+import org.redisson.api.RScript;
+import org.redisson.api.RSet;
 import org.redisson.api.RedissonClient;
+import org.redisson.client.codec.StringCodec;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.util.concurrent.TimeUnit;
+import java.util.Arrays;
+import java.util.List;
 
-// RLock 을 통해 Redisson 분산락 적용
-// 하나의 쿠폰 발급에 대한 동시성 제어 가능 및 중복 검증, 재고 감소가 한 트랜잭션에서 이뤄짐
-// 락 획득 시 대기 시간이 존재하여 성능에 저하 가능성이 있음
-
-@Slf4j
+/*
+    @Async 기반 비동기 처리로 메인에서 Redis 처리 후, 서브 스레드에서 DB 처리 진행함
+    비동기 처리로 병렬화가 가능하나 내부 스레드 기반으로 확장성에 한계가 존재함
+    또한, Redis Set을 사용하여 Lock을 사용하지 않음으로써 Lock으로 발생하는 부하를 줄임
+ */
 @Service
 @RequiredArgsConstructor
 public class UserCouponCommandServiceV4_3 {
+    private final RedissonClient redissonClient;
     private final UserQueryService userQueryService;
     private final CouponQueryService couponQueryService;
     private final UserCouponRepository userCouponRepository;
     private final UserCouponMapper userCouponMapper;
-    private final RedissonClient redissonClient;  // Redis 클라이언트 주입
+    private final ApplicationEventPublisher eventPublisher;
 
+    private static final String LUA_SCRIPT = """
+        local total = tonumber(redis.call('GET', KEYS[1]))
+        local used = tonumber(redis.call('GET', KEYS[2])) or 0
+
+        if not total then
+            return -1  -- 쿠폰 없음
+        end
+
+        if used >= total then
+            return 0  -- 품절
+        end
+
+        redis.call('INCR', KEYS[2])
+        return 1  -- 성공
+    """;
+
+    // Redis 재고 감소 처리 (트랜잭션 외부)
+    public void checkAndDecreaseRedisStock(Long couponId) {
+        String totalKey = "coupon_total_" + couponId;
+        String usedKey = "coupon_used_" + couponId;
+
+        RScript script = redissonClient.getScript();
+        List<Object> keys = Arrays.asList(totalKey, usedKey);
+
+        Long result = script.eval(
+                RScript.Mode.READ_WRITE,
+                LUA_SCRIPT,
+                RScript.ReturnType.INTEGER,
+                keys
+        );
+
+        if (result == null || result == -1) {
+            throw new CustomException(ErrorCode.COUPON_NOT_FOUND);
+        } else if (result == 0) {
+            throw new CustomException(ErrorCode.COUPON_OUT_STOCK);
+        }
+    }
+
+    // DB 트랜잭션 내 저장 및 중복 체크
     @Transactional
-    public UserCouponIssueResponse issueCoupon(Long userId, UserCouponIssueRequest request) {
-        String totalKey = "coupon_total_" + request.couponId();
-        String usedKey = "coupon_used_" + request.couponId();
-        String lockKey = "coupon_lock_" + request.couponId();
-
-        RLock lock = redissonClient.getLock(lockKey);
+    public UserCouponIssueResponse saveCouponIssue(Long userId, Long couponId) {
+        User user = userQueryService.getUser(userId);
+        Coupon coupon = couponQueryService.getCoupon(couponId);
 
         try {
-            boolean isLocked = lock.tryLock(5, 3, TimeUnit.SECONDS);
-            if(!isLocked){
-                throw new CustomException(ErrorCode.COUPON_OUT_STOCK);
-            }
-
-            // 1. Redis에서 총 재고와 사용량을 읽어온다
-            RAtomicLong totalAtomic = redissonClient.getAtomicLong(totalKey);
-            RAtomicLong usedAtomic = redissonClient.getAtomicLong(usedKey);
-
-            Long total = totalAtomic.get();
-            Long used = usedAtomic.get();
-
-            if (total == null) {
-                throw new CustomException(ErrorCode.COUPON_NOT_FOUND);
-            }
-
-            if (used == null) {
-                used = 0L;
-            }
-
-            // 2. 재고 확인
-            if (used >= total) {
-                throw new CustomException(ErrorCode.COUPON_OUT_STOCK);
-            }
-
-            // 3. 사용량 증가 (원자적 연산)
-            long currentUsed = usedAtomic.incrementAndGet();
-
-            // 증가 후 체크: 동시에 여러 요청이 왔을 수 있으므로 마지노선 체크
-            if (currentUsed > total) {
-                // 초과로 증가했을 경우 롤백
-                usedAtomic.decrementAndGet();
-                throw new CustomException(ErrorCode.COUPON_OUT_STOCK);
-            }
-
-            // 4. DB 처리
-            User user = userQueryService.getUser(userId);
-            Coupon coupon = couponQueryService.getCoupon(request.couponId());
-
-            if (userCouponRepository.existsByUserAndCoupon(user, coupon)) {
-                usedAtomic.decrementAndGet();
-                throw new CustomException(ErrorCode.ALREADY_ISSUED_COUPON);
-            }
-
             UserCoupon userCoupon = UserCoupon.create(user, coupon);
             userCouponRepository.save(userCoupon);
-
             return userCouponMapper.toCreateResponse(userCoupon);
-        } catch (InterruptedException e){
-            Thread.currentThread().interrupt();
-            throw new CustomException(ErrorCode.INVALID_COUPON_STATUS);
-        } finally {
-            if(lock.isHeldByCurrentThread()){
-                lock.unlock();
-            }
+        } catch (DataIntegrityViolationException e) {
+            // 중복 발급 예외 처리
+            throw new CustomException(ErrorCode.ALREADY_ISSUED_COUPON);
+        }
+    }
+
+    // Redis Set 중복 체크 & 등록 메서드
+    private boolean addUserToIssuedSet(Long couponId, Long userId) {
+        String issuedSetKey = "issued_users_" + couponId;
+        RSet<String> issuedSet = redissonClient.getSet(issuedSetKey, StringCodec.INSTANCE);
+        return issuedSet.add(String.valueOf(userId));
+    }
+
+    private void removeUserFromIssuedSet(Long couponId, Long userId) {
+        String issuedSetKey = "issued_users_" + couponId;
+        RSet<String> issuedSet = redissonClient.getSet(issuedSetKey, StringCodec.INSTANCE);
+        issuedSet.remove(String.valueOf(userId));
+    }
+
+    // 전체 쿠폰 발급 플로우 (Redis 재고 + Redis Set 중복 체크 통합)
+    public UserCouponIssueResponse issueCoupon(Long userId, UserCouponIssueRequest request) {
+        Long couponId = request.couponId();
+
+        // 1) Redis Set 중복 체크 및 등록 (중복 시 예외)
+        boolean added = addUserToIssuedSet(couponId, userId);
+        if (!added) {
+            throw new CustomException(ErrorCode.ALREADY_ISSUED_COUPON);
+        }
+
+        try {
+            // 2) Redis 재고 감소 체크
+            checkAndDecreaseRedisStock(couponId);
+
+            // 3) DB 저장 (중복 예외 시 롤백)
+            UserCouponIssueResponse response = saveCouponIssue(userId, couponId);
+
+            // 4) 이벤트 발행
+            return response;
+        } catch (CustomException e) {
+            // Redis Set에서 userId 제거(롤백)
+            removeUserFromIssuedSet(couponId, userId);
+            throw e;
+        } catch (RuntimeException e) {
+            removeUserFromIssuedSet(couponId, userId);
+            throw e;
         }
     }
 }

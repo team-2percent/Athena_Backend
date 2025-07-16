@@ -1,77 +1,67 @@
 package goorm.athena.domain.userCoupon.service.test;
 
+import goorm.athena.domain.coupon.entity.Coupon;
+import goorm.athena.domain.coupon.service.CouponQueryService;
+import goorm.athena.domain.user.entity.User;
+import goorm.athena.domain.user.service.UserQueryService;
+import goorm.athena.domain.userCoupon.dto.req.UserCouponIssueRequest;
+import goorm.athena.domain.userCoupon.entity.UserCoupon;
+import goorm.athena.domain.userCoupon.repository.UserCouponRepository;
 import goorm.athena.global.exception.CustomException;
 import goorm.athena.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.redisson.api.RScript;
+import org.redisson.api.RAtomicLong;
 import org.redisson.api.RedissonClient;
-import org.redisson.client.codec.StringCodec;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Arrays;
-
-// Lua 스크립트 내에서 SET + DECR 처리하여 Redis에선 완전 원자적
-// DB 저장은 이벤트 리스너에서 동기적으로 수행함 (EventPublisher 사용)
+// AtomicLong만 사용하여 처리속도가 매우 빠름 ( Redis I/O 비용 최소 )
+// 단순한 구조로 구현이 쉬우나 고동시성 환경에선 불안한 단점이 있 ( 중복 처리 요청 민감 )
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserCouponCommandServiceV4 {
+    private final UserQueryService userQueryService;
+    private final CouponQueryService couponQueryService;
+    private final UserCouponRepository userCouponRepository;
     private final RedissonClient redissonClient;  // Redis 클라이언트 주입
-    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
-    public void issueCoupon(Long userId, Long couponId) {
-        LuaResult result = tryIssueCoupon(couponId, userId);
+    public void issueCoupon(Long userId, UserCouponIssueRequest request) {
+        Long couponId = request.couponId();
+        String totalKey = "coupon_total_" + couponId;
+        String usedKey = "coupon_used_" + couponId;
+        String successKey = "coupon_success_" + couponId;
 
-        switch (result) {
-            case OUT_OF_STOCK -> throw new CustomException(ErrorCode.COUPON_OUT_STOCK);
-            case ALREADY_ISSUED -> throw new CustomException(ErrorCode.ALREADY_ISSUED_COUPON);
-            case SUCCESS -> {
-                // DB 저장은 비동기 이벤트로 할려고 했으나 이벤트 입력 값이 바뀌어서 임시 주석 처리
- //               eventPublisher.publishEvent(new CouponIssueEvent(userId, couponId));
-            }
+        // 1. 총량 확인
+        RAtomicLong totalAtomic = redissonClient.getAtomicLong(totalKey);
+        RAtomicLong usedAtomic = redissonClient.getAtomicLong(usedKey);
+        RAtomicLong successAtomic = redissonClient.getAtomicLong(successKey);
+
+        long total = totalAtomic.get();
+        long used = usedAtomic.incrementAndGet(); // ✅ 먼저 선점
+
+        if (used > total) {
+            usedAtomic.decrementAndGet(); // ❌ 선점 취소
+            throw new CustomException(ErrorCode.COUPON_OUT_STOCK);
         }
-    }
 
-    public enum LuaResult {
-        OUT_OF_STOCK, ALREADY_ISSUED, SUCCESS
-    }
+        // 2. 사용자/쿠폰 중복 확인 (조심)
+        User user = userQueryService.getUser(userId);
+        Coupon coupon = couponQueryService.getCoupon(couponId);
 
-    public LuaResult tryIssueCoupon(Long couponId, Long userId) {
-        String stockKey = "coupon:" + couponId + ":count";
-        String userSetKey = "coupon:" + couponId + ":users";
+        if (userCouponRepository.existsByUserAndCoupon(user, coupon)) {
+            usedAtomic.decrementAndGet(); // 중복일 경우 롤백
+            throw new CustomException(ErrorCode.ALREADY_ISSUED_COUPON);
+        }
 
-            String script = """
-            local count = tonumber(redis.call('GET', KEYS[1]))
-            if not count or count <= 0 then
-                return 0 -- 재고 없음
-            end
-            
-            local added = redis.call('SADD', KEYS[2], ARGV[1])
-            if added == 0 then
-                return 1 -- 이미 발급됨
-            end
-            
-            redis.call('DECR', KEYS[1])
-            return 2 -- 성공
-            """;
+        // 3. DB 저장
+        UserCoupon userCoupon = UserCoupon.create(user, coupon);
+        userCouponRepository.save(userCoupon);
 
-        Long result = redissonClient.getScript(StringCodec.INSTANCE)
-                .eval(RScript.Mode.READ_WRITE,
-                        script,
-                        RScript.ReturnType.VALUE,
-                        Arrays.asList(stockKey, userSetKey),
-                        userId.toString());
+        // 4. 성공 수 증가
+        successAtomic.incrementAndGet();
 
-        Long resultCode = result;
-        return switch (resultCode.intValue()) {
-            case 0 -> LuaResult.OUT_OF_STOCK;
-            case 1 -> LuaResult.ALREADY_ISSUED;
-            case 2 -> LuaResult.SUCCESS;
-            default -> throw new IllegalStateException("Unknown Lua result");
-        };
     }
 }

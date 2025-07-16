@@ -77,6 +77,8 @@ public class Coupon {
 
     public void completed() { this.couponStatus = CouponStatus.COMPLETED; }
 
+    public void syncFailed() { this.couponStatus = CouponStatus.SYNC_FAILED; }
+
     public void expired(){
         this.couponStatus = CouponStatus.ENDED;
     }
