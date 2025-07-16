@@ -74,22 +74,21 @@
 //        KakaoPayApproveResponse response;
 //
 //        try {
+//            orderCommendService.postPaymentProcess(orderId); //상품 재고 감소 ,주문 금액 만큼 프로젝트 누적 가격 증가
+//        } catch (Exception e) {
+//            log.error("결제 승인 후 내부 처리 오류", e);
+//            return KakaoPayApproveResponse.ofFailure("결제 승인 후 재고,누적 처리 오류");
+//        }
+//
+//
+//        try {
 //            response = kakaoPayService.approveKakaoPayment(payment.getTid(), requestDto, user);
 //        } catch (CustomException ce) {
 //            log.warn("카카오페이 결제 승인 중 예외 발생: {}", ce.getMessage());
 //            return KakaoPayApproveResponse.ofFailure("카카오페이 연동 실패 발생");
 //        };
 //
-//
-//        try {
-//            orderCommendService.postPaymentProcess(orderId); //상품 재고 감소 ,주문 금액 만큼 프로젝트 누적 가격 증가
-//            payment.approve(pgToken); // 결제 상태 변경
-//            return response;
-//
-//        } catch (Exception e) {
-//            log.error("결제 승인 후 내부 처리 오류", e);
-//            return KakaoPayApproveResponse.ofFailure("결제 승인 후 재고,누적 처리 오류");
-//        }
-//
+//        payment.approve(pgToken); // 결제 상태 변경
+//        return response;
 //    }
 //}

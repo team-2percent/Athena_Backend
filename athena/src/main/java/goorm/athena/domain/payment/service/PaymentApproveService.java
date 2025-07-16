@@ -120,7 +120,9 @@ public class PaymentApproveService {
                 }
             }
         }
-
+        redisStockService.rollbackStocks(event.getDeductedStocks().getDeductedStocks());
+        event.getPayment().failApprove();
+        paymentRepository.save(event.getPayment());
         throw new RuntimeException("카카오페이 결제 승인 실패 (재시도 실패): " + lastException.getMessage());
     }
 }
